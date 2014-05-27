@@ -1,4 +1,4 @@
-gerrit-rest-java-client
+gerrit-rest-java-client [![Build Status](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
 ======================
 
 Introduction
