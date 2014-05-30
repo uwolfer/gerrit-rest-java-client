@@ -17,6 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.base.Strings;
+import com.google.gerrit.extensions.api.projects.ProjectApi;
 import com.google.gerrit.extensions.api.projects.Projects;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -49,6 +50,11 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
                 return ProjectsRestClient.this.list(this);
             }
         };
+    }
+
+    @Override
+    public ProjectApi name(String name) throws RestApiException {
+        return new ProjectApiRestClient(gerritRestClient, projectsParser, name);
     }
 
     private List<ProjectInfo> list(ListRequest listParameter) throws RestApiException {
