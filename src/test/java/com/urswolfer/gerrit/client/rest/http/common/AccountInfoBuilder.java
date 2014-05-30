@@ -42,4 +42,9 @@ public final class AccountInfoBuilder {
         accountInfo.username = username;
         return this;
     }
+
+    public AccountInfoBuilder withAccountId(int id) {
+        accountInfo._accountId = id;
+        return this;
+    }
 }

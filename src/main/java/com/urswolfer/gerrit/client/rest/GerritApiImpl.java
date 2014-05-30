@@ -29,6 +29,7 @@ import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsRestClient;
 import com.urswolfer.gerrit.client.rest.http.changes.ChangesParser;
 import com.urswolfer.gerrit.client.rest.http.changes.ChangesRestClient;
+import com.urswolfer.gerrit.client.rest.http.changes.CommentsParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsRestClient;
 import com.urswolfer.gerrit.client.rest.http.tools.ToolsRestClient;
@@ -44,7 +45,7 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritApi
                          HttpClientBuilderExtension... httpClientBuilderExtensions) {
         GerritRestClient gerritRestClient = new GerritRestClient(authData, httpRequestExecutor, httpClientBuilderExtensions);
         Gson gson = gerritRestClient.getGson();
-        changesRestClient = new ChangesRestClient(gerritRestClient, new ChangesParser(gson));
+        changesRestClient = new ChangesRestClient(gerritRestClient, new ChangesParser(gson), new CommentsParser(gson));
         accountsRestClient = new AccountsRestClient(gerritRestClient, new AccountsParser(gson));
         projectsRestClient = new ProjectsRestClient(gerritRestClient, new ProjectsParser(gson));
         toolsRestClient = new ToolsRestClient(gerritRestClient);

@@ -35,11 +35,14 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     private final GerritRestClient gerritRestClient;
     private final ChangesParser changesParser;
+    private final CommentsParser commentsParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
-                             ChangesParser changesParser) {
+                             ChangesParser changesParser,
+                             CommentsParser commentsParser) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
+        this.commentsParser = commentsParser;
     }
 
     @Override
@@ -84,16 +87,16 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(int id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, id);
+        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, id);
     }
 
     @Override
     public ChangeApi id(String triplet) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, triplet);
+        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, triplet);
     }
 
     @Override
     public ChangeApi id(String project, String branch, String id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, String.format("%s~%s~%s", project, branch, id));
+        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, String.format("%s~%s~%s", project, branch, id));
     }
 }

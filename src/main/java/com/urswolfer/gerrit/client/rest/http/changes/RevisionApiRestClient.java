@@ -16,21 +16,16 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gerrit.extensions.api.changes.ReviewInput;
 import com.google.gerrit.extensions.api.changes.RevisionApi;
 import com.google.gerrit.extensions.api.changes.SubmitInput;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -40,13 +35,16 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
     private final GerritRestClient gerritRestClient;
     private final ChangeApiRestClient changeApiRestClient;
+    private final CommentsParser commentsParser;
     private final String revision;
 
     public RevisionApiRestClient(GerritRestClient gerritRestClient,
                                  ChangeApiRestClient changeApiRestClient,
+                                 CommentsParser commentsParser,
                                  String revision) {
         this.gerritRestClient = gerritRestClient;
         this.changeApiRestClient = changeApiRestClient;
+        this.commentsParser = commentsParser;
         this.revision = revision;
     }
 
@@ -93,27 +91,6 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     public TreeMap<String, List<CommentInfo>> getComments() throws RestApiException {
         String request = "/changes/" + changeApiRestClient.id() + "/revisions/" + revision + "/comments/";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return parseCommentInfos(jsonElement);
-    }
-
-    private TreeMap<String, List<CommentInfo>> parseCommentInfos(JsonElement result) {
-        TreeMap<String, List<CommentInfo>> commentInfos = Maps.newTreeMap();
-        JsonObject jsonObject = result.getAsJsonObject();
-
-        for (Map.Entry<String, JsonElement> element : jsonObject.entrySet()) {
-            List<CommentInfo> currentCommentInfos = Lists.newArrayList();
-
-            for (JsonElement jsonElement : element.getValue().getAsJsonArray()) {
-                currentCommentInfos.add(parseSingleCommentInfos(jsonElement.getAsJsonObject()));
-            }
-
-            commentInfos.put(element.getKey(), currentCommentInfos);
-        }
-        return commentInfos;
-    }
-
-    private CommentInfo parseSingleCommentInfos(JsonObject result) {
-        Gson gson = gerritRestClient.getGson();
-        return gson.fromJson(result, CommentInfo.class);
+        return commentsParser.parseCommentInfos(jsonElement);
     }
 }

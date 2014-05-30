@@ -16,38 +16,19 @@
 
 package com.urswolfer.gerrit.client.rest.http.common;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.gerrit.extensions.common.*;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
-import java.util.TimeZone;
 
 /**
  * @author Thomas Forrer
  */
-public class ChangeInfoBuilder {
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    static {
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
+public class ChangeInfoBuilder extends AbstractBuilder {
 
     private final ChangeInfo changeInfo = new ChangeInfo();
-
-    private static Timestamp timestamp(String timestamp) {
-        try {
-            Date parse = DATE_FORMAT.parse(timestamp);
-            return new Timestamp(parse.getTime());
-        } catch (ParseException e) {
-            throw Throwables.propagate(e);
-        }
-    }
 
     public ChangeInfo get() {
         return changeInfo;
