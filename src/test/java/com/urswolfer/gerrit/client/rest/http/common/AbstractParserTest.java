@@ -34,7 +34,7 @@ public abstract class AbstractParserTest {
         return new JsonParser().parse(new FileReader(file));
     }
 
-    protected Gson getGson() {
+    protected static Gson getGson() {
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(Date.class, new DateDeserializer());
         builder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);

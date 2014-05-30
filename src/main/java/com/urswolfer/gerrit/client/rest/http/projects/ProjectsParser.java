@@ -43,13 +43,13 @@ public class ProjectsParser {
             if (!element.getValue().isJsonObject()) {
                 throw new RestApiException(String.format("This element should be a JsonObject: %s%nTotal JSON response: %n%s", element, result));
             }
-            repositories.add(parseSingleRepositoryInfo(element.getValue().getAsJsonObject()));
+            repositories.add(parseSingleProjectInfo(element.getValue().getAsJsonObject()));
 
         }
         return repositories;
     }
 
-    public ProjectInfo parseSingleRepositoryInfo(JsonObject result) {
+    public ProjectInfo parseSingleProjectInfo(JsonElement result) {
         return gson.fromJson(result, ProjectInfo.class);
     }
 }

@@ -96,6 +96,10 @@ public class GerritRestClient {
         return request(path, null, Arrays.asList(headers), HttpVerb.PUT);
     }
 
+    public JsonElement putRequest(String path, String requestBody, Header... headers) throws RestApiException {
+        return request(path, requestBody, Arrays.asList(headers), HttpVerb.PUT);
+    }
+
     public JsonElement deleteRequest(String path, Header... headers) throws RestApiException {
         return request(path, null, Arrays.asList(headers), HttpVerb.DELETE);
     }
