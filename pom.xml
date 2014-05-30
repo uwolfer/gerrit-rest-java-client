@@ -76,6 +76,14 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.6</version>
         <configuration>
+          <instrumentation>
+            <ignores>
+              <ignore>com.google.gerrit.extensions.*</ignore>
+            </ignores>
+            <excludes>
+              <exclude>com/google/gerrit/extensions/**/*.class</exclude>
+            </excludes>
+          </instrumentation>
           <formats>
             <format>html</format>
             <format>xml</format>
