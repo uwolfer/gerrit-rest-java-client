@@ -1,5 +1,8 @@
-gerrit-rest-java-client [![Build Status](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
+gerrit-rest-java-client
 ======================
+
+[![Build Status](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
+[![Coverage Status](https://img.shields.io/coveralls/uwolfer/gerrit-rest-java-client.svg)](https://coveralls.io/r/uwolfer/gerrit-rest-java-client)
 
 Introduction
 -----------
@@ -28,15 +31,15 @@ List<ChangeInfo> changes = gerritApi.changes().query("status:merged").withLimit(
 ```
 
 _Note:_ It is not guaranteed that all interfaces are implemented. If an implementation is missing, you get a
-<code>com.google.gerrit.extensions.restapi.NotImplementedException.NotImplementedException</code>. Feel free to
-implement it and create a pull request at GitHub - it is quite easy! :)
+<code>com.google.gerrit.extensions.restapi.NotImplementedException</code>. Feel free to implement it and create a pull
+request at GitHub - it is quite easy! :)
 
 [com.google.gerrit.extensions.api.GerritApi]: https://gerrit.googlesource.com/gerrit/+/HEAD/gerrit-extension-api/src/main/java/com/google/gerrit/extensions/api/GerritApi.java
 
 
 Your Support
 ------------
-If you like this plugin, you can support it:
+If you like this library, you can support it:
 * Star it: [Star it at GitHub]. GitHub account required.
 * Improve it: Report bugs or feature requests. Or even fix / implement them by yourself - everything is open source!
 * Donate: You can find donation-possibilities at the bottom of this file.
