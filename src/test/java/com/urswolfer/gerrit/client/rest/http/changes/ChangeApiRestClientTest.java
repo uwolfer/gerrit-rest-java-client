@@ -40,7 +40,7 @@ public class ChangeApiRestClientTest {
         ChangesRestClient changesRestClient = getChangesRestClient();
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(
-                gerritRestClient, changesRestClient,
+                gerritRestClient, changesRestClient, null,
                 "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         AddReviewerInput input = new AddReviewerInput();
@@ -60,7 +60,7 @@ public class ChangeApiRestClientTest {
         ChangesRestClient changesRestClient = getChangesRestClient();
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(
-                gerritRestClient, changesRestClient,
+                gerritRestClient, changesRestClient, null,
                 "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         changeApiRestClient.addReviewer("jdoe");

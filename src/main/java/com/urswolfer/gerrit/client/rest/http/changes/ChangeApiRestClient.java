@@ -35,21 +35,26 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     private final GerritRestClient gerritRestClient;
     private final ChangesRestClient changesRestClient;
+    private final CommentsParser commentsParser;
     private final String id;
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
+                               CommentsParser commentsParser,
                                String triplet) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
+        this.commentsParser = commentsParser;
         this.id = triplet;
     }
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
+                               CommentsParser commentsParser,
                                int id) {
         this.changesRestClient = changesRestClient;
         this.gerritRestClient = gerritRestClient;
+        this.commentsParser = commentsParser;
         this.id = "" + id;
     }
 
@@ -60,17 +65,17 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public RevisionApi current() throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, "current");
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, "current");
     }
 
     @Override
     public RevisionApi revision(int id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, "" + id);
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, "" + id);
     }
 
     @Override
     public RevisionApi revision(String id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, id);
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, id);
     }
 
     @Override

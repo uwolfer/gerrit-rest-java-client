@@ -81,7 +81,7 @@ public class ChangesRestClientTest {
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
         ChangesParser changesParser = setupChangesParser();
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser);
+        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null);
 
         Changes.QueryRequest queryRequest = changes.query();
         testCase.queryParameter.apply(queryRequest).get();
@@ -95,7 +95,7 @@ public class ChangesRestClientTest {
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
         ChangesParser changesParser = setupChangesParser();
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser);
+        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null);
 
         changes.query().get();
 
