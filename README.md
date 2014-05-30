@@ -13,6 +13,27 @@ This implementation is used for example as base for the [Gerrit IntelliJ Plugin]
 [Gerrit Code Review Tool]: http://code.google.com/p/gerrit/
 [Gerrit IntelliJ Plugin]: https://github.com/uwolfer/gerrit-intellij-plugin
 
+
+Usage
+-------
+This library implements <code>[com.google.gerrit.extensions.api.GerritApi]</code>. 
+
+You just need a few lines to get it working:
+```java
+GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
+GerritAuthData.Basic authData = new GerritAuthData.Basic("http://localhost:8080");
+// or: authData = new GerritAuthData.Basic("https://example.com/gerrit, "user", "password"");
+GerritApi gerritApi = gerritRestApiFactory.create(authData);
+List<ChangeInfo> changes = gerritApi.changes().query("status:merged").withLimit(10).get();
+```
+
+_Note:_ It is not guaranteed that all interfaces are implemented. If an implementation is missing, you get a
+<code>com.google.gerrit.extensions.restapi.NotImplementedException.NotImplementedException</code>. Feel free to
+implement it and create a pull request at GitHub - it is quite easy! :)
+
+[com.google.gerrit.extensions.api.GerritApi]: https://gerrit.googlesource.com/gerrit/+/HEAD/gerrit-extension-api/src/main/java/com/google/gerrit/extensions/api/GerritApi.java
+
+
 Your Support
 ------------
 If you like this plugin, you can support it:
