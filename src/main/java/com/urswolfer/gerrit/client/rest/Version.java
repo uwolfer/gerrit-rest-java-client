@@ -16,14 +16,12 @@
 
 package com.urswolfer.gerrit.client.rest;
 
-import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
-import com.google.common.io.Resources;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * @author Urs Wolfer
@@ -34,20 +32,20 @@ public class Version {
 
     static {
         try {
-            URL url = Version.class.getClassLoader().getResource("META-INF/plugin.xml");
-            PLUGIN_VERSION = parseVersionFromFile(url);
+            InputStream inputStream = Version.class.getResourceAsStream("/version.properties");
+            PLUGIN_VERSION = getVersionProperties(inputStream);
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
     }
 
-    private static String parseVersionFromFile(URL url) throws IOException {
-        String text = Resources.toString(url, Charsets.UTF_8);
-
-        Pattern versionTagPattern = Pattern.compile(".*?<version>(.+?)</version>");
-        Matcher matcher = versionTagPattern.matcher(text);
-        if (matcher.find()) {
-            return matcher.group(1);
+    private static String getVersionProperties(InputStream inputStream) throws IOException {
+        Properties properties = new Properties();
+        properties.load(inputStream);
+        inputStream.close();
+        String versionProperty = properties.getProperty("gerrit-rest-java-client.version");
+        if (!Strings.isNullOrEmpty(versionProperty)) {
+            return versionProperty;
         } else {
             return "<unknown>";
         }
