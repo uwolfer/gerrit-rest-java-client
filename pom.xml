@@ -58,6 +58,12 @@
       <version>1.4.7</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>8.1.15.v20140411</version> <!-- we need jetty 8 because of java 1.6 compatibility -->
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

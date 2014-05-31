@@ -43,7 +43,7 @@ public class AccountsParserTest extends AbstractParserTest {
 
     @Test
     public void testParseUserInfos() throws Exception {
-        JsonElement jsonElement = getJsonElement("account.json");
+        JsonElement jsonElement = getJsonElement("self/account.json");
 
         AccountInfo accountInfo = accountsParser.parseUserInfo(jsonElement);
 

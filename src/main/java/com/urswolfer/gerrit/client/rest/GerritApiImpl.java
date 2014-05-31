@@ -34,6 +34,9 @@ import com.urswolfer.gerrit.client.rest.http.projects.ProjectsParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsRestClient;
 import com.urswolfer.gerrit.client.rest.http.tools.ToolsRestClient;
 
+/**
+ * @author Urs Wolfer
+ */
 public class GerritApiImpl extends GerritApi.NotImplemented implements GerritApi {
     private final AccountsRestClient accountsRestClient;
     private final ChangesRestClient changesRestClient;
