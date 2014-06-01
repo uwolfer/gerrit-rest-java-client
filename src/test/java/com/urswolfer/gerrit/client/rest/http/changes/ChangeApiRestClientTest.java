@@ -16,6 +16,7 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
+import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -55,6 +56,32 @@ public class ChangeApiRestClientTest {
         ChangeApi changeApi = changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         changeApi.addReviewer("jdoe");
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testAbandonChange() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+                "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/abandon",
+                "{}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").abandon();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testAbandonChangeWithMessage() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+                "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/abandon",
+                "{\"message\":\"Change not necessary.\"}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        AbandonInput abandonInput = new AbandonInput();
+        abandonInput.message = "Change not necessary.";
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").abandon(abandonInput);
 
         EasyMock.verify(gerritRestClient);
     }

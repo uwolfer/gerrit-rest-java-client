@@ -61,7 +61,6 @@ public final class GerritRestClientBuilder {
         return this;
     }
 
-
     public GerritRestClientBuilder expectGetGson() {
         EasyMock.expect(gerritRestClient.getGson()).andReturn(AbstractParserTest.getGson()).once();
         return this;
