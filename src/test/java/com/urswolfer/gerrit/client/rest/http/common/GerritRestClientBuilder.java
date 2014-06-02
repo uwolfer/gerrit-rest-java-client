@@ -41,6 +41,10 @@ public final class GerritRestClientBuilder {
         return this;
     }
 
+    public GerritRestClientBuilder expectPut(String url) throws Exception {
+        return expectPut(url, EasyMock.createMock(JsonElement.class));
+    }
+
     public GerritRestClientBuilder expectPut(String url, JsonElement result) throws Exception {
         EasyMock.expect(gerritRestClient.putRequest(url)).andReturn(result).once();
         return this;
@@ -58,6 +62,12 @@ public final class GerritRestClientBuilder {
     public GerritRestClientBuilder expectPost(String url, String requestBody, JsonElement result) throws Exception {
         EasyMock.expect(gerritRestClient.postRequest(url, requestBody))
                 .andReturn(result).once();
+        return this;
+    }
+
+    public GerritRestClientBuilder expectDelete(String url) throws Exception {
+        EasyMock.expect(gerritRestClient.deleteRequest(url))
+                .andReturn(EasyMock.createMock(JsonElement.class)).once();
         return this;
     }
 
