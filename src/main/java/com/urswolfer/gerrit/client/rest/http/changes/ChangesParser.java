@@ -57,5 +57,4 @@ public class ChangesParser {
     public ChangeInfo parseSingleChangeInfos(JsonObject result) {
         return gson.fromJson(result, ChangeInfo.class);
     }
-
 }
