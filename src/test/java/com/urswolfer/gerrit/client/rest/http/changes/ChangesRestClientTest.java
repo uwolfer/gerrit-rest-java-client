@@ -19,12 +19,15 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ListChangesOption;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -90,6 +93,46 @@ public class ChangesRestClientTest {
     }
 
     @Test
+    public void testQueryWithString() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+                .expectGet("/changes/?q=is:open", MOCK_JSON_ELEMENT)
+                .get();
+        ChangesParser changesParser = setupChangesParser();
+        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser);
+        changesRestClient.query("is:open").get();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testIdAsInt() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
+        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser);
+
+        ChangeApi changeApi = changesRestClient.id(123);
+
+        Assert.assertEquals(changeApi.id(), "123");
+    }
+
+    @Test
+    public void testIdAsTriplet() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
+        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser);
+
+        ChangeApi changeApi = changesRestClient.id("packages%2Ftest", "master", "Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
+
+        Assert.assertEquals(changeApi.id(), "packages%2Ftest~master~Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
+    }
+
+    @Test
     public void testQuery() throws Exception {
         ChangesQueryTestCase testCase = new ChangesQueryTestCase().expectUrl("/changes/");
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
@@ -122,7 +165,6 @@ public class ChangesRestClientTest {
         EasyMock.replay(changesParser);
         return changesParser;
     }
-
 
     private static ChangesQueryTestCase queryParameter(TestQueryRequest parameter) {
         return new ChangesQueryTestCase().withQueryParameter(parameter);
