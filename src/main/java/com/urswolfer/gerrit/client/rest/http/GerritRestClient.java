@@ -93,7 +93,7 @@ public class GerritRestClient {
     }
 
     public JsonElement putRequest(String path, Header... headers) throws RestApiException {
-        return request(path, null, Arrays.asList(headers), HttpVerb.PUT);
+        return putRequest(path, null, headers);
     }
 
     public JsonElement putRequest(String path, String requestBody, Header... headers) throws RestApiException {
@@ -314,10 +314,8 @@ public class GerritRestClient {
             // if no auth scheme available yet, try to initialize it preemptively
             if (authState.getAuthScheme() == null) {
                 AuthScheme authScheme = (AuthScheme) context.getAttribute(PREEMPTIVE_AUTH);
-                if (authScheme != null) {
-                    UsernamePasswordCredentials creds = new UsernamePasswordCredentials(authData.getLogin(), authData.getPassword());
-                    authState.update(authScheme, creds);
-                }
+                UsernamePasswordCredentials creds = new UsernamePasswordCredentials(authData.getLogin(), authData.getPassword());
+                authState.update(authScheme, creds);
             }
         }
     }
@@ -326,10 +324,8 @@ public class GerritRestClient {
 
         public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
             Header existingUserAgent = request.getFirstHeader(HttpHeaders.USER_AGENT);
-            String userAgent = String.format("gerrit-intellij-plugin/%s", Version.get());
-            if (existingUserAgent != null) {
-                userAgent += " using " + existingUserAgent.getValue();
-            }
+            String userAgent = String.format("gerrit-rest-java-client/%s", Version.get());
+            userAgent += " using " + existingUserAgent.getValue();
             request.setHeader(HttpHeaders.USER_AGENT, userAgent);
         }
     }

@@ -43,12 +43,7 @@ public class Version {
         Properties properties = new Properties();
         properties.load(inputStream);
         inputStream.close();
-        String versionProperty = properties.getProperty("gerrit-rest-java-client.version");
-        if (!Strings.isNullOrEmpty(versionProperty)) {
-            return versionProperty;
-        } else {
-            return "<unknown>";
-        }
+        return properties.getProperty("gerrit-rest-java-client.version");
     }
 
     public static String get() {
