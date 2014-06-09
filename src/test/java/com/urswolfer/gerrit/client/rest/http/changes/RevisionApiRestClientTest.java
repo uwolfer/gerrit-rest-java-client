@@ -53,9 +53,16 @@ public class RevisionApiRestClientTest {
         ReviewInput reviewInput = new ReviewInput();
         reviewInput.label("Code-Review", 2).message("Looks good!");
 
-        changesRestClient.id(CHANGE_ID)
-                .revision(testCase.revision)
-                .review(reviewInput);
+        String revision = testCase.revision;
+        if (revision.equals("current")) {
+            changesRestClient.id(CHANGE_ID)
+                    .current()
+                    .review(reviewInput);
+        } else {
+            changesRestClient.id(CHANGE_ID)
+                    .revision(revision)
+                    .review(reviewInput);
+        }
 
         EasyMock.verify(gerritRestClient);
     }

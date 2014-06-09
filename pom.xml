@@ -18,6 +18,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jdk.min.version>1.6</jdk.min.version>
+    <jetty.version>8.1.15.v20140411</jetty.version> <!-- we need jetty 8 because of java 1.6 compatibility -->
   </properties>
 
   <dependencies>
@@ -61,7 +62,13 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>8.1.15.v20140411</version> <!-- we need jetty 8 because of java 1.6 compatibility -->
+      <version>${jetty.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>${jetty.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
