@@ -14,11 +14,11 @@
 
 package com.google.gerrit.extensions.restapi;
 
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /** Applied to a String field to indicate the default input parameter. */
 @Target({ElementType.FIELD})

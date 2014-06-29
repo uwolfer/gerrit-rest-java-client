@@ -23,7 +23,7 @@ import com.google.gerrit.extensions.common.ProjectInfo;
 import com.thoughtworks.xstream.XStream;
 import org.testng.Assert;
 
-import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -51,7 +51,7 @@ public class GerritAssert {
         assertXmlOutputEqual(actual, expected);
     }
 
-    public static void assertEquals(TreeMap<String, List<CommentInfo>> actual, TreeMap<String, List<CommentInfo>> expected) {
+    public static void assertEquals(TreeMap<String, Set<CommentInfo>> actual, TreeMap<String, Set<CommentInfo>> expected) {
         assertXmlOutputEqual(actual, expected);
     }
 

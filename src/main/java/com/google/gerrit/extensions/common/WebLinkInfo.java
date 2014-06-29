@@ -14,18 +14,12 @@
 
 package com.google.gerrit.extensions.common;
 
-import java.util.List;
-import java.util.Map;
+public class WebLinkInfo {
+  public String name;
+  public String url;
 
-public class LabelInfo {
-  public AccountInfo approved;
-  public AccountInfo rejected;
-  public AccountInfo recommended;
-  public AccountInfo disliked;
-  public List<ApprovalInfo> all;
-  public Map<String, String> values;
-  public Short value;
-  public Short defaultValue;
-  public Boolean optional;
-  public Boolean blocking;
+  public WebLinkInfo(String name, String url) {
+    this.name = name;
+    this.url = url;
+  }
 }

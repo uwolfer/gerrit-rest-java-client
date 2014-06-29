@@ -27,14 +27,4 @@ public class RevisionInfo {
   public Map<String, FileInfo> files;
   public Map<String, ActionInfo> actions;
   public List<WebLinkInfo> webLinks;
-
-  public static class WebLinkInfo {
-    public String name;
-    public String url;
-
-    public WebLinkInfo(String name, String url) {
-      this.name = name;
-      this.url = url;
-    }
-  }
 }

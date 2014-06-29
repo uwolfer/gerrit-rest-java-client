@@ -16,15 +16,15 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -37,12 +37,12 @@ public class CommentsParser {
         this.gson = gson;
     }
 
-    public TreeMap<String, List<CommentInfo>> parseCommentInfos(JsonElement result) {
-        TreeMap<String, List<CommentInfo>> commentInfos = Maps.newTreeMap();
+    public TreeMap<String, Set<CommentInfo>> parseCommentInfos(JsonElement result) {
+        TreeMap<String, Set<CommentInfo>> commentInfos = Maps.newTreeMap();
         JsonObject jsonObject = result.getAsJsonObject();
 
         for (Map.Entry<String, JsonElement> element : jsonObject.entrySet()) {
-            List<CommentInfo> currentCommentInfos = Lists.newArrayList();
+            Set<CommentInfo> currentCommentInfos = Sets.newLinkedHashSet();
 
             for (JsonElement jsonElement : element.getValue().getAsJsonArray()) {
                 currentCommentInfos.add(parseSingleCommentInfos(jsonElement.getAsJsonObject()));

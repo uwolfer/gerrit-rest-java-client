@@ -18,7 +18,7 @@ import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 public interface RevisionApi {
@@ -33,10 +33,10 @@ public interface RevisionApi {
   ChangeApi rebase() throws RestApiException;
   boolean canRebase();
 
-  void setReviewed(String unencodedFilePath) throws RestApiException;
-  void deleteReviewed(String unencodedFilePath) throws RestApiException;
+  void setReviewed(String path, boolean reviewed) throws RestApiException;
+  Set<String> reviewed() throws RestApiException;
 
-  Map<String, List<CommentInfo>> getComments() throws RestApiException;
+  Map<String, Set<CommentInfo>> getComments() throws RestApiException;
 
   /**
    * A default implementation which allows source compatibility
@@ -84,17 +84,17 @@ public interface RevisionApi {
     }
 
     @Override
-    public void setReviewed(String unencodedFilePath) throws RestApiException {
+    public void setReviewed(String path, boolean reviewed) throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public void deleteReviewed(String unencodedFilePath) throws RestApiException {
+    public Set<String> reviewed() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public Map<String, List<CommentInfo>> getComments() throws RestApiException {
+    public Map<String, Set<CommentInfo>> getComments() throws RestApiException {
       throw new NotImplementedException();
     }
   }

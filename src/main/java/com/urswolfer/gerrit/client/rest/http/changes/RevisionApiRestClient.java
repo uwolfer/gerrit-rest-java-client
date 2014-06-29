@@ -25,7 +25,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
-import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -68,27 +68,21 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     }
 
     @Override
-    public void setReviewed(String unencodedFilePath) throws RestApiException {
-        String url = createReviewedUrl(unencodedFilePath);
-        gerritRestClient.putRequest(url);
-    }
-
-    @Override
-    public void deleteReviewed(String unencodedFilePath) throws RestApiException {
-        String url = createReviewedUrl(unencodedFilePath);
-        gerritRestClient.deleteRequest(url);
-    }
-
-    public String createReviewedUrl(String unencodedFilePath) {
-        String encodedPath = Url.encode(unencodedFilePath);
-        return String.format("/changes/%s/revisions/%s/files/%s/reviewed", changeApiRestClient.id(), revision, encodedPath);
+    public void setReviewed(String path, boolean reviewed) throws RestApiException {
+        String encodedPath = Url.encode(path);
+        String url =  String.format("/changes/%s/revisions/%s/files/%s/reviewed", changeApiRestClient.id(), revision, encodedPath);
+        if (reviewed) {
+            gerritRestClient.putRequest(url);
+        } else {
+            gerritRestClient.deleteRequest(url);
+        }
     }
 
     /**
      * Support starting from Gerrit 2.7.
      */
     @Override
-    public TreeMap<String, List<CommentInfo>> getComments() throws RestApiException {
+    public TreeMap<String, Set<CommentInfo>> getComments() throws RestApiException {
         String request = "/changes/" + changeApiRestClient.id() + "/revisions/" + revision + "/comments/";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return commentsParser.parseCommentInfos(jsonElement);

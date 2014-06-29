@@ -107,7 +107,7 @@ public class RevisionApiRestClientTest {
 
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
 
-        changesRestClient.id(CHANGE_ID).revision(testCase.revision).setReviewed(FILE_PATH);
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).setReviewed(FILE_PATH, true);
 
         EasyMock.verify(gerritRestClient);
     }
@@ -120,7 +120,7 @@ public class RevisionApiRestClientTest {
 
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
 
-        changesRestClient.id(CHANGE_ID).revision(testCase.revision).deleteReviewed(FILE_PATH);
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).setReviewed(FILE_PATH, false);
 
         EasyMock.verify(gerritRestClient);
     }
