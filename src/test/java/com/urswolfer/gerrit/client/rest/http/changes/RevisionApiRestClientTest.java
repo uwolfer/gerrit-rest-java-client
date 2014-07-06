@@ -138,7 +138,7 @@ public class RevisionApiRestClientTest {
 
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, commentsParser);
 
-        changesRestClient.id(CHANGE_ID).revision(testCase.revision).getComments();
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).comments();
 
         EasyMock.verify(gerritRestClient, commentsParser);
     }

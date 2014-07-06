@@ -16,16 +16,14 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.gerrit.extensions.api.changes.ReviewInput;
-import com.google.gerrit.extensions.api.changes.RevisionApi;
-import com.google.gerrit.extensions.api.changes.SubmitInput;
+import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
-import java.util.Set;
+import java.util.List;
 import java.util.TreeMap;
 
 /**
@@ -46,6 +44,10 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         this.changeApiRestClient = changeApiRestClient;
         this.commentsParser = commentsParser;
         this.revision = revision;
+    }
+
+    public String revision() {
+        return revision;
     }
 
     @Override
@@ -82,9 +84,32 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
      * Support starting from Gerrit 2.7.
      */
     @Override
-    public TreeMap<String, Set<CommentInfo>> getComments() throws RestApiException {
-        String request = "/changes/" + changeApiRestClient.id() + "/revisions/" + revision + "/comments/";
+    public TreeMap<String, List<CommentInfo>> comments() throws RestApiException {
+        return comments("comments");
+    }
+
+    @Override
+    public TreeMap<String, List<CommentInfo>> drafts() throws RestApiException {
+        return comments("drafts");
+    }
+
+    private TreeMap<String, List<CommentInfo>> comments(String type) throws RestApiException {
+        String request = "/changes/" + changeApiRestClient.id() + "/revisions/" + revision + '/' + type + '/';
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return commentsParser.parseCommentInfos(jsonElement);
+    }
+
+    @Override
+    public DraftApi createDraft(DraftInput in) throws RestApiException {
+        String request = "/changes/" + changeApiRestClient.id() + "/revisions/" + revision + "/drafts";
+        String json = gerritRestClient.getGson().toJson(in);
+        JsonElement jsonElement = gerritRestClient.putRequest(request, json);
+        CommentInfo commentInfo = commentsParser.parseSingleCommentInfo(jsonElement.getAsJsonObject());
+        return new DraftApiRestClient(gerritRestClient, changeApiRestClient, this, commentsParser, commentInfo);
+    }
+
+    @Override
+    public DraftApi draft(String id) throws RestApiException {
+        return new DraftApiRestClient(gerritRestClient, changeApiRestClient, this, commentsParser, id);
     }
 }

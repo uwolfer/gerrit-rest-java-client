@@ -159,6 +159,9 @@ public class GerritRestClient {
                 break;
             case PUT:
                 method = new HttpPut(uri);
+                if (requestBody != null) {
+                    ((HttpPut) method).setEntity(new StringEntity(requestBody, ContentType.APPLICATION_JSON));
+                }
                 break;
             default:
                 throw new IllegalStateException("Wrong HttpVerb: unknown method: " + verb.toString());
@@ -275,7 +278,7 @@ public class GerritRestClient {
         }
     }
 
-    private void checkStatusCode(HttpResponse response) throws HttpStatusException {
+    private void checkStatusCode(HttpResponse response) throws HttpStatusException, IOException {
         StatusLine statusLine = response.getStatusLine();
         int code = statusLine.getStatusCode();
         switch (code) {
@@ -289,7 +292,12 @@ public class GerritRestClient {
             case HttpStatus.SC_PAYMENT_REQUIRED:
             case HttpStatus.SC_FORBIDDEN:
             default:
-                String message = String.format("Request not successful. Message: %s. Status-Code: %s.", statusLine.getReasonPhrase(), statusLine.getStatusCode());
+                String body = "empty";
+                if (response.getEntity() != null && response.getEntity().getContent() != null) {
+                    body = CharStreams.toString(new InputStreamReader(response.getEntity().getContent())).trim();
+                }
+                String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
+                        statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
                 throw new HttpStatusException(statusLine.getStatusCode(), statusLine.getReasonPhrase(), message);
         }
     }
