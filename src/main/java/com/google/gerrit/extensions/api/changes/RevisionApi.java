@@ -14,13 +14,14 @@
 
 package com.google.gerrit.extensions.api.changes;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gerrit.extensions.common.CommentInfo;
+import com.google.gerrit.extensions.common.FileInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
-
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
 
 public interface RevisionApi {
   void delete() throws RestApiException;
@@ -36,6 +37,9 @@ public interface RevisionApi {
 
   void setReviewed(String path, boolean reviewed) throws RestApiException;
   Set<String> reviewed() throws RestApiException;
+  Map<String, FileInfo> files() throws RestApiException;
+  Map<String, FileInfo> files(String base) throws RestApiException;
+  FileApi file(String path);
 
   Map<String, List<CommentInfo>> comments() throws RestApiException;
   Map<String, List<CommentInfo>> drafts() throws RestApiException;
@@ -97,6 +101,21 @@ public interface RevisionApi {
 
     @Override
     public Set<String> reviewed() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public Map<String, FileInfo> files() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public Map<String, FileInfo> files(String base) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public FileApi file(String path) {
       throw new NotImplementedException();
     }
 
