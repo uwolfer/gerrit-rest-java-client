@@ -36,25 +36,35 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final GerritRestClient gerritRestClient;
     private final ChangesRestClient changesRestClient;
     private final CommentsParser commentsParser;
+    private final FileInfoParser fileInfoParser;
+    private final DiffInfoParser diffInfoParser;
     private final String id;
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
                                CommentsParser commentsParser,
+                               FileInfoParser fileInfoParser,
+                               DiffInfoParser diffInfoParser,
                                String triplet) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
         this.commentsParser = commentsParser;
+        this.fileInfoParser = fileInfoParser;
+        this.diffInfoParser = diffInfoParser;
         this.id = triplet;
     }
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
                                CommentsParser commentsParser,
+                               FileInfoParser fileInfoParser,
+                               DiffInfoParser diffInfoParser,
                                int id) {
         this.changesRestClient = changesRestClient;
         this.gerritRestClient = gerritRestClient;
         this.commentsParser = commentsParser;
+        this.fileInfoParser = fileInfoParser;
+        this.diffInfoParser = diffInfoParser;
         this.id = "" + id;
     }
 
@@ -65,17 +75,17 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public RevisionApi current() throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, "current");
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, "current");
     }
 
     @Override
     public RevisionApi revision(int id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, "" + id);
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, "" + id);
     }
 
     @Override
     public RevisionApi revision(String id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, id);
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, id);
     }
 
     @Override
@@ -85,14 +95,14 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public void abandon(AbandonInput abandonInput) throws RestApiException {
-        String request = "/changes/" + id + "/abandon";
+        String request = getRequestPath() + "/abandon";
         String json = gerritRestClient.getGson().toJson(abandonInput);
         gerritRestClient.postRequest(request, json);
     }
 
     @Override
     public void addReviewer(AddReviewerInput in) throws RestApiException {
-        String request = "/changes/" + id + "/reviewers";
+        String request = getRequestPath() + "/reviewers";
         String json = gerritRestClient.getGson().toJson(in);
         gerritRestClient.postRequest(request, json);
     }
@@ -117,5 +127,9 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     @Override
     public ChangeInfo info() throws RestApiException {
         return get(EnumSet.noneOf(ListChangesOption.class));
+    }
+
+    protected String getRequestPath() {
+        return "/changes/" + id;
     }
 }

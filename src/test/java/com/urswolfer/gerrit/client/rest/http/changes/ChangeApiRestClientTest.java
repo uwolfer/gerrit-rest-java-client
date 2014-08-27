@@ -97,7 +97,8 @@ public class ChangeApiRestClientTest {
         return new ChangesRestClient(
                 gerritRestClient,
                 EasyMock.createMock(ChangesParser.class),
-                EasyMock.createMock(CommentsParser.class)
-        );
+                EasyMock.createMock(CommentsParser.class),
+                EasyMock.createMock(FileInfoParser.class),
+                EasyMock.createMock(DiffInfoParser.class));
     }
 }

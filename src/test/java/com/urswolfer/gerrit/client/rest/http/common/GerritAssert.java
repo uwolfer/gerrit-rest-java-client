@@ -16,14 +16,12 @@
 
 package com.urswolfer.gerrit.client.rest.http.common;
 
-import com.google.gerrit.extensions.common.AccountInfo;
-import com.google.gerrit.extensions.common.ChangeInfo;
-import com.google.gerrit.extensions.common.CommentInfo;
-import com.google.gerrit.extensions.common.ProjectInfo;
+import com.google.gerrit.extensions.common.*;
 import com.thoughtworks.xstream.XStream;
 import org.testng.Assert;
 
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -52,6 +50,14 @@ public class GerritAssert {
     }
 
     public static void assertEquals(TreeMap<String, List<CommentInfo>> actual, TreeMap<String, List<CommentInfo>> expected) {
+        assertXmlOutputEqual(actual, expected);
+    }
+
+    public static void assertEquals(Map<String, FileInfo> actual, Map<String, FileInfo> expected) {
+        assertXmlOutputEqual(actual, expected);
+    }
+
+    public static void assertEquals(DiffInfo actual, DiffInfo expected) {
         assertXmlOutputEqual(actual, expected);
     }
 
