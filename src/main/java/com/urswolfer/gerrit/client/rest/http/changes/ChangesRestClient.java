@@ -36,13 +36,19 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final GerritRestClient gerritRestClient;
     private final ChangesParser changesParser;
     private final CommentsParser commentsParser;
+    private final FileInfoParser fileInfoParser;
+    private final DiffInfoParser diffInfoParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
-                             CommentsParser commentsParser) {
+                             CommentsParser commentsParser,
+                             FileInfoParser fileInfoParser,
+                             DiffInfoParser diffInfoParser) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
+        this.fileInfoParser = fileInfoParser;
+        this.diffInfoParser = diffInfoParser;
     }
 
     @Override
@@ -87,16 +93,16 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(int id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, id);
+        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, id);
     }
 
     @Override
     public ChangeApi id(String triplet) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, triplet);
+        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, triplet);
     }
 
     @Override
     public ChangeApi id(String project, String branch, String id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, String.format("%s~%s~%s", project, branch, id));
+        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, String.format("%s~%s~%s", project, branch, id));
     }
 }

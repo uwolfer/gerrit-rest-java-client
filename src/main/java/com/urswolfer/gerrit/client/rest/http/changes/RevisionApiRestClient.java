@@ -18,12 +18,14 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.common.CommentInfo;
+import com.google.gerrit.extensions.common.FileInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -34,15 +36,21 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     private final GerritRestClient gerritRestClient;
     private final ChangeApiRestClient changeApiRestClient;
     private final CommentsParser commentsParser;
+    private final FileInfoParser fileInfoParser;
+    private final DiffInfoParser diffInfoParser;
     private final String revision;
 
     public RevisionApiRestClient(GerritRestClient gerritRestClient,
                                  ChangeApiRestClient changeApiRestClient,
                                  CommentsParser commentsParser,
+                                 FileInfoParser fileInfoParser,
+                                 DiffInfoParser diffInfoParser,
                                  String revision) {
         this.gerritRestClient = gerritRestClient;
         this.changeApiRestClient = changeApiRestClient;
         this.commentsParser = commentsParser;
+        this.fileInfoParser = fileInfoParser;
+        this.diffInfoParser = diffInfoParser;
         this.revision = revision;
     }
 
@@ -52,7 +60,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
     @Override
     public void review(ReviewInput reviewInput) throws RestApiException {
-        String request = "/changes/" + changeApiRestClient.id() + "/revisions/" + revision + "/review";
+        String request = getRequestPath() + "/review";
         String json = gerritRestClient.getGson().toJson(reviewInput);
         gerritRestClient.postRequest(request, json);
     }
@@ -64,7 +72,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
     @Override
     public void submit(SubmitInput submitInput) throws RestApiException {
-        String request = "/changes/" + changeApiRestClient.id() + "/submit";
+        String request = changeApiRestClient.getRequestPath() + "/submit";
         String json = gerritRestClient.getGson().toJson(submitInput);
         gerritRestClient.postRequest(request, json);
     }
@@ -94,14 +102,14 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     }
 
     private TreeMap<String, List<CommentInfo>> comments(String type) throws RestApiException {
-        String request = "/changes/" + changeApiRestClient.id() + "/revisions/" + revision + '/' + type + '/';
+        String request = getRequestPath() + '/' + type + '/';
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return commentsParser.parseCommentInfos(jsonElement);
     }
 
     @Override
     public DraftApi createDraft(DraftInput in) throws RestApiException {
-        String request = "/changes/" + changeApiRestClient.id() + "/revisions/" + revision + "/drafts";
+        String request = getRequestPath() + "/drafts";
         String json = gerritRestClient.getGson().toJson(in);
         JsonElement jsonElement = gerritRestClient.putRequest(request, json);
         CommentInfo commentInfo = commentsParser.parseSingleCommentInfo(jsonElement.getAsJsonObject());
@@ -111,5 +119,22 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public DraftApi draft(String id) throws RestApiException {
         return new DraftApiRestClient(gerritRestClient, changeApiRestClient, this, commentsParser, id);
+    }
+
+
+    @Override
+    public Map<String, FileInfo> files() throws RestApiException {
+        String request = getRequestPath() + "/files";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return fileInfoParser.parseFileInfos(jsonElement);
+    }
+
+    @Override
+    public FileApi file(String path) {
+        return new FileApiRestClient(gerritRestClient, this, diffInfoParser, path);
+    }
+
+    protected String getRequestPath() {
+        return changeApiRestClient.getRequestPath() + "/revisions/" + revision;
     }
 }
