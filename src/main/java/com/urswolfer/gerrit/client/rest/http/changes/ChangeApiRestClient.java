@@ -21,6 +21,7 @@ import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.RevisionApi;
+import com.google.gerrit.extensions.api.changes.SubmitInput;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ListChangesOption;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -82,8 +83,21 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     public void abandon() throws RestApiException {
         abandon(new AbandonInput());
     }
+    
+    @Override
+    public void submit() throws RestApiException {
+    	submit(new SubmitInput());
+    }
 
     @Override
+    public void submit(SubmitInput submitInput) throws RestApiException {
+    	 String request = "/changes/" + id + "/submit";
+         String json = gerritRestClient.getGson().toJson(submitInput);
+         gerritRestClient.postRequest(request, json);
+		
+	}
+
+	@Override
     public void abandon(AbandonInput abandonInput) throws RestApiException {
         String request = "/changes/" + id + "/abandon";
         String json = gerritRestClient.getGson().toJson(abandonInput);

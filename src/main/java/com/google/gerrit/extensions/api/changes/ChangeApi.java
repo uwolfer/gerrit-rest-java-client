@@ -33,6 +33,9 @@ public interface ChangeApi {
 
   void restore() throws RestApiException;
   void restore(RestoreInput in) throws RestApiException;
+  
+  void submit() throws RestApiException;
+  void submit(SubmitInput in) throws RestApiException;
 
   ChangeApi revert() throws RestApiException;
   ChangeApi revert(RevertInput in) throws RestApiException;
@@ -126,5 +129,17 @@ public interface ChangeApi {
     public ChangeInfo info() throws RestApiException {
       throw new NotImplementedException();
     }
+
+	@Override
+	public void submit() throws RestApiException {
+		 throw new NotImplementedException();
+		
+	}
+
+	@Override
+	public void submit(SubmitInput in) throws RestApiException {
+		throw new NotImplementedException();
+		
+	}
   }
 }
