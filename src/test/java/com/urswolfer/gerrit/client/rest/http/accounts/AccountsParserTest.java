@@ -21,8 +21,8 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
-import junit.framework.Assert;
 import org.easymock.EasyMock;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**

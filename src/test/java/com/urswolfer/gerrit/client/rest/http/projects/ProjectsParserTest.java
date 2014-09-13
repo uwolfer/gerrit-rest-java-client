@@ -22,7 +22,7 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import com.urswolfer.gerrit.client.rest.http.common.ProjectInfoBuilder;
-import junit.framework.Assert;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;

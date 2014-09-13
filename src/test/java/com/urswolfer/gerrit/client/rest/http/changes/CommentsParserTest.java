@@ -26,7 +26,7 @@ import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.AccountInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.CommentInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
-import junit.framework.Assert;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
