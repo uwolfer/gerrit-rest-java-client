@@ -16,12 +16,13 @@
 
 package com.urswolfer.gerrit.client.rest;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.gerrit.extensions.api.GerritApi;
 import com.google.gerrit.extensions.api.accounts.Accounts;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.api.projects.Projects;
 import com.google.gerrit.extensions.api.tools.Tools;
-import com.google.gson.Gson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.HttpClientBuilderExtension;
 import com.urswolfer.gerrit.client.rest.http.HttpRequestExecutor;
@@ -36,40 +37,65 @@ import com.urswolfer.gerrit.client.rest.http.tools.ToolsRestClient;
  * @author Urs Wolfer
  */
 public class GerritApiImpl extends GerritApi.NotImplemented implements GerritApi {
-    private final AccountsRestClient accountsRestClient;
-    private final ChangesRestClient changesRestClient;
-    private final ProjectsRestClient projectsRestClient;
-    private final ToolsRestClient toolsRestClient;
+    private final GerritRestClient gerritRestClient;
+
+    private final Supplier<AccountsRestClient> accountsRestClient = Suppliers.memoize(new Supplier<AccountsRestClient>() {
+        @Override
+        public AccountsRestClient get() {
+            return new AccountsRestClient(gerritRestClient, new AccountsParser(gerritRestClient.getGson()));
+        }
+    });
+
+    private final Supplier<ChangesRestClient> changesRestClient = Suppliers.memoize(new Supplier<ChangesRestClient>() {
+        @Override
+        public ChangesRestClient get() {
+            return new ChangesRestClient(
+                    gerritRestClient,
+                    new ChangesParser(gerritRestClient.getGson()),
+                    new CommentsParser(gerritRestClient.getGson()),
+                    new FileInfoParser(gerritRestClient.getGson()),
+                    new DiffInfoParser(gerritRestClient.getGson())
+            );
+        }
+    });
+
+    private final Supplier<ProjectsRestClient> projectsRestClient = Suppliers.memoize(new Supplier<ProjectsRestClient>() {
+        @Override
+        public ProjectsRestClient get() {
+            return new ProjectsRestClient(gerritRestClient, new ProjectsParser(gerritRestClient.getGson()));
+        }
+    });
+
+    private final Supplier<ToolsRestClient> toolsRestClient = Suppliers.memoize(new Supplier<ToolsRestClient>() {
+        @Override
+        public ToolsRestClient get() {
+            return new ToolsRestClient(gerritRestClient);
+        }
+    });
 
     public GerritApiImpl(GerritAuthData authData,
                          HttpRequestExecutor httpRequestExecutor,
                          HttpClientBuilderExtension... httpClientBuilderExtensions) {
-        GerritRestClient gerritRestClient = new GerritRestClient(authData, httpRequestExecutor, httpClientBuilderExtensions);
-        Gson gson = gerritRestClient.getGson();
-        changesRestClient = new ChangesRestClient(gerritRestClient,
-                new ChangesParser(gson), new CommentsParser(gson), new FileInfoParser(gson), new DiffInfoParser(gson));
-        accountsRestClient = new AccountsRestClient(gerritRestClient, new AccountsParser(gson));
-        projectsRestClient = new ProjectsRestClient(gerritRestClient, new ProjectsParser(gson));
-        toolsRestClient = new ToolsRestClient(gerritRestClient);
+        this.gerritRestClient = new GerritRestClient(authData, httpRequestExecutor, httpClientBuilderExtensions);
     }
 
     @Override
     public Accounts accounts() {
-        return accountsRestClient;
+        return accountsRestClient.get();
     }
 
     @Override
     public Changes changes() {
-        return changesRestClient;
+        return changesRestClient.get();
     }
 
     @Override
     public Projects projects() {
-        return projectsRestClient;
+        return projectsRestClient.get();
     }
 
     @Override
     public Tools tools() {
-        return toolsRestClient;
+        return toolsRestClient.get();
     }
 }
