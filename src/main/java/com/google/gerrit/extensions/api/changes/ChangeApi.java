@@ -16,16 +16,42 @@ package com.google.gerrit.extensions.api.changes;
 
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ListChangesOption;
+import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
 import java.util.EnumSet;
+import java.util.List;
 
 public interface ChangeApi {
   String id();
 
+  /**
+   * Look up the current revision for the change.
+   * <p>
+   * <strong>Note:</strong> This method eagerly reads the revision. Methods that
+   * mutate the revision do not necessarily re-read the revision. Therefore,
+   * calling a getter method on an instance after calling a mutation method on
+   * that same instance is not guaranteed to reflect the mutation. It is not
+   * recommended to store references to {@code RevisionApi} instances.
+   *
+   * @return API for accessing the revision.
+   * @throws RestApiException if an error occurred.
+   */
   RevisionApi current() throws RestApiException;
+
+  /**
+   * Look up a revision of a change by number.
+   *
+   * @see #current()
+   */
   RevisionApi revision(int id) throws RestApiException;
+
+  /**
+   * Look up a revision of a change by commit SHA-1.
+   *
+   * @see #current()
+   */
   RevisionApi revision(String id) throws RestApiException;
 
   void abandon() throws RestApiException;
@@ -34,11 +60,28 @@ public interface ChangeApi {
   void restore() throws RestApiException;
   void restore(RestoreInput in) throws RestApiException;
 
+  /**
+   * Create a new change that reverts this change.
+   *
+   * @see Changes#id(int)
+   */
   ChangeApi revert() throws RestApiException;
+
+  /**
+   * Create a new change that reverts this change.
+   *
+   * @see Changes#id(int)
+   */
   ChangeApi revert(RevertInput in) throws RestApiException;
+
+  String topic() throws RestApiException;
+  void topic(String topic) throws RestApiException;
 
   void addReviewer(AddReviewerInput in) throws RestApiException;
   void addReviewer(String in) throws RestApiException;
+
+  List<SuggestedReviewerInfo> suggestReviewers(String query) throws RestApiException;
+  List<SuggestedReviewerInfo> suggestReviewers(String query, int limit) throws RestApiException;
 
   ChangeInfo get(EnumSet<ListChangesOption> options) throws RestApiException;
 
@@ -103,12 +146,32 @@ public interface ChangeApi {
     }
 
     @Override
+    public String topic() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void topic(String topic) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public void addReviewer(AddReviewerInput in) throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
     public void addReviewer(String in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<SuggestedReviewerInfo> suggestReviewers(String query) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<SuggestedReviewerInfo> suggestReviewers(String query, int limit) throws RestApiException {
       throw new NotImplementedException();
     }
 

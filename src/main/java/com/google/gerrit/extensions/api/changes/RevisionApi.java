@@ -14,14 +14,14 @@
 
 package com.google.gerrit.extensions.api.changes;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.FileInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface RevisionApi {
   void delete() throws RestApiException;
