@@ -16,21 +16,22 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
  * @author Thomas Forrer
  */
 public class CommentsParser {
+    private static final Type TYPE = new TypeToken<TreeMap<String, List<CommentInfo>>>() {}.getType();
+
     private final Gson gson;
 
     public CommentsParser(Gson gson) {
@@ -38,19 +39,7 @@ public class CommentsParser {
     }
 
     public TreeMap<String, List<CommentInfo>> parseCommentInfos(JsonElement result) {
-        TreeMap<String, List<CommentInfo>> commentInfos = Maps.newTreeMap();
-        JsonObject jsonObject = result.getAsJsonObject();
-
-        for (Map.Entry<String, JsonElement> element : jsonObject.entrySet()) {
-            List<CommentInfo> currentCommentInfos = Lists.newArrayList();
-
-            for (JsonElement jsonElement : element.getValue().getAsJsonArray()) {
-                currentCommentInfos.add(parseSingleCommentInfo(jsonElement.getAsJsonObject()));
-            }
-
-            commentInfos.put(element.getKey(), currentCommentInfos);
-        }
-        return commentInfos;
+        return gson.fromJson(result, TYPE);
     }
 
     public CommentInfo parseSingleCommentInfo(JsonObject result) {

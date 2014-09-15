@@ -111,14 +111,4 @@ public class ChangesParserTest extends AbstractParserTest {
 
         GerritAssert.assertEquals(changeInfos.get(0), CHANGE_INFOS.get(0));
     }
-
-    @Test(expectedExceptions = RestApiException.class)
-    public void testInvalidJson() throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
-        EasyMock.expect(jsonElement.isJsonArray()).andReturn(false).once();
-        EasyMock.expect(jsonElement.isJsonObject()).andReturn(false).once();
-        EasyMock.replay(jsonElement);
-
-        changesParser.parseChangeInfos(jsonElement);
-    }
 }

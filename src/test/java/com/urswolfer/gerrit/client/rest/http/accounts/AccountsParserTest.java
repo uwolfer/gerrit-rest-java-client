@@ -56,18 +56,4 @@ public class AccountsParserTest extends AbstractParserTest {
 
         Assert.assertNull(accountInfo);
     }
-
-    @Test(expectedExceptions = RestApiException.class)
-    public void testParseInvalidJsonElement() throws Exception {
-        JsonElement jsonElement = getInvalidJsonElement();
-
-        accountsParser.parseUserInfo(jsonElement);
-    }
-
-    private JsonElement getInvalidJsonElement() {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
-        EasyMock.expect(jsonElement.isJsonObject()).andReturn(false).once();
-        EasyMock.replay(jsonElement);
-        return jsonElement;
-    }
 }

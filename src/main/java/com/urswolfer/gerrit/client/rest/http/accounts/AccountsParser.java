@@ -32,12 +32,6 @@ public class AccountsParser {
     }
 
     public AccountInfo parseUserInfo(JsonElement result) throws RestApiException {
-        if (result == null) {
-            return null;
-        }
-        if (!result.isJsonObject()) {
-            throw new RestApiException(String.format("Unexpected JSON result format: %s", result));
-        }
         return gson.fromJson(result, AccountInfo.class);
     }
 }

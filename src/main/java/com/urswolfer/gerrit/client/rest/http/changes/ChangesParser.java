@@ -16,13 +16,13 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
+import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
-import java.util.ArrayList;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,6 +30,8 @@ import java.util.List;
  * @author Thomas Forrer
  */
 public class ChangesParser {
+    private static final Type TYPE = new TypeToken<List<ChangeInfo>>() {}.getType();
+
     private final Gson gson;
 
     public ChangesParser(Gson gson) {
@@ -38,23 +40,8 @@ public class ChangesParser {
 
     public List<ChangeInfo> parseChangeInfos(JsonElement result) throws RestApiException {
         if (!result.isJsonArray()) {
-            if (!result.isJsonObject()) {
-                throw new RestApiException(String.format("Unexpected JSON result format: %s", result));
-            }
-            return Collections.singletonList(parseSingleChangeInfos(result.getAsJsonObject()));
+            return Collections.singletonList(gson.fromJson(result, ChangeInfo.class));
         }
-
-        List<ChangeInfo> changeInfoList = new ArrayList<ChangeInfo>();
-        for (JsonElement element : result.getAsJsonArray()) {
-            if (!element.isJsonObject()) {
-                throw new RestApiException(String.format("This element should be a JsonObject: %s%nTotal JSON response: %n%s", element, result));
-            }
-            changeInfoList.add(parseSingleChangeInfos(element.getAsJsonObject()));
-        }
-        return changeInfoList;
-    }
-
-    public ChangeInfo parseSingleChangeInfos(JsonObject result) {
-        return gson.fromJson(result, ChangeInfo.class);
+        return gson.fromJson(result, TYPE);
     }
 }

@@ -16,20 +16,23 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
-import java.util.ArrayList;
+import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Thomas Forrer
  */
 public class ProjectsParser {
+    private static final Type TYPE = new TypeToken<LinkedHashMap<String, ProjectInfo>>() {}.getType();
+
     private final Gson gson;
 
     public ProjectsParser(Gson gson) {
@@ -37,16 +40,8 @@ public class ProjectsParser {
     }
 
     public List<ProjectInfo> parseProjectInfos(JsonElement result) throws RestApiException {
-        List<ProjectInfo> repositories = new ArrayList<ProjectInfo>();
-        final JsonObject jsonObject = result.getAsJsonObject();
-        for (Map.Entry<String, JsonElement> element : jsonObject.entrySet()) {
-            if (!element.getValue().isJsonObject()) {
-                throw new RestApiException(String.format("This element should be a JsonObject: %s%nTotal JSON response: %n%s", element, result));
-            }
-            repositories.add(parseSingleProjectInfo(element.getValue().getAsJsonObject()));
-
-        }
-        return repositories;
+        LinkedHashMap<String, ProjectInfo> projectInfos = gson.fromJson(result, TYPE);
+        return Lists.newArrayList(projectInfos.values());
     }
 
     public ProjectInfo parseSingleProjectInfo(JsonElement result) {
