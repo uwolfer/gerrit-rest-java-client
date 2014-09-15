@@ -65,7 +65,7 @@ public class FileApiRestClient implements FileApi {
         String request = getRequestPath() + "/content";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         String content = jsonElement.getAsString();
-        return new String(Base64.decodeBase64(content));
+        return new String(Base64.decodeBase64(content.getBytes()));
     }
 
     @Override
