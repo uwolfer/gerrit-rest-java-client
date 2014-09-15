@@ -23,10 +23,13 @@ import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.RevisionApi;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ListChangesOption;
+import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
 import java.util.EnumSet;
+import java.util.List;
 
 /**
  * @author Urs Wolfer
@@ -38,6 +41,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final CommentsParser commentsParser;
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
+    private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
     private final String id;
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
@@ -45,12 +49,14 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                CommentsParser commentsParser,
                                FileInfoParser fileInfoParser,
                                DiffInfoParser diffInfoParser,
+                               SuggestedReviewerInfoParser suggestedReviewerInfoParser,
                                String triplet) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
         this.commentsParser = commentsParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
+        this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
         this.id = triplet;
     }
 
@@ -59,12 +65,14 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                CommentsParser commentsParser,
                                FileInfoParser fileInfoParser,
                                DiffInfoParser diffInfoParser,
+                               SuggestedReviewerInfoParser suggestedReviewerInfoParser,
                                int id) {
         this.changesRestClient = changesRestClient;
         this.gerritRestClient = gerritRestClient;
         this.commentsParser = commentsParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
+        this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
         this.id = "" + id;
     }
 
@@ -112,6 +120,22 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         AddReviewerInput input = new AddReviewerInput();
         input.reviewer = in;
         addReviewer(input);
+    }
+
+    @Override
+    public List<SuggestedReviewerInfo> suggestReviewers(String query) throws RestApiException {
+        return getSuggestedReviewers(String.format("q=%s", query));
+    }
+
+    @Override
+    public List<SuggestedReviewerInfo> suggestReviewers(String query, int limit) throws RestApiException {
+        return getSuggestedReviewers(String.format("q=%s&n=%s", query, limit));
+    }
+
+    private List<SuggestedReviewerInfo> getSuggestedReviewers(String queryPart) throws RestApiException {
+        String request = getRequestPath() + String.format("/suggest_reviewers?%s", queryPart);
+        JsonElement suggestedReviewers = gerritRestClient.getRequest(request);
+        return suggestedReviewerInfoParser.parseSuggestReviewerInfos(suggestedReviewers);
     }
 
     @Override

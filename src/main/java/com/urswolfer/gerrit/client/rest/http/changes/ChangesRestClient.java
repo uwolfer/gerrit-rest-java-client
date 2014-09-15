@@ -38,17 +38,20 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final CommentsParser commentsParser;
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
+    private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
                              CommentsParser commentsParser,
                              FileInfoParser fileInfoParser,
-                             DiffInfoParser diffInfoParser) {
+                             DiffInfoParser diffInfoParser,
+                             SuggestedReviewerInfoParser suggestedReviewerInfoParser) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
+        this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
     }
 
     @Override
@@ -93,16 +96,16 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(int id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, id);
+        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, id);
     }
 
     @Override
     public ChangeApi id(String triplet) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, triplet);
+        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, triplet);
     }
 
     @Override
     public ChangeApi id(String project, String branch, String id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, String.format("%s~%s~%s", project, branch, id));
+        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, String.format("%s~%s~%s", project, branch, id));
     }
 }
