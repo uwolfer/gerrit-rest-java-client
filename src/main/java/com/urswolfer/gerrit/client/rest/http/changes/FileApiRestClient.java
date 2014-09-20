@@ -22,6 +22,7 @@ import com.google.common.base.Throwables;
 import com.google.gerrit.extensions.api.changes.FileApi;
 import com.google.gerrit.extensions.common.DiffInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import org.apache.commons.codec.binary.Base64;
@@ -42,12 +43,8 @@ public class FileApiRestClient implements FileApi {
     private final Supplier<String> requestPath = Suppliers.memoize(new Supplier<String>() {
         @Override
         public String get() {
-            try {
-                String encodedPath = URLEncoder.encode(path, "UTF-8");
-                return revisionApiRestClient.getRequestPath() + "/files/" + encodedPath;
-            } catch (UnsupportedEncodingException e) {
-                throw Throwables.propagate(e);
-            }
+            String encodedPath = Url.encode(path);
+            return revisionApiRestClient.getRequestPath() + "/files/" + encodedPath;
         }
     });
 

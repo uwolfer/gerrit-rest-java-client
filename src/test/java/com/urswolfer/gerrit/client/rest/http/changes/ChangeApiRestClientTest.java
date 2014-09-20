@@ -96,7 +96,7 @@ public class ChangeApiRestClientTest {
     public void testSuggestReviewers() throws Exception {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/suggest_reviewers?q=J", jsonElement)
+                .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/suggest_reviewers?q=J&n=-1", jsonElement)
                 .get();
 
         List<SuggestedReviewerInfo> expectedSuggestedReviewerInfos = Lists.newArrayList();

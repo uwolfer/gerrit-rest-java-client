@@ -20,6 +20,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.gerrit.extensions.common.DiffInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -109,8 +110,8 @@ public class FileApiRestClientTest {
         EasyMock.verify(gerritRestClient, diffInfoParser);
     }
 
-    private String getBaseRequestUrl() throws UnsupportedEncodingException {
-        String filePathEncoded = URLEncoder.encode(FILE_PATH, "UTF-8");
+    private String getBaseRequestUrl() {
+        String filePathEncoded = Url.encode(FILE_PATH);
         return "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revisions/1/files/" + filePathEncoded;
     }
 

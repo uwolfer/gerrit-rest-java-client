@@ -25,6 +25,7 @@ import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ListChangesOption;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
@@ -124,12 +125,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public List<SuggestedReviewerInfo> suggestReviewers(String query) throws RestApiException {
-        return getSuggestedReviewers(String.format("q=%s", query));
+        return suggestReviewers(query, -1); // a limit must be added because of a Gerrit bug; see: https://gerrit-review.googlesource.com/#/c/60242/
     }
 
     @Override
     public List<SuggestedReviewerInfo> suggestReviewers(String query, int limit) throws RestApiException {
-        return getSuggestedReviewers(String.format("q=%s&n=%s", query, limit));
+        String encodedQuery = Url.encode(query);
+        return getSuggestedReviewers(String.format("q=%s&n=%s", encodedQuery, limit));
     }
 
     private List<SuggestedReviewerInfo> getSuggestedReviewers(String queryPart) throws RestApiException {
