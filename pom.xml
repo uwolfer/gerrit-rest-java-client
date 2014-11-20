@@ -8,7 +8,7 @@
 
   <name>gerrit-rest-java-client</name>
   <description>Java REST client for Gerrit Code Review.
-    See: https://github.com/uwolfer/gerrit-intellij-plugin
+    See: https://github.com/uwolfer/gerrit-rest-java-client
   </description>
   <issueManagement>
     <system>Github</system>
