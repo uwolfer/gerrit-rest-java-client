@@ -177,7 +177,7 @@ public class GerritRestClient {
         return httpRequestExecutor.execute(client, method, httpContext);
     }
 
-    /*
+    /**
      * Try to authenticate against Gerrit instances with HTTP auth (not OAuth or something like that).
      * In case of success we get a GerritAccount cookie. In that case no more login credentials need to be sent as
      * long as we use the *same* HTTP client. Even requests against authenticated rest api (/a) will be processed
