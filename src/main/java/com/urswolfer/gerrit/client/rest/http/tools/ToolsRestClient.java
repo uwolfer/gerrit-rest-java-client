@@ -41,7 +41,12 @@ public class ToolsRestClient implements Tools {
     public InputStream getCommitMessageHook() throws RestApiException {
         try {
             HttpResponse response = gerritRestClient.doRest("/tools/hooks/commit-msg", null, Collections.<Header>emptyList(), GerritRestClient.HttpVerb.GET);
-            return response.getEntity().getContent();
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode >= 200 && statusCode < 400) {
+                return response.getEntity().getContent();
+            } else {
+                throw new RestApiException("HTTP Error: " + response.getStatusLine().getReasonPhrase());
+            }
         } catch (IOException e) {
             throw new RestApiException(e);
         }
