@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest;
 
-import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 
 import java.io.IOException;
