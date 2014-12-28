@@ -17,12 +17,12 @@
 package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import com.urswolfer.gerrit.client.rest.http.common.ProjectInfoBuilder;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class ProjectsParserTest extends AbstractParserTest {
 
         List<ProjectInfo> projectInfos = projectsParser.parseProjectInfos(jsonElement);
 
-        Assert.assertEquals(projectInfos.size(), 3);
+        Truth.assertThat(projectInfos.size()).is(3);
         for (int i = 0; i < projectInfos.size(); i++) {
             ProjectInfo actual = projectInfos.get(i);
             ProjectInfo expected = PROJECT_INFO_LIST.get(i);

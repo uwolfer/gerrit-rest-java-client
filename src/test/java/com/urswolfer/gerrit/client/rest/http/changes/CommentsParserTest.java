@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gson.JsonElement;
@@ -26,7 +27,6 @@ import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.AccountInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.CommentInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -78,7 +78,7 @@ public class CommentsParserTest extends AbstractParserTest {
     @Test
     public void testParseCommentsFileName() throws Exception {
         TreeMap<String, List<CommentInfo>> comments = parseComments();
-        Assert.assertEquals(comments.keySet(), COMMENT_INFOS.keySet());
+        Truth.assertThat((Iterable) comments.keySet()).isEqualTo(COMMENT_INFOS.keySet());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class CommentsParserTest extends AbstractParserTest {
         SortedMap<String, Integer> commentsPerFile = Maps.transformValues(comments, listSizeFunction);
         SortedMap<String, Integer> expectedCommentsPerFile = Maps.transformValues(COMMENT_INFOS, listSizeFunction);
 
-        Assert.assertEquals(commentsPerFile, expectedCommentsPerFile);
+        Truth.assertThat(commentsPerFile).isEqualTo(expectedCommentsPerFile);
     }
 
     @Test

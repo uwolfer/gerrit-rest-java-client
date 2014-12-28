@@ -16,14 +16,11 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
-import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.AccountInfo;
-import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
-import org.easymock.EasyMock;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
@@ -57,6 +54,6 @@ public class AccountsParserTest extends AbstractParserTest {
     public void testParseUserInfosWithNullJsonElement() throws Exception {
         AccountInfo accountInfo = accountsParser.parseUserInfo(null);
 
-        Assert.assertNull(accountInfo);
+        Truth.assertThat(accountInfo).isNull();
     }
 }

@@ -17,10 +17,10 @@
 package com.urswolfer.gerrit.client.rest.gson;
 
 import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import org.easymock.EasyMock;
-import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -35,7 +35,7 @@ public class DateDeserializerTest {
     @Test(dataProvider = "TestCases")
     public void testDeserialize(TestCase testCase) throws Exception {
         Date actualDate = dateDeserializer.deserialize(testCase.getJsonElement(), null, null);
-        Assert.assertEquals(actualDate, testCase.expectedDate);
+        Truth.assertThat(actualDate).isEqualTo(testCase.expectedDate);
     }
 
     @Test(expectedExceptions = JsonParseException.class)

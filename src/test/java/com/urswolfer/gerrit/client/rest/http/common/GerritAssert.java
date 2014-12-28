@@ -16,9 +16,9 @@
 
 package com.urswolfer.gerrit.client.rest.http.common;
 
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.*;
 import com.thoughtworks.xstream.XStream;
-import org.testng.Assert;
 
 import java.util.List;
 import java.util.Map;
@@ -69,6 +69,6 @@ public class GerritAssert {
         String actualXml = xStream.toXML(actual);
         String expectedXml = xStream.toXML(expected);
 
-        Assert.assertEquals(actualXml, expectedXml);
+        Truth.assertThat(actualXml).is(expectedXml);
     }
 }

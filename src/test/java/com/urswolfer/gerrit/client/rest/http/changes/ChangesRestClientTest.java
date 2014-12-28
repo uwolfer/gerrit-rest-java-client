@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.common.ChangeInfo;
@@ -27,7 +28,6 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
-import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -116,7 +116,7 @@ public class ChangesRestClientTest {
 
         ChangeApi changeApi = changesRestClient.id(123);
 
-        Assert.assertEquals(changeApi.id(), "123");
+        Truth.assertThat(changeApi.id()).is("123");
     }
 
     @Test
@@ -129,7 +129,7 @@ public class ChangesRestClientTest {
 
         ChangeApi changeApi = changesRestClient.id("packages%2Ftest", "master", "Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
 
-        Assert.assertEquals(changeApi.id(), "packages%2Ftest~master~Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
+        Truth.assertThat(changeApi.id()).is("packages%2Ftest~master~Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
     }
 
     @Test

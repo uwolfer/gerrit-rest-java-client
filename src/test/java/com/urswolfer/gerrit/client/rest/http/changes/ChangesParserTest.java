@@ -17,18 +17,16 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ChangeStatus;
-import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.AccountInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.ChangeInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import com.urswolfer.gerrit.client.rest.http.common.LabelInfoBuilder;
-import org.easymock.EasyMock;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -92,7 +90,7 @@ public class ChangesParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("changes.json");
 
         List<ChangeInfo> changeInfos = changesParser.parseChangeInfos(jsonElement);
-        Assert.assertEquals(changeInfos.size(), 3);
+        Truth.assertThat(changeInfos.size()).is(3);
 
         for (int i = 0; i < changeInfos.size(); i++) {
             ChangeInfo actual = changeInfos.get(i);
@@ -107,7 +105,7 @@ public class ChangesParserTest extends AbstractParserTest {
 
         List<ChangeInfo> changeInfos = changesParser.parseChangeInfos(jsonElement);
 
-        Assert.assertEquals(changeInfos.size(), 1);
+        Truth.assertThat(changeInfos.size()).is(1);
 
         GerritAssert.assertEquals(changeInfos.get(0), CHANGE_INFOS.get(0));
     }

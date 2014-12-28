@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.GerritApi;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
@@ -39,7 +40,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -116,14 +116,14 @@ public class GerritRestClientTest {
     public void testGetChanges() throws Exception {
         GerritApi gerritClient = getGerritApiWithJettyHost();
         List<ChangeInfo> changes = gerritClient.changes().query().get();
-        Assert.assertEquals(3, changes.size());
+        Truth.assertThat(changes.size()).is(3);
     }
 
     @Test
     public void testGetSelfAccount() throws Exception {
         GerritApi gerritClient = getGerritApiWithJettyHost();
         AccountInfo accountInfo = gerritClient.accounts().self().get();
-        Assert.assertEquals("John Doe", accountInfo.name);
+        Truth.assertThat(accountInfo.name).is("John Doe");
     }
 
     @Test(expectedExceptions = HttpStatusException.class)
@@ -136,7 +136,7 @@ public class GerritRestClientTest {
     public void testGetProjects() throws Exception {
         GerritApi gerritClient = getGerritApiWithJettyHost();
         List<ProjectInfo> projects = gerritClient.projects().list().get();
-        Assert.assertEquals(3, projects.size());
+        Truth.assertThat(projects.size()).is(3);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class GerritRestClientTest {
         GerritApi gerritClient = getGerritApiWithJettyHost();
         InputStream commitMessageHook = gerritClient.tools().getCommitMessageHook();
         String result = CharStreams.toString(new InputStreamReader(commitMessageHook, Charsets.UTF_8));
-        Assert.assertEquals("dummy-commit-msg-hook\n", result);
+        Truth.assertThat(result).is("dummy-commit-msg-hook\n");
     }
 
     @Test(expectedExceptions = HttpStatusException.class)
@@ -172,7 +172,7 @@ public class GerritRestClientTest {
         try {
             gerritClient.changes().query().get();
         } catch (HttpStatusException e) {
-            Assert.assertEquals(e.getStatusCode(), 404);
+            Truth.assertThat(e.getStatusCode()).is(404);
         }
     }
 
@@ -183,8 +183,8 @@ public class GerritRestClientTest {
         try {
             gerritClient.changes().query().get();
         } catch (HttpStatusException e) {
-            Assert.assertEquals(e.getStatusCode(), 401);
-            Assert.assertTrue(e.getStatusText().toLowerCase().contains("unauthorized"));
+            Truth.assertThat(e.getStatusCode()).is(401);
+            Truth.assertThat(e.getStatusText().toLowerCase()).contains("unauthorized");
         }
     }
 
@@ -210,8 +210,8 @@ public class GerritRestClientTest {
         GerritApi gerritClient = gerritRestApiFactory.create(new GerritAuthData.Basic(jettyUrl), httpClientBuilderExtension);
         gerritClient.changes().query().get();
 
-        Assert.assertEquals(extendCalled[0], true);
-        Assert.assertEquals(extendCredentialProviderCalled[0], true);
+        Truth.assertThat(extendCalled[0]).isTrue();
+        Truth.assertThat(extendCredentialProviderCalled[0]).isTrue();
     }
 
     @Test(enabled = false) // requires running Gerrit instance

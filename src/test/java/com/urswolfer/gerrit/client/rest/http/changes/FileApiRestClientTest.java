@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.DiffInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
@@ -27,11 +28,7 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.easymock.EasyMock;
-import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * @author Thomas Forrer
@@ -56,7 +53,7 @@ public class FileApiRestClientTest {
         FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, revisionApiRestClient, null, FILE_PATH);
         String actualContent = fileApiRestClient.content();
 
-        Assert.assertEquals(actualContent, FILE_CONTENT);
+        Truth.assertThat(actualContent).is(FILE_CONTENT);
         EasyMock.verify(gerritRestClient);
     }
 

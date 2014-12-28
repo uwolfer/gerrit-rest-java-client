@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -23,9 +25,7 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
-import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.testng.collections.Lists;
 
 /**
  * @author Thomas Forrer
@@ -49,7 +49,7 @@ public class ProjectApiRestClientTest {
         ProjectInfo projectInfo = projectsRestClient.name(projectName).get();
 
         EasyMock.verify(gerritRestClient, projectsParser);
-        Assert.assertEquals(projectInfo, MOCK_PROJECT_INFO);
+        Truth.assertThat(projectInfo).is(MOCK_PROJECT_INFO);
     }
 
     @Test(expectedExceptions = RuntimeException.class)

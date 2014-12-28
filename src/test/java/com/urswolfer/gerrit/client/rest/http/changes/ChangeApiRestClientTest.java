@@ -17,6 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
@@ -25,7 +26,6 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -111,7 +111,7 @@ public class ChangeApiRestClientTest {
 
         List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J");
 
-        Assert.assertTrue(expectedSuggestedReviewerInfos == suggestedReviewerInfos);
+        Truth.assertThat(suggestedReviewerInfos).isSameAs(expectedSuggestedReviewerInfos);
         EasyMock.verify(gerritRestClient, suggestedReviewerInfoParser);
     }
 
@@ -134,7 +134,7 @@ public class ChangeApiRestClientTest {
 
         List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J", 5);
 
-        Assert.assertTrue(expectedSuggestedReviewerInfos == suggestedReviewerInfos);
+        Truth.assertThat(suggestedReviewerInfos).isSameAs(expectedSuggestedReviewerInfos);
         EasyMock.verify(gerritRestClient, suggestedReviewerInfoParser);
     }
 
