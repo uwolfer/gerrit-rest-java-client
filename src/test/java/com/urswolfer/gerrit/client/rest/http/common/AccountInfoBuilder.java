@@ -22,7 +22,7 @@ import com.google.gerrit.extensions.common.AccountInfo;
  * @author Thomas Forrer
  */
 public final class AccountInfoBuilder {
-    private final AccountInfo accountInfo = new AccountInfo();
+    private final AccountInfo accountInfo = new AccountInfo(null);
 
     public AccountInfo get() {
         return accountInfo;

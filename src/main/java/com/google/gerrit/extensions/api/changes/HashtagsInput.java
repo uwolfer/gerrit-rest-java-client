@@ -12,18 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.common;
+package com.google.gerrit.extensions.api.changes;
 
-import java.util.List;
+import com.google.gerrit.extensions.restapi.DefaultInput;
 
-public class AccountInfo {
-  public Integer _accountId;
-  public String name;
-  public String email;
-  public String username;
-  public List<AvatarInfo> avatars;
+import java.util.Set;
 
-  public AccountInfo(Integer id) {
-    this._accountId = id;
-  }
+public class HashtagsInput {
+  @DefaultInput
+  public Set<String> add;
+  public Set<String> remove;
 }

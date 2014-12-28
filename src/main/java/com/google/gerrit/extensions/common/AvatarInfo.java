@@ -14,16 +14,18 @@
 
 package com.google.gerrit.extensions.common;
 
-import java.util.List;
+public class AvatarInfo {
+  /**
+   * Size in pixels the UI prefers an avatar image to be.
+   *
+   * The web UI prefers avatar images to be square, both
+   * the height and width of the image should be this size.
+   * The height is the more important dimension to match
+   * than the width.
+   */
+  public static final int DEFAULT_SIZE = 26;
 
-public class AccountInfo {
-  public Integer _accountId;
-  public String name;
-  public String email;
-  public String username;
-  public List<AvatarInfo> avatars;
-
-  public AccountInfo(Integer id) {
-    this._accountId = id;
-  }
+  public String url;
+  public Integer height;
+  public Integer width;
 }

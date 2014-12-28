@@ -16,6 +16,7 @@ package com.google.gerrit.extensions.common;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class ChangeInfo {
@@ -23,6 +24,7 @@ public class ChangeInfo {
   public String project;
   public String branch;
   public String topic;
+  public Collection<String> hashtags;
   public String changeId;
   public String subject;
   public ChangeStatus status;
@@ -33,12 +35,21 @@ public class ChangeInfo {
   public Boolean mergeable;
   public Integer insertions;
   public Integer deletions;
-  public AccountInfo owner;
-  public String currentRevision;
-  public Map<String, ActionInfo> actions;
-  public Map<String, LabelInfo> labels;
-  public Collection<ChangeMessageInfo> messages;
-  public Map<String, RevisionInfo> revisions;
+
   public String baseChange;
   public int _number;
+
+  public AccountInfo owner;
+
+  public Map<String, ActionInfo> actions;
+  public Map<String, LabelInfo> labels;
+  public Map<String, Collection<String>> permittedLabels;
+  public Collection<AccountInfo> removableReviewers;
+  public Collection<ChangeMessageInfo> messages;
+
+  public String currentRevision;
+  public Map<String, RevisionInfo> revisions;
+  public Boolean _moreChanges;
+
+  public List<ProblemInfo> problems;
 }

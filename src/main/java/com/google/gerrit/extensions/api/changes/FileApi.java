@@ -22,7 +22,7 @@ public interface FileApi {
   String content() throws RestApiException;
 
   /**
-   * diff against the revision's parent version of the file
+   * Diff against the revision's parent version of the file.
    */
   DiffInfo diff() throws RestApiException;
 
@@ -37,7 +37,6 @@ public interface FileApi {
    * when adding new methods to the interface.
    **/
   public class NotImplemented implements FileApi {
-
     @Override
     public String content() throws RestApiException {
       throw new NotImplementedException();

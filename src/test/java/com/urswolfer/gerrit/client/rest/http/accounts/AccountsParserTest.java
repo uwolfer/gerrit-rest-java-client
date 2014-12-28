@@ -16,6 +16,7 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
+import com.google.common.collect.Lists;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
@@ -24,6 +25,8 @@ import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import org.easymock.EasyMock;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.Collections;
 
 /**
  * @author Thomas Forrer
@@ -34,11 +37,11 @@ public class AccountsParserTest extends AbstractParserTest {
     private final AccountInfo johnDoe;
 
     public AccountsParserTest() {
-        this.johnDoe = new AccountInfo();
-        this.johnDoe._accountId = 1000003;
+        this.johnDoe = new AccountInfo(1000003);
         this.johnDoe.name = "John Doe";
         this.johnDoe.email = "jdoe@gmail.com";
         this.johnDoe.username = "jdoe";
+        this.johnDoe.avatars = Collections.emptyList();
     }
 
     @Test

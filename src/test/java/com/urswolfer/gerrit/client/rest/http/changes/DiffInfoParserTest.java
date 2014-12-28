@@ -16,7 +16,7 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.gerrit.extensions.api.changes.ChangeType;
+import com.google.gerrit.extensions.common.ChangeType;
 import com.google.gerrit.extensions.common.DiffInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;

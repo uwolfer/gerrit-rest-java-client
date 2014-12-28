@@ -16,6 +16,7 @@ package com.google.gerrit.extensions.api.changes;
 
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.FileInfo;
+import com.google.gerrit.extensions.common.MergeableInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
@@ -37,6 +38,7 @@ public interface RevisionApi {
 
   void setReviewed(String path, boolean reviewed) throws RestApiException;
   Set<String> reviewed() throws RestApiException;
+
   Map<String, FileInfo> files() throws RestApiException;
   Map<String, FileInfo> files(String base) throws RestApiException;
   FileApi file(String path);
@@ -46,6 +48,9 @@ public interface RevisionApi {
 
   DraftApi createDraft(DraftInput in) throws RestApiException;
   DraftApi draft(String id) throws RestApiException;
+
+  MergeableInfo mergeable() throws RestApiException;
+  MergeableInfo mergeableOtherBranches() throws RestApiException;
 
   CommentApi comment(String id) throws RestApiException;
 
@@ -141,6 +146,16 @@ public interface RevisionApi {
 
     @Override
     public CommentApi comment(String id) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public MergeableInfo mergeable() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public MergeableInfo mergeableOtherBranches() throws RestApiException {
       throw new NotImplementedException();
     }
   }

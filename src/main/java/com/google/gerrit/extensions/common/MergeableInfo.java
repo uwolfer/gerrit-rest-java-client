@@ -1,4 +1,4 @@
-// Copyright (C) 2009 The Android Open Source Project
+// Copyright (C) 2014 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
 
 package com.google.gerrit.extensions.common;
 
-/** Extension of Enum which provides distinct character code values. */
-public interface CodedEnum {
-  char getCode();
+import java.util.List;
+
+public class MergeableInfo {
+  public SubmitType submitType;
+  public boolean mergeable;
+  public List<String> mergeableInto;
 }

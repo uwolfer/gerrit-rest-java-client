@@ -12,50 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.api.changes;
-
-import com.google.gerrit.extensions.common.CodedEnum;
+package com.google.gerrit.extensions.common;
 
 /** Type of modification made to the file path. */
-public enum ChangeType implements CodedEnum {
+public enum ChangeType {
   /** Path is being created/introduced by this patch. */
-  ADDED('A'),
+  ADDED,
 
   /** Path already exists, and has updated content. */
-  MODIFIED('M'),
+  MODIFIED,
 
   /** Path existed, but is being removed by this patch. */
-  DELETED('D'),
+  DELETED,
 
-  /** Path existed at {@link Patch#getSourceFileName()} but was moved. */
-  RENAMED('R'),
+  /** Path existed but was moved. */
+  RENAMED,
 
-  /** Path was copied from {@link Patch#getSourceFileName()}. */
-  COPIED('C'),
+  /** Path was copied from source. */
+  COPIED,
 
   /** Sufficient amount of content changed to claim the file was rewritten. */
-  REWRITE('W');
-
-  private final char code;
-
-  private ChangeType(final char c) {
-    code = c;
-  }
-
-  public char getCode() {
-    return code;
-  }
-
-  public boolean matches(String s) {
-    return s != null && s.length() == 1 && s.charAt(0) == code;
-  }
-
-  public static ChangeType forCode(final char c) {
-    for (final ChangeType s : ChangeType.values()) {
-      if (s.code == c) {
-        return s;
-      }
-    }
-    return null;
-  }
+  REWRITE;
 }

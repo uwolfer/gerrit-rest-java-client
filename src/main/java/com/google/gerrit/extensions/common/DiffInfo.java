@@ -14,28 +14,40 @@
 
 package com.google.gerrit.extensions.common;
 
-import com.google.gerrit.extensions.api.changes.ChangeType;
-
 import java.util.List;
 
+/* This entity contains information about the diff of a file in a revision. */
 public class DiffInfo {
+  // Meta information about the file on side A
   public FileMeta metaA;
+  // Meta information about the file on side B
   public FileMeta metaB;
+  // Intraline status
   public IntraLineStatus intralineStatus;
+  // The type of change
   public ChangeType changeType;
+  // A list of strings representing the patch set diff header
   public List<String> diffHeader;
+  // The content differences in the file as a list of entities
   public List<ContentEntry> content;
+  // Links to the file diff in external sites
+  public List<DiffWebLinkInfo> webLinks;
 
-  public enum IntraLineStatus {
+  public static enum IntraLineStatus {
     OK,
     TIMEOUT,
     FAILURE
   }
 
   public static class FileMeta {
+    // The name of the file
     public String name;
+    // The content type of the file
     public String contentType;
+    // The total number of lines in the file
     public Integer lines;
+    // Links to the file in external sites
+    public List<WebLinkInfo> webLinks;
   }
 
   public static final class ContentEntry {

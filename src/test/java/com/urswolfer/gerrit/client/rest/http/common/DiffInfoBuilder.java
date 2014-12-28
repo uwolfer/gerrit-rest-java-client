@@ -17,7 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.common;
 
 import com.google.common.collect.Lists;
-import com.google.gerrit.extensions.api.changes.ChangeType;
+import com.google.gerrit.extensions.common.ChangeType;
 import com.google.gerrit.extensions.common.DiffInfo;
 
 /**
