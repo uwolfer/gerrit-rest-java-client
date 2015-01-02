@@ -49,7 +49,7 @@ public class ProjectApiRestClientTest {
         ProjectInfo projectInfo = projectsRestClient.name(projectName).get();
 
         EasyMock.verify(gerritRestClient, projectsParser);
-        Truth.assertThat(projectInfo).is(MOCK_PROJECT_INFO);
+        Truth.assertThat(projectInfo).isEqualTo(MOCK_PROJECT_INFO);
     }
 
     @Test(expectedExceptions = RuntimeException.class)
