@@ -5,5 +5,8 @@ jdk:
 #  - openjdk6
 #  - oraclejdk7
 
+env:
+- TERM=dumb
+
 after_success:
-  - mvn clean cobertura:cobertura coveralls:report
+  - gradle cobertura coveralls

@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'net.saliman.cobertura' version '2.2.5'
+    id 'com.github.kt3k.coveralls' version '2.0.1'
+}
+
+group = 'com.urswolfer.gerrit.client.rest'
+version = '0.8.0'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+ext.jettyVersion = '8.1.16.v20140903' // we need jetty 8 because of java 1.6 compatibility
+
+dependencies {
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.3.5'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
+    compile group: 'com.google.guava', name: 'guava', version: '18.0'
+
+    testCompile group: 'org.testng', name: 'testng', version: '6.8.13'
+    testCompile group: 'com.google.truth', name: 'truth', version: '0.25'
+    testCompile group: 'org.easymock', name: 'easymock', version: '3.3'
+    testCompile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.7'
+    testCompile group: 'org.eclipse.jetty', name: 'jetty-server', version: jettyVersion
+    testCompile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: jettyVersion
+}
+
+repositories {
+    mavenCentral()
+}
+
+processResources {
+    filesMatching('**/version.properties') {
+        filter {
+            it.replace('${project.version}', project.version)
+        }
+    }
+}
+
+test {
+    useTestNG()
+}
+
+// manually copy test resources into output folder; see: http://stackoverflow.com/a/27433508
+task copyTestResources(type: Copy) {
+    from sourceSets.test.resources
+    into sourceSets.test.output.classesDir
+}
+processTestResources.dependsOn copyTestResources
+
+cobertura {
+    coverageExcludes = ['.*com.google.gerrit.extensions.*']
+    coverageIgnores = ['.*com.google.gerrit.extensions.*']
+    coverageFormats = ['html', 'xml'] // coveralls plugin depends on xml format report
+}
