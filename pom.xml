@@ -103,9 +103,6 @@
         <version>2.6</version>
         <configuration>
           <instrumentation>
-            <ignores>
-              <ignore>com.google.gerrit.extensions.*</ignore>
-            </ignores>
             <excludes>
               <exclude>com/google/gerrit/extensions/**/*.class</exclude>
             </excludes>
