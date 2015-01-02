@@ -117,8 +117,7 @@ public class GerritRestClient {
             InputStream resp = entity.getContent();
             JsonElement ret = parseResponse(resp);
             if (ret.isJsonNull()) {
-                String message = String.format("Unexpectedly empty response: %s.", CharStreams.toString(new InputStreamReader(resp)));
-                throw new RestApiException(message);
+                throw new RestApiException("Unexpectedly empty response.");
             }
             return ret;
         } catch (IOException e) {
@@ -144,9 +143,7 @@ public class GerritRestClient {
         switch (verb) {
             case POST:
                 method = new HttpPost(uri);
-                if (requestBody != null) {
-                    ((HttpPost) method).setEntity(new StringEntity(requestBody, ContentType.APPLICATION_JSON));
-                }
+                setRequestBody(requestBody, method);
                 break;
             case GET:
                 method = new HttpGet(uri);
@@ -154,17 +151,12 @@ public class GerritRestClient {
             case DELETE:
                 method = new HttpDelete(uri);
                 break;
-            case HEAD:
-                method = new HttpHead(uri);
-                break;
             case PUT:
                 method = new HttpPut(uri);
-                if (requestBody != null) {
-                    ((HttpPut) method).setEntity(new StringEntity(requestBody, ContentType.APPLICATION_JSON));
-                }
+                setRequestBody(requestBody, method);
                 break;
             default:
-                throw new IllegalStateException("Wrong HttpVerb: unknown method: " + verb.toString());
+                throw new IllegalStateException("Unknown or unsupported HttpVerb method: " + verb.toString());
         }
         for (Header header : headers) {
             method.addHeader(header);
@@ -175,6 +167,12 @@ public class GerritRestClient {
         method.addHeader("Accept", ContentType.APPLICATION_JSON.getMimeType());
 
         return httpRequestExecutor.execute(client, method, httpContext);
+    }
+
+    private void setRequestBody(String requestBody, HttpRequestBase method) {
+        if (requestBody != null) {
+            ((HttpEntityEnclosingRequestBase) method).setEntity(new StringEntity(requestBody, ContentType.APPLICATION_JSON));
+        }
     }
 
     /**
@@ -272,7 +270,7 @@ public class GerritRestClient {
         try {
             return new JsonParser().parse(reader);
         } catch (JsonSyntaxException jse) {
-            throw new IOException(String.format("Couldn't parse response: %n%s", CharStreams.toString(new InputStreamReader(response))), jse);
+            throw new IOException(String.format("Couldn't parse response: %n%s", CharStreams.toString(reader)), jse);
         } finally {
             reader.close();
         }
@@ -292,9 +290,10 @@ public class GerritRestClient {
             case HttpStatus.SC_PAYMENT_REQUIRED:
             case HttpStatus.SC_FORBIDDEN:
             default:
-                String body = "empty";
-                if (response.getEntity() != null && response.getEntity().getContent() != null) {
-                    body = CharStreams.toString(new InputStreamReader(response.getEntity().getContent())).trim();
+                String body = "<empty>";
+                HttpEntity entity = response.getEntity();
+                if (entity != null && entity.getContent() != null) {
+                    body = CharStreams.toString(new InputStreamReader(entity.getContent())).trim();
                 }
                 String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
                         statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
