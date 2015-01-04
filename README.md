@@ -39,6 +39,16 @@ moment because not all extensions to this API are merged into Gerrit repository 
 
 [com.google.gerrit.extensions.api.GerritApi]: https://gerrit.googlesource.com/gerrit/+/HEAD/gerrit-extension-api/src/main/java/com/google/gerrit/extensions/api/GerritApi.java
 
+Maven Artifact
+--------------
+Releases are available with Maven:
+```xml
+<dependency>
+    <groupId>com.urswolfer.gerrit.client.rest</groupId>
+    <artifactId>gerrit-rest-java-client</artifactId>
+    <version>0.8.0</version>
+</dependency>
+```
 
 Your Support
 ------------
@@ -60,7 +70,7 @@ Please only use the link from github.com/uwolfer/gerrit-intellij-plugin to verif
 Copyright and license
 --------------------
 
-Copyright 2013 - 2014 Urs Wolfer
+Copyright 2013 - 2015 Urs Wolfer
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this work except in compliance with the License.
