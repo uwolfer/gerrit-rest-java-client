@@ -19,7 +19,7 @@ This implementation is used for example as base for the [Gerrit IntelliJ Plugin]
 
 Usage
 -------
-This library implements <code>[com.google.gerrit.extensions.api.GerritApi]</code>. 
+This library implements <code>[com.google.gerrit.extensions.api.GerritApi]</code>.
 
 You just need a few lines to get it working:
 ```java
@@ -33,6 +33,9 @@ List<ChangeInfo> changes = gerritApi.changes().query("status:merged").withLimit(
 _Note:_ It is not guaranteed that all interfaces are implemented. If an implementation is missing, you get a
 <code>com.google.gerrit.extensions.restapi.NotImplementedException</code>. Feel free to implement it and create a pull
 request at GitHub - it is quite easy! :)
+
+_Note:_ The source of <code>com.google.gerrit.extensions</code> is included in this repository at the
+moment because not all extensions to this API are merged into Gerrit repository yet.
 
 [com.google.gerrit.extensions.api.GerritApi]: https://gerrit.googlesource.com/gerrit/+/HEAD/gerrit-extension-api/src/main/java/com/google/gerrit/extensions/api/GerritApi.java
 
