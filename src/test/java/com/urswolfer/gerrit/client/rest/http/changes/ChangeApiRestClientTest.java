@@ -109,7 +109,7 @@ public class ChangeApiRestClientTest {
                 suggestedReviewerInfoParser,
                 "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
-        List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J");
+        List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J").get();
 
         Truth.assertThat(suggestedReviewerInfos).isSameAs(expectedSuggestedReviewerInfos);
         EasyMock.verify(gerritRestClient, suggestedReviewerInfoParser);
@@ -132,7 +132,7 @@ public class ChangeApiRestClientTest {
                 suggestedReviewerInfoParser,
                 "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
-        List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J", 5);
+        List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J").withLimit(5).get();
 
         Truth.assertThat(suggestedReviewerInfos).isSameAs(expectedSuggestedReviewerInfos);
         EasyMock.verify(gerritRestClient, suggestedReviewerInfoParser);

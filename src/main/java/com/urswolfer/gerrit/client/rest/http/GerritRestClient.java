@@ -121,7 +121,7 @@ public class GerritRestClient {
             }
             return ret;
         } catch (IOException e) {
-            throw new RestApiException(e);
+            throw new RestApiException("Request failed.", e);
         }
     }
 

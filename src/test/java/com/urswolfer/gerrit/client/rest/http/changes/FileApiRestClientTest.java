@@ -20,6 +20,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.DiffInfo;
+import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
@@ -29,6 +30,8 @@ import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author Thomas Forrer
@@ -51,10 +54,18 @@ public class FileApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectGet(requestUrl, jsonElement).get();
 
         FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, revisionApiRestClient, null, FILE_PATH);
-        String actualContent = fileApiRestClient.content();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        BinaryResult binaryResult = fileApiRestClient.content();
+        try {
+            binaryResult.writeTo(byteArrayOutputStream);
+            String actualContent = new String(Base64.decodeBase64(byteArrayOutputStream.toString()));
 
-        Truth.assertThat(actualContent).is(FILE_CONTENT);
-        EasyMock.verify(gerritRestClient);
+            Truth.assertThat(actualContent).is(FILE_CONTENT);
+            EasyMock.verify(gerritRestClient);
+        } finally {
+            binaryResult.close();
+            byteArrayOutputStream.close();
+        }
     }
 
     @Test

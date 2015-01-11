@@ -22,10 +22,6 @@ public class RestApiException extends Exception {
   public RestApiException() {
   }
 
-  public RestApiException(Throwable cause) {
-    super(cause);
-  }
-
   public RestApiException(String msg) {
     super(msg);
   }

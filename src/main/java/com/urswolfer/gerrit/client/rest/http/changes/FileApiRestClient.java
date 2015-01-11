@@ -20,11 +20,11 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.gerrit.extensions.api.changes.FileApi;
 import com.google.gerrit.extensions.common.DiffInfo;
+import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * @author Thomas Forrer
@@ -54,11 +54,11 @@ public class FileApiRestClient implements FileApi {
     }
 
     @Override
-    public String content() throws RestApiException {
+    public BinaryResult content() throws RestApiException {
         String request = getRequestPath() + "/content";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         String content = jsonElement.getAsString();
-        return new String(Base64.decodeBase64(content.getBytes()));
+        return BinaryResult.create(content.getBytes()).base64();
     }
 
     @Override

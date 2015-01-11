@@ -124,14 +124,23 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
-    public List<SuggestedReviewerInfo> suggestReviewers(String query) throws RestApiException {
-        return suggestReviewers(query, -1); // a limit must be added because of a Gerrit bug; see: https://gerrit-review.googlesource.com/#/c/60242/
+    public SuggestedReviewersRequest suggestReviewers() throws RestApiException {
+        return new SuggestedReviewersRequest() {
+            @Override
+            public List<SuggestedReviewerInfo> get() throws RestApiException {
+                return ChangeApiRestClient.this.suggestReviewers(this);
+            }
+        };
     }
 
     @Override
-    public List<SuggestedReviewerInfo> suggestReviewers(String query, int limit) throws RestApiException {
-        String encodedQuery = Url.encode(query);
-        return getSuggestedReviewers(String.format("q=%s&n=%s", encodedQuery, limit));
+    public SuggestedReviewersRequest suggestReviewers(String query) throws RestApiException {
+        return suggestReviewers().withQuery(query).withLimit(-1); // a limit must be added because of a Gerrit bug; see: https://gerrit-review.googlesource.com/#/c/60242/
+    }
+
+    private List<SuggestedReviewerInfo> suggestReviewers(SuggestedReviewersRequest r) throws RestApiException {
+        String encodedQuery = Url.encode(r.getQuery());
+        return getSuggestedReviewers(String.format("q=%s&n=%s", encodedQuery, r.getLimit()));
     }
 
     private List<SuggestedReviewerInfo> getSuggestedReviewers(String queryPart) throws RestApiException {

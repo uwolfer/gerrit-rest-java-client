@@ -42,15 +42,14 @@ public interface RevisionApi {
   Map<String, FileInfo> files() throws RestApiException;
   Map<String, FileInfo> files(String base) throws RestApiException;
   FileApi file(String path);
+  MergeableInfo mergeable() throws RestApiException;
+  MergeableInfo mergeableOtherBranches() throws RestApiException;
 
   Map<String, List<CommentInfo>> comments() throws RestApiException;
   Map<String, List<CommentInfo>> drafts() throws RestApiException;
 
   DraftApi createDraft(DraftInput in) throws RestApiException;
   DraftApi draft(String id) throws RestApiException;
-
-  MergeableInfo mergeable() throws RestApiException;
-  MergeableInfo mergeableOtherBranches() throws RestApiException;
 
   CommentApi comment(String id) throws RestApiException;
 
@@ -110,12 +109,22 @@ public interface RevisionApi {
     }
 
     @Override
-    public Map<String, FileInfo> files() throws RestApiException {
+    public MergeableInfo mergeable() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public MergeableInfo mergeableOtherBranches() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
     public Map<String, FileInfo> files(String base) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public Map<String, FileInfo> files() throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -146,16 +155,6 @@ public interface RevisionApi {
 
     @Override
     public CommentApi comment(String id) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public MergeableInfo mergeable() throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public MergeableInfo mergeableOtherBranches() throws RestApiException {
       throw new NotImplementedException();
     }
   }

@@ -14,11 +14,6 @@
 
 package com.google.gerrit.extensions.common;
 
-import java.util.Map;
-
-public class EditInfo {
-  public CommitInfo commit;
-  public String baseRevision;
-  public Map<String, FetchInfo> fetch;
-  public Map<String, FileInfo> files;
+public enum Side {
+  PARENT, REVISION
 }

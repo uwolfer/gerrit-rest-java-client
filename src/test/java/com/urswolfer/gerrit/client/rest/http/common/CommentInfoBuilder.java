@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.common;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.Comment;
 import com.google.gerrit.extensions.common.CommentInfo;
+import com.google.gerrit.extensions.common.Side;
 
 /**
  * @author Thomas Forrer
@@ -45,7 +46,7 @@ public class CommentInfoBuilder extends AbstractBuilder {
         return this;
     }
 
-    public CommentInfoBuilder withSide(Comment.Side side) {
+    public CommentInfoBuilder withSide(Side side) {
         commentInfo.side = side;
         return this;
     }

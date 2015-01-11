@@ -48,7 +48,7 @@ public class ToolsRestClient implements Tools {
                 throw new RestApiException("HTTP Error: " + response.getStatusLine().getReasonPhrase());
             }
         } catch (IOException e) {
-            throw new RestApiException(e);
+            throw new RestApiException("Failed to get commit message hook.", e);
         }
     }
 }

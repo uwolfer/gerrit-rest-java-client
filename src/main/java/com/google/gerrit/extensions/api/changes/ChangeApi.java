@@ -81,14 +81,14 @@ public interface ChangeApi {
   void addReviewer(AddReviewerInput in) throws RestApiException;
   void addReviewer(String in) throws RestApiException;
 
-  List<SuggestedReviewerInfo> suggestReviewers(String query) throws RestApiException;
-  List<SuggestedReviewerInfo> suggestReviewers(String query, int limit) throws RestApiException;
+  SuggestedReviewersRequest suggestReviewers() throws RestApiException;
+  SuggestedReviewersRequest suggestReviewers(String query) throws RestApiException;
 
   ChangeInfo get(EnumSet<ListChangesOption> options) throws RestApiException;
 
-  /** {@code get} with {@link ListChangesOption} set to ALL. */
+  /** {@code get} with {@link ListChangesOption} set to all except CHECK. */
   ChangeInfo get() throws RestApiException;
-  /** {@code get} with {@link ListChangesOption} set to NONE. */
+  /** {@code get} with {@link ListChangesOption} set to none. */
   ChangeInfo info() throws RestApiException;
 
   /**
@@ -105,6 +105,31 @@ public interface ChangeApi {
 
   ChangeInfo check() throws RestApiException;
   ChangeInfo check(FixInput fix) throws RestApiException;
+
+  public abstract class SuggestedReviewersRequest {
+    private String query;
+    private int limit;
+
+    public abstract List<SuggestedReviewerInfo> get() throws RestApiException;
+
+    public SuggestedReviewersRequest withQuery(String query) {
+      this.query = query;
+      return this;
+    }
+
+    public SuggestedReviewersRequest withLimit(int limit) {
+      this.limit = limit;
+      return this;
+    }
+
+    public String getQuery() {
+      return query;
+    }
+
+    public int getLimit() {
+      return limit;
+    }
+  }
 
   /**
    * A default implementation which allows source compatibility
@@ -182,12 +207,12 @@ public interface ChangeApi {
     }
 
     @Override
-    public List<SuggestedReviewerInfo> suggestReviewers(String query) throws RestApiException {
+    public SuggestedReviewersRequest suggestReviewers() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public List<SuggestedReviewerInfo> suggestReviewers(String query, int limit) throws RestApiException {
+    public SuggestedReviewersRequest suggestReviewers(String query) throws RestApiException {
       throw new NotImplementedException();
     }
 
