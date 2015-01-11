@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest;
 
-import com.google.gerrit.extensions.api.GerritApi;
 import com.urswolfer.gerrit.client.rest.http.HttpClientBuilderExtension;
 import com.urswolfer.gerrit.client.rest.http.HttpRequestExecutor;
 
@@ -25,12 +24,12 @@ import com.urswolfer.gerrit.client.rest.http.HttpRequestExecutor;
  */
 public class GerritRestApiFactory {
 
-    public GerritApi create(GerritAuthData authData,
+    public GerritRestApi create(GerritAuthData authData,
                             HttpClientBuilderExtension... httpClientBuilderExtensions) {
         return create(authData, new HttpRequestExecutor(), httpClientBuilderExtensions);
     }
 
-    public GerritApi create(GerritAuthData authData,
+    public GerritRestApi create(GerritAuthData authData,
                             HttpRequestExecutor httpRequestExecutor,
                             HttpClientBuilderExtension... httpClientBuilderExtensions) {
         return new GerritApiImpl(authData, httpRequestExecutor, httpClientBuilderExtensions);

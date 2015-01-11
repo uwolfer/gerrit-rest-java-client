@@ -17,14 +17,12 @@ package com.google.gerrit.extensions.api;
 import com.google.gerrit.extensions.api.accounts.Accounts;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.api.projects.Projects;
-import com.google.gerrit.extensions.api.tools.Tools;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 
 public interface GerritApi {
   public Accounts accounts();
   public Changes changes();
   public Projects projects();
-  public Tools tools(); // added uwolfer
 
   /**
    * A default implementation which allows source compatibility
@@ -43,11 +41,6 @@ public interface GerritApi {
 
     @Override
     public Projects projects() {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public Tools tools() {
       throw new NotImplementedException();
     }
   }

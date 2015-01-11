@@ -22,7 +22,6 @@ import com.google.gerrit.extensions.api.GerritApi;
 import com.google.gerrit.extensions.api.accounts.Accounts;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.api.projects.Projects;
-import com.google.gerrit.extensions.api.tools.Tools;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.HttpClientBuilderExtension;
 import com.urswolfer.gerrit.client.rest.http.HttpRequestExecutor;
@@ -32,11 +31,12 @@ import com.urswolfer.gerrit.client.rest.http.changes.*;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsRestClient;
 import com.urswolfer.gerrit.client.rest.http.tools.ToolsRestClient;
+import com.urswolfer.gerrit.client.rest.tools.Tools;
 
 /**
  * @author Urs Wolfer
  */
-public class GerritApiImpl extends GerritApi.NotImplemented implements GerritApi {
+public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRestApi {
     private final GerritRestClient gerritRestClient;
 
     private final Supplier<AccountsRestClient> accountsRestClient = Suppliers.memoize(new Supplier<AccountsRestClient>() {

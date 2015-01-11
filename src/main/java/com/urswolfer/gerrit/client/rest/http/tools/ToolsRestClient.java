@@ -16,9 +16,9 @@
 
 package com.urswolfer.gerrit.client.rest.http.tools;
 
-import com.google.gerrit.extensions.api.tools.Tools;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.tools.Tools;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 

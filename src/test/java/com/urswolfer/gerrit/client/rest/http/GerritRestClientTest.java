@@ -24,8 +24,9 @@ import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
-import com.urswolfer.gerrit.client.rest.GerritRestApiFactory;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
+import com.urswolfer.gerrit.client.rest.GerritRestApi;
+import com.urswolfer.gerrit.client.rest.GerritRestApiFactory;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -107,7 +108,7 @@ public class GerritRestClientTest {
         gerritClient.changes().query().get();
     }
 
-    private GerritApi getGerritApiWithJettyHost() {
+    private GerritRestApi getGerritApiWithJettyHost() {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
         return gerritRestApiFactory.create(new GerritAuthData.Basic(jettyUrl));
     }
@@ -141,7 +142,7 @@ public class GerritRestClientTest {
 
     @Test
     public void testGetCommitMsgHook() throws Exception {
-        GerritApi gerritClient = getGerritApiWithJettyHost();
+        GerritRestApi gerritClient = getGerritApiWithJettyHost();
         InputStream commitMessageHook = gerritClient.tools().getCommitMessageHook();
         String result = CharStreams.toString(new InputStreamReader(commitMessageHook, Charsets.UTF_8));
         Truth.assertThat(result).is("dummy-commit-msg-hook\n");
