@@ -25,7 +25,7 @@ You just need a few lines to get it working:
 ```java
 GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
 GerritAuthData.Basic authData = new GerritAuthData.Basic("http://localhost:8080");
-// or: authData = new GerritAuthData.Basic("https://example.com/gerrit, "user", "password"");
+// or: authData = new GerritAuthData.Basic("https://example.com/gerrit", "user", "password"");
 GerritApi gerritApi = gerritRestApiFactory.create(authData);
 List<ChangeInfo> changes = gerritApi.changes().query("status:merged").withLimit(10).get();
 ```
