@@ -36,13 +36,11 @@ public interface GerritAuthData {
         private final String password;
 
         public Basic(String host) {
-            this.host = host;
-            this.login = "";
-            this.password = "";
+            this(host, "", "");
         }
 
         public Basic(String host, String login, String password) {
-            this.host = host;
+            this.host = stripTrailingSlash(host);
             this.login = login;
             this.password = password;
         }
@@ -65,6 +63,13 @@ public interface GerritAuthData {
         @Override
         public boolean isLoginAndPasswordAvailable() {
             return !Strings.isNullOrEmpty(getLogin()) && !Strings.isNullOrEmpty(getPassword());
+        }
+
+        private String stripTrailingSlash(String host) {
+            if (!Strings.isNullOrEmpty(host) && host.endsWith("/")) {
+                host = host.substring(0, host.length() - 1);
+            }
+            return host;
         }
     }
 }
