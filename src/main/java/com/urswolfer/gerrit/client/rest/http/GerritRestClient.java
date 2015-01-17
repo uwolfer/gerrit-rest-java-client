@@ -17,6 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -28,6 +29,7 @@ import org.apache.http.*;
 import org.apache.http.auth.*;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.cookie.Cookie;
@@ -38,6 +40,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -58,7 +61,6 @@ import java.util.regex.Pattern;
  */
 public class GerritRestClient {
 
-    private static final String UTF_8 = "UTF-8";
     private static final Pattern GERRIT_AUTH_PATTERN = Pattern.compile(".*?xGerritAuth=\"(.+?)\"");
     private static final int CONNECTION_TIMEOUT_MS = 30000;
     private static final String PREEMPTIVE_AUTH = "preemptive-auth";
@@ -132,7 +134,11 @@ public class GerritRestClient {
         BasicCookieStore cookieStore = new BasicCookieStore();
         httpContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
 
-        final Optional<String> gerritAuthOptional = tryGerritHttpAuth(client, httpContext);
+        Optional<String> gerritAuthOptional = tryGerritHttpAuth(client, httpContext);
+        if (!gerritAuthOptional.isPresent()) {
+            gerritAuthOptional = tryGerritHttpFormAuth(client, httpContext);
+        }
+
         String uri = authData.getHost();
         if (authData.isLoginAndPasswordAvailable()) {
             uri += "/a";
@@ -176,6 +182,24 @@ public class GerritRestClient {
     }
 
     /**
+     * Handles LDAP auth (but not LDAP_HTTP) which uses a HTML form.
+     */
+    private Optional<String> tryGerritHttpFormAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException {
+        if (!authData.isLoginAndPasswordAvailable()) {
+            return Optional.absent();
+        }
+        String loginUrl = authData.getHost() + "/login/";
+        HttpPost method = new HttpPost(loginUrl);
+        List<BasicNameValuePair> parameters = Lists.newArrayList(
+            new BasicNameValuePair("username", authData.getLogin()),
+            new BasicNameValuePair("password", authData.getPassword())
+        );
+        method.setEntity(new UrlEncodedFormEntity(parameters, Consts.UTF_8));
+        HttpResponse loginRequest = httpRequestExecutor.execute(client, method, httpContext);
+        return extractGerritAuthCookie(httpContext, loginRequest);
+    }
+
+    /**
      * Try to authenticate against Gerrit instances with HTTP auth (not OAuth or something like that).
      * In case of success we get a GerritAccount cookie. In that case no more login credentials need to be sent as
      * long as we use the *same* HTTP client. Even requests against authenticated rest api (/a) will be processed
@@ -197,6 +221,10 @@ public class GerritRestClient {
     private Optional<String> tryGerritHttpAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException {
         String loginUrl = authData.getHost() + "/login/";
         HttpResponse loginRequest = httpRequestExecutor.execute(client, new HttpGet(loginUrl), httpContext);
+        return extractGerritAuthCookie(httpContext, loginRequest);
+    }
+
+    private Optional<String> extractGerritAuthCookie(HttpContext httpContext, HttpResponse loginRequest) throws IOException {
         if (loginRequest.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
             List<Cookie> cookies = ((BasicCookieStore) httpContext.getAttribute(HttpClientContext.COOKIE_STORE)).getCookies();
             for (Cookie cookie : cookies) {
@@ -266,7 +294,7 @@ public class GerritRestClient {
     }
 
     private JsonElement parseResponse(InputStream response) throws IOException {
-        Reader reader = new InputStreamReader(response, UTF_8);
+        Reader reader = new InputStreamReader(response, Consts.UTF_8);
         try {
             return new JsonParser().parse(reader);
         } catch (JsonSyntaxException jse) {
