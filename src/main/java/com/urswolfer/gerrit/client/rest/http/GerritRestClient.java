@@ -140,7 +140,9 @@ public class GerritRestClient {
         }
 
         String uri = authData.getHost();
-        if (authData.isLoginAndPasswordAvailable()) {
+        // only use /a when http login is required (i.e. we haven't got a gerrit-auth cookie)
+        // it would work in most cases also with /a, but it breaks with HTTP digest auth ("Forbidden" returned)
+        if (authData.isLoginAndPasswordAvailable() && !gerritAuthOptional.isPresent()) {
             uri += "/a";
         }
         uri += path;
