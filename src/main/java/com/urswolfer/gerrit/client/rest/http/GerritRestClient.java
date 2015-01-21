@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2015 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package com.urswolfer.gerrit.client.rest.http;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
@@ -197,8 +199,8 @@ public class GerritRestClient {
             new BasicNameValuePair("password", authData.getPassword())
         );
         method.setEntity(new UrlEncodedFormEntity(parameters, Consts.UTF_8));
-        HttpResponse loginRequest = httpRequestExecutor.execute(client, method, httpContext);
-        return extractGerritAuthCookie(httpContext, loginRequest);
+        HttpResponse loginResponse = httpRequestExecutor.execute(client, method, httpContext);
+        return extractGerritAuth(httpContext, loginResponse);
     }
 
     /**
@@ -222,24 +224,31 @@ public class GerritRestClient {
      */
     private Optional<String> tryGerritHttpAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException {
         String loginUrl = authData.getHost() + "/login/";
-        HttpResponse loginRequest = httpRequestExecutor.execute(client, new HttpGet(loginUrl), httpContext);
-        return extractGerritAuthCookie(httpContext, loginRequest);
+        HttpResponse loginResponse = httpRequestExecutor.execute(client, new HttpGet(loginUrl), httpContext);
+        return extractGerritAuth(httpContext, loginResponse);
     }
 
-    private Optional<String> extractGerritAuthCookie(HttpContext httpContext, HttpResponse loginRequest) throws IOException {
-        if (loginRequest.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
-            List<Cookie> cookies = ((BasicCookieStore) httpContext.getAttribute(HttpClientContext.COOKIE_STORE)).getCookies();
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("GerritAccount")) {
-                    Matcher matcher = GERRIT_AUTH_PATTERN.matcher(EntityUtils.toString(loginRequest.getEntity(), Consts.UTF_8));
-                    if (matcher.find()) {
-                        return Optional.of(matcher.group(1));
-                    }
-                    break;
+    private Optional<String> extractGerritAuth(HttpContext httpContext, HttpResponse loginResponse) throws IOException {
+        if (loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
+            Optional<Cookie> gerritAccountCookie = findGerritAccountCookie(httpContext);
+            if (gerritAccountCookie.isPresent()) {
+                Matcher matcher = GERRIT_AUTH_PATTERN.matcher(EntityUtils.toString(loginResponse.getEntity(), Consts.UTF_8));
+                if (matcher.find()) {
+                    return Optional.of(matcher.group(1));
                 }
             }
         }
         return Optional.absent();
+    }
+
+    private Optional<Cookie> findGerritAccountCookie(HttpContext httpContext) {
+        List<Cookie> cookies = ((BasicCookieStore) httpContext.getAttribute(HttpClientContext.COOKIE_STORE)).getCookies();
+        return Iterables.tryFind(cookies, new Predicate<Cookie>() {
+            @Override
+            public boolean apply(Cookie cookie) {
+                return cookie.getName().equals("GerritAccount");
+            }
+        });
     }
 
     private HttpClientBuilder getHttpClient(HttpContext httpContext) {
