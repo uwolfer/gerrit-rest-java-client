@@ -72,12 +72,18 @@ public class GerritRestClient {
     private final HttpRequestExecutor httpRequestExecutor;
     private final List<HttpClientBuilderExtension> httpClientBuilderExtensions;
 
+    private final BasicCookieStore cookieStore;
+    private final LoginCache loginCache;
+
     public GerritRestClient(GerritAuthData authData,
                             HttpRequestExecutor httpRequestExecutor,
                             HttpClientBuilderExtension... httpClientBuilderExtensions) {
         this.authData = authData;
         this.httpRequestExecutor = httpRequestExecutor;
         this.httpClientBuilderExtensions = Arrays.asList(httpClientBuilderExtensions);
+
+        cookieStore = new BasicCookieStore();
+        loginCache = new LoginCache(authData, cookieStore);
     }
 
     public enum HttpVerb {
@@ -133,13 +139,7 @@ public class GerritRestClient {
         HttpContext httpContext = new BasicHttpContext();
         HttpClientBuilder client = getHttpClient(httpContext);
 
-        BasicCookieStore cookieStore = new BasicCookieStore();
-        httpContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
-
-        Optional<String> gerritAuthOptional = tryGerritHttpAuth(client, httpContext);
-        if (!gerritAuthOptional.isPresent()) {
-            gerritAuthOptional = tryGerritHttpFormAuth(client, httpContext);
-        }
+        Optional<String> gerritAuthOptional = updateGerritAuthWhenRequired(httpContext, client);
 
         String uri = authData.getHost();
         // only use /a when http login is required (i.e. we haven't got a gerrit-auth cookie)
@@ -185,6 +185,24 @@ public class GerritRestClient {
         }
     }
 
+    private Optional<String> updateGerritAuthWhenRequired(HttpContext httpContext, HttpClientBuilder client) throws IOException {
+        if (!loginCache.getHostSupportsGerritAuth()) {
+            return Optional.absent();
+        }
+        Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
+        if (!gerritAccountCookie.isPresent() || gerritAccountCookie.get().isExpired(new Date())) {
+            return updateGerritAuth(httpContext, client);
+        }
+        return loginCache.getGerritAuthOptional();
+    }
+
+    private Optional<String> updateGerritAuth(HttpContext httpContext, HttpClientBuilder client) throws IOException {
+        Optional<String> gerritAuthOptional = tryGerritHttpAuth(client, httpContext)
+            .or(tryGerritHttpFormAuth(client, httpContext));
+        loginCache.setGerritAuthOptional(gerritAuthOptional);
+        return gerritAuthOptional;
+    }
+
     /**
      * Handles LDAP auth (but not LDAP_HTTP) which uses a HTML form.
      */
@@ -200,7 +218,7 @@ public class GerritRestClient {
         );
         method.setEntity(new UrlEncodedFormEntity(parameters, Consts.UTF_8));
         HttpResponse loginResponse = httpRequestExecutor.execute(client, method, httpContext);
-        return extractGerritAuth(httpContext, loginResponse);
+        return extractGerritAuth(loginResponse);
     }
 
     /**
@@ -225,12 +243,12 @@ public class GerritRestClient {
     private Optional<String> tryGerritHttpAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException {
         String loginUrl = authData.getHost() + "/login/";
         HttpResponse loginResponse = httpRequestExecutor.execute(client, new HttpGet(loginUrl), httpContext);
-        return extractGerritAuth(httpContext, loginResponse);
+        return extractGerritAuth(loginResponse);
     }
 
-    private Optional<String> extractGerritAuth(HttpContext httpContext, HttpResponse loginResponse) throws IOException {
+    private Optional<String> extractGerritAuth(HttpResponse loginResponse) throws IOException {
         if (loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
-            Optional<Cookie> gerritAccountCookie = findGerritAccountCookie(httpContext);
+            Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
             if (gerritAccountCookie.isPresent()) {
                 Matcher matcher = GERRIT_AUTH_PATTERN.matcher(EntityUtils.toString(loginResponse.getEntity(), Consts.UTF_8));
                 if (matcher.find()) {
@@ -241,8 +259,8 @@ public class GerritRestClient {
         return Optional.absent();
     }
 
-    private Optional<Cookie> findGerritAccountCookie(HttpContext httpContext) {
-        List<Cookie> cookies = ((BasicCookieStore) httpContext.getAttribute(HttpClientContext.COOKIE_STORE)).getCookies();
+    private Optional<Cookie> findGerritAccountCookie() {
+        List<Cookie> cookies = cookieStore.getCookies();
         return Iterables.tryFind(cookies, new Predicate<Cookie>() {
             @Override
             public boolean apply(Cookie cookie) {
@@ -255,6 +273,8 @@ public class GerritRestClient {
         HttpClientBuilder client = HttpClients.custom();
 
         client.useSystemProperties(); // see also: com.intellij.util.net.ssl.CertificateManager
+
+        httpContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
 
         RequestConfig.Builder requestConfig = RequestConfig.custom()
                 .setConnectTimeout(CONNECTION_TIMEOUT_MS) // how long it takes to connect to remote host
