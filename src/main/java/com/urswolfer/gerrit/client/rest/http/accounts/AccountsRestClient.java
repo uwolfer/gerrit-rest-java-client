@@ -24,7 +24,7 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 /**
  * @author Urs Wolfer
  */
-public class AccountsRestClient extends AccountApi.NotImplemented implements Accounts {
+public class AccountsRestClient extends Accounts.NotImplemented implements Accounts {
 
     private final GerritRestClient gerritRestClient;
     private final AccountsParser accountsParser;
