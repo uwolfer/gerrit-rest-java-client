@@ -101,7 +101,7 @@ public class AccountsRestClientTest {
 
     private AccountsParser getAccountsParser() throws Exception {
         AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-        EasyMock.expect(accountsParser.parseUserInfo(MOCK_JSON_ELEMENT))
+        EasyMock.expect(accountsParser.parseAccountInfo(MOCK_JSON_ELEMENT))
                 .andReturn(MOCK_ACCOUNT_INFO).once();
         EasyMock.replay(accountsParser);
         return accountsParser;

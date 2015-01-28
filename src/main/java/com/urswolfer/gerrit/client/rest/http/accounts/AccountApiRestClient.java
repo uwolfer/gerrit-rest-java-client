@@ -43,7 +43,7 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
     @Override
     public AccountInfo get() throws RestApiException {
         JsonElement result = gerritRestClient.getRequest("/accounts/" + name);
-        return accountsParser.parseUserInfo(result);
+        return accountsParser.parseAccountInfo(result);
     }
 
     @Override

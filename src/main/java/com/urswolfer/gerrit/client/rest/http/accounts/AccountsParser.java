@@ -31,7 +31,7 @@ public class AccountsParser {
         this.gson = gson;
     }
 
-    public AccountInfo parseUserInfo(JsonElement result) throws RestApiException {
+    public AccountInfo parseAccountInfo(JsonElement result) throws RestApiException {
         return gson.fromJson(result, AccountInfo.class);
     }
 }
