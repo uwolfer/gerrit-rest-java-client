@@ -184,6 +184,10 @@ public class GerritRestClient {
 
     private Optional<String> updateGerritAuthWhenRequired(HttpContext httpContext, HttpClientBuilder client) throws IOException {
         if (!loginCache.getHostSupportsGerritAuth()) {
+            // We do not not need a cookie here since we are sending credentials as HTTP basic / digest header again.
+            // In fact cookies could hurt: googlesource.com Gerrit instances block requests which send a magic cookie
+            // named "gi" with a 400 HTTP status (as of 01/29/15).
+            cookieStore.clear();
             return Optional.absent();
         }
         Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
