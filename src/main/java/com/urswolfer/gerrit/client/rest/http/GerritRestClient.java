@@ -38,10 +38,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.*;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -273,6 +270,9 @@ public class GerritRestClient {
         HttpClientBuilder client = HttpClients.custom();
 
         client.useSystemProperties(); // see also: com.intellij.util.net.ssl.CertificateManager
+
+        // we need to get redirected result after login (which is done with POST) for extracting xGerritAuth
+        client.setRedirectStrategy(new LaxRedirectStrategy());
 
         httpContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
 
