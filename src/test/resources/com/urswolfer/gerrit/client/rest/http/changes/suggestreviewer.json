@@ -1,0 +1,10 @@
+)]}'
+{
+    "kind": "gerritcodereview#suggestedreviewer",
+    "account": {
+        "_account_id": 1000004,
+        "name": "Joe Doe",
+        "username": "jdoe",
+        "avatars": []
+    }
+}
