@@ -48,7 +48,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -91,29 +94,29 @@ public class GerritRestClient {
         return GSON;
     }
 
-    public JsonElement getRequest(String path, Header... headers) throws RestApiException {
-        return request(path, null, Arrays.asList(headers), HttpVerb.GET);
+    public JsonElement getRequest(String path) throws RestApiException {
+        return request(path, null, HttpVerb.GET);
     }
 
-    public JsonElement postRequest(String path, String requestBody, Header... headers) throws RestApiException {
-        return request(path, requestBody, Arrays.asList(headers), HttpVerb.POST);
+    public JsonElement postRequest(String path, String requestBody) throws RestApiException {
+        return request(path, requestBody, HttpVerb.POST);
     }
 
-    public JsonElement putRequest(String path, Header... headers) throws RestApiException {
-        return putRequest(path, null, headers);
+    public JsonElement putRequest(String path) throws RestApiException {
+        return putRequest(path, null);
     }
 
-    public JsonElement putRequest(String path, String requestBody, Header... headers) throws RestApiException {
-        return request(path, requestBody, Arrays.asList(headers), HttpVerb.PUT);
+    public JsonElement putRequest(String path, String requestBody) throws RestApiException {
+        return request(path, requestBody, HttpVerb.PUT);
     }
 
-    public JsonElement deleteRequest(String path, Header... headers) throws RestApiException {
-        return request(path, null, Arrays.asList(headers), HttpVerb.DELETE);
+    public JsonElement deleteRequest(String path) throws RestApiException {
+        return request(path, null, HttpVerb.DELETE);
     }
 
-    public JsonElement request(String path, String requestBody, Collection<Header> headers, HttpVerb verb) throws RestApiException {
+    public JsonElement request(String path, String requestBody, HttpVerb verb) throws RestApiException {
         try {
-            HttpResponse response = doRest(path, requestBody, headers, verb);
+            HttpResponse response = doRest(path, requestBody, verb);
 
             checkStatusCode(response);
 
@@ -132,7 +135,7 @@ public class GerritRestClient {
         }
     }
 
-    public HttpResponse doRest(String path, String requestBody, Collection<Header> headers, HttpVerb verb) throws IOException, RestApiException {
+    public HttpResponse doRest(String path, String requestBody, HttpVerb verb) throws IOException, RestApiException {
         HttpContext httpContext = new BasicHttpContext();
         HttpClientBuilder client = getHttpClient(httpContext);
 
@@ -164,9 +167,6 @@ public class GerritRestClient {
                 break;
             default:
                 throw new IllegalStateException("Unknown or unsupported HttpVerb method: " + verb.toString());
-        }
-        for (Header header : headers) {
-            method.addHeader(header);
         }
         if (gerritAuthOptional.isPresent()) {
             method.addHeader("X-Gerrit-Auth", gerritAuthOptional.get());

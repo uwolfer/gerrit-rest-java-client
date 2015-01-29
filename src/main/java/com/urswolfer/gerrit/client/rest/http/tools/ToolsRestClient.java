@@ -19,12 +19,10 @@ package com.urswolfer.gerrit.client.rest.http.tools;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 
 /**
  * @author Urs Wolfer
@@ -40,7 +38,7 @@ public class ToolsRestClient implements Tools {
     @Override
     public InputStream getCommitMessageHook() throws RestApiException {
         try {
-            HttpResponse response = gerritRestClient.doRest("/tools/hooks/commit-msg", null, Collections.<Header>emptyList(), GerritRestClient.HttpVerb.GET);
+            HttpResponse response = gerritRestClient.doRest("/tools/hooks/commit-msg", null, GerritRestClient.HttpVerb.GET);
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode >= 200 && statusCode < 400) {
                 return response.getEntity().getContent();
