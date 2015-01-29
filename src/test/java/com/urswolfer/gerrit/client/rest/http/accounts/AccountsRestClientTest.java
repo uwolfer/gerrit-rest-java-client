@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2015 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,19 @@ public class AccountsRestClientTest {
                 EasyMock.createMock(AccountsParser.class));
 
         accountsRestClient.id("jdoe").unstarChange("Iccf90a8284f8371a211db9a2824d0617e95a79f9");
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testSuggestAccount() throws Exception {
+        GerritRestClient gerritRestClient = gerritRestClientExpectGet(
+                "/accounts/?q=jdoe&n=5");
+        AccountsRestClient accountsRestClient = new AccountsRestClient(
+                gerritRestClient,
+                EasyMock.createMock(AccountsParser.class));
+
+        accountsRestClient.suggestAccounts("jdoe").withLimit(5).get();
 
         EasyMock.verify(gerritRestClient);
     }

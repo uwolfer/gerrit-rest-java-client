@@ -18,8 +18,13 @@ package com.urswolfer.gerrit.client.rest.http.accounts;
 
 import com.google.gerrit.extensions.api.accounts.AccountApi;
 import com.google.gerrit.extensions.api.accounts.Accounts;
+import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
+import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+
+import java.util.List;
 
 /**
  * @author Urs Wolfer
@@ -42,5 +47,37 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
     @Override
     public AccountApi self() throws RestApiException {
         return id("self");
+    }
+
+    /**
+     * Added in Gerrit 2.11.
+     */
+    @Override
+    public SuggestAccountsRequest suggestAccounts() throws RestApiException {
+        return new SuggestAccountsRequest() {
+            @Override
+            public List<AccountInfo> get() throws RestApiException {
+                return AccountsRestClient.this.suggestAccounts(this);
+            }
+        };
+    }
+
+    /**
+     * Added in Gerrit 2.11.
+     */
+    @Override
+    public SuggestAccountsRequest suggestAccounts(String query) throws RestApiException {
+        return suggestAccounts().withQuery(query);
+    }
+
+    private List<AccountInfo> suggestAccounts(SuggestAccountsRequest r) throws RestApiException {
+        String encodedQuery = Url.encode(r.getQuery());
+        return getSuggestAccounts(String.format("q=%s&n=%s", encodedQuery, r.getLimit()));
+    }
+
+    private List<AccountInfo> getSuggestAccounts(String queryPart) throws RestApiException {
+        String request = String.format("/accounts/?%s", queryPart);
+        JsonElement suggestedReviewers = gerritRestClient.getRequest(request);
+        return accountsParser.parseAccountInfos(suggestedReviewers);
     }
 }

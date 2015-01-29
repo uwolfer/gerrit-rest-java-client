@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2015 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Thomas Forrer
@@ -42,7 +43,7 @@ public class AccountsParserTest extends AbstractParserTest {
     }
 
     @Test
-    public void testParseUserInfos() throws Exception {
+    public void testParseUserInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("self/account.json");
 
         AccountInfo accountInfo = accountsParser.parseAccountInfo(jsonElement);
@@ -51,9 +52,23 @@ public class AccountsParserTest extends AbstractParserTest {
     }
 
     @Test
-    public void testParseUserInfosWithNullJsonElement() throws Exception {
+    public void testParseUserInfoWithNullJsonElement() throws Exception {
         AccountInfo accountInfo = accountsParser.parseAccountInfo(null);
 
         Truth.assertThat(accountInfo).isNull();
+    }
+
+    @Test
+    public void testParseUserInfos() throws Exception {
+        JsonElement jsonElement = getJsonElement("accounts.json");
+        List<AccountInfo> accountInfos = accountsParser.parseAccountInfos(jsonElement);
+        Truth.assertThat(accountInfos).hasSize(2);
+    }
+
+    @Test
+    public void testParseSigngleUserInfos() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/account.json");
+        List<AccountInfo> accountInfos = accountsParser.parseAccountInfos(jsonElement);
+        Truth.assertThat(accountInfos).hasSize(1);
     }
 }

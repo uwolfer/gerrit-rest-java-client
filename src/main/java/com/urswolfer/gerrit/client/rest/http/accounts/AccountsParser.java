@@ -16,15 +16,22 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
+import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Thomas Forrer
  */
 public class AccountsParser {
+    private static final Type TYPE = new TypeToken<List<AccountInfo>>() {}.getType();
+
     private final Gson gson;
 
     public AccountsParser(Gson gson) {
@@ -33,5 +40,12 @@ public class AccountsParser {
 
     public AccountInfo parseAccountInfo(JsonElement result) throws RestApiException {
         return gson.fromJson(result, AccountInfo.class);
+    }
+
+    public List<AccountInfo> parseAccountInfos(JsonElement result) throws RestApiException {
+        if (!result.isJsonArray()) {
+            return Collections.singletonList(parseAccountInfo(result));
+        }
+        return gson.fromJson(result, TYPE);
     }
 }
