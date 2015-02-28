@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.common;
+package com.google.gerrit.extensions.client;
 
 import java.util.EnumSet;
 
@@ -55,7 +55,10 @@ public enum ListChangesOption {
   WEB_LINKS(14),
 
   /** Include consistency check results. */
-  CHECK(15);
+  CHECK(15),
+
+  /** Include allowed change actions client could perform. */
+  CHANGE_ACTIONS(16);
 
   private final int value;
 

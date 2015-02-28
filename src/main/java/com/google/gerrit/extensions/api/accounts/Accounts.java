@@ -44,21 +44,55 @@ public interface Accounts {
    */
   AccountApi self() throws RestApiException;
 
+  /**
+   * Suggest users for a given query.
+   * <p>
+   * Example code:
+   * {@code suggestAccounts().withQuery("Reviewer").withLimit(5).get()}
+   *
+   * @return API for setting parameters and getting result.
+   */
   SuggestAccountsRequest suggestAccounts() throws RestApiException;
+
+  /**
+   * Suggest users for a given query.
+   * <p>
+   * Shortcut API for {@code suggestAccounts().withQuery(String)}.
+   *
+   * @see #suggestAccounts()
+   */
   SuggestAccountsRequest suggestAccounts(String query)
     throws RestApiException;
 
+  /**
+   * API for setting parameters and getting result.
+   * Used for {@code suggestAccounts()}.
+   *
+   * @see #suggestAccounts()
+   */
   public abstract class SuggestAccountsRequest {
     private String query;
     private int limit;
 
+    /**
+     * Executes query and returns a list of accounts.
+     */
     public abstract List<AccountInfo> get() throws RestApiException;
 
+    /**
+     * Set query.
+     *
+     * @param query needs to be in human-readable form.
+     */
     public SuggestAccountsRequest withQuery(String query) {
       this.query = query;
       return this;
     }
 
+    /**
+     * Set limit for returned list of accounts.
+     * Optional; server-default is used when not provided.
+     */
     public SuggestAccountsRequest withLimit(int limit) {
       this.limit = limit;
       return this;

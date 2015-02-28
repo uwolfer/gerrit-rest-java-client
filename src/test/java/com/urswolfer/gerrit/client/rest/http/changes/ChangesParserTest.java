@@ -18,15 +18,11 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.client.ChangeStatus;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
-import com.google.gerrit.extensions.common.ChangeStatus;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
-import com.urswolfer.gerrit.client.rest.http.common.AccountInfoBuilder;
-import com.urswolfer.gerrit.client.rest.http.common.ChangeInfoBuilder;
-import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
-import com.urswolfer.gerrit.client.rest.http.common.LabelInfoBuilder;
+import com.urswolfer.gerrit.client.rest.http.common.*;
 import org.testng.annotations.Test;
 
 import java.util.List;

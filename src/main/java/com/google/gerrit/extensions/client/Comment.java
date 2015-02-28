@@ -12,19 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.common;
+package com.google.gerrit.extensions.client;
 
-import com.google.gerrit.extensions.client.ProjectState;
+import java.sql.Timestamp;
 
-import java.util.List;
-import java.util.Map;
-
-public class ProjectInfo {
+public abstract class Comment {
   public String id;
-  public String name;
-  public String parent;
-  public String description;
-  public ProjectState state;
-  public Map<String, String> branches;
-  public List<WebLinkInfo> webLinks;
+  public String path;
+  public Side side;
+  public Integer line;
+  public Range range;
+  public String inReplyTo;
+  public Timestamp updated;
+  public String message;
+
+  public static class Range {
+    public int startLine;
+    public int startCharacter;
+    public int endLine;
+    public int endCharacter;
+  }
 }

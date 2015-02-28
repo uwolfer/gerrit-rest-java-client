@@ -16,10 +16,10 @@
 
 package com.urswolfer.gerrit.client.rest.http.common;
 
+import com.google.gerrit.extensions.client.Comment;
+import com.google.gerrit.extensions.client.Side;
 import com.google.gerrit.extensions.common.AccountInfo;
-import com.google.gerrit.extensions.common.Comment;
 import com.google.gerrit.extensions.common.CommentInfo;
-import com.google.gerrit.extensions.common.Side;
 
 /**
  * @author Thomas Forrer

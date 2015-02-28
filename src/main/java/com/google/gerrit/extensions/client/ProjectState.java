@@ -12,19 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.common;
+package com.google.gerrit.extensions.client;
 
-import com.google.gerrit.extensions.client.ProjectState;
-
-import java.util.List;
-import java.util.Map;
-
-public class ProjectInfo {
-  public String id;
-  public String name;
-  public String parent;
-  public String description;
-  public ProjectState state;
-  public Map<String, String> branches;
-  public List<WebLinkInfo> webLinks;
+public enum ProjectState {
+  ACTIVE,
+  READ_ONLY,
+  HIDDEN
 }

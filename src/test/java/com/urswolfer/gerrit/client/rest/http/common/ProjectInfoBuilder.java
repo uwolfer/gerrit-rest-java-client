@@ -16,7 +16,7 @@
 
 package com.urswolfer.gerrit.client.rest.http.common;
 
-import com.google.gerrit.extensions.api.projects.ProjectState;
+import com.google.gerrit.extensions.client.ProjectState;
 import com.google.gerrit.extensions.common.ProjectInfo;
 
 /**

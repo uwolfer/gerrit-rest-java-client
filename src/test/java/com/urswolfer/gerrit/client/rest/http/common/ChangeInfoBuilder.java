@@ -17,6 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.common;
 
 import com.google.common.collect.Maps;
+import com.google.gerrit.extensions.client.ChangeStatus;
 import com.google.gerrit.extensions.common.*;
 
 import java.sql.Timestamp;

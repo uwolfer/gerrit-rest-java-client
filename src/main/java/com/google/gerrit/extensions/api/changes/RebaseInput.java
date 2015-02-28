@@ -1,4 +1,4 @@
-// Copyright (C) 2014 The Android Open Source Project
+// Copyright (C) 2015 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.common;
+package com.google.gerrit.extensions.api.changes;
 
-import java.sql.Timestamp;
-
-public abstract class Comment {
-  public String id;
-  public String path;
-  public Side side;
-  public Integer line;
-  public Range range;
-  public String inReplyTo;
-  public Timestamp updated;
-  public String message;
-
-  public static class Range {
-    public int startLine;
-    public int startCharacter;
-    public int endLine;
-    public int endCharacter;
-  }
+public class RebaseInput {
+  public String base;
 }

@@ -26,7 +26,8 @@ public interface DraftApi extends CommentApi {
    * A default implementation which allows source compatibility
    * when adding new methods to the interface.
    **/
-  public class NotImplemented extends CommentApi.NotImplemented implements DraftApi {
+  public class NotImplemented extends CommentApi.NotImplemented
+      implements DraftApi {
     @Override
     public CommentInfo update(DraftInput in) throws RestApiException {
       throw new NotImplementedException();

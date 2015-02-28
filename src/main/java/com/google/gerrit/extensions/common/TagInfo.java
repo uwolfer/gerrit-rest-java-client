@@ -12,10 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.api.projects;
+package com.google.gerrit.extensions.common;
 
-public enum ProjectState {
-  ACTIVE,
-  READ_ONLY,
-  HIDDEN
+public class TagInfo {
+  public String ref;
+  public String revision;
+  public String object;
+  public String message;
+  public GitPerson tagger;
+
+  public TagInfo(String ref, String revision) {
+    this.ref = ref;
+    this.revision = revision;
+  }
+
+  public TagInfo(String ref, String revision, String object,
+      String message, GitPerson tagger) {
+    this(ref, revision);
+    this.object = object;
+    this.message = message;
+    this.tagger = tagger;
+  }
 }
