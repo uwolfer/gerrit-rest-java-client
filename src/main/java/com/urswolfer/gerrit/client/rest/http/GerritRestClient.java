@@ -27,6 +27,7 @@ import com.google.gson.*;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
 import com.urswolfer.gerrit.client.rest.Version;
 import com.urswolfer.gerrit.client.rest.gson.DateDeserializer;
+import com.urswolfer.gerrit.client.rest.gson.DateSerializer;
 import org.apache.http.*;
 import org.apache.http.auth.*;
 import org.apache.http.client.CredentialsProvider;
@@ -403,6 +404,7 @@ public class GerritRestClient {
     private static Gson initGson() {
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(Date.class, new DateDeserializer());
+        builder.registerTypeAdapter(Date.class, new DateSerializer());
         builder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
         return builder.create();
     }

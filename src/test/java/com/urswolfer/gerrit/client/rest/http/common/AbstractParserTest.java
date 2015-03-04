@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.common;
 
 import com.google.gson.*;
 import com.urswolfer.gerrit.client.rest.gson.DateDeserializer;
+import com.urswolfer.gerrit.client.rest.gson.DateSerializer;
 
 import java.io.File;
 import java.io.FileReader;
@@ -37,6 +38,7 @@ public abstract class AbstractParserTest {
     protected static Gson getGson() {
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(Date.class, new DateDeserializer());
+        builder.registerTypeAdapter(Date.class, new DateSerializer());
         builder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
         return builder.create();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Urs Wolfer
+ * Copyright 2013-2015 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,21 @@
 
 package com.urswolfer.gerrit.client.rest.gson;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
-import java.text.ParseException;
 import java.util.Date;
 
 /**
  * @author Urs Wolfer
  */
-public class DateDeserializer extends DateFormatter implements JsonDeserializer<Date> {
+public class DateSerializer extends DateFormatter implements JsonSerializer<Date> {
     @Override
-    public Date deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        String date = jsonElement.getAsString();
-        try {
-            return DATE_FORMAT.get().parse(date);
-        } catch (ParseException e) {
-            throw new JsonParseException(e);
-        }
+    public JsonElement serialize(Date date, Type type, JsonSerializationContext jsonSerializationContext) {
+        String result = DATE_FORMAT.get().format(date);
+        return new JsonPrimitive(result);
     }
 }
