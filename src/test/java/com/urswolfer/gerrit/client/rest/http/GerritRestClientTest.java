@@ -215,6 +215,14 @@ public class GerritRestClientTest {
         Truth.assertThat(extendCredentialProviderCalled[0]).isTrue();
     }
 
+    @Test
+    public void testVersion() throws Exception {
+        GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
+        GerritApi gerritClient = gerritRestApiFactory.create(new GerritAuthData.Basic(jettyUrl));
+        String version = gerritClient.config().server().getVersion();
+        Truth.assertThat(version).is("2.10");
+    }
+
     @Test(enabled = false) // requires running Gerrit instance
     public void testBasicRestCallToLocalhost() throws Exception {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
