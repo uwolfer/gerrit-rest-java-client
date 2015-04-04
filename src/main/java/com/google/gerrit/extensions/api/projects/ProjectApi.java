@@ -14,6 +14,9 @@
 
 package com.google.gerrit.extensions.api.projects;
 
+import java.util.List;
+
+import com.google.gerrit.extensions.common.BranchInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -22,6 +25,7 @@ public interface ProjectApi {
   ProjectApi create() throws RestApiException;
   ProjectApi create(ProjectInput in) throws RestApiException;
   ProjectInfo get();
+  List<BranchInfo> getBranches() throws RestApiException;
 
   /**
    * Look up a branch by refname.
@@ -61,5 +65,10 @@ public interface ProjectApi {
     public BranchApi branch(String ref) {
       throw new NotImplementedException();
     }
+
+    @Override
+    public List<BranchInfo> getBranches() throws RestApiException {
+      throw new NotImplementedException();
+    }    
   }
 }

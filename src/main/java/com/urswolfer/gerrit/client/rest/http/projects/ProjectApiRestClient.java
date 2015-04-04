@@ -16,9 +16,12 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import java.util.List;
+
 import com.google.common.base.Throwables;
 import com.google.gerrit.extensions.api.projects.ProjectApi;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
+import com.google.gerrit.extensions.common.BranchInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
@@ -30,13 +33,16 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 public class ProjectApiRestClient extends ProjectApi.NotImplemented implements ProjectApi {
     private final GerritRestClient gerritRestClient;
     private final ProjectsParser projectsParser;
+    private final BranchInfoParser branchInfoParser;
     private final String name;
 
     public ProjectApiRestClient(GerritRestClient gerritRestClient,
-                                ProjectsParser projectsParser,
-                                String name) {
+            ProjectsParser projectsParser,
+            BranchInfoParser branchInfoParser,
+            String name) {
         this.gerritRestClient = gerritRestClient;
         this.projectsParser = projectsParser;
+        this.branchInfoParser = branchInfoParser;
         this.name = name;
     }
 
@@ -61,6 +67,12 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         String body = gerritRestClient.getGson().toJson(in);
         gerritRestClient.putRequest(projectsUrl(), body);
         return this;
+    }
+
+    public List<BranchInfo> getBranches() throws RestApiException {
+        String request = projectsUrl() + "/branches";
+        JsonElement branches = gerritRestClient.getRequest(request);
+        return branchInfoParser.parseBranchInfos(branches);
     }
 
     private String projectsUrl() {

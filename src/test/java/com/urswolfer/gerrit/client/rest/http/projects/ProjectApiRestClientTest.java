@@ -16,14 +16,18 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import java.util.List;
+
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
+import com.google.gerrit.extensions.common.BranchInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
+
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
@@ -34,6 +38,7 @@ public class ProjectApiRestClientTest {
 
     public static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
     public static final ProjectInfo MOCK_PROJECT_INFO = EasyMock.createMock(ProjectInfo.class);
+    public static final List<BranchInfo> BRANCH_INFOS = Lists.newArrayList();
 
     @Test
     public void testGetProjectInfoForName() throws Exception {
@@ -44,7 +49,10 @@ public class ProjectApiRestClientTest {
         ProjectsParser projectsParser = new ProjectsParserBuilder()
                 .expectParseSingleProjectInfo(MOCK_JSON_ELEMENT, MOCK_PROJECT_INFO)
                 .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser);
+        BranchInfoParser branchInfoParser = new BranchInfoParserBuilder()
+                .expectParseBranchInfos(MOCK_JSON_ELEMENT,BRANCH_INFOS)
+                 .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser);
 
         ProjectInfo projectInfo = projectsRestClient.name(projectName).get();
 
@@ -59,7 +67,8 @@ public class ProjectApiRestClientTest {
                 .expectGet("/projects/sandbox", new RestApiException())
                 .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser);
+        BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser);
 
         projectsRestClient.name(projectName).get();
     }
@@ -71,7 +80,8 @@ public class ProjectApiRestClientTest {
                 .expectPut("/projects/sandbox", MOCK_JSON_ELEMENT)
                 .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser);
+        BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser);
 
         projectsRestClient.name(projectName).create();
 
@@ -99,7 +109,8 @@ public class ProjectApiRestClientTest {
                 .expectGetGson()
                 .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser);
+        BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser);
 
         projectsRestClient.name(projectName).create(projectInput);
 
