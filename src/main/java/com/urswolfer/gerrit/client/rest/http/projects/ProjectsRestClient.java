@@ -35,11 +35,14 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
 
     private final GerritRestClient gerritRestClient;
     private final ProjectsParser projectsParser;
+    private final BranchInfoParser branchInfoParser;
 
     public ProjectsRestClient(GerritRestClient gerritRestClient,
-                              ProjectsParser projectsParser) {
+            ProjectsParser projectsParser,
+            BranchInfoParser branchInfoParser) {
         this.gerritRestClient = gerritRestClient;
         this.projectsParser = projectsParser;
+        this.branchInfoParser = branchInfoParser;
     }
 
     @Override
@@ -54,7 +57,7 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
 
     @Override
     public ProjectApi name(String name) throws RestApiException {
-        return new ProjectApiRestClient(gerritRestClient, projectsParser, name);
+        return new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, name);
     }
 
     private List<ProjectInfo> list(ListRequest listParameter) throws RestApiException {
