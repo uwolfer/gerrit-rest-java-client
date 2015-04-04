@@ -18,10 +18,67 @@ import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
+import java.util.List;
+
 public interface ProjectApi {
   ProjectApi create() throws RestApiException;
   ProjectApi create(ProjectInput in) throws RestApiException;
-  ProjectInfo get();
+  ProjectInfo get() throws RestApiException;
+
+  String description() throws RestApiException;
+  void description(PutDescriptionInput in) throws RestApiException;
+
+  ListBranchesRequest branches();
+
+  public abstract class ListBranchesRequest {
+    private int limit;
+    private int start;
+    private String substring;
+    private String regex;
+
+    public abstract List<BranchInfo> get() throws RestApiException;
+
+    public ListBranchesRequest withLimit(int limit) {
+      this.limit = limit;
+      return this;
+    }
+
+    public ListBranchesRequest withStart(int start) {
+      this.start = start;
+      return this;
+    }
+
+    public ListBranchesRequest withSubstring(String substring) {
+      this.substring = substring;
+      return this;
+    }
+
+    public ListBranchesRequest withRegex(String regex) {
+      this.regex = regex;
+      return this;
+    }
+
+    public int getLimit() {
+      return limit;
+    }
+
+    public int getStart() {
+      return start;
+    }
+
+    public String getSubstring() {
+      return substring;
+    }
+
+    public String getRegex() {
+      return regex;
+    }
+
+  }
+
+  List<ProjectInfo> children() throws RestApiException;
+  List<ProjectInfo> children(boolean recursive) throws RestApiException;
+  ChildProjectApi child(String name) throws RestApiException;
 
   /**
    * Look up a branch by refname.
@@ -33,9 +90,10 @@ public interface ProjectApi {
    * to store references to {@code BranchApi} instances.
    *
    * @param ref branch name, with or without "refs/heads/" prefix.
+   * @throws RestApiException if a problem occurred reading the project.
    * @return API for accessing the branch.
    */
-  BranchApi branch(String ref);
+  BranchApi branch(String ref) throws RestApiException;
 
   /**
    * A default implementation which allows source compatibility
@@ -53,12 +111,43 @@ public interface ProjectApi {
     }
 
     @Override
-    public ProjectInfo get() {
+    public ProjectInfo get() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public BranchApi branch(String ref) {
+    public String description() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void description(PutDescriptionInput in)
+        throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ListBranchesRequest branches() {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ProjectInfo> children() {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ProjectInfo> children(boolean recursive) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ChildProjectApi child(String name) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public BranchApi branch(String ref) throws RestApiException {
       throw new NotImplementedException();
     }
   }

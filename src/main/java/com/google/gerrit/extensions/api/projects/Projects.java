@@ -18,7 +18,11 @@ import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
 public interface Projects {
   /**
@@ -36,15 +40,54 @@ public interface Projects {
    */
   ProjectApi name(String name) throws RestApiException;
 
+  /**
+   * Create a project using the default configuration.
+   *
+   * @param name project name.
+   * @return API for accessing the newly-created project.
+   * @throws RestApiException if an error occurred.
+   */
+  ProjectApi create(String name) throws RestApiException;
+
+  /**
+   * Create a project.
+   *
+   * @param in project creation input; name must be set.
+   * @return API for accessing the newly-created project.
+   * @throws RestApiException if an error occurred.
+   */
+  ProjectApi create(ProjectInput in) throws RestApiException;
+
   ListRequest list();
 
   public abstract class ListRequest {
+    public static enum FilterType {
+      CODE, PARENT_CANDIDATES, PERMISSIONS, ALL;
+    }
+
+    private final List<String> branches = new ArrayList<String>();
     private boolean description;
     private String prefix;
+    private String substring;
+    private String regex;
     private int limit;
     private int start;
+    private boolean showTree;
+    private FilterType type = FilterType.ALL;
 
-    public abstract List<ProjectInfo> get() throws RestApiException;
+    public List<ProjectInfo> get() throws RestApiException {
+      Map<String, ProjectInfo> map = getAsMap();
+      List<ProjectInfo> result = new ArrayList<ProjectInfo>(map.size());
+      for (Map.Entry<String, ProjectInfo> e : map.entrySet()) {
+        // ListProjects "helpfully" nulls out names when converting to a map.
+        e.getValue().name = e.getKey();
+        result.add(e.getValue());
+      }
+      return Collections.unmodifiableList(result);
+    }
+
+    public abstract SortedMap<String, ProjectInfo> getAsMap()
+        throws RestApiException;
 
     public ListRequest withDescription(boolean description) {
       this.description = description;
@@ -53,6 +96,16 @@ public interface Projects {
 
     public ListRequest withPrefix(String prefix) {
       this.prefix = prefix;
+      return this;
+    }
+
+    public ListRequest withSubstring(String substring) {
+      this.substring = substring;
+      return this;
+    }
+
+    public ListRequest withRegex(String regex) {
+      this.regex = regex;
       return this;
     }
 
@@ -66,6 +119,21 @@ public interface Projects {
       return this;
     }
 
+    public ListRequest addShowBranch(String branch) {
+      branches.add(branch);
+      return this;
+    }
+
+    public ListRequest withTree(boolean show) {
+      showTree = show;
+      return this;
+    }
+
+    public ListRequest withType(FilterType type) {
+      this.type = type != null ? type : FilterType.ALL;
+      return this;
+    }
+
     public boolean getDescription() {
       return description;
     }
@@ -74,12 +142,32 @@ public interface Projects {
       return prefix;
     }
 
+    public String getSubstring() {
+      return substring;
+    }
+
+    public String getRegex() {
+      return regex;
+    }
+
     public int getLimit() {
       return limit;
     }
 
     public int getStart() {
       return start;
+    }
+
+    public List<String> getBranches() {
+      return Collections.unmodifiableList(branches);
+    }
+
+    public boolean getShowTree() {
+      return showTree;
+    }
+
+    public FilterType getFilterType() {
+      return type;
     }
   }
 
@@ -90,6 +178,16 @@ public interface Projects {
   public class NotImplemented implements Projects {
     @Override
     public ProjectApi name(String name) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ProjectApi create(ProjectInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ProjectApi create(String name) throws RestApiException {
       throw new NotImplementedException();
     }
 

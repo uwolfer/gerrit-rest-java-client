@@ -1,4 +1,4 @@
-// Copyright (C) 2013 The Android Open Source Project
+// Copyright (C) 2015 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,33 +14,26 @@
 
 package com.google.gerrit.extensions.api.projects;
 
+import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
-public interface BranchApi {
-  BranchApi create(BranchInput in) throws RestApiException;
-
-  BranchInfo get() throws RestApiException;
-
-  void delete() throws RestApiException;
+public interface ChildProjectApi {
+  ProjectInfo get() throws RestApiException;
+  ProjectInfo get(boolean recursive) throws RestApiException;
 
   /**
    * A default implementation which allows source compatibility
    * when adding new methods to the interface.
    **/
-  public class NotImplemented implements BranchApi {
+  public class NotImplemented implements ChildProjectApi {
     @Override
-    public BranchApi create(BranchInput in) throws RestApiException {
+    public ProjectInfo get() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public BranchInfo get() throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public void delete() throws RestApiException {
+    public ProjectInfo get(boolean recursive) throws RestApiException {
       throw new NotImplementedException();
     }
   }

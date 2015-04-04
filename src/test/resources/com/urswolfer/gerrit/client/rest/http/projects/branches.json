@@ -1,0 +1,18 @@
+)]}'
+[
+  {
+    "ref": "HEAD",
+    "revision": "master",
+    "can_delete": false
+  },
+  {
+    "ref": "refs/heads/master",
+    "revision": "a6e054e9c220e4fa16802ccab074a00d384067fc",
+    "can_delete": false
+  },
+  {
+    "ref": "refs/heads/test",
+    "revision": "a6e054e9c220e4fa16802ccab074a00d384067fc",
+    "can_delete": false
+  }
+]

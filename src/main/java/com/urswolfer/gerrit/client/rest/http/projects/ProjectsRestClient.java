@@ -27,6 +27,8 @@ import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * @author Urs Wolfer
@@ -35,11 +37,14 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
 
     private final GerritRestClient gerritRestClient;
     private final ProjectsParser projectsParser;
+    private final BranchInfoParser branchInfoParser;
 
     public ProjectsRestClient(GerritRestClient gerritRestClient,
-                              ProjectsParser projectsParser) {
+                              ProjectsParser projectsParser,
+                              BranchInfoParser branchInfoParser) {
         this.gerritRestClient = gerritRestClient;
         this.projectsParser = projectsParser;
+        this.branchInfoParser = branchInfoParser;
     }
 
     @Override
@@ -49,12 +54,22 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
             public List<ProjectInfo> get() throws RestApiException {
                 return ProjectsRestClient.this.list(this);
             }
+
+            @Override
+            public SortedMap<String, ProjectInfo> getAsMap()
+                    throws RestApiException {
+                SortedMap<String, ProjectInfo> projectMap = new TreeMap<String, ProjectInfo>();
+                for (ProjectInfo projectInfo : get()) {
+                    projectMap.put(projectInfo.name, projectInfo);
+                }
+                return projectMap;
+            }
         };
     }
 
     @Override
     public ProjectApi name(String name) throws RestApiException {
-        return new ProjectApiRestClient(gerritRestClient, projectsParser, name);
+        return new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, name);
     }
 
     private List<ProjectInfo> list(ListRequest listParameter) throws RestApiException {
