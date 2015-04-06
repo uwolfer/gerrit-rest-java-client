@@ -16,13 +16,18 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.ProjectApi;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
+
+import java.util.List;
 
 /**
  * @author Thomas Forrer
@@ -30,13 +35,16 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 public class ProjectApiRestClient extends ProjectApi.NotImplemented implements ProjectApi {
     private final GerritRestClient gerritRestClient;
     private final ProjectsParser projectsParser;
+    private final BranchInfoParser branchInfoParser;
     private final String name;
 
     public ProjectApiRestClient(GerritRestClient gerritRestClient,
                                 ProjectsParser projectsParser,
+                                BranchInfoParser branchInfoParser,
                                 String name) {
         this.gerritRestClient = gerritRestClient;
         this.projectsParser = projectsParser;
+        this.branchInfoParser = branchInfoParser;
         this.name = name;
     }
 
@@ -63,7 +71,46 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         return this;
     }
 
+    @Override
+    public ListBranchesRequest branches() {
+        return new ListBranchesRequest() {
+            @Override
+            public List<BranchInfo> get() throws RestApiException {
+                return ProjectApiRestClient.this.getBranches(this);
+            }
+        };
+    }
+
+    private List<BranchInfo> getBranches(ListBranchesRequest lbr) throws RestApiException {
+        String request = projectsUrl() + branchesUrl(lbr);
+        JsonElement branches = gerritRestClient.getRequest(request);
+        return branchInfoParser.parseBranchInfos(branches);
+    }
+
     private String projectsUrl() {
         return "/projects/" + name;
+    }
+
+    private String branchesUrl(ListBranchesRequest lbr) {
+        String query = "";
+
+        if (lbr.getLimit() != 0) {
+            query = UrlUtils.appendToUrlQuery(query, "n=" + lbr.getLimit());
+        }
+        if (lbr.getStart() != 0) {
+            query = UrlUtils.appendToUrlQuery(query, "s=" + lbr.getStart());
+        }
+        if (!Strings.isNullOrEmpty(lbr.getSubstring())) {
+            query = UrlUtils.appendToUrlQuery(query, "m=" + lbr.getSubstring());
+        }
+        if (!Strings.isNullOrEmpty(lbr.getRegex())) {
+            query = UrlUtils.appendToUrlQuery(query, "r=" + lbr.getRegex());
+        }
+
+        String url = "/branches";
+        if (!Strings.isNullOrEmpty(query)) {
+            url += '?' + query;
+        }
+        return url;
     }
 }

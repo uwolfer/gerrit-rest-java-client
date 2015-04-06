@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.Projects;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonElement;
@@ -29,6 +30,7 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 /**
  * @author Thomas Forrer
@@ -88,6 +90,7 @@ public class ProjectsRestClientTest {
         private JsonElement mockJsonElement = EasyMock.createMock(JsonElement.class);
         private GerritRestClient gerritRestClient;
         private ProjectsParser projectsParser;
+        private BranchInfoParser branchInfoParser;
 
         public ProjectListTestCase withListParameter(TestListRequest listParameter) {
             this.listParameter = listParameter;
@@ -113,7 +116,8 @@ public class ProjectsRestClientTest {
         public ProjectsRestClient getProjectsRestClient() throws Exception {
             return new ProjectsRestClient(
                     setupGerritRestClient(),
-                    setupProjectsParser()
+                    setupProjectsParser(),
+                    setupBranchInfoParser()
             );
         }
 
@@ -129,10 +133,19 @@ public class ProjectsRestClientTest {
         public ProjectsParser setupProjectsParser() throws Exception {
             projectsParser = EasyMock.createMock(ProjectsParser.class);
             EasyMock.expect(projectsParser.parseProjectInfos(mockJsonElement))
-                    .andReturn(Lists.<ProjectInfo>newArrayList())
+                    .andReturn(new TreeMap<String, ProjectInfo>())
                     .once();
             EasyMock.replay(projectsParser);
             return projectsParser;
+        }
+
+        public BranchInfoParser setupBranchInfoParser() throws Exception {
+            branchInfoParser = EasyMock.createMock(BranchInfoParser.class);
+            EasyMock.expect(branchInfoParser.parseBranchInfos(mockJsonElement))
+                    .andReturn(Lists.<BranchInfo>newArrayList())
+                    .once();
+            EasyMock.replay(branchInfoParser);
+            return branchInfoParser;
         }
 
         @Override

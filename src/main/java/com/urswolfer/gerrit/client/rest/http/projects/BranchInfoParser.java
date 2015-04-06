@@ -17,31 +17,30 @@
 package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gerrit.extensions.common.ProjectInfo;
-import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import java.lang.reflect.Type;
-import java.util.SortedMap;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * @author Thomas Forrer
+ * @author Tim Coulson
  */
-public class ProjectsParser {
-    private static final Type TYPE = new TypeToken<SortedMap<String, ProjectInfo>>() {}.getType();
+public class BranchInfoParser {
+    private static final Type TYPE = new TypeToken<List<BranchInfo>>() {}.getType();
 
     private final Gson gson;
 
-    public ProjectsParser(Gson gson) {
+    public BranchInfoParser(Gson gson) {
         this.gson = gson;
     }
 
-    public SortedMap<String, ProjectInfo> parseProjectInfos(JsonElement result) throws RestApiException {
+    public List<BranchInfo> parseBranchInfos(JsonElement result) {
+        if (!result.isJsonArray()) {
+            return Collections.singletonList(gson.fromJson(result, BranchInfo.class));
+        }
         return gson.fromJson(result, TYPE);
-    }
-
-    public ProjectInfo parseSingleProjectInfo(JsonElement result) {
-        return gson.fromJson(result, ProjectInfo.class);
     }
 }

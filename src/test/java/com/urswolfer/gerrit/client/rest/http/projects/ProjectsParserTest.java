@@ -26,6 +26,7 @@ import com.urswolfer.gerrit.client.rest.http.common.ProjectInfoBuilder;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.SortedMap;
 
 /**
  * @author Thomas Forrer
@@ -51,13 +52,14 @@ public class ProjectsParserTest extends AbstractParserTest {
     public void testParseProjectInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("projects.json");
 
-        List<ProjectInfo> projectInfos = projectsParser.parseProjectInfos(jsonElement);
+        SortedMap<String, ProjectInfo> projectInfos = projectsParser.parseProjectInfos(jsonElement);
 
         Truth.assertThat(projectInfos.size()).is(3);
-        for (int i = 0; i < projectInfos.size(); i++) {
-            ProjectInfo actual = projectInfos.get(i);
+        int i = 0;
+        for (ProjectInfo projectInfo : projectInfos.values()) {
             ProjectInfo expected = PROJECT_INFO_LIST.get(i);
-            GerritAssert.assertEquals(actual, expected);
+            GerritAssert.assertEquals(projectInfo, expected);
+            i++;
         }
     }
 }

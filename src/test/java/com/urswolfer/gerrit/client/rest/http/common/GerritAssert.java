@@ -17,6 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.common;
 
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.common.*;
 import com.thoughtworks.xstream.XStream;
 
@@ -42,6 +43,10 @@ public class GerritAssert {
     }
 
     public static void assertEquals(ProjectInfo actual, ProjectInfo expected) {
+        assertXmlOutputEqual(actual, expected);
+    }
+
+    public static void assertEquals(BranchInfo actual, BranchInfo expected) {
         assertXmlOutputEqual(actual, expected);
     }
 
