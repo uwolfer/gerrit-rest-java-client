@@ -152,4 +152,9 @@ public class ChangeInfoBuilder extends AbstractBuilder {
         changeInfo._number = number;
         return this;
     }
+
+    public ChangeInfoBuilder withSortKey(String sortKey) {
+        changeInfo._sortkey = sortKey;
+        return this;
+    }
 }

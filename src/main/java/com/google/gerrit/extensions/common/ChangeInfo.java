@@ -52,6 +52,7 @@ public class ChangeInfo {
   public String currentRevision;
   public Map<String, RevisionInfo> revisions;
   public Boolean _moreChanges;
+  public String _sortkey; // server version < 2.9, needed for change list paging
 
   public List<ProblemInfo> problems;
 }

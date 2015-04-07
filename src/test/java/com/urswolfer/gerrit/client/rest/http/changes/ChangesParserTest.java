@@ -49,6 +49,7 @@ public class ChangesParserTest extends AbstractParserTest {
                 .withNumber(9)
                 .withOwner(uw)
                 .withLabel("Code-Review", new LabelInfoBuilder().withApproved(uw).get())
+                .withSortKey("002887a800000009")
                 .get());
         CHANGE_INFOS.add(new ChangeInfoBuilder()
                 .withId("packages%2Ftest~master~Id786826bdec0ae196737a0137ee2a67a1a294286")
@@ -63,6 +64,7 @@ public class ChangesParserTest extends AbstractParserTest {
                 .withNumber(10)
                 .withOwner(uw)
                 .withLabel("Code-Review", new LabelInfoBuilder().get())
+                .withSortKey("0028876e0000000a")
                 .get());
         CHANGE_INFOS.add(new ChangeInfoBuilder()
                 .withId("packages%2Ftest~master~I71460f2975fef513a7fb485bef92dada88b88f3a")
@@ -76,6 +78,7 @@ public class ChangesParserTest extends AbstractParserTest {
                 .withMergeable(false)
                 .withNumber(11)
                 .withOwner(tf)
+                .withSortKey("002860490000000b")
                 .get());
     }
 
