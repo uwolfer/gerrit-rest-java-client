@@ -17,11 +17,16 @@
 package com.urswolfer.gerrit.client.rest;
 
 import com.google.gerrit.extensions.api.GerritApi;
+import com.google.gerrit.extensions.api.changes.Changes;
+import com.google.gerrit.extensions.restapi.RestApiException;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
 
 /**
  * @author Urs Wolfer
  */
 public interface GerritRestApi extends GerritApi {
-    public Tools tools();
+    Tools tools();
+    boolean supportsChangesStart() throws RestApiException;
+    double getServerVersion() throws RestApiException;
+    Changes.QueryRequest updateResumeSortKey(Changes.QueryRequest queryRequest, String sortkey);
 }
