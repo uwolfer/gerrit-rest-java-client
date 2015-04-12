@@ -23,6 +23,7 @@ import com.google.gerrit.extensions.api.accounts.Accounts;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.api.config.Config;
 import com.google.gerrit.extensions.api.projects.Projects;
+import com.google.gerrit.extensions.restapi.RestApiException;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.HttpClientBuilderExtension;
 import com.urswolfer.gerrit.client.rest.http.HttpRequestExecutor;
@@ -35,6 +36,9 @@ import com.urswolfer.gerrit.client.rest.http.projects.ProjectsParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsRestClient;
 import com.urswolfer.gerrit.client.rest.http.tools.ToolsRestClient;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Urs Wolfer
@@ -52,13 +56,20 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
     private final Supplier<ChangesRestClient> changesRestClient = Suppliers.memoize(new Supplier<ChangesRestClient>() {
         @Override
         public ChangesRestClient get() {
+            boolean supportsChangesStart;
+            try {
+                supportsChangesStart = GerritApiImpl.this.supportsChangesStart();
+            } catch (RestApiException e) {
+                supportsChangesStart = true; // assume we are on a current server
+            }
             return new ChangesRestClient(
                     gerritRestClient,
                     new ChangesParser(gerritRestClient.getGson()),
                     new CommentsParser(gerritRestClient.getGson()),
                     new FileInfoParser(gerritRestClient.getGson()),
                     new DiffInfoParser(gerritRestClient.getGson()),
-                    new SuggestedReviewerInfoParser(gerritRestClient.getGson()));
+                    new SuggestedReviewerInfoParser(gerritRestClient.getGson()),
+                    supportsChangesStart);
         }
     });
 
@@ -82,6 +93,8 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
             return new ToolsRestClient(gerritRestClient);
         }
     });
+
+    private double serverVersion = 0.0; // cache for server version which should not change once set over the life of this object, so only look it up once
 
     public GerritApiImpl(GerritAuthData authData,
                          HttpRequestExecutor httpRequestExecutor,
@@ -113,4 +126,52 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
     public Tools tools() {
         return toolsRestClient.get();
     }
+
+    public boolean supportsChangesStart() throws RestApiException {
+        return getServerVersion() >= 2.9;
+    }
+
+    private static double parseVersion(String version) {
+        if (version == null || version.length() == 0) {
+            return 0.0;
+        }
+
+        try {
+            final int fd = version.indexOf('.');
+            final int sd = version.indexOf('.', fd + 1);
+            if (0 < sd) {
+                version = version.substring(0, sd);
+            }
+            return Double.parseDouble(version);
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+
+    public double getServerVersion() throws RestApiException {
+        if (serverVersion == 0.0) {
+            serverVersion = parseVersion(config().server().getVersion()); // idempotent, so do not worry about threading issues
+        }
+        return serverVersion;
+    }
+
+    // violating normal declaration style for code readability to keep this pattern close to the code that uses it
+    private static final Pattern OLD_SORTKEY_PATTERN = Pattern.compile("^(.*?)(?:\\+AND\\+)?\\(resume_sortkey:[^\\)]+\\)(.*)$");
+
+    public Changes.QueryRequest updateResumeSortKey(Changes.QueryRequest queryRequest, String sortkey) {
+        StringBuilder query = new StringBuilder();
+        String currentQuery = queryRequest.getQuery();
+        if (currentQuery != null) {
+            // strip off old resume sortkey if present
+            Matcher oldSortKeyMatcher = OLD_SORTKEY_PATTERN.matcher(currentQuery);
+            if (oldSortKeyMatcher.matches()) {
+                currentQuery = new StringBuilder(oldSortKeyMatcher.group(1)).append(oldSortKeyMatcher.group(2)).toString();
+            }
+            query.append(currentQuery).append("+AND+");
+        }
+        query.append("(resume_sortkey:").append(sortkey).append(')');
+
+        return queryRequest.withQuery(query.toString());
+    }
+
 }

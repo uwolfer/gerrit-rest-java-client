@@ -39,6 +39,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
     private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
+    private final boolean supportsChangesStart;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
@@ -46,12 +47,23 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
                              FileInfoParser fileInfoParser,
                              DiffInfoParser diffInfoParser,
                              SuggestedReviewerInfoParser suggestedReviewerInfoParser) {
+        this(gerritRestClient, changesParser, commentsParser, fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, true);
+    }
+
+    public ChangesRestClient(GerritRestClient gerritRestClient,
+                             ChangesParser changesParser,
+                             CommentsParser commentsParser,
+                             FileInfoParser fileInfoParser,
+                             DiffInfoParser diffInfoParser,
+                             SuggestedReviewerInfoParser suggestedReviewerInfoParser,
+                             boolean supportsChangesStart) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
         this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
+        this.supportsChangesStart = supportsChangesStart;
     }
 
     @Override
@@ -60,6 +72,13 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
             @Override
             public List<ChangeInfo> get() throws RestApiException {
                 return ChangesRestClient.this.get(this);
+            }
+            @Override
+            public QueryRequest withStart(int start) {
+                if (!supportsChangesStart) {
+                    throw new UnsupportedOperationException("Changes 'start' parameter not supported in this version of the Gerrit server. Use resume_sortkey query instead.");
+                }
+                return super.withStart(start);
             }
         };
     }
