@@ -67,6 +67,7 @@ public interface Changes {
     private String query;
     private int limit;
     private int start;
+    private String sortkey; // server version < 2.9, needed for change list paging
     private EnumSet<ListChangesOption> options = EnumSet.noneOf(ListChangesOption.class);
 
     public abstract List<ChangeInfo> get() throws RestApiException;
@@ -83,6 +84,12 @@ public interface Changes {
 
     public QueryRequest withStart(int start) {
       this.start = start;
+      return this;
+    }
+
+    // server version < 2.9, needed for change list paging
+    public QueryRequest withSortkey(String sortkey) {
+      this.sortkey = sortkey;
       return this;
     }
 
@@ -111,6 +118,11 @@ public interface Changes {
 
     public int getStart() {
       return start;
+    }
+
+    // server version < 2.9, needed for change list paging
+    public String getSortkey() {
+      return sortkey;
     }
 
     public EnumSet<ListChangesOption> getOptions() {

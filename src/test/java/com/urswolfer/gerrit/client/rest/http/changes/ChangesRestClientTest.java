@@ -71,6 +71,9 @@ public class ChangesRestClientTest {
                         new TestQueryRequest().withStart(50)
                 ).expectUrl("/changes/?S=50"),
                 queryParameter(
+                        new TestQueryRequest().withSortkey("003460ab0001ae15")
+                ).expectUrl("/changes/?N=003460ab0001ae15"),
+                queryParameter(
                         new TestQueryRequest().withQuery("is:open")
                                 .withLimit(10)
                                 .withOption(ListChangesOption.CURRENT_FILES)
@@ -195,6 +198,7 @@ public class ChangesRestClientTest {
         private String query = null;
         private Integer limit = null;
         private Integer start = null;
+        private String sortkey = null;
         private EnumSet<ListChangesOption> options = EnumSet.noneOf(ListChangesOption.class);
 
         public TestQueryRequest withQuery(String query) {
@@ -212,6 +216,11 @@ public class ChangesRestClientTest {
             return this;
         }
 
+        public TestQueryRequest withSortkey(String sortkey) {
+            this.sortkey = sortkey;
+            return this;
+        }
+
         public TestQueryRequest withOption(ListChangesOption options) {
             this.options.add(options);
             return this;
@@ -226,6 +235,9 @@ public class ChangesRestClientTest {
             }
             if (start != null) {
                 queryRequest.withStart(start);
+            }
+            if (sortkey != null) {
+                queryRequest.withSortkey(sortkey);
             }
             if (!options.isEmpty()) {
                 queryRequest.withOptions(options);

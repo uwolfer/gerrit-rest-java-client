@@ -81,6 +81,10 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         if (queryRequest.getStart() > 0) {
             query = UrlUtils.appendToUrlQuery(query, "S=" + queryRequest.getStart());
         }
+        // server version < 2.9, needed for change list paging
+        if (!Strings.isNullOrEmpty(queryRequest.getSortkey())) {
+            query = UrlUtils.appendToUrlQuery(query, "N=" + queryRequest.getSortkey());
+        }
         for (ListChangesOption option : queryRequest.getOptions()) {
             query = UrlUtils.appendToUrlQuery(query, "o=" + option);
         }
