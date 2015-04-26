@@ -119,6 +119,12 @@ public class GerritRestClient {
         try {
             HttpResponse response = doRest(path, requestBody, verb);
 
+            if (response.getStatusLine().getStatusCode() == 403 && loginCache.getGerritAuthOptional().isPresent()) {
+                // handle expired sessions: try again with a fresh login
+                loginCache.invalidate();
+                response = doRest(path, requestBody, verb);
+            }
+
             checkStatusCode(response);
 
             HttpEntity entity = response.getEntity();

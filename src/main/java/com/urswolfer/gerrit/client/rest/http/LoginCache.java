@@ -30,7 +30,7 @@ public class LoginCache {
     private Optional<String> gerritAuthOptional = Optional.absent();
     // remember when host does not support gerrit-auth login method so we don't have to try again
     private boolean hostSupportsGerritAuth = true;
-    private String lastConnection = "";
+    private String lastConnection;
 
     public LoginCache(GerritAuthData authData, BasicCookieStore cookieStore) {
         this.authData = authData;
@@ -52,6 +52,13 @@ public class LoginCache {
         return hostSupportsGerritAuth;
     }
 
+    public void invalidate() {
+        lastConnection = null;
+        gerritAuthOptional = Optional.absent();
+        hostSupportsGerritAuth = true;
+        cookieStore.clear();
+    }
+
     /**
      * GerritAuthData can change at runtime (when getters are implemented dynamically so they return e.g. application
      * settings. So let's check if we can re-use cached login data. Resetting them on any config change.
@@ -60,10 +67,8 @@ public class LoginCache {
     private void invalidateLoginDataOnNewSettings() {
         String authDataString = "" + authData.getHost() + authData.getLogin() + authData.getPassword();
         if (!authDataString.equals(lastConnection)) {
+            invalidate();
             lastConnection = authDataString;
-            gerritAuthOptional = Optional.absent();
-            hostSupportsGerritAuth = true;
-            cookieStore.clear();
         }
     }
 }
