@@ -49,7 +49,7 @@ Releases are available with Maven:
 <dependency>
     <groupId>com.urswolfer.gerrit.client.rest</groupId>
     <artifactId>gerrit-rest-java-client</artifactId>
-    <version>0.8.4</version>
+    <version>0.8.5</version>
 </dependency>
 ```
 
