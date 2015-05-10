@@ -19,26 +19,58 @@ package com.urswolfer.gerrit.client.rest;
 import com.google.common.base.Strings;
 
 /**
+ * In most cases {@link Basic} is what you need.
+ * You can create your own implementation when you for example want to access
+ * application settings dynamically (after setting up the REST client).
+ *
  * @author Thomas Forrer
  */
 public interface GerritAuthData {
+    /**
+     * Username used for login.
+     */
     String getLogin();
 
+    /**
+     * Password used for login.
+     */
     String getPassword();
 
+    /**
+     * HTTP URL for accessing Gerrit. Please make sure that Gerrit root URL is used.
+     *
+     * Example: {@code "https://gerrit-review.googlesource.com"}
+     */
     String getHost();
 
+    /**
+     * @return true when username and password is available. When false, anonymous access
+     * will be used.
+     */
     boolean isLoginAndPasswordAvailable();
 
-    public final class Basic implements GerritAuthData {
+    /**
+     * A simple implementation for providing username and password at
+     * construction time.
+     * Note: It is not related to HTTP basic access authentication.
+     */
+    public class Basic implements GerritAuthData {
         private final String host;
         private final String login;
         private final String password;
 
+        /**
+         * @param host see {@link GerritAuthData#getHost}.
+         */
         public Basic(String host) {
             this(host, "", "");
         }
 
+        /**
+         * @param host see {@link GerritAuthData#getPassword}.
+         * @param login see {@link GerritAuthData#getLogin}.
+         * @param password see {@link GerritAuthData#getLogin}.
+         */
         public Basic(String host, String login, String password) {
             this.host = stripTrailingSlash(host);
             this.login = login;
