@@ -13,6 +13,9 @@ Only Gerrit 2.6 or newer is supported (missing / incomplete REST API in older ve
 
 This implementation is used for example as base for the [Gerrit IntelliJ Plugin].
 
+Many different authentication-methods are supported (HTTP basic, HTTP digest, LDAP with form,
+HTTP password from Gerrit setting, ...).
+
 [Gerrit Code Review Tool]: http://code.google.com/p/gerrit/
 [Gerrit IntelliJ Plugin]: https://github.com/uwolfer/gerrit-intellij-plugin
 
@@ -49,6 +52,14 @@ Releases are available with Maven:
     <version>0.8.4</version>
 </dependency>
 ```
+
+Dependencies
+------------
+This library depends on [Apache HttpClient], [Gson] and [Guava].
+
+[Apache HttpClient]: https://hc.apache.org/httpcomponents-client-ga/
+[Gson]: https://github.com/google/gson
+[Guava]: https://github.com/google/guava
 
 Your Support
 ------------
