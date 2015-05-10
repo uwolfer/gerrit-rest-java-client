@@ -23,16 +23,18 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
+ * You can get the Gerrit REST client library version with this class.
+ *
  * @author Urs Wolfer
  */
 public class Version {
 
-    private static final String PLUGIN_VERSION;
+    private static final String VERSION;
 
     static {
         try {
             InputStream inputStream = Version.class.getResourceAsStream("/version.properties");
-            PLUGIN_VERSION = getVersionProperties(inputStream);
+            VERSION = getVersionProperties(inputStream);
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
@@ -46,7 +48,7 @@ public class Version {
     }
 
     public static String get() {
-        return PLUGIN_VERSION;
+        return VERSION;
     }
 
 }
