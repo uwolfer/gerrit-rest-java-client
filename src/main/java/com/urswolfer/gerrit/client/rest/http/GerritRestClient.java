@@ -362,8 +362,8 @@ public class GerritRestClient {
             default:
                 String body = "<empty>";
                 HttpEntity entity = response.getEntity();
-                if (entity != null && entity.getContent() != null) {
-                    body = CharStreams.toString(new InputStreamReader(entity.getContent())).trim();
+                if (entity != null) {
+                    body = EntityUtils.toString(entity).trim();
                 }
                 String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
                         statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
