@@ -35,7 +35,9 @@ import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
@@ -46,6 +48,7 @@ import org.testng.annotations.Test;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.List;
 
@@ -63,12 +66,21 @@ public class GerritRestClientTest {
         URL url = this.getClass().getResource(".");
         resourceHandler.setBaseResource(new FileResource(url));
         resourceHandler.setWelcomeFiles(new String[] {"changes.json", "projects.json", "account.json"});
-        server.setHandler(resourceHandler);
 
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SECURITY);
-        context.setSecurityHandler(basicAuth("foo", "bar", "Gerrit Auth"));
-        context.setContextPath("/a");
-        resourceHandler.setHandler(context);
+        ServletContextHandler servletContextHandler = new ServletContextHandler();
+        servletContextHandler.addServlet(LoginSimulationServlet.class, "/login/");
+
+        ServletContextHandler basicAuthContextHandler = new ServletContextHandler(ServletContextHandler.SECURITY);
+        basicAuthContextHandler.setSecurityHandler(basicAuth("foo", "bar", "Gerrit Auth"));
+        basicAuthContextHandler.setContextPath("/a");
+
+        HandlerCollection handlers = new HandlerCollection();
+        handlers.setHandlers(new Handler[] {
+            servletContextHandler,
+            resourceHandler,
+            basicAuthContextHandler
+        });
+        server.setHandler(handlers);
 
         server.start();
 
@@ -166,27 +178,53 @@ public class GerritRestClientTest {
         gerritClient.changes().id(1).abandon();
     }
 
+    @Test(expectedExceptions = RestApiException.class)
+    public void testInvalidJson() throws Exception {
+        GerritApi gerritClient = getGerritApiWithJettyHost();
+        gerritClient.accounts().id("invalid_json").get();
+    }
+
+    @Test(expectedExceptions = RestApiException.class)
+    public void testNullJson() throws Exception {
+        GerritApi gerritClient = getGerritApiWithJettyHost();
+        gerritClient.accounts().id("null_json").get();
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testUnsupportedHttpMethod() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClient(
+            new GerritAuthData.Basic(jettyUrl), new HttpRequestExecutor());
+        gerritRestClient.doRest("/invalid/", null, GerritRestClient.HttpVerb.HEAD);
+    }
+
     @Test
     public void testUserAuth() throws Exception {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
         GerritApi gerritClient = gerritRestApiFactory.create(new GerritAuthData.Basic(jettyUrl, "foo", "bar"));
+        boolean catched = false;
         try {
             gerritClient.changes().query().get();
         } catch (HttpStatusException e) {
+            catched = true;
+            // 404 because this url does not provide a valid response (not set up in this test case)
             Truth.assertThat(e.getStatusCode()).is(404);
         }
+        Truth.assertThat(catched).isTrue();
     }
 
     @Test
     public void testInvalidUserAuth() throws Exception {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
         GerritApi gerritClient = gerritRestApiFactory.create(new GerritAuthData.Basic(jettyUrl, "foox", "bar"));
+        boolean catched = false;
         try {
             gerritClient.changes().query().get();
         } catch (HttpStatusException e) {
+            catched = true;
             Truth.assertThat(e.getStatusCode()).is(401);
             Truth.assertThat(e.getStatusText().toLowerCase()).contains("unauthorized");
         }
+        Truth.assertThat(catched).isTrue();
     }
 
     @Test
@@ -221,6 +259,49 @@ public class GerritRestClientTest {
         GerritApi gerritClient = gerritRestApiFactory.create(new GerritAuthData.Basic(jettyUrl));
         String version = gerritClient.config().server().getVersion();
         Truth.assertThat(version).is("2.10");
+    }
+
+    /**
+     * When cookie "GerritAccount" is available (sent in test with "LoginServlet"),
+     * "GerritAuth" string is extracted and cached.
+     */
+    @Test
+    public void testGerritAuthExtractionAndCache() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClient(
+            new GerritAuthData.Basic(jettyUrl), new HttpRequestExecutor());
+        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
+        loginCacheField.setAccessible(true);
+        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+
+        Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+        gerritRestClient.doRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+        gerritRestClient.doRest("/changes/?n=5", null, GerritRestClient.HttpVerb.GET);
+        Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isTrue();
+        Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
+
+        loginCache.invalidate();
+        Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+
+        // ensure that even with invalidated cache request is possible and cached filled again
+        gerritRestClient.doRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+        Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
+    }
+
+    @Test
+    public void testGerritAuthNotAvailable() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClient(
+            new GerritAuthData.Basic(jettyUrl, "foo", "bar"), new HttpRequestExecutor());
+        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
+        loginCacheField.setAccessible(true);
+        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+
+        Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+        Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isTrue();
+        gerritRestClient.doRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+        Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isFalse();
+        Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+        gerritRestClient.doRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+        Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
     }
 
     @Test(enabled = false) // requires running Gerrit instance
