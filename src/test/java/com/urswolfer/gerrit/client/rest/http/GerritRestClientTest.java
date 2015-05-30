@@ -197,6 +197,10 @@ public class GerritRestClientTest {
         gerritRestClient.doRest("/invalid/", null, GerritRestClient.HttpVerb.HEAD);
     }
 
+    /**
+     * Tests authentication with a login which us handled by HTTP auth
+     * (path: "/a/changes/" isn't mapped -> status 404).
+     */
     @Test
     public void testUserAuth() throws Exception {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
@@ -212,6 +216,9 @@ public class GerritRestClientTest {
         Truth.assertThat(catched).isTrue();
     }
 
+    /**
+     * Tests authentication with an invalid HTTP login. Status 401 expected.
+     */
     @Test
     public void testInvalidUserAuth() throws Exception {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
@@ -267,6 +274,8 @@ public class GerritRestClientTest {
     /**
      * When cookie "GerritAccount" is available (sent in test with "LoginServlet"),
      * "GerritAuth" string is extracted and cached.
+     * Note that no username / login is NOT sent - otherwise LoginSimulationServlet would
+     * not return a GerritAccount-cookie.
      */
     @Test
     public void testGerritAuthExtractionAndCache() throws Exception {
