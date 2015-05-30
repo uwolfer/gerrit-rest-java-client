@@ -227,6 +227,9 @@ public class GerritRestClientTest {
         Truth.assertThat(catched).isTrue();
     }
 
+    /**
+     * Tests that client-builder-extensions are called correctly.
+     */
     @Test
     public void testHttpClientBuilderExtension() throws Exception {
         final boolean[] extendCalled = {false};
@@ -287,6 +290,11 @@ public class GerritRestClientTest {
         Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
     }
 
+    /**
+     * Tests that the login cache is used correctly for a host which does NOT
+     * support Gerrit-Auth method. It tries the first time to get the GerritAccount-cookie
+     * and if that fails it continues to use HTTP auth.
+     */
     @Test
     public void testGerritAuthNotAvailable() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClient(
