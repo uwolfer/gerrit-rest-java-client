@@ -18,11 +18,7 @@ import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.*;
 
 public interface Projects {
   /**
@@ -62,7 +58,7 @@ public interface Projects {
 
   public abstract class ListRequest {
     public static enum FilterType {
-      CODE, PARENT_CANDIDATES, PERMISSIONS, ALL;
+      CODE, PARENT_CANDIDATES, PERMISSIONS, ALL
     }
 
     private final List<String> branches = new ArrayList<String>();
