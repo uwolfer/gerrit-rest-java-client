@@ -198,7 +198,7 @@ public class GerritRestClientTest {
     }
 
     /**
-     * Tests authentication with a login which us handled by HTTP auth
+     * Tests authentication with a login which us handled by HTTP auth (preemptive authentication is assumed)
      * (path: "/a/changes/" isn't mapped -> status 404).
      */
     @Test
@@ -217,7 +217,7 @@ public class GerritRestClientTest {
     }
 
     /**
-     * Tests authentication with an invalid HTTP login. Status 401 expected.
+     * Tests authentication with an invalid HTTP login (preemptive authentication is assumed). Status 401 expected.
      */
     @Test
     public void testInvalidUserAuth() throws Exception {
