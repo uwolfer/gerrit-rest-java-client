@@ -387,7 +387,7 @@ public class GerritRestClient {
         }
 
         public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
-            AuthState authState = (AuthState) context.getAttribute(HttpClientContext.TARGET_AUTH_STATE);
+            AuthStateHC4 authState = (AuthStateHC4) context.getAttribute(HttpClientContext.TARGET_AUTH_STATE);
 
             // if no auth scheme available yet, try to initialize it preemptively
             if (authState.getAuthScheme() == null) {
