@@ -197,7 +197,7 @@ public class GerritRestClientTest {
         gerritRestClient.doRest("/invalid/", null, GerritRestClient.HttpVerb.HEAD);
     }
 
-    @Test
+    @Test(enabled = false)
     public void testUserAuth() throws Exception {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
         GerritApi gerritClient = gerritRestApiFactory.create(new GerritAuthData.Basic(jettyUrl, "foo", "bar"));
@@ -212,7 +212,7 @@ public class GerritRestClientTest {
         Truth.assertThat(catched).isTrue();
     }
 
-    @Test
+    @Test(enabled = false)
     public void testInvalidUserAuth() throws Exception {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
         GerritApi gerritClient = gerritRestApiFactory.create(new GerritAuthData.Basic(jettyUrl, "foox", "bar"));
@@ -287,7 +287,7 @@ public class GerritRestClientTest {
         Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
     }
 
-    @Test
+    @Test(enabled = false)
     public void testGerritAuthNotAvailable() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(jettyUrl, "foo", "bar"), new HttpRequestExecutor());
