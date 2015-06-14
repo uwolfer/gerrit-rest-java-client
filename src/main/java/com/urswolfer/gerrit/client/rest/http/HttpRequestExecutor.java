@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpRequestBaseHC4;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
 
@@ -30,7 +31,7 @@ import java.io.IOException;
  */
 public class HttpRequestExecutor {
 
-    public HttpResponse execute(HttpClientBuilder client, HttpRequestBase method, HttpContext context) throws IOException {
+    public HttpResponse execute(HttpClientBuilder client, HttpRequestBaseHC4 method, HttpContext context) throws IOException {
         return client.build().execute(method, context);
     }
 }

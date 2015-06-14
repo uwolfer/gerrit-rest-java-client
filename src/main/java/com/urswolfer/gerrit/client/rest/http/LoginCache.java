@@ -18,13 +18,13 @@ package com.urswolfer.gerrit.client.rest.http;
 
 import com.google.common.base.Optional;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
-import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.BasicCookieStoreHC4;
 
 /**
  * @author Urs Wolfer
  */
 public class LoginCache {
-    private final BasicCookieStore cookieStore;
+    private final BasicCookieStoreHC4 cookieStore;
     private final GerritAuthData authData;
 
     private Optional<String> gerritAuthOptional = Optional.absent();
@@ -32,7 +32,7 @@ public class LoginCache {
     private boolean hostSupportsGerritAuth = true;
     private String lastConnection;
 
-    public LoginCache(GerritAuthData authData, BasicCookieStore cookieStore) {
+    public LoginCache(GerritAuthData authData, BasicCookieStoreHC4 cookieStore) {
         this.authData = authData;
         this.cookieStore = cookieStore;
     }
