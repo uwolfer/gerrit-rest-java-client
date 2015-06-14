@@ -30,21 +30,20 @@ import com.urswolfer.gerrit.client.rest.gson.DateDeserializer;
 import com.urswolfer.gerrit.client.rest.gson.DateSerializer;
 import org.apache.http.*;
 import org.apache.http.auth.*;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.entity.StringEntityHC4;
+import org.apache.http.impl.auth.BasicSchemeHC4;
 import org.apache.http.impl.client.*;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.BasicHttpContextHC4;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.util.EntityUtilsHC4;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,7 +74,7 @@ public class GerritRestClient {
     private final HttpRequestExecutor httpRequestExecutor;
     private final List<HttpClientBuilderExtension> httpClientBuilderExtensions;
 
-    private final BasicCookieStore cookieStore;
+    private final BasicCookieStoreHC4 cookieStore;
     private final LoginCache loginCache;
 
     public GerritRestClient(GerritAuthData authData,
@@ -85,7 +84,7 @@ public class GerritRestClient {
         this.httpRequestExecutor = httpRequestExecutor;
         this.httpClientBuilderExtensions = Arrays.asList(httpClientBuilderExtensions);
 
-        cookieStore = new BasicCookieStore();
+        cookieStore = new BasicCookieStoreHC4();
         loginCache = new LoginCache(authData, cookieStore);
     }
 
@@ -149,7 +148,7 @@ public class GerritRestClient {
                                 String requestBody,
                                 HttpVerb verb,
                                 Header... headers) throws IOException, HttpStatusException {
-        HttpContext httpContext = new BasicHttpContext();
+        HttpContext httpContext = new BasicHttpContextHC4();
         HttpClientBuilder client = getHttpClient(httpContext);
 
         Optional<String> gerritAuthOptional = updateGerritAuthWhenRequired(httpContext, client);
@@ -162,20 +161,20 @@ public class GerritRestClient {
         }
         uri += path;
 
-        HttpRequestBase method;
+        HttpRequestBaseHC4 method;
         switch (verb) {
             case POST:
-                method = new HttpPost(uri);
+                method = new HttpPostHC4(uri);
                 setRequestBody(requestBody, method);
                 break;
             case GET:
-                method = new HttpGet(uri);
+                method = new HttpGetHC4(uri);
                 break;
             case DELETE:
-                method = new HttpDelete(uri);
+                method = new HttpGetHC4(uri);
                 break;
             case PUT:
-                method = new HttpPut(uri);
+                method = new HttpPutHC4(uri);
                 setRequestBody(requestBody, method);
                 break;
             default:
@@ -202,9 +201,9 @@ public class GerritRestClient {
         return response;
     }
 
-    private void setRequestBody(String requestBody, HttpRequestBase method) {
+    private void setRequestBody(String requestBody, HttpRequestBaseHC4 method) {
         if (requestBody != null) {
-            ((HttpEntityEnclosingRequestBase) method).setEntity(new StringEntity(requestBody, ContentType.APPLICATION_JSON));
+            ((HttpEntityEnclosingRequestBaseHC4) method).setEntity(new StringEntityHC4(requestBody, ContentType.APPLICATION_JSON));
         }
     }
 
@@ -238,12 +237,12 @@ public class GerritRestClient {
             return Optional.absent();
         }
         String loginUrl = authData.getHost() + "/login/";
-        HttpPost method = new HttpPost(loginUrl);
+        HttpPostHC4 method = new HttpPostHC4(loginUrl);
         List<BasicNameValuePair> parameters = Lists.newArrayList(
             new BasicNameValuePair("username", authData.getLogin()),
             new BasicNameValuePair("password", authData.getPassword())
         );
-        method.setEntity(new UrlEncodedFormEntity(parameters, Consts.UTF_8));
+        method.setEntity(new UrlEncodedFormEntityHC4(parameters, Consts.UTF_8));
         HttpResponse loginResponse = httpRequestExecutor.execute(client, method, httpContext);
         return extractGerritAuth(loginResponse);
     }
@@ -269,7 +268,7 @@ public class GerritRestClient {
      */
     private Optional<String> tryGerritHttpAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException {
         String loginUrl = authData.getHost() + "/login/";
-        HttpResponse loginResponse = httpRequestExecutor.execute(client, new HttpGet(loginUrl), httpContext);
+        HttpResponse loginResponse = httpRequestExecutor.execute(client, new HttpGetHC4(loginUrl), httpContext);
         return extractGerritAuth(loginResponse);
     }
 
@@ -277,7 +276,7 @@ public class GerritRestClient {
         if (loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
             Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
             if (gerritAccountCookie.isPresent()) {
-                Matcher matcher = GERRIT_AUTH_PATTERN.matcher(EntityUtils.toString(loginResponse.getEntity(), Consts.UTF_8));
+                Matcher matcher = GERRIT_AUTH_PATTERN.matcher(EntityUtilsHC4.toString(loginResponse.getEntity(), Consts.UTF_8));
                 if (matcher.find()) {
                     return Optional.of(matcher.group(1));
                 }
@@ -312,14 +311,14 @@ public class GerritRestClient {
                 .setConnectionRequestTimeout(CONNECTION_TIMEOUT_MS);
         client.setDefaultRequestConfig(requestConfig.build());
 
-        CredentialsProvider credentialsProvider = getCredentialsProvider();
+        BasicCredentialsProviderHC4 credentialsProvider = getCredentialsProvider();
         client.setDefaultCredentialsProvider(credentialsProvider);
 
         if (authData.isLoginAndPasswordAvailable()) {
             credentialsProvider.setCredentials(AuthScope.ANY,
                     new UsernamePasswordCredentials(authData.getLogin(), authData.getPassword()));
 
-            BasicScheme basicAuth = new BasicScheme();
+            BasicSchemeHC4 basicAuth = new BasicSchemeHC4();
             httpContext.setAttribute(PREEMPTIVE_AUTH, basicAuth);
             client.addInterceptorFirst(new PreemptiveAuthHttpRequestInterceptor(authData));
         }
@@ -339,8 +338,8 @@ public class GerritRestClient {
      * When server returns status code 401, the HTTP client provides the same credentials forever.
      * Since we create a new HTTP client for every request, we can handle it this way.
      */
-    private BasicCredentialsProvider getCredentialsProvider() {
-        return new BasicCredentialsProvider() {
+    private BasicCredentialsProviderHC4 getCredentialsProvider() {
+        return new BasicCredentialsProviderHC4() {
             private Set<AuthScope> authAlreadyTried = Sets.newHashSet();
 
             @Override
@@ -382,7 +381,7 @@ public class GerritRestClient {
                 String body = "<empty>";
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
-                    body = EntityUtils.toString(entity).trim();
+                    body = EntityUtilsHC4.toString(entity).trim();
                 }
                 String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
                         statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
@@ -412,7 +411,7 @@ public class GerritRestClient {
         }
 
         public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
-            AuthState authState = (AuthState) context.getAttribute(HttpClientContext.TARGET_AUTH_STATE);
+            AuthStateHC4 authState = (AuthStateHC4) context.getAttribute(HttpClientContext.TARGET_AUTH_STATE);
 
             // if no auth scheme available yet, try to initialize it preemptively
             if (authState.getAuthScheme() == null) {
