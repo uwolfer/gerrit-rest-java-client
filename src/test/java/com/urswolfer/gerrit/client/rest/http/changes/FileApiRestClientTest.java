@@ -48,10 +48,10 @@ public class FileApiRestClientTest {
     @Test
     public void testContent() throws Exception {
         String requestUrl = getBaseRequestUrl() + "/content";
-        JsonPrimitive jsonElement = new JsonPrimitive(Base64.encodeBase64String(FILE_CONTENT.getBytes("UTF-8")));
+        byte[] possibleResult = Base64.encodeBase64String(FILE_CONTENT.getBytes("UTF-8")).getBytes("UTF-8");
 
         setupServices();
-        GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectGet(requestUrl, jsonElement).get();
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectGet(requestUrl, possibleResult).get();
 
         FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, revisionApiRestClient, null, FILE_PATH);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
