@@ -56,9 +56,8 @@ public class FileApiRestClient implements FileApi {
     @Override
     public BinaryResult content() throws RestApiException {
         String request = getRequestPath() + "/content";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        String content = jsonElement.getAsString();
-        return BinaryResult.create(content.getBytes()).base64();
+        byte[] content = gerritRestClient.getRequestSimple(request);
+        return BinaryResult.create(content).base64();
     }
 
     @Override

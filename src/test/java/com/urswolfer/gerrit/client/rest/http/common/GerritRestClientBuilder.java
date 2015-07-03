@@ -36,6 +36,11 @@ public final class GerritRestClientBuilder {
         return this;
     }
 
+    public GerritRestClientBuilder expectGet(String url, byte[] result) throws Exception {
+        EasyMock.expect(gerritRestClient.getRequestSimple(url)).andReturn(result).once();
+        return this;
+    }
+
     public GerritRestClientBuilder expectGet(String url, Throwable throwable) throws Exception {
         EasyMock.expect(gerritRestClient.getRequest(url)).andThrow(throwable).once();
         return this;

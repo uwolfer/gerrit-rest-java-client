@@ -45,14 +45,11 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.io.*;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,6 +96,10 @@ public class GerritRestClient {
         return request(path, null, HttpVerb.GET);
     }
 
+    public byte[] getRequestSimple(String path) throws RestApiException {
+        return requestSimple(path, null, HttpVerb.GET);
+    }
+
     public JsonElement postRequest(String path, String requestBody) throws RestApiException {
         return request(path, requestBody, HttpVerb.POST);
     }
@@ -137,6 +138,29 @@ public class GerritRestClient {
                 throw new RestApiException("Unexpectedly empty response.");
             }
             return ret;
+        } catch (IOException e) {
+            throw new RestApiException("Request failed.", e);
+        }
+    }
+
+    public byte[] requestSimple(String path, String requestBody, HttpVerb verb) throws RestApiException {
+        try {
+            HttpResponse response = doRest(path, requestBody, verb);
+
+            if (response.getStatusLine().getStatusCode() == 403 && loginCache.getGerritAuthOptional().isPresent()) {
+                // handle expired sessions: try again with a fresh login
+                loginCache.invalidate();
+                response = doRest(path, requestBody, verb);
+            }
+
+            checkStatusCode(response);
+
+            HttpEntity entity = response.getEntity();
+            if (entity == null) {
+                return null;
+            }
+            InputStream resp = entity.getContent();
+            return readFully(resp);
         } catch (IOException e) {
             throw new RestApiException("Request failed.", e);
         }
@@ -333,6 +357,16 @@ public class GerritRestClient {
                 return super.getCredentials(authscope);
             }
         };
+    }
+
+    private byte[] readFully(InputStream response) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = response.read(buffer)) != -1) {
+            baos.write(buffer, 0, length);
+        }
+        return baos.toByteArray();
     }
 
     private JsonElement parseResponse(InputStream response) throws IOException {
