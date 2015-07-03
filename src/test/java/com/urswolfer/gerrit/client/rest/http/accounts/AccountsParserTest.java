@@ -66,7 +66,7 @@ public class AccountsParserTest extends AbstractParserTest {
     }
 
     @Test
-    public void testParseSigngleUserInfos() throws Exception {
+    public void testParseSingleUserInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("self/account.json");
         List<AccountInfo> accountInfos = accountsParser.parseAccountInfos(jsonElement);
         Truth.assertThat(accountInfos).hasSize(1);
