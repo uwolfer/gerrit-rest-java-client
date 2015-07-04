@@ -125,8 +125,10 @@ public class GerritRestClient {
             if (entity == null) {
                 return null;
             }
-            InputStream resp = entity.getContent();
-            JsonElement ret = parseResponse(resp);
+
+            checkContentType(entity);
+
+            JsonElement ret = parseResponse(entity.getContent());
             if (ret.isJsonNull()) {
                 throw new RestApiException("Unexpectedly empty response.");
             }
@@ -385,6 +387,13 @@ public class GerritRestClient {
                 String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
                         statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
                 throw new HttpStatusException(statusLine.getStatusCode(), statusLine.getReasonPhrase(), message);
+        }
+    }
+
+    private void checkContentType(HttpEntity entity) throws RestApiException {
+        Header contentType = entity.getContentType();
+        if (contentType != null && !contentType.getValue().contains(JSON_MIME_TYPE)) {
+            throw new RestApiException(String.format("Expected JSON but got '%s'.", contentType.getValue()));
         }
     }
 

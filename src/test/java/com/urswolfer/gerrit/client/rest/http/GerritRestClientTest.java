@@ -29,6 +29,7 @@ import com.urswolfer.gerrit.client.rest.GerritRestApi;
 import com.urswolfer.gerrit.client.rest.GerritRestApiFactory;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -64,6 +65,9 @@ public class GerritRestClientTest {
         Server server = new Server(0);
 
         ResourceHandler resourceHandler = new ResourceHandler();
+        MimeTypes mimeTypes = new MimeTypes();
+        mimeTypes.addMimeMapping("json", "application/json");
+        resourceHandler.setMimeTypes(mimeTypes);
         URL url = this.getClass().getResource(".");
         resourceHandler.setBaseResource(new FileResource(url));
         resourceHandler.setWelcomeFiles(new String[] {"changes.json", "projects.json", "account.json"});
