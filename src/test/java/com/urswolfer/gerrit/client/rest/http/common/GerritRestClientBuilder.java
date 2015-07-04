@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.common;
 
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import org.apache.http.HttpResponse;
 import org.easymock.EasyMock;
 
 /**
@@ -68,6 +69,12 @@ public final class GerritRestClientBuilder {
     public GerritRestClientBuilder expectDelete(String url) throws Exception {
         EasyMock.expect(gerritRestClient.deleteRequest(url))
                 .andReturn(EasyMock.createMock(JsonElement.class)).once();
+        return this;
+    }
+
+    public GerritRestClientBuilder expectRequest(String path, String requestBody, GerritRestClient.HttpVerb verb,
+                                                 HttpResponse result) throws Exception {
+        EasyMock.expect(gerritRestClient.request(path, requestBody, verb)).andReturn(result).once();
         return this;
     }
 
