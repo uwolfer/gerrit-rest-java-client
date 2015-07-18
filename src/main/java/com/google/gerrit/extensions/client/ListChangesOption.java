@@ -15,6 +15,7 @@
 package com.google.gerrit.extensions.client;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 /** Output options available for retrieval change details. */
 public enum ListChangesOption {
@@ -58,7 +59,10 @@ public enum ListChangesOption {
   CHECK(15),
 
   /** Include allowed change actions client could perform. */
-  CHANGE_ACTIONS(16);
+  CHANGE_ACTIONS(16),
+
+  /** Include a copy of commit messages including review footers. */
+  COMMIT_FOOTERS(17);
 
   private final int value;
 
@@ -87,7 +91,7 @@ public enum ListChangesOption {
     return r;
   }
 
-  public static int toBits(EnumSet<ListChangesOption> set) {
+  public static int toBits(Set<ListChangesOption> set) {
     int r = 0;
     for (ListChangesOption o : set) {
       r |= 1 << o.value;

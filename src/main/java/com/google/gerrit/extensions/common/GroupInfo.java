@@ -1,4 +1,4 @@
-// Copyright (C) 2014 The Android Open Source Project
+// Copyright (C) 2015 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,20 +14,19 @@
 
 package com.google.gerrit.extensions.common;
 
-import java.sql.Timestamp;
-import java.util.Map;
+import java.util.List;
 
-public class RevisionInfo {
-  public transient boolean isCurrent;
-  public Boolean draft;
-  public Boolean hasDraftComments;
-  public int _number;
-  public Timestamp created;
-  public AccountInfo uploader;
-  public String ref;
-  public Map<String, FetchInfo> fetch;
-  public CommitInfo commit;
-  public Map<String, FileInfo> files;
-  public Map<String, ActionInfo> actions;
-  public String commitWithFooters;
+public class GroupInfo extends GroupBaseInfo {
+  public String url;
+  public GroupOptionsInfo options;
+
+  // These fields are only supplied for internal groups.
+  public String description;
+  public Integer groupId;
+  public String owner;
+  public String ownerId;
+
+  // These fields are only supplied for internal groups, and only if requested.
+  public List<AccountInfo> members;
+  public List<GroupInfo> includes;
 }

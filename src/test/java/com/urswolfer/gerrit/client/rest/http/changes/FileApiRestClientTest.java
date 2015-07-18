@@ -24,13 +24,16 @@ import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.message.BasicHeader;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 /**
@@ -48,10 +51,20 @@ public class FileApiRestClientTest {
     @Test
     public void testContent() throws Exception {
         String requestUrl = getBaseRequestUrl() + "/content";
-        JsonPrimitive jsonElement = new JsonPrimitive(Base64.encodeBase64String(FILE_CONTENT.getBytes("UTF-8")));
+        String base64String = Base64.encodeBase64String(FILE_CONTENT.getBytes("UTF-8"));
+        HttpResponse httpResponse = EasyMock.createMock(HttpResponse.class);
+        HttpEntity httpEntity = EasyMock.createMock(HttpEntity.class);
+        EasyMock.expect(httpEntity.getContent()).andStubReturn(new ByteArrayInputStream(base64String.getBytes("UTF-8")));
+        EasyMock.expect(httpResponse.getEntity()).andStubReturn(httpEntity);
+        EasyMock.expect(httpResponse.getFirstHeader("X-FYI-Content-Encoding")).andStubReturn(
+            new BasicHeader("X-FYI-Content-Type", "base64"));
+        EasyMock.expect(httpResponse.getFirstHeader("X-FYI-Content-Type")).andStubReturn(
+            new BasicHeader("X-FYI-Content-Type", "text/plain"));
+        EasyMock.replay(httpEntity, httpResponse);
 
         setupServices();
-        GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectGet(requestUrl, jsonElement).get();
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectRequest(requestUrl, null,
+            GerritRestClient.HttpVerb.GET, httpResponse).get();
 
         FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, revisionApiRestClient, null, FILE_PATH);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -61,6 +74,8 @@ public class FileApiRestClientTest {
             String actualContent = new String(Base64.decodeBase64(byteArrayOutputStream.toString()));
 
             Truth.assertThat(actualContent).is(FILE_CONTENT);
+            Truth.assertThat(binaryResult.isBase64()).isTrue();
+            Truth.assertThat(binaryResult.getContentType()).isEqualTo("text/plain");
             EasyMock.verify(gerritRestClient);
         } finally {
             binaryResult.close();

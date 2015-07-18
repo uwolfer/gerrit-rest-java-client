@@ -29,6 +29,7 @@ import com.urswolfer.gerrit.client.rest.GerritRestApi;
 import com.urswolfer.gerrit.client.rest.GerritRestApiFactory;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -46,6 +47,7 @@ import org.eclipse.jetty.util.security.Credential;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
@@ -63,6 +65,9 @@ public class GerritRestClientTest {
         Server server = new Server(0);
 
         ResourceHandler resourceHandler = new ResourceHandler();
+        MimeTypes mimeTypes = new MimeTypes();
+        mimeTypes.addMimeMapping("json", "application/json");
+        resourceHandler.setMimeTypes(mimeTypes);
         URL url = this.getClass().getResource(".");
         resourceHandler.setBaseResource(new FileResource(url));
         resourceHandler.setWelcomeFiles(new String[] {"changes.json", "projects.json", "account.json"});
@@ -194,9 +199,13 @@ public class GerritRestClientTest {
     public void testUnsupportedHttpMethod() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(jettyUrl), new HttpRequestExecutor());
-        gerritRestClient.doRest("/invalid/", null, GerritRestClient.HttpVerb.HEAD);
+        gerritRestClient.requestRest("/invalid/", null, GerritRestClient.HttpVerb.HEAD);
     }
 
+    /**
+     * Tests authentication with a login which us handled by HTTP auth (preemptive authentication is assumed)
+     * (path: "/a/changes/" isn't mapped -> status 404).
+     */
     @Test(enabled = false)
     public void testUserAuth() throws Exception {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
@@ -212,6 +221,9 @@ public class GerritRestClientTest {
         Truth.assertThat(catched).isTrue();
     }
 
+    /**
+     * Tests authentication with an invalid HTTP login (preemptive authentication is assumed). Status 401 expected.
+     */
     @Test(enabled = false)
     public void testInvalidUserAuth() throws Exception {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
@@ -227,6 +239,9 @@ public class GerritRestClientTest {
         Truth.assertThat(catched).isTrue();
     }
 
+    /**
+     * Tests that client-builder-extensions are called correctly.
+     */
     @Test
     public void testHttpClientBuilderExtension() throws Exception {
         final boolean[] extendCalled = {false};
@@ -264,6 +279,8 @@ public class GerritRestClientTest {
     /**
      * When cookie "GerritAccount" is available (sent in test with "LoginServlet"),
      * "GerritAuth" string is extracted and cached.
+     * Note that no username / login is NOT sent - otherwise LoginSimulationServlet would
+     * not return a GerritAccount-cookie.
      */
     @Test
     public void testGerritAuthExtractionAndCache() throws Exception {
@@ -274,8 +291,8 @@ public class GerritRestClientTest {
         LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
 
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
-        gerritRestClient.doRest("/changes/", null, GerritRestClient.HttpVerb.GET);
-        gerritRestClient.doRest("/changes/?n=5", null, GerritRestClient.HttpVerb.GET);
+        gerritRestClient.requestRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+        gerritRestClient.requestRest("/changes/?n=5", null, GerritRestClient.HttpVerb.GET);
         Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isTrue();
         Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
 
@@ -283,10 +300,15 @@ public class GerritRestClientTest {
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
 
         // ensure that even with invalidated cache request is possible and cached filled again
-        gerritRestClient.doRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+        gerritRestClient.requestRest("/changes/", null, GerritRestClient.HttpVerb.GET);
         Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
     }
 
+    /**
+     * Tests that the login cache is used correctly for a host which does NOT
+     * support Gerrit-Auth method. It tries the first time to get the GerritAccount-cookie
+     * and if that fails it continues to use HTTP auth.
+     */
     @Test(enabled = false)
     public void testGerritAuthNotAvailable() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClient(
@@ -297,11 +319,21 @@ public class GerritRestClientTest {
 
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
         Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isTrue();
-        gerritRestClient.doRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+        requestChanges(gerritRestClient);
         Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isFalse();
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
-        gerritRestClient.doRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+        requestChanges(gerritRestClient);
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+    }
+
+    private void requestChanges(GerritRestClient gerritRestClient) throws IOException, HttpStatusException {
+        try {
+            gerritRestClient.requestRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+        } catch (HttpStatusException e) {
+            if (e.getStatusCode() != 404) { // 404 is expected since path /a/changes is not mapped
+                throw e;
+            }
+        }
     }
 
     @Test(enabled = false) // requires running Gerrit instance

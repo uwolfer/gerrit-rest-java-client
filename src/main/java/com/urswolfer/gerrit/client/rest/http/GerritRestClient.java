@@ -41,6 +41,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntityHC4;
 import org.apache.http.impl.auth.BasicSchemeHC4;
 import org.apache.http.impl.client.*;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContextHC4;
 import org.apache.http.protocol.HttpContext;
@@ -65,6 +66,7 @@ import java.util.regex.Pattern;
  */
 public class GerritRestClient {
 
+    private static final String JSON_MIME_TYPE = ContentType.APPLICATION_JSON.getMimeType();
     private static final Pattern GERRIT_AUTH_PATTERN = Pattern.compile(".*?xGerritAuth=\"(.+?)\"");
     private static final int CONNECTION_TIMEOUT_MS = 30000;
     private static final String PREEMPTIVE_AUTH = "preemptive-auth";
@@ -97,11 +99,11 @@ public class GerritRestClient {
     }
 
     public JsonElement getRequest(String path) throws RestApiException {
-        return request(path, null, HttpVerb.GET);
+        return requestJson(path, null, HttpVerb.GET);
     }
 
     public JsonElement postRequest(String path, String requestBody) throws RestApiException {
-        return request(path, requestBody, HttpVerb.POST);
+        return requestJson(path, requestBody, HttpVerb.POST);
     }
 
     public JsonElement putRequest(String path) throws RestApiException {
@@ -109,31 +111,25 @@ public class GerritRestClient {
     }
 
     public JsonElement putRequest(String path, String requestBody) throws RestApiException {
-        return request(path, requestBody, HttpVerb.PUT);
+        return requestJson(path, requestBody, HttpVerb.PUT);
     }
 
     public JsonElement deleteRequest(String path) throws RestApiException {
-        return request(path, null, HttpVerb.DELETE);
+        return requestJson(path, null, HttpVerb.DELETE);
     }
 
-    public JsonElement request(String path, String requestBody, HttpVerb verb) throws RestApiException {
+    public JsonElement requestJson(String path, String requestBody, HttpVerb verb) throws RestApiException {
         try {
-            HttpResponse response = doRest(path, requestBody, verb);
-
-            if (response.getStatusLine().getStatusCode() == 403 && loginCache.getGerritAuthOptional().isPresent()) {
-                // handle expired sessions: try again with a fresh login
-                loginCache.invalidate();
-                response = doRest(path, requestBody, verb);
-            }
-
-            checkStatusCode(response);
+            HttpResponse response = requestRest(path, requestBody, verb);
 
             HttpEntity entity = response.getEntity();
             if (entity == null) {
                 return null;
             }
-            InputStream resp = entity.getContent();
-            JsonElement ret = parseResponse(resp);
+
+            checkContentType(entity);
+
+            JsonElement ret = parseResponse(entity.getContent());
             if (ret.isJsonNull()) {
                 throw new RestApiException("Unexpectedly empty response.");
             }
@@ -143,7 +139,17 @@ public class GerritRestClient {
         }
     }
 
-    public HttpResponse doRest(String path, String requestBody, HttpVerb verb) throws IOException, RestApiException {
+    public HttpResponse requestRest(String path,
+                                    String requestBody,
+                                    HttpVerb verb) throws IOException, HttpStatusException {
+        BasicHeader acceptHeader = new BasicHeader("Accept", JSON_MIME_TYPE);
+        return request(path, requestBody, verb, acceptHeader);
+    }
+
+    public HttpResponse request(String path,
+                                String requestBody,
+                                HttpVerb verb,
+                                Header... headers) throws IOException, HttpStatusException {
         HttpContext httpContext = new BasicHttpContextHC4();
         HttpClientBuilder client = getHttpClient(httpContext);
 
@@ -179,9 +185,22 @@ public class GerritRestClient {
         if (gerritAuthOptional.isPresent()) {
             method.addHeader("X-Gerrit-Auth", gerritAuthOptional.get());
         }
-        method.addHeader("Accept", ContentType.APPLICATION_JSON.getMimeType());
 
-        return httpRequestExecutor.execute(client, method, httpContext);
+        for (Header header : headers) {
+            method.addHeader(header);
+        }
+
+        HttpResponse response = httpRequestExecutor.execute(client, method, httpContext);
+
+        if (response.getStatusLine().getStatusCode() == 403 && loginCache.getGerritAuthOptional().isPresent()) {
+            // handle expired sessions: try again with a fresh login
+            loginCache.invalidate();
+            response = requestRest(path, requestBody, verb);
+        }
+
+        checkStatusCode(response);
+
+        return response;
     }
 
     private void setRequestBody(String requestBody, HttpRequestBaseHC4 method) {
@@ -369,6 +388,13 @@ public class GerritRestClient {
                 String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
                         statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
                 throw new HttpStatusException(statusLine.getStatusCode(), statusLine.getReasonPhrase(), message);
+        }
+    }
+
+    private void checkContentType(HttpEntity entity) throws RestApiException {
+        Header contentType = entity.getContentType();
+        if (contentType != null && !contentType.getValue().contains(JSON_MIME_TYPE)) {
+            throw new RestApiException(String.format("Expected JSON but got '%s'.", contentType.getValue()));
         }
     }
 
