@@ -194,7 +194,7 @@ public class RevisionApiRestClientTest {
             binaryResult.writeTo(byteArrayOutputStream);
             String actualContent = new String(Base64.decodeBase64(byteArrayOutputStream.toString()));
 
-            Truth.assertThat(actualContent).is(patchContent);
+            Truth.assertThat(actualContent).isEqualTo(patchContent);
             Truth.assertThat(binaryResult.isBase64()).isTrue();
             Truth.assertThat(binaryResult.getContentType()).isEqualTo("application/mbox");
             EasyMock.verify(gerritRestClient);

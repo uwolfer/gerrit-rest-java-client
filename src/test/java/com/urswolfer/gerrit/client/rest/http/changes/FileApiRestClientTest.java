@@ -73,7 +73,7 @@ public class FileApiRestClientTest {
             binaryResult.writeTo(byteArrayOutputStream);
             String actualContent = new String(Base64.decodeBase64(byteArrayOutputStream.toString()));
 
-            Truth.assertThat(actualContent).is(FILE_CONTENT);
+            Truth.assertThat(actualContent).isEqualTo(FILE_CONTENT);
             Truth.assertThat(binaryResult.isBase64()).isTrue();
             Truth.assertThat(binaryResult.getContentType()).isEqualTo("text/plain");
             EasyMock.verify(gerritRestClient);

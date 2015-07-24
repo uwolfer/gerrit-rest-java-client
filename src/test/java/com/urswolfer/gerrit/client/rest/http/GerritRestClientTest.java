@@ -134,14 +134,14 @@ public class GerritRestClientTest {
     public void testGetChanges() throws Exception {
         GerritApi gerritClient = getGerritApiWithJettyHost();
         List<ChangeInfo> changes = gerritClient.changes().query().get();
-        Truth.assertThat(changes.size()).is(3);
+        Truth.assertThat(changes.size()).isEqualTo(3);
     }
 
     @Test
     public void testGetSelfAccount() throws Exception {
         GerritApi gerritClient = getGerritApiWithJettyHost();
         AccountInfo accountInfo = gerritClient.accounts().self().get();
-        Truth.assertThat(accountInfo.name).is("John Doe");
+        Truth.assertThat(accountInfo.name).isEqualTo("John Doe");
     }
 
     @Test(expectedExceptions = HttpStatusException.class)
@@ -154,7 +154,7 @@ public class GerritRestClientTest {
     public void testGetProjects() throws Exception {
         GerritApi gerritClient = getGerritApiWithJettyHost();
         List<ProjectInfo> projects = gerritClient.projects().list().get();
-        Truth.assertThat(projects.size()).is(3);
+        Truth.assertThat(projects.size()).isEqualTo(3);
     }
 
     @Test
@@ -162,7 +162,7 @@ public class GerritRestClientTest {
         GerritRestApi gerritClient = getGerritApiWithJettyHost();
         InputStream commitMessageHook = gerritClient.tools().getCommitMessageHook();
         String result = CharStreams.toString(new InputStreamReader(commitMessageHook, Charsets.UTF_8));
-        Truth.assertThat(result).is("dummy-commit-msg-hook\n");
+        Truth.assertThat(result).isEqualTo("dummy-commit-msg-hook\n");
     }
 
     @Test(expectedExceptions = HttpStatusException.class)
@@ -216,7 +216,7 @@ public class GerritRestClientTest {
         } catch (HttpStatusException e) {
             catched = true;
             // 404 because this url does not provide a valid response (not set up in this test case)
-            Truth.assertThat(e.getStatusCode()).is(404);
+            Truth.assertThat(e.getStatusCode()).isEqualTo(404);
         }
         Truth.assertThat(catched).isTrue();
     }
@@ -233,7 +233,7 @@ public class GerritRestClientTest {
             gerritClient.changes().query().get();
         } catch (HttpStatusException e) {
             catched = true;
-            Truth.assertThat(e.getStatusCode()).is(401);
+            Truth.assertThat(e.getStatusCode()).isEqualTo(401);
             Truth.assertThat(e.getStatusText().toLowerCase()).contains("unauthorized");
         }
         Truth.assertThat(catched).isTrue();
@@ -273,7 +273,7 @@ public class GerritRestClientTest {
         GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
         GerritApi gerritClient = gerritRestApiFactory.create(new GerritAuthData.Basic(jettyUrl));
         String version = gerritClient.config().server().getVersion();
-        Truth.assertThat(version).is("2.10");
+        Truth.assertThat(version).isEqualTo("2.10");
     }
 
     /**

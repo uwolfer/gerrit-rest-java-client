@@ -89,7 +89,7 @@ public class ChangesParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("changes.json");
 
         List<ChangeInfo> changeInfos = changesParser.parseChangeInfos(jsonElement);
-        Truth.assertThat(changeInfos.size()).is(3);
+        Truth.assertThat(changeInfos.size()).isEqualTo(3);
 
         for (int i = 0; i < changeInfos.size(); i++) {
             ChangeInfo actual = changeInfos.get(i);
@@ -104,7 +104,7 @@ public class ChangesParserTest extends AbstractParserTest {
 
         List<ChangeInfo> changeInfos = changesParser.parseChangeInfos(jsonElement);
 
-        Truth.assertThat(changeInfos.size()).is(1);
+        Truth.assertThat(changeInfos.size()).isEqualTo(1);
 
         GerritAssert.assertEquals(changeInfos.get(0), CHANGE_INFOS.get(0));
     }
