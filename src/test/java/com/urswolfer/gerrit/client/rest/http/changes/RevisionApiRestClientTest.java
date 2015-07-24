@@ -1,15 +1,23 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.ReviewInput;
 import com.google.gerrit.extensions.api.changes.SubmitInput;
+import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.message.BasicHeader;
 import org.easymock.EasyMock;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 
 /**
@@ -141,6 +149,42 @@ public class RevisionApiRestClientTest {
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).comments();
 
         EasyMock.verify(gerritRestClient, commentsParser);
+    }
+
+    @Test
+    public void testPatch() throws Exception {
+        String patchContent = "patch content";
+        String requestUrl = "/changes/122/revisions/1/patch";
+        String base64String = Base64.encodeBase64String(patchContent.getBytes("UTF-8"));
+        HttpResponse httpResponse = EasyMock.createMock(HttpResponse.class);
+        HttpEntity httpEntity = EasyMock.createMock(HttpEntity.class);
+        EasyMock.expect(httpEntity.getContent()).andStubReturn(new ByteArrayInputStream(base64String.getBytes("UTF-8")));
+        EasyMock.expect(httpResponse.getEntity()).andStubReturn(httpEntity);
+        EasyMock.expect(httpResponse.getFirstHeader("X-FYI-Content-Encoding")).andStubReturn(
+            new BasicHeader("X-FYI-Content-Type", "base64"));
+        EasyMock.expect(httpResponse.getFirstHeader("X-FYI-Content-Type")).andStubReturn(
+            new BasicHeader("X-FYI-Content-Type", "application/mbox"));
+        EasyMock.replay(httpEntity, httpResponse);
+
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectRequest(requestUrl, null,
+            GerritRestClient.HttpVerb.GET, httpResponse).get();
+
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, null, null, null, null, null);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        BinaryResult binaryResult = changesRestClient.id(122).revision(1).patch();
+        try {
+            binaryResult.writeTo(byteArrayOutputStream);
+            String actualContent = new String(Base64.decodeBase64(byteArrayOutputStream.toString()));
+
+            Truth.assertThat(actualContent).is(patchContent);
+            Truth.assertThat(binaryResult.isBase64()).isTrue();
+            Truth.assertThat(binaryResult.getContentType()).isEqualTo("application/mbox");
+            EasyMock.verify(gerritRestClient);
+        } finally {
+            binaryResult.close();
+            byteArrayOutputStream.close();
+        }
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {

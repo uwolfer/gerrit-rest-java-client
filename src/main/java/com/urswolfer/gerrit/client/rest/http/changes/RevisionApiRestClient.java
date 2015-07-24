@@ -19,11 +19,15 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.FileInfo;
+import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
+import org.apache.http.HttpResponse;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -132,6 +136,17 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public FileApi file(String path) {
         return new FileApiRestClient(gerritRestClient, this, diffInfoParser, path);
+    }
+
+    @Override
+    public BinaryResult patch() throws RestApiException {
+        String request = getRequestPath() + "/patch";
+        try {
+            HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
+            return BinaryResultUtils.createBinaryResult(response);
+        } catch (IOException e) {
+            throw new RestApiException("Failed to get patch.", e);
+        }
     }
 
     protected String getRequestPath() {
