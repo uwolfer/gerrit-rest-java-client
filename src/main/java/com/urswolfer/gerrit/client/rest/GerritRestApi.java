@@ -24,4 +24,6 @@ import com.urswolfer.gerrit.client.rest.tools.Tools;
  */
 public interface GerritRestApi extends GerritApi {
     public Tools tools();
+
+    public RestClient restClient();
 }
