@@ -27,7 +27,7 @@ public class GerritAuthDataTest {
     public void basicAuth() throws Exception {
         String host = "http://localhost:8080";
         GerritAuthData.Basic authData = new GerritAuthData.Basic(host);
-        Truth.assertThat(authData.getHost()).is(host);
+        Truth.assertThat(authData.getHost()).isEqualTo(host);
         Truth.assertThat(authData.getLogin()).isEmpty();
         Truth.assertThat(authData.getPassword()).isEmpty();
         Truth.assertThat(authData.isLoginAndPasswordAvailable()).isFalse();
@@ -39,9 +39,9 @@ public class GerritAuthDataTest {
         String user = "foo";
         String password = "bar";
         GerritAuthData.Basic authData = new GerritAuthData.Basic(host, user, password);
-        Truth.assertThat(authData.getHost()).is(host);
-        Truth.assertThat(authData.getLogin()).is(user);
-        Truth.assertThat(authData.getPassword()).is(password);
+        Truth.assertThat(authData.getHost()).isEqualTo(host);
+        Truth.assertThat(authData.getLogin()).isEqualTo(user);
+        Truth.assertThat(authData.getPassword()).isEqualTo(password);
         Truth.assertThat(authData.isLoginAndPasswordAvailable()).isTrue();
     }
 
@@ -49,6 +49,6 @@ public class GerritAuthDataTest {
     public void basicAuthUrlWithTrailingSlash() throws Exception {
         String host = "http://localhost:8080/r/";
         GerritAuthData.Basic authData = new GerritAuthData.Basic(host);
-        Truth.assertThat(authData.getHost()).is("http://localhost:8080/r");
+        Truth.assertThat(authData.getHost()).isEqualTo("http://localhost:8080/r");
     }
 }

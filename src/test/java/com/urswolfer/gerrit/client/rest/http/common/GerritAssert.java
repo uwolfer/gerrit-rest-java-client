@@ -74,6 +74,6 @@ public class GerritAssert {
         String actualXml = xStream.toXML(actual);
         String expectedXml = xStream.toXML(expected);
 
-        Truth.assertThat(actualXml).is(expectedXml);
+        Truth.assertThat(actualXml).isEqualTo(expectedXml);
     }
 }

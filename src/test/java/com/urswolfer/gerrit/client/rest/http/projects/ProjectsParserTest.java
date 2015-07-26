@@ -54,7 +54,7 @@ public class ProjectsParserTest extends AbstractParserTest {
 
         SortedMap<String, ProjectInfo> projectInfos = projectsParser.parseProjectInfos(jsonElement);
 
-        Truth.assertThat(projectInfos.size()).is(3);
+        Truth.assertThat(projectInfos.size()).isEqualTo(3);
         int i = 0;
         for (ProjectInfo projectInfo : projectInfos.values()) {
             ProjectInfo expected = PROJECT_INFO_LIST.get(i);

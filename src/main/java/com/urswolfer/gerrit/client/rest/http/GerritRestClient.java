@@ -25,6 +25,7 @@ import com.google.common.io.CharStreams;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.*;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
+import com.urswolfer.gerrit.client.rest.RestClient;
 import com.urswolfer.gerrit.client.rest.Version;
 import com.urswolfer.gerrit.client.rest.gson.DateDeserializer;
 import com.urswolfer.gerrit.client.rest.gson.DateSerializer;
@@ -60,11 +61,9 @@ import java.util.regex.Pattern;
 
 
 /**
- * This class provides basic http access to the rest interface of a gerrit instance.
- *
  * @author Urs Wolfer
  */
-public class GerritRestClient {
+public class GerritRestClient implements RestClient {
 
     private static final String JSON_MIME_TYPE = ContentType.APPLICATION_JSON.getMimeType();
     private static final Pattern GERRIT_AUTH_PATTERN = Pattern.compile(".*?xGerritAuth=\"(.+?)\"");
@@ -90,34 +89,37 @@ public class GerritRestClient {
         loginCache = new LoginCache(authData, cookieStore);
     }
 
-    public enum HttpVerb {
-        GET, POST, DELETE, HEAD, PUT
-    }
-
+    @Override
     public Gson getGson() {
         return GSON;
     }
 
+    @Override
     public JsonElement getRequest(String path) throws RestApiException {
         return requestJson(path, null, HttpVerb.GET);
     }
 
+    @Override
     public JsonElement postRequest(String path, String requestBody) throws RestApiException {
         return requestJson(path, requestBody, HttpVerb.POST);
     }
 
+    @Override
     public JsonElement putRequest(String path) throws RestApiException {
         return putRequest(path, null);
     }
 
+    @Override
     public JsonElement putRequest(String path, String requestBody) throws RestApiException {
         return requestJson(path, requestBody, HttpVerb.PUT);
     }
 
+    @Override
     public JsonElement deleteRequest(String path) throws RestApiException {
         return requestJson(path, null, HttpVerb.DELETE);
     }
 
+    @Override
     public JsonElement requestJson(String path, String requestBody, HttpVerb verb) throws RestApiException {
         try {
             HttpResponse response = requestRest(path, requestBody, verb);
@@ -139,6 +141,7 @@ public class GerritRestClient {
         }
     }
 
+    @Override
     public HttpResponse requestRest(String path,
                                     String requestBody,
                                     HttpVerb verb) throws IOException, HttpStatusException {
@@ -146,6 +149,7 @@ public class GerritRestClient {
         return request(path, requestBody, verb, acceptHeader);
     }
 
+    @Override
     public HttpResponse request(String path,
                                 String requestBody,
                                 HttpVerb verb,

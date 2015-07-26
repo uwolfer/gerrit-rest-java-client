@@ -113,4 +113,9 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
     public Tools tools() {
         return toolsRestClient.get();
     }
+
+    @Override
+    public RestClient restClient() {
+        return gerritRestClient;
+    }
 }

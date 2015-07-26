@@ -25,11 +25,10 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import org.apache.http.Header;
+import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author Thomas Forrer
@@ -63,29 +62,9 @@ public class FileApiRestClient implements FileApi {
         String request = getRequestPath() + "/content";
         try {
             HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
-            InputStream content = response.getEntity().getContent();
-            BinaryResult binaryResult = BinaryResult.create(content);
-            setContentType(response, binaryResult);
-            setContentEncoding(response, binaryResult);
-            return binaryResult;
+            return BinaryResultUtils.createBinaryResult(response);
         } catch (IOException e) {
             throw new RestApiException("Failed to get file content.", e);
-        }
-    }
-
-    private void setContentType(HttpResponse response, BinaryResult binaryResult) {
-        Header fileContentType = response.getFirstHeader("X-FYI-Content-Type");
-        if (fileContentType != null) {
-            binaryResult.setContentType(fileContentType.getValue());
-        }
-    }
-
-    private void setContentEncoding(HttpResponse response, BinaryResult binaryResult) {
-        Header contentEncoding = response.getFirstHeader("X-FYI-Content-Encoding");
-        if (contentEncoding != null) {
-            if ("base64".equals(contentEncoding.getValue())) {
-                binaryResult.base64();
-            }
         }
     }
 

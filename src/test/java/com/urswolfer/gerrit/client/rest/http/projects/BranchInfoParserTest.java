@@ -59,7 +59,7 @@ public class BranchInfoParserTest extends AbstractParserTest {
 
         List<BranchInfo> branchInfos = branchInfoParser.parseBranchInfos(jsonElement);
 
-        Truth.assertThat(branchInfos.size()).is(3);
+        Truth.assertThat(branchInfos.size()).isEqualTo(3);
         for (int i = 0; i < branchInfos.size(); i++) {
             BranchInfo actual = branchInfos.get(i);
             BranchInfo expected = BRANCH_INFO_LIST.get(i);

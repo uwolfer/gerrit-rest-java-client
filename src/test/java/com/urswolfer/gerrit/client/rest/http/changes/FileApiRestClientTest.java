@@ -46,8 +46,6 @@ public class FileApiRestClientTest {
 
     private RevisionApiRestClient revisionApiRestClient;
 
-
-
     @Test
     public void testContent() throws Exception {
         String requestUrl = getBaseRequestUrl() + "/content";
@@ -63,8 +61,10 @@ public class FileApiRestClientTest {
         EasyMock.replay(httpEntity, httpResponse);
 
         setupServices();
-        GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectRequest(requestUrl, null,
-            GerritRestClient.HttpVerb.GET, httpResponse).get();
+
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectRequest(requestUrl, null, GerritRestClient.HttpVerb.GET, httpResponse)
+            .get();
 
         FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, revisionApiRestClient, null, FILE_PATH);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -73,7 +73,7 @@ public class FileApiRestClientTest {
             binaryResult.writeTo(byteArrayOutputStream);
             String actualContent = new String(Base64.decodeBase64(byteArrayOutputStream.toString()));
 
-            Truth.assertThat(actualContent).is(FILE_CONTENT);
+            Truth.assertThat(actualContent).isEqualTo(FILE_CONTENT);
             Truth.assertThat(binaryResult.isBase64()).isTrue();
             Truth.assertThat(binaryResult.getContentType()).isEqualTo("text/plain");
             EasyMock.verify(gerritRestClient);
@@ -140,7 +140,8 @@ public class FileApiRestClientTest {
 
     public void setupServices() {
         revisionApiRestClient = EasyMock.createMock(RevisionApiRestClient.class);
-        EasyMock.expect(revisionApiRestClient.getRequestPath()).andReturn("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revisions/1").once();
+        EasyMock.expect(revisionApiRestClient.getRequestPath())
+            .andReturn("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revisions/1").once();
         EasyMock.replay(revisionApiRestClient);
     }
 }
