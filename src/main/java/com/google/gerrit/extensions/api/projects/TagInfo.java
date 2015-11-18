@@ -12,19 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.client;
+package com.google.gerrit.extensions.api.projects;
 
-public enum Side {
-  PARENT,
-  REVISION;
+import com.google.gerrit.extensions.common.GitPerson;
 
-  public static Side fromShort(short s) {
-    switch (s) {
-      case 0:
-        return PARENT;
-      case 1:
-        return REVISION;
-    }
-    return null;
+public class TagInfo extends RefInfo {
+  public String object;
+  public String message;
+  public GitPerson tagger;
+
+  public TagInfo(String ref, String revision) {
+    this.ref = ref;
+    this.revision = revision;
+  }
+
+  public TagInfo(String ref, String revision, String object,
+      String message, GitPerson tagger) {
+    this(ref, revision);
+    this.object = object;
+    this.message = message;
+    this.tagger = tagger;
   }
 }

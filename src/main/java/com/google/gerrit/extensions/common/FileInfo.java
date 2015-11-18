@@ -20,4 +20,6 @@ public class FileInfo {
   public String oldPath;
   public Integer linesInserted;
   public Integer linesDeleted;
+  public long sizeDelta;
+  public long size;
 }

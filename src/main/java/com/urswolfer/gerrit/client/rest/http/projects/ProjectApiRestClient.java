@@ -72,8 +72,8 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
     }
 
     @Override
-    public ListBranchesRequest branches() {
-        return new ListBranchesRequest() {
+    public ListRefsRequest<BranchInfo> branches() {
+        return new ListRefsRequest<BranchInfo>() {
             @Override
             public List<BranchInfo> get() throws RestApiException {
                 return ProjectApiRestClient.this.getBranches(this);
@@ -81,7 +81,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         };
     }
 
-    private List<BranchInfo> getBranches(ListBranchesRequest lbr) throws RestApiException {
+    private List<BranchInfo> getBranches(ListRefsRequest<BranchInfo> lbr) throws RestApiException {
         String request = projectsUrl() + branchesUrl(lbr);
         JsonElement branches = gerritRestClient.getRequest(request);
         return branchInfoParser.parseBranchInfos(branches);
@@ -91,7 +91,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         return "/projects/" + name;
     }
 
-    private String branchesUrl(ListBranchesRequest lbr) {
+    private String branchesUrl(ListRefsRequest<BranchInfo> lbr) {
         String query = "";
 
         if (lbr.getLimit() != 0) {

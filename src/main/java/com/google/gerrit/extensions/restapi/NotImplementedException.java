@@ -19,6 +19,10 @@ public class NotImplementedException extends UnsupportedOperationException {
   private static final long serialVersionUID = 1L;
 
   public NotImplementedException() {
-    super("Not implemented.");
+    this("Not implemented");
+  }
+
+  public NotImplementedException(String message) {
+    super(message);
   }
 }

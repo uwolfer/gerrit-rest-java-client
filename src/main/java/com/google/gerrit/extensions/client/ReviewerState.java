@@ -1,4 +1,4 @@
-// Copyright (C) 2014 The Android Open Source Project
+// Copyright (C) 2015 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
 
 package com.google.gerrit.extensions.client;
 
-public enum Side {
-  PARENT,
-  REVISION;
+public enum ReviewerState {
+  /** The user has contributed at least one nonzero vote on the change. */
+  REVIEWER,
 
-  public static Side fromShort(short s) {
-    switch (s) {
-      case 0:
-        return PARENT;
-      case 1:
-        return REVISION;
-    }
-    return null;
-  }
+  /** The reviewer was added to the change, but has not voted. */
+  CC,
+
+  /** The user was previously a reviewer on the change, but was removed. */
+  REMOVED;
 }

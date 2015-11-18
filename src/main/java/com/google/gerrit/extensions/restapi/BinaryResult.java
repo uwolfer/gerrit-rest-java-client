@@ -16,7 +16,12 @@ package com.google.gerrit.extensions.restapi;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.charset.*;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.UnsupportedCharsetException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Wrapper around a non-JSON result from a {@link RestView}.
@@ -50,7 +55,7 @@ public abstract class BinaryResult implements Closeable {
   }
 
   private String contentType = OCTET_STREAM;
-  private String characterEncoding;
+  private Charset characterEncoding;
   private long contentLength = -1;
   private boolean gzip = true;
   private boolean base64 = false;
@@ -58,9 +63,9 @@ public abstract class BinaryResult implements Closeable {
 
   /** @return the MIME type of the result, for HTTP clients. */
   public String getContentType() {
-    String enc = getCharacterEncoding();
+    Charset enc = getCharacterEncoding();
     if (enc != null) {
-      return contentType + "; charset=" + enc;
+      return contentType + "; charset=" + enc.name();
     }
     return contentType;
   }
@@ -72,12 +77,18 @@ public abstract class BinaryResult implements Closeable {
   }
 
   /** Get the character encoding; null if not known. */
-  public String getCharacterEncoding() {
+  public Charset getCharacterEncoding() {
     return characterEncoding;
   }
 
   /** Set the character set used to encode text data and return {@code this}. */
+  @Deprecated
   public BinaryResult setCharacterEncoding(String encoding) {
+    return setCharacterEncoding(Charset.forName(encoding));
+  }
+
+  /** Set the character set used to encode text data and return {@code this}. */
+  public BinaryResult setCharacterEncoding(Charset encoding) {
     characterEncoding = encoding;
     return this;
   }
@@ -175,11 +186,11 @@ public abstract class BinaryResult implements Closeable {
         getContentType());
   }
 
-  private static String decode(byte[] data, String enc) {
+  private static String decode(byte[] data, Charset enc) {
     try {
       Charset cs = enc != null
-          ? Charset.forName(enc)
-          : StandardCharsets.UTF_8;
+          ? enc
+          : UTF_8;
       return cs.newDecoder()
         .onMalformedInput(CodingErrorAction.REPORT)
         .onUnmappableCharacter(CodingErrorAction.REPORT)
@@ -188,14 +199,16 @@ public abstract class BinaryResult implements Closeable {
     } catch (UnsupportedCharsetException e) {
       // Fallback to ISO-8850-1 style encoding.
       StringBuilder r = new StringBuilder(data.length);
-      for (byte b : data)
-          r.append((char) (b & 0xff));
+      for (byte b : data) {
+        r.append((char) (b & 0xff));
+      }
       return r.toString();
     } catch (CharacterCodingException e) {
       // Fallback to ISO-8850-1 style encoding.
       StringBuilder r = new StringBuilder(data.length);
-      for (byte b : data)
-          r.append((char) (b & 0xff));
+      for (byte b : data) {
+        r.append((char) (b & 0xff));
+      }
       return r.toString();
     }
   }
@@ -223,9 +236,9 @@ public abstract class BinaryResult implements Closeable {
     private final String str;
 
     StringResult(String str) {
-      super(str.getBytes(StandardCharsets.UTF_8));
+      super(str.getBytes(UTF_8));
       setContentType("text/plain");
-      setCharacterEncoding("UTF-8");
+      setCharacterEncoding(UTF_8.name());
       this.str = str;
     }
 
