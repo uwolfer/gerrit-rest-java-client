@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.gerrit.extensions.api.projects.BranchApi;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.ProjectApi;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
@@ -81,13 +82,18 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         };
     }
 
+    @Override
+    public BranchApi branch(String ref) throws RestApiException {
+        return new BranchApiRestClient(gerritRestClient, branchInfoParser, this, ref);
+    }
+
     private List<BranchInfo> getBranches(ListRefsRequest<BranchInfo> lbr) throws RestApiException {
         String request = projectsUrl() + branchesUrl(lbr);
         JsonElement branches = gerritRestClient.getRequest(request);
         return branchInfoParser.parseBranchInfos(branches);
     }
 
-    private String projectsUrl() {
+    protected String projectsUrl() {
         return "/projects/" + name;
     }
 
