@@ -23,7 +23,7 @@ import com.urswolfer.gerrit.client.rest.tools.Tools;
  * @author Urs Wolfer
  */
 public interface GerritRestApi extends GerritApi {
-    public Tools tools();
+    Tools tools();
 
-    public RestClient restClient();
+    RestClient restClient();
 }

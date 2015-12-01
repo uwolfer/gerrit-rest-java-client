@@ -1,6 +1,15 @@
-.idea/*
-target/*
-/target/
+# Maven
+target/
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+
+# Eclipse
 .classpath
 .project
 .settings/
+
+# OS X
+.DS_Store
