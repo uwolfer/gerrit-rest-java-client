@@ -34,90 +34,87 @@ import java.util.List;
  * @author Thomas Forrer
  */
 public class ProjectApiRestClient extends ProjectApi.NotImplemented implements ProjectApi {
-  private final GerritRestClient gerritRestClient;
-  private final ProjectsParser projectsParser;
-  private final BranchInfoParser branchInfoParser;
-  private final String name;
+    private final GerritRestClient gerritRestClient;
+    private final ProjectsParser projectsParser;
+    private final BranchInfoParser branchInfoParser;
+    private final String name;
 
-  public ProjectApiRestClient(GerritRestClient gerritRestClient, ProjectsParser projectsParser,
-      BranchInfoParser branchInfoParser, String name) {
-    this.gerritRestClient = gerritRestClient;
-    this.projectsParser = projectsParser;
-    this.branchInfoParser = branchInfoParser;
-    this.name = name;
-  }
-
-  @Override
-  public ProjectInfo get() {
-    try {
-      JsonElement jsonElement = gerritRestClient.getRequest(projectsUrl());
-      return projectsParser.parseSingleProjectInfo(jsonElement);
-    } catch (RestApiException e) {
-      throw Throwables.propagate(e);
-    }
-  }
-
-  @Override
-  public ProjectApi create() throws RestApiException {
-    gerritRestClient.putRequest(projectsUrl());
-    return this;
-  }
-
-  @Override
-  public ProjectApi create(ProjectInput in) throws RestApiException {
-    String body = gerritRestClient.getGson().toJson(in);
-    gerritRestClient.putRequest(projectsUrl(), body);
-    return this;
-  }
-
-  @Override
-  public ListRefsRequest<BranchInfo> branches() {
-    return new ListRefsRequest<BranchInfo>() {
-      @Override
-      public List<BranchInfo> get() throws RestApiException {
-        return ProjectApiRestClient.this.getBranches(this);
-      }
-    };
-  }
-
-  /* (non-Javadoc)
-   * @see com.google.gerrit.extensions.api.projects.ProjectApi.NotImplemented#branch(java.lang.String)
-   */
-  @Override
-  public BranchApi branch(String ref) throws RestApiException {
-    return new BranchApiRestClient(gerritRestClient, branchInfoParser, this, ref);
-  }
-
-  private List<BranchInfo> getBranches(ListRefsRequest<BranchInfo> lbr) throws RestApiException {
-    String request = projectsUrl() + branchesUrl(lbr);
-    JsonElement branches = gerritRestClient.getRequest(request);
-    return branchInfoParser.parseBranchInfos(branches);
-  }
-
-  protected String projectsUrl() {
-    return "/projects/" + name;
-  }
-
-  private String branchesUrl(ListRefsRequest<BranchInfo> lbr) {
-    String query = "";
-
-    if (lbr.getLimit() != 0) {
-      query = UrlUtils.appendToUrlQuery(query, "n=" + lbr.getLimit());
-    }
-    if (lbr.getStart() != 0) {
-      query = UrlUtils.appendToUrlQuery(query, "s=" + lbr.getStart());
-    }
-    if (!Strings.isNullOrEmpty(lbr.getSubstring())) {
-      query = UrlUtils.appendToUrlQuery(query, "m=" + lbr.getSubstring());
-    }
-    if (!Strings.isNullOrEmpty(lbr.getRegex())) {
-      query = UrlUtils.appendToUrlQuery(query, "r=" + lbr.getRegex());
+    public ProjectApiRestClient(GerritRestClient gerritRestClient, ProjectsParser projectsParser,
+            BranchInfoParser branchInfoParser, String name) {
+        this.gerritRestClient = gerritRestClient;
+        this.projectsParser = projectsParser;
+        this.branchInfoParser = branchInfoParser;
+        this.name = name;
     }
 
-    String url = "/branches";
-    if (!Strings.isNullOrEmpty(query)) {
-      url += '?' + query;
+    @Override
+    public ProjectInfo get() {
+        try {
+            JsonElement jsonElement = gerritRestClient.getRequest(projectsUrl());
+            return projectsParser.parseSingleProjectInfo(jsonElement);
+        } catch (RestApiException e) {
+            throw Throwables.propagate(e);
+        }
     }
-    return url;
-  }
+
+    @Override
+    public ProjectApi create() throws RestApiException {
+        gerritRestClient.putRequest(projectsUrl());
+        return this;
+    }
+
+    @Override
+    public ProjectApi create(ProjectInput in) throws RestApiException {
+        String body = gerritRestClient.getGson().toJson(in);
+        gerritRestClient.putRequest(projectsUrl(), body);
+        return this;
+    }
+
+    @Override
+    public ListRefsRequest<BranchInfo> branches() {
+        return new ListRefsRequest<BranchInfo>() {
+            @Override
+            public List<BranchInfo> get() throws RestApiException {
+                return ProjectApiRestClient.this.getBranches(this);
+            }
+        };
+    }
+
+    @Override
+    public BranchApi branch(String ref) throws RestApiException {
+        return new BranchApiRestClient(gerritRestClient, branchInfoParser, this, ref);
+    }
+
+    private List<BranchInfo> getBranches(ListRefsRequest<BranchInfo> lbr) throws RestApiException {
+        String request = projectsUrl() + branchesUrl(lbr);
+        JsonElement branches = gerritRestClient.getRequest(request);
+        return branchInfoParser.parseBranchInfos(branches);
+    }
+
+    protected String projectsUrl() {
+        return "/projects/" + name;
+    }
+
+    private String branchesUrl(ListRefsRequest<BranchInfo> lbr) {
+        String query = "";
+
+        if (lbr.getLimit() != 0) {
+            query = UrlUtils.appendToUrlQuery(query, "n=" + lbr.getLimit());
+        }
+        if (lbr.getStart() != 0) {
+            query = UrlUtils.appendToUrlQuery(query, "s=" + lbr.getStart());
+        }
+        if (!Strings.isNullOrEmpty(lbr.getSubstring())) {
+            query = UrlUtils.appendToUrlQuery(query, "m=" + lbr.getSubstring());
+        }
+        if (!Strings.isNullOrEmpty(lbr.getRegex())) {
+            query = UrlUtils.appendToUrlQuery(query, "r=" + lbr.getRegex());
+        }
+
+        String url = "/branches";
+        if (!Strings.isNullOrEmpty(query)) {
+            url += '?' + query;
+        }
+        return url;
+    }
 }
