@@ -23,12 +23,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.gerrit.extensions.restapi.RestApiException;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
 import com.urswolfer.gerrit.client.rest.RestClient;
 import com.urswolfer.gerrit.client.rest.Version;
-import com.urswolfer.gerrit.client.rest.gson.DateDeserializer;
-import com.urswolfer.gerrit.client.rest.gson.DateSerializer;
+import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 import org.apache.http.*;
 import org.apache.http.auth.*;
 import org.apache.http.client.CredentialsProvider;
@@ -68,7 +70,7 @@ public class GerritRestClient implements RestClient {
     private static final Pattern GERRIT_AUTH_PATTERN = Pattern.compile(".*?xGerritAuth=\"(.+?)\"");
     private static final int CONNECTION_TIMEOUT_MS = 30000;
     private static final String PREEMPTIVE_AUTH = "preemptive-auth";
-    private static final Gson GSON = initGson();
+    private static final Gson GSON = GsonFactory.create();
 
     private final GerritAuthData authData;
     private final HttpRequestExecutor httpRequestExecutor;
@@ -453,13 +455,5 @@ public class GerritRestClient implements RestClient {
             userAgent += " using " + existingUserAgent.getValue();
             request.setHeader(HttpHeaders.USER_AGENT, userAgent);
         }
-    }
-
-    private static Gson initGson() {
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Date.class, new DateDeserializer());
-        builder.registerTypeAdapter(Date.class, new DateSerializer());
-        builder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-        return builder.create();
     }
 }
