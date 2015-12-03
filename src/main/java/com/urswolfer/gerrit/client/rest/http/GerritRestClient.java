@@ -212,7 +212,7 @@ public class GerritRestClient implements RestClient {
         }
     }
 
-    private Optional<String> updateGerritAuthWhenRequired(HttpContext httpContext, HttpClientBuilder client) throws IOException {
+    private Optional<String> updateGerritAuthWhenRequired(HttpContext httpContext, HttpClientBuilder client) throws IOException, HttpStatusException {
         if (!loginCache.getHostSupportsGerritAuth()) {
             // We do not not need a cookie here since we are sending credentials as HTTP basic / digest header again.
             // In fact cookies could hurt: googlesource.com Gerrit instances block requests which send a magic cookie
@@ -227,7 +227,7 @@ public class GerritRestClient implements RestClient {
         return loginCache.getGerritAuthOptional();
     }
 
-    private Optional<String> updateGerritAuth(HttpContext httpContext, HttpClientBuilder client) throws IOException {
+    private Optional<String> updateGerritAuth(HttpContext httpContext, HttpClientBuilder client) throws IOException, HttpStatusException {
         Optional<String> gerritAuthOptional = tryGerritHttpAuth(client, httpContext)
             .or(tryGerritHttpFormAuth(client, httpContext));
         loginCache.setGerritAuthOptional(gerritAuthOptional);
@@ -237,7 +237,7 @@ public class GerritRestClient implements RestClient {
     /**
      * Handles LDAP auth (but not LDAP_HTTP) which uses a HTML form.
      */
-    private Optional<String> tryGerritHttpFormAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException {
+    private Optional<String> tryGerritHttpFormAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException, HttpStatusException {
         if (!authData.isLoginAndPasswordAvailable()) {
             return Optional.absent();
         }
@@ -271,13 +271,14 @@ public class GerritRestClient implements RestClient {
      * [Gerrit documentation].
      * [Gerrit documentation]: https://gerrit-review.googlesource.com/Documentation/rest-api.html#authentication
      */
-    private Optional<String> tryGerritHttpAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException {
+    private Optional<String> tryGerritHttpAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException, HttpStatusException {
         String loginUrl = authData.getHost() + "/login/";
         HttpResponse loginResponse = httpRequestExecutor.execute(client, new HttpGet(loginUrl), httpContext);
         return extractGerritAuth(loginResponse);
     }
 
-    private Optional<String> extractGerritAuth(HttpResponse loginResponse) throws IOException {
+    private Optional<String> extractGerritAuth(HttpResponse loginResponse) throws IOException, HttpStatusException {
+        checkStatusCodeServerError(loginResponse);
         if (loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
             Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
             if (gerritAccountCookie.isPresent()) {
