@@ -369,29 +369,46 @@ public class GerritRestClient implements RestClient {
         }
     }
 
+    /**
+     * @throws HttpStatusException on any error (client 4xx and server 5xx).
+     */
     private void checkStatusCode(HttpResponse response) throws HttpStatusException, IOException {
+        checkStatusCodeClientError(response);
+        checkStatusCodeServerError(response);
+    }
+
+    /**
+     * @throws HttpStatusException on client error (4xx).
+     */
+    private void checkStatusCodeClientError(HttpResponse response) throws HttpStatusException, IOException {
+        checkStatusCodeError(response, 400, 499);
+    }
+
+    /**
+     * @throws HttpStatusException on server error (5xx).
+     */
+    private void checkStatusCodeServerError(HttpResponse response) throws HttpStatusException, IOException {
+        checkStatusCodeError(response, 500, 599);
+    }
+
+    private void checkStatusCodeError(HttpResponse response, int errorIfMin, int errorIfMax) throws HttpStatusException, IOException {
         StatusLine statusLine = response.getStatusLine();
         int code = statusLine.getStatusCode();
-        switch (code) {
-            case HttpStatus.SC_OK:
-            case HttpStatus.SC_CREATED:
-            case HttpStatus.SC_ACCEPTED:
-            case HttpStatus.SC_NO_CONTENT:
-                return;
-            case HttpStatus.SC_BAD_REQUEST:
-            case HttpStatus.SC_UNAUTHORIZED:
-            case HttpStatus.SC_PAYMENT_REQUIRED:
-            case HttpStatus.SC_FORBIDDEN:
-            default:
-                String body = "<empty>";
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    body = EntityUtils.toString(entity).trim();
-                }
-                String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
-                        statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
-                throw new HttpStatusException(statusLine.getStatusCode(), statusLine.getReasonPhrase(), message);
+        if (code >= errorIfMin && code <= errorIfMax) {
+            throwHttpStatusException(response);
         }
+    }
+
+    private void throwHttpStatusException(HttpResponse response) throws IOException, HttpStatusException {
+        StatusLine statusLine = response.getStatusLine();
+        String body = "<empty>";
+        HttpEntity entity = response.getEntity();
+        if (entity != null) {
+            body = EntityUtils.toString(entity).trim();
+        }
+        String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
+                statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
+        throw new HttpStatusException(statusLine.getStatusCode(), statusLine.getReasonPhrase(), message);
     }
 
     private void checkContentType(HttpEntity entity) throws RestApiException {
