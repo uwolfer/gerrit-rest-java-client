@@ -294,11 +294,15 @@ public class GerritRestClient implements RestClient {
     }
 
     private Optional<Cookie> findGerritAccountCookie() {
+        return findCookie("GerritAccount");
+    }
+
+    private Optional<Cookie> findCookie(final String cookieName) {
         List<Cookie> cookies = cookieStore.getCookies();
         return Iterables.tryFind(cookies, new Predicate<Cookie>() {
             @Override
             public boolean apply(Cookie cookie) {
-                return cookie.getName().equals("GerritAccount");
+                return cookie.getName().equals(cookieName);
             }
         });
     }
