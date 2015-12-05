@@ -282,12 +282,33 @@ public class GerritRestClient implements RestClient {
     private Optional<String> extractGerritAuth(HttpResponse loginResponse) throws IOException, HttpStatusException {
         checkStatusCodeServerError(loginResponse);
         if (loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
-            Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
-            if (gerritAccountCookie.isPresent()) {
-                Matcher matcher = GERRIT_AUTH_PATTERN.matcher(EntityUtils.toString(loginResponse.getEntity(), Consts.UTF_8));
-                if (matcher.find()) {
-                    return Optional.of(matcher.group(1));
-                }
+            return getXsrfCookie().or(getXsrfFromHtmlBody(loginResponse));
+        }
+        return Optional.absent();
+    }
+
+    /**
+     * In Gerrit >= 2.12 the XSRF token got moved to a cookie.
+     * Introduced in: https://gerrit-review.googlesource.com/72031/
+     */
+    private Optional<String> getXsrfCookie() {
+        Optional<Cookie> xsrfCookie = findCookie("XSRF_TOKEN");
+        if (xsrfCookie.isPresent()) {
+            return Optional.of(xsrfCookie.get().getValue());
+        }
+        return Optional.absent();
+    }
+
+
+    /**
+     * In Gerrit < 2.12 the XSRF token was included in the start page HTML.
+     */
+    private Optional<String> getXsrfFromHtmlBody(HttpResponse loginResponse) throws IOException {
+        Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
+        if (gerritAccountCookie.isPresent()) {
+            Matcher matcher = GERRIT_AUTH_PATTERN.matcher(EntityUtils.toString(loginResponse.getEntity(), Consts.UTF_8));
+            if (matcher.find()) {
+                return Optional.of(matcher.group(1));
             }
         }
         return Optional.absent();
