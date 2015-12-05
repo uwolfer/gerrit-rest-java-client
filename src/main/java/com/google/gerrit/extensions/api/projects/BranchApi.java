@@ -25,8 +25,17 @@ public interface BranchApi {
   void delete() throws RestApiException;
 
   /**
-   * A default implementation which allows source compatibility
-   * when adding new methods to the interface.
+   * Look up a file by the given path in the HEAD revision of the branch.
+   * 
+   * @param path Path to the file.
+   * @return Returns a instance of <code>FileApi</code> which represents the file.
+   * @throws RestApiException
+   */
+  FileApi file(String path) throws RestApiException;
+
+  /**
+   * A default implementation which allows source compatibility when adding new
+   * methods to the interface.
    **/
   public class NotImplemented implements BranchApi {
     @Override
@@ -41,6 +50,11 @@ public interface BranchApi {
 
     @Override
     public void delete() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public FileApi file(String path) throws RestApiException {
       throw new NotImplementedException();
     }
   }
