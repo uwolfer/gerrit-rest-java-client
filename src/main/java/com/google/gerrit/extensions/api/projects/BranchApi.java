@@ -14,6 +14,7 @@
 
 package com.google.gerrit.extensions.api.projects;
 
+import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
@@ -25,13 +26,9 @@ public interface BranchApi {
   void delete() throws RestApiException;
 
   /**
-   * Look up a file by the given path in the HEAD revision of the branch.
-   *
-   * @param path Path to the file.
-   * @return Returns a instance of <code>FileApi</code> which represents the file.
-   * @throws RestApiException
+   * Returns the content of a file from the HEAD revision.
    */
-  FileApi file(String path) throws RestApiException;
+  BinaryResult file(String path) throws RestApiException;
 
   /**
    * A default implementation which allows source compatibility
@@ -54,7 +51,7 @@ public interface BranchApi {
     }
 
     @Override
-    public FileApi file(String path) throws RestApiException {
+    public BinaryResult file(String path) throws RestApiException {
       throw new NotImplementedException();
     }
   }

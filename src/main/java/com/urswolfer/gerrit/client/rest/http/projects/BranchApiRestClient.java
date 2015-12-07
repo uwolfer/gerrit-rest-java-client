@@ -17,12 +17,18 @@
 package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import com.google.gerrit.extensions.api.projects.BranchApi;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
-import com.google.gerrit.extensions.api.projects.FileApi;
+import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
+import org.apache.http.HttpResponse;
+
+import java.io.IOException;
 
 /**
  * @author Ingo Rissmann
@@ -47,14 +53,21 @@ public class BranchApiRestClient extends BranchApi.NotImplemented implements Bra
     public BranchInfo get() throws RestApiException {
         try {
             JsonElement jsonElement = gerritRestClient.getRequest(branchUrl());
-            return branchInfoParser.parseBranchInfos(jsonElement).get(0);
+            return Iterables.getOnlyElement(branchInfoParser.parseBranchInfos(jsonElement));
         } catch (RestApiException e) {
             throw Throwables.propagate(e);
         }
     }
 
-    public FileApi file(String path) throws RestApiException {
-        return new FileApiRestClient(gerritRestClient, this, path);
+    public BinaryResult file(String path) throws RestApiException {
+        String encodedPath = Url.encode(path);
+        String request = branchUrl() + "/files/" + encodedPath + "/content";
+        try {
+            HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
+            return BinaryResultUtils.createBinaryResult(response);
+        } catch (IOException e) {
+            throw new RestApiException("Failed to get file content.", e);
+        }
     }
 
     protected String branchUrl() {
