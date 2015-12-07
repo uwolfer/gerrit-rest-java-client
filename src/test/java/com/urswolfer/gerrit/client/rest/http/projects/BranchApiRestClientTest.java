@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
+import com.google.gerrit.extensions.api.projects.BranchInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
@@ -48,6 +49,17 @@ public class BranchApiRestClientTest {
     private ProjectApiRestClient projectApiRestClient;
 
     @Test
+    public void testCreateBranch() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPut("/projects/sandbox/branches/some-feature", "{}", MOCK_JSON_ELEMENT)
+            .expectGetGson()
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null);
+
+        projectsRestClient.name("sandbox").branch("some-feature").create(new BranchInput());
+    }
+
+    @Test
     public void testGetBranchInfoForName() throws Exception {
         String projectName = "sandbox";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
@@ -63,6 +75,16 @@ public class BranchApiRestClientTest {
 
         EasyMock.verify(gerritRestClient, projectsParser);
         Truth.assertThat(branchInfo).isEqualTo(MOCK_BRANCH_INFO);
+    }
+
+    @Test
+    public void testDeleteBranch() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectDelete("/projects/sandbox/branches/some-feature")
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null);
+
+        projectsRestClient.name("sandbox").branch("some-feature").delete();
     }
 
     @Test

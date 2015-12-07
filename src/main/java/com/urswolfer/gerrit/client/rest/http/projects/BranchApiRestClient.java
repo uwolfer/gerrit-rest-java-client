@@ -16,10 +16,10 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.gerrit.extensions.api.projects.BranchApi;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
+import com.google.gerrit.extensions.api.projects.BranchInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
@@ -50,15 +50,24 @@ public class BranchApiRestClient extends BranchApi.NotImplemented implements Bra
     }
 
     @Override
-    public BranchInfo get() throws RestApiException {
-        try {
-            JsonElement jsonElement = gerritRestClient.getRequest(branchUrl());
-            return Iterables.getOnlyElement(branchInfoParser.parseBranchInfos(jsonElement));
-        } catch (RestApiException e) {
-            throw Throwables.propagate(e);
-        }
+    public BranchApi create(BranchInput in) throws RestApiException {
+        String json = gerritRestClient.getGson().toJson(in);
+        gerritRestClient.putRequest(branchUrl(), json);
+        return this;
     }
 
+    @Override
+    public BranchInfo get() throws RestApiException {
+        JsonElement jsonElement = gerritRestClient.getRequest(branchUrl());
+        return Iterables.getOnlyElement(branchInfoParser.parseBranchInfos(jsonElement));
+    }
+
+    @Override
+    public void delete() throws RestApiException {
+        gerritRestClient.deleteRequest(branchUrl());
+    }
+
+    @Override
     public BinaryResult file(String path) throws RestApiException {
         String encodedPath = Url.encode(path);
         String request = branchUrl() + "/files/" + encodedPath + "/content";
