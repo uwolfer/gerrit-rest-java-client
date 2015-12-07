@@ -17,7 +17,9 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.api.changes.DraftInput;
 import com.google.gerrit.extensions.common.CommentInfo;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
@@ -70,6 +72,28 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
         CommentInfo commentInfo = draftApiRestClient.get();
 
         Truth.assertThat(commentInfo).isSameAs(expectedCommentInfo);
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testUpdateDraft() throws Exception {
+        String draftId = "89233d9c_56013406";
+        String revisionId = "ec047590bc7fb8db7ae03ebac336488bfc1c5e12";
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPut("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/" +
+                "revisions/" + revisionId + "/drafts/" + draftId, "{}", jsonElement)
+            .expectGetGson()
+            .get();
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null, null,
+            "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null, revisionId);
+        DraftApiRestClient draftApiRestClient = new DraftApiRestClient(gerritRestClient, changeApiRestClient,
+            revisionApiRestClient, commentsParser, "89233d9c_56013406");
+
+        draftApiRestClient.update(new DraftInput());
+
         EasyMock.verify(gerritRestClient);
     }
 
