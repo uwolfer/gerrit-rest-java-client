@@ -33,6 +33,9 @@ GerritApi gerritApi = gerritRestApiFactory.create(authData);
 List<ChangeInfo> changes = gerritApi.changes().query("status:merged").withLimit(10).get();
 ```
 
+If you like to write a script instead of a full Java application, you might want to use [Groovy].
+There is a [basic Groovy example] available.
+
 _Note:_ It is not guaranteed that all interfaces are implemented. If an implementation is missing, you get a
 <code>com.google.gerrit.extensions.restapi.NotImplementedException</code>. Feel free to implement it and create a pull
 request at GitHub - it is quite easy! :)
@@ -41,6 +44,8 @@ _Note:_ The source of <code>com.google.gerrit.extensions</code> is included in t
 moment because not all extensions to this API are merged into Gerrit repository yet.
 
 [com.google.gerrit.extensions.api.GerritApi]: https://gerrit.googlesource.com/gerrit/+/HEAD/gerrit-extension-api/src/main/java/com/google/gerrit/extensions/api/GerritApi.java
+[Groovy]: http://www.groovy-lang.org/
+[basic Groovy example]: https://github.com/uwolfer/gerrit-rest-java-client/blob/master/examples/Basic.groovy
 
 Maven Artifact
 --------------
