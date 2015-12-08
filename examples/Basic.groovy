@@ -1,8 +1,9 @@
 #!/usr/bin/env groovy
+
+@Grab(group = 'com.urswolfer.gerrit.client.rest', module = 'gerrit-rest-java-client', version = '0.8.5')
 import com.google.gerrit.extensions.api.GerritApi
 import com.google.gerrit.extensions.common.ChangeInfo
 import com.urswolfer.gerrit.client.rest.GerritAuthData
-@Grab(group = 'com.urswolfer.gerrit.client.rest', module = 'gerrit-rest-java-client', version = '0.8.5')
 import com.urswolfer.gerrit.client.rest.GerritRestApiFactory
 
 /**
