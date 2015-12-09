@@ -146,8 +146,15 @@ public class GerritRestClient implements RestClient {
     public HttpResponse requestRest(String path,
                                     String requestBody,
                                     HttpVerb verb) throws IOException, HttpStatusException {
+        return requestRest(path, requestBody, verb, false);
+    }
+
+    private HttpResponse requestRest(String path,
+                                     String requestBody,
+                                     HttpVerb verb,
+                                     boolean isRetry) throws IOException, HttpStatusException {
         BasicHeader acceptHeader = new BasicHeader("Accept", JSON_MIME_TYPE);
-        return request(path, requestBody, verb, acceptHeader);
+        return request(path, requestBody, verb, isRetry, acceptHeader);
     }
 
     @Override
@@ -155,6 +162,14 @@ public class GerritRestClient implements RestClient {
                                 String requestBody,
                                 HttpVerb verb,
                                 Header... headers) throws IOException, HttpStatusException {
+        return request(path, requestBody, verb, false, headers);
+    }
+
+    private HttpResponse request(String path,
+                                 String requestBody,
+                                 HttpVerb verb,
+                                 boolean isRetry,
+                                 Header... headers) throws IOException, HttpStatusException {
         HttpContext httpContext = new BasicHttpContext();
         HttpClientBuilder client = getHttpClient(httpContext);
 
@@ -197,10 +212,10 @@ public class GerritRestClient implements RestClient {
 
         HttpResponse response = httpRequestExecutor.execute(client, method, httpContext);
 
-        if (response.getStatusLine().getStatusCode() == 403 && loginCache.getGerritAuthOptional().isPresent()) {
+        if (!isRetry && response.getStatusLine().getStatusCode() == 403 && loginCache.getGerritAuthOptional().isPresent()) {
             // handle expired sessions: try again with a fresh login
             loginCache.invalidate();
-            response = requestRest(path, requestBody, verb);
+            response = requestRest(path, requestBody, verb, true);
         }
 
         checkStatusCode(response);
