@@ -475,6 +475,7 @@ public class GerritRestClient implements RestClient {
             this.authData = authData;
         }
 
+        @Override
         public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
             AuthState authState = (AuthState) context.getAttribute(HttpClientContext.TARGET_AUTH_STATE);
 
@@ -489,6 +490,7 @@ public class GerritRestClient implements RestClient {
 
     private static class UserAgentHttpRequestInterceptor implements HttpRequestInterceptor {
 
+        @Override
         public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
             Header existingUserAgent = request.getFirstHeader(HttpHeaders.USER_AGENT);
             String userAgent = String.format("gerrit-rest-java-client/%s", Version.get());
