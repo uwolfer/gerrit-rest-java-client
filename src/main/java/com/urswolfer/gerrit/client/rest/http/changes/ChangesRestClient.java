@@ -100,16 +100,16 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(int id) throws RestApiException {
+        return id("" + id);
+    }
+
+    @Override
+    public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, id);
     }
 
     @Override
-    public ChangeApi id(String triplet) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, triplet);
-    }
-
-    @Override
     public ChangeApi id(String project, String branch, String id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, String.format("%s~%s~%s", project, branch, id));
+        return id(String.format("%s~%s~%s", project, branch, id));
     }
 }

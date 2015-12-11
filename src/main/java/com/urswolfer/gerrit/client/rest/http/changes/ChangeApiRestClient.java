@@ -51,30 +51,14 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                FileInfoParser fileInfoParser,
                                DiffInfoParser diffInfoParser,
                                SuggestedReviewerInfoParser suggestedReviewerInfoParser,
-                               String triplet) {
+                               String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
         this.commentsParser = commentsParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
         this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
-        this.id = triplet;
-    }
-
-    public ChangeApiRestClient(GerritRestClient gerritRestClient,
-                               ChangesRestClient changesRestClient,
-                               CommentsParser commentsParser,
-                               FileInfoParser fileInfoParser,
-                               DiffInfoParser diffInfoParser,
-                               SuggestedReviewerInfoParser suggestedReviewerInfoParser,
-                               int id) {
-        this.changesRestClient = changesRestClient;
-        this.gerritRestClient = gerritRestClient;
-        this.commentsParser = commentsParser;
-        this.fileInfoParser = fileInfoParser;
-        this.diffInfoParser = diffInfoParser;
-        this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
-        this.id = "" + id;
+        this.id = id;
     }
 
     @Override
@@ -84,12 +68,12 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public RevisionApi current() throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, "current");
+        return revision("current");
     }
 
     @Override
     public RevisionApi revision(int id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, "" + id);
+        return revision("" + id);
     }
 
     @Override
