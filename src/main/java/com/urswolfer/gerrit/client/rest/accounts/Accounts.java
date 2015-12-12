@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest;
+package com.urswolfer.gerrit.client.rest.accounts;
 
-import com.google.gerrit.extensions.api.GerritApi;
-import com.urswolfer.gerrit.client.rest.accounts.Accounts;
-import com.urswolfer.gerrit.client.rest.tools.Tools;
+import com.google.gerrit.extensions.restapi.RestApiException;
 
 /**
+ * Required for returning extended AccountApi interface.
+ *
  * @author Urs Wolfer
  */
-public interface GerritRestApi extends GerritApi {
-    Tools tools();
+public interface Accounts extends com.google.gerrit.extensions.api.accounts.Accounts {
 
     @Override
-    Accounts accounts();
+    AccountApi id(String id) throws RestApiException;
 
-    RestClient restClient();
+    @Override
+    AccountApi id(int id) throws RestApiException;
+
+    @Override
+    AccountApi self() throws RestApiException;
 }

@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest;
+package com.urswolfer.gerrit.client.rest.accounts;
 
-import com.google.gerrit.extensions.api.GerritApi;
-import com.urswolfer.gerrit.client.rest.accounts.Accounts;
-import com.urswolfer.gerrit.client.rest.tools.Tools;
+import com.google.gerrit.extensions.restapi.BinaryResult;
+import com.google.gerrit.extensions.restapi.RestApiException;
 
 /**
  * @author Urs Wolfer
  */
-public interface GerritRestApi extends GerritApi {
-    Tools tools();
+public interface AccountApi extends com.google.gerrit.extensions.api.accounts.AccountApi {
 
-    @Override
-    Accounts accounts();
-
-    RestClient restClient();
+    BinaryResult downloadAvatar(int size) throws RestApiException;
 }

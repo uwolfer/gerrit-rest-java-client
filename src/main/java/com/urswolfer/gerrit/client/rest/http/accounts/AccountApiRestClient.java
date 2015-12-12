@@ -16,12 +16,17 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
-import com.google.gerrit.extensions.api.accounts.AccountApi;
 import com.google.gerrit.extensions.common.AccountInfo;
+import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.accounts.AccountApi;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
+import org.apache.http.HttpResponse;
+
+import java.io.IOException;
 
 /**
  * @author Urs Wolfer
@@ -62,6 +67,17 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
      */
     private String createStarUrl(String id) throws RestApiException {
         return getRequestPath() + "/starred.changes/" + id;
+    }
+
+    @Override
+    public BinaryResult downloadAvatar(int size) throws RestApiException {
+        String request = getRequestPath() + "/avatar?s=" + size;
+        try {
+            HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
+            return BinaryResultUtils.createBinaryResult(response);
+        } catch (IOException e) {
+            throw new RestApiException("Failed to get avatar.", e);
+        }
     }
 
     private String getRequestPath() {

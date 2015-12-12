@@ -16,12 +16,12 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
-import com.google.gerrit.extensions.api.accounts.AccountApi;
-import com.google.gerrit.extensions.api.accounts.Accounts;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.accounts.AccountApi;
+import com.urswolfer.gerrit.client.rest.accounts.Accounts;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
 import java.util.List;
