@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2015 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.accounts;
 import com.google.gerrit.extensions.api.accounts.AccountApi;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
@@ -42,7 +43,7 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
 
     @Override
     public AccountInfo get() throws RestApiException {
-        JsonElement result = gerritRestClient.getRequest("/accounts/" + name);
+        JsonElement result = gerritRestClient.getRequest(getRequestPath());
         return accountsParser.parseAccountInfo(result);
     }
 
@@ -60,6 +61,10 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
      * Star-endpoint added in Gerrit 2.8.
      */
     private String createStarUrl(String id) throws RestApiException {
-        return "/accounts/" + name + "/starred.changes/" + id;
+        return getRequestPath() + "/starred.changes/" + id;
+    }
+
+    private String getRequestPath() {
+        return "/accounts/" + Url.encode(name);
     }
 }
