@@ -39,6 +39,9 @@ public class BinaryResultUtils {
 
     private static void setContentType(HttpResponse response, BinaryResult binaryResult) {
         Header fileContentType = response.getFirstHeader("X-FYI-Content-Type");
+        if (fileContentType == null) {
+            fileContentType = response.getFirstHeader("Content-Type");
+        }
         if (fileContentType != null) {
             binaryResult.setContentType(fileContentType.getValue());
         }
