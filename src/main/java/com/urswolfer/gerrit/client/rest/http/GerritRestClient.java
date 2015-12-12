@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -477,6 +478,11 @@ public class GerritRestClient implements RestClient {
 
         @Override
         public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
+            // never ever send credentials preemptively to a host which is not the configured Gerrit host
+            if (!isForGerritHost(request)) {
+                return;
+            }
+
             AuthState authState = (AuthState) context.getAttribute(HttpClientContext.TARGET_AUTH_STATE);
 
             // if no auth scheme available yet, try to initialize it preemptively
@@ -485,6 +491,18 @@ public class GerritRestClient implements RestClient {
                 UsernamePasswordCredentials creds = new UsernamePasswordCredentials(authData.getLogin(), authData.getPassword());
                 authState.update(authScheme, creds);
             }
+        }
+
+        /**
+         * Checks if request is intended for Gerrit host.
+         */
+        private boolean isForGerritHost(HttpRequest request) {
+            if (!(request instanceof HttpRequestWrapper)) return false;
+            HttpRequest originalRequest = ((HttpRequestWrapper) request).getOriginal();
+            if (!(originalRequest instanceof HttpRequestBase)) return false;
+            URI uri = ((HttpRequestBase) originalRequest).getURI();
+            URI authDataUri = URI.create(authData.getHost());
+            return (uri.getHost().equals(authDataUri.getHost()) && uri.getPort() == authDataUri.getPort());
         }
     }
 
