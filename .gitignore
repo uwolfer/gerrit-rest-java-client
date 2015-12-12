@@ -1,3 +1,6 @@
+# this file contains test-hosts and eventually credentials
+src/test/resources/com/urswolfer/gerrit/client/rest/testhosts.json
+
 # Maven
 target/
 
