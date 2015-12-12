@@ -45,6 +45,11 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
     }
 
     @Override
+    public AccountApi id(int id) throws RestApiException {
+        return id(String.valueOf(id));
+    }
+
+    @Override
     public AccountApi self() throws RestApiException {
         return id("self");
     }
