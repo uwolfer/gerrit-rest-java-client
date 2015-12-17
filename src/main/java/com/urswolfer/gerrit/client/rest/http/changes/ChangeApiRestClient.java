@@ -29,8 +29,10 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Urs Wolfer
@@ -91,6 +93,20 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String request = getRequestPath() + "/abandon";
         String json = gerritRestClient.getGson().toJson(abandonInput);
         gerritRestClient.postRequest(request, json);
+    }
+
+    @Override
+    public String topic() throws RestApiException {
+        String request = getRequestPath() + "/topic";
+        return gerritRestClient.getRequest(request).getAsString();
+    }
+
+    @Override
+    public void topic(String topic) throws RestApiException {
+        String request = getRequestPath() + "/topic";
+        Map<String, String> topicInput = Collections.singletonMap("topic", topic);
+        String json = gerritRestClient.getGson().toJson(topicInput);
+        gerritRestClient.putRequest(request, json);
     }
 
     @Override
