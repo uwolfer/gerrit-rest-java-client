@@ -102,6 +102,11 @@ public class GerritRestClient implements RestClient {
     }
 
     @Override
+    public JsonElement postRequest(String path) throws RestApiException {
+        return postRequest(path, null);
+    }
+
+    @Override
     public JsonElement postRequest(String path, String requestBody) throws RestApiException {
         return requestJson(path, requestBody, HttpVerb.POST);
     }

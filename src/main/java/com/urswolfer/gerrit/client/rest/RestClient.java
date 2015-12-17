@@ -45,6 +45,11 @@ public interface RestClient {
     /**
      * Shortcut for {@code #requestJson} for doing {@code POST} operation.
      */
+    JsonElement postRequest(String path) throws RestApiException;
+
+    /**
+     * Shortcut for {@code #requestJson} for doing {@code POST} operation with a request body.
+     */
     JsonElement postRequest(String path, String requestBody) throws RestApiException;
 
     /**
