@@ -33,6 +33,7 @@ import com.urswolfer.gerrit.client.rest.http.config.ConfigRestClient;
 import com.urswolfer.gerrit.client.rest.http.projects.BranchInfoParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsRestClient;
+import com.urswolfer.gerrit.client.rest.http.projects.TagInfoParser;
 import com.urswolfer.gerrit.client.rest.http.tools.ToolsRestClient;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
 
@@ -72,7 +73,11 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
     private final Supplier<ProjectsRestClient> projectsRestClient = Suppliers.memoize(new Supplier<ProjectsRestClient>() {
         @Override
         public ProjectsRestClient get() {
-            return new ProjectsRestClient(gerritRestClient, new ProjectsParser(gerritRestClient.getGson()), new BranchInfoParser(gerritRestClient.getGson()));
+            return new ProjectsRestClient(
+                    gerritRestClient,
+                    new ProjectsParser(gerritRestClient.getGson()),
+                    new BranchInfoParser(gerritRestClient.getGson()),
+                    new TagInfoParser(gerritRestClient.getGson()));
         }
     });
 
