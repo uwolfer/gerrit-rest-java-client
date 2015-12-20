@@ -54,7 +54,7 @@ public class BranchApiRestClientTest {
             .expectPut("/projects/sandbox/branches/some-feature", "{}", MOCK_JSON_ELEMENT)
             .expectGetGson()
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null, null);
 
         projectsRestClient.name("sandbox").branch("some-feature").create(new BranchInput());
     }
@@ -69,7 +69,7 @@ public class BranchApiRestClientTest {
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder()
             .expectParseBranchInfos(MOCK_JSON_ELEMENT, Collections.singletonList(MOCK_BRANCH_INFO))
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, null);
 
         BranchInfo branchInfo = projectsRestClient.name(projectName).branch("master").get();
 
@@ -82,7 +82,7 @@ public class BranchApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectDelete("/projects/sandbox/branches/some-feature")
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null, null);
 
         projectsRestClient.name("sandbox").branch("some-feature").delete();
     }
