@@ -1,0 +1,15 @@
+)]}'
+[
+  {
+    "ref": "refs/tags/v0.0.1",
+    "revision": "a6e054e9c220e4fa16802ccab074a00d384067fc"
+  },
+  {
+    "ref": "refs/tags/v0.0.2",
+    "revision": "fd608fbe625a2b456d9f15c2b1dc41f252057dd7"
+  },
+  {
+    "ref": "refs/tags/v0.0.3",
+    "revision": "8bbde7aacf771a9afb6992434f1ae413e010c6d8"
+  }
+]

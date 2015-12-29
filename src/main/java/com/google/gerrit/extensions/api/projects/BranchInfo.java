@@ -20,9 +20,7 @@ import com.google.gerrit.extensions.common.WebLinkInfo;
 import java.util.List;
 import java.util.Map;
 
-public class BranchInfo {
-  public String ref;
-  public String revision;
+public class BranchInfo extends RefInfo {
   public Boolean canDelete;
   public Map<String, ActionInfo> actions;
   public List<WebLinkInfo> webLinks;

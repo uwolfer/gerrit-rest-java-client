@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.client.ProjectState;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
@@ -61,5 +62,20 @@ public class ProjectsParserTest extends AbstractParserTest {
             GerritAssert.assertEquals(projectInfo, expected);
             i++;
         }
+    }
+
+    @Test
+    public void testParseSingleProjectInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("project.json");
+
+        ProjectInfo projectInfo = projectsParser.parseSingleProjectInfo(jsonElement);
+
+        GerritAssert.assertEquals(projectInfo, new ProjectInfoBuilder()
+            .withId("Hello-World")
+            .withName("Hello-World")
+            .withParent("My-Parent")
+            .withDescription("Hello-World project")
+            .withState(ProjectState.ACTIVE)
+            .get());
     }
 }

@@ -30,7 +30,6 @@ public interface RevisionApi {
   void delete() throws RestApiException;
   void review(ReviewInput in) throws RestApiException;
 
-  /** {@code submit} with {@link SubmitInput#waitForMerge} set to true. */
   void submit() throws RestApiException;
   void submit(SubmitInput in) throws RestApiException;
   void publish() throws RestApiException;
@@ -59,9 +58,12 @@ public interface RevisionApi {
 
   CommentApi comment(String id) throws RestApiException;
 
-  Map<String, ActionInfo> actions() throws RestApiException;
-
+  /**
+   * Returns patch of revision.
+   */
   BinaryResult patch() throws RestApiException;
+
+  Map<String, ActionInfo> actions() throws RestApiException;
 
   /**
    * A default implementation which allows source compatibility
@@ -184,12 +186,12 @@ public interface RevisionApi {
     }
 
     @Override
-    public Map<String, ActionInfo> actions() throws RestApiException {
+    public BinaryResult patch() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public BinaryResult patch() throws RestApiException {
+    public Map<String, ActionInfo> actions() throws RestApiException {
       throw new NotImplementedException();
     }
   }

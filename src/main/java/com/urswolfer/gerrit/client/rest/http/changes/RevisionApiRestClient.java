@@ -82,6 +82,25 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     }
 
     @Override
+    public void publish() throws RestApiException {
+        String request = getRequestPath() + "/publish";
+        gerritRestClient.postRequest(request);
+    }
+
+    @Override
+    public ChangeApi rebase() throws RestApiException {
+        return rebase(new RebaseInput());
+    }
+
+    @Override
+    public ChangeApi rebase(RebaseInput in) throws RestApiException {
+        String request = getRequestPath() + "/rebase";
+        String json = gerritRestClient.getGson().toJson(in);
+        gerritRestClient.postRequest(request, json);
+        return changeApiRestClient;
+    }
+
+    @Override
     public void setReviewed(String path, boolean reviewed) throws RestApiException {
         String encodedPath = Url.encode(path);
         String url =  String.format("/changes/%s/revisions/%s/files/%s/reviewed", changeApiRestClient.id(), revision, encodedPath);

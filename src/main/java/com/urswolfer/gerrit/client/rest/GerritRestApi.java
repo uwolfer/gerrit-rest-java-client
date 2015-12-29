@@ -17,11 +17,17 @@
 package com.urswolfer.gerrit.client.rest;
 
 import com.google.gerrit.extensions.api.GerritApi;
+import com.urswolfer.gerrit.client.rest.accounts.Accounts;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
 
 /**
  * @author Urs Wolfer
  */
 public interface GerritRestApi extends GerritApi {
-    public Tools tools();
+    Tools tools();
+
+    @Override
+    Accounts accounts();
+
+    RestClient restClient();
 }

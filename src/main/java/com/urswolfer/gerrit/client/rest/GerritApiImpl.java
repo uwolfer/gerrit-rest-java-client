@@ -19,10 +19,10 @@ package com.urswolfer.gerrit.client.rest;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.gerrit.extensions.api.GerritApi;
-import com.google.gerrit.extensions.api.accounts.Accounts;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.api.config.Config;
 import com.google.gerrit.extensions.api.projects.Projects;
+import com.urswolfer.gerrit.client.rest.accounts.Accounts;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.HttpClientBuilderExtension;
 import com.urswolfer.gerrit.client.rest.http.HttpRequestExecutor;
@@ -33,6 +33,7 @@ import com.urswolfer.gerrit.client.rest.http.config.ConfigRestClient;
 import com.urswolfer.gerrit.client.rest.http.projects.BranchInfoParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsRestClient;
+import com.urswolfer.gerrit.client.rest.http.projects.TagInfoParser;
 import com.urswolfer.gerrit.client.rest.http.tools.ToolsRestClient;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
 
@@ -72,7 +73,11 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
     private final Supplier<ProjectsRestClient> projectsRestClient = Suppliers.memoize(new Supplier<ProjectsRestClient>() {
         @Override
         public ProjectsRestClient get() {
-            return new ProjectsRestClient(gerritRestClient, new ProjectsParser(gerritRestClient.getGson()), new BranchInfoParser(gerritRestClient.getGson()));
+            return new ProjectsRestClient(
+                    gerritRestClient,
+                    new ProjectsParser(gerritRestClient.getGson()),
+                    new BranchInfoParser(gerritRestClient.getGson()),
+                    new TagInfoParser(gerritRestClient.getGson()));
         }
     });
 
@@ -112,5 +117,10 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
     @Override
     public Tools tools() {
         return toolsRestClient.get();
+    }
+
+    @Override
+    public RestClient restClient() {
+        return gerritRestClient;
     }
 }

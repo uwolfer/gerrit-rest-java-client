@@ -67,6 +67,32 @@ public class ChangeApiRestClientTest {
     }
 
     @Test
+    public void testGetTopic() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+                .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/topic", jsonElement)
+                .get();
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").topic();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testSetTopic() throws Exception {
+        String topic = "my-topic";
+        String json = "{\"topic\":\"" + topic + "\"}";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+                .expectPut("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/topic", json, null)
+                .expectGetGson()
+                .get();
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").topic(topic);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
     public void testAbandonChange() throws Exception {
         GerritRestClient gerritRestClient = getGerritRestClient(
                 "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/abandon",
