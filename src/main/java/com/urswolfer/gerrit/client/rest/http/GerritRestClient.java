@@ -23,11 +23,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.gerrit.extensions.restapi.RestApiException;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
+import com.urswolfer.gerrit.client.rest.RestClient;
 import com.urswolfer.gerrit.client.rest.Version;
-import com.urswolfer.gerrit.client.rest.gson.DateDeserializer;
-import com.urswolfer.gerrit.client.rest.gson.DateSerializer;
+import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 import org.apache.http.*;
 import org.apache.http.auth.*;
 import org.apache.http.client.config.RequestConfig;
@@ -49,6 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -58,17 +62,15 @@ import java.util.regex.Pattern;
 
 
 /**
- * This class provides basic http access to the rest interface of a gerrit instance.
- *
  * @author Urs Wolfer
  */
-public class GerritRestClient {
+public class GerritRestClient implements RestClient {
 
     private static final String JSON_MIME_TYPE = ContentType.APPLICATION_JSON.getMimeType();
     private static final Pattern GERRIT_AUTH_PATTERN = Pattern.compile(".*?xGerritAuth=\"(.+?)\"");
     private static final int CONNECTION_TIMEOUT_MS = 30000;
     private static final String PREEMPTIVE_AUTH = "preemptive-auth";
-    private static final Gson GSON = initGson();
+    private static final Gson GSON = GsonFactory.create();
 
     private final GerritAuthData authData;
     private final HttpRequestExecutor httpRequestExecutor;
@@ -88,34 +90,42 @@ public class GerritRestClient {
         loginCache = new LoginCache(authData, cookieStore);
     }
 
-    public enum HttpVerb {
-        GET, POST, DELETE, HEAD, PUT
-    }
-
+    @Override
     public Gson getGson() {
         return GSON;
     }
 
+    @Override
     public JsonElement getRequest(String path) throws RestApiException {
         return requestJson(path, null, HttpVerb.GET);
     }
 
+    @Override
+    public JsonElement postRequest(String path) throws RestApiException {
+        return postRequest(path, null);
+    }
+
+    @Override
     public JsonElement postRequest(String path, String requestBody) throws RestApiException {
         return requestJson(path, requestBody, HttpVerb.POST);
     }
 
+    @Override
     public JsonElement putRequest(String path) throws RestApiException {
         return putRequest(path, null);
     }
 
+    @Override
     public JsonElement putRequest(String path, String requestBody) throws RestApiException {
         return requestJson(path, requestBody, HttpVerb.PUT);
     }
 
+    @Override
     public JsonElement deleteRequest(String path) throws RestApiException {
         return requestJson(path, null, HttpVerb.DELETE);
     }
 
+    @Override
     public JsonElement requestJson(String path, String requestBody, HttpVerb verb) throws RestApiException {
         try {
             HttpResponse response = requestRest(path, requestBody, verb);
@@ -137,17 +147,34 @@ public class GerritRestClient {
         }
     }
 
+    @Override
     public HttpResponse requestRest(String path,
                                     String requestBody,
                                     HttpVerb verb) throws IOException, HttpStatusException {
-        BasicHeader acceptHeader = new BasicHeader("Accept", JSON_MIME_TYPE);
-        return request(path, requestBody, verb, acceptHeader);
+        return requestRest(path, requestBody, verb, false);
     }
 
+    private HttpResponse requestRest(String path,
+                                     String requestBody,
+                                     HttpVerb verb,
+                                     boolean isRetry) throws IOException, HttpStatusException {
+        BasicHeader acceptHeader = new BasicHeader("Accept", JSON_MIME_TYPE);
+        return request(path, requestBody, verb, isRetry, acceptHeader);
+    }
+
+    @Override
     public HttpResponse request(String path,
                                 String requestBody,
                                 HttpVerb verb,
                                 Header... headers) throws IOException, HttpStatusException {
+        return request(path, requestBody, verb, false, headers);
+    }
+
+    private HttpResponse request(String path,
+                                 String requestBody,
+                                 HttpVerb verb,
+                                 boolean isRetry,
+                                 Header... headers) throws IOException, HttpStatusException {
         HttpContext httpContext = new BasicHttpContextHC4();
         HttpClientBuilder client = getHttpClient(httpContext);
 
@@ -190,10 +217,10 @@ public class GerritRestClient {
 
         HttpResponse response = httpRequestExecutor.execute(client, method, httpContext);
 
-        if (response.getStatusLine().getStatusCode() == 403 && loginCache.getGerritAuthOptional().isPresent()) {
+        if (!isRetry && response.getStatusLine().getStatusCode() == 403 && loginCache.getGerritAuthOptional().isPresent()) {
             // handle expired sessions: try again with a fresh login
             loginCache.invalidate();
-            response = requestRest(path, requestBody, verb);
+            response = requestRest(path, requestBody, verb, true);
         }
 
         checkStatusCode(response);
@@ -207,7 +234,7 @@ public class GerritRestClient {
         }
     }
 
-    private Optional<String> updateGerritAuthWhenRequired(HttpContext httpContext, HttpClientBuilder client) throws IOException {
+    private Optional<String> updateGerritAuthWhenRequired(HttpContext httpContext, HttpClientBuilder client) throws IOException, HttpStatusException {
         if (!loginCache.getHostSupportsGerritAuth()) {
             // We do not not need a cookie here since we are sending credentials as HTTP basic / digest header again.
             // In fact cookies could hurt: googlesource.com Gerrit instances block requests which send a magic cookie
@@ -222,7 +249,7 @@ public class GerritRestClient {
         return loginCache.getGerritAuthOptional();
     }
 
-    private Optional<String> updateGerritAuth(HttpContext httpContext, HttpClientBuilder client) throws IOException {
+    private Optional<String> updateGerritAuth(HttpContext httpContext, HttpClientBuilder client) throws IOException, HttpStatusException {
         Optional<String> gerritAuthOptional = tryGerritHttpAuth(client, httpContext)
             .or(tryGerritHttpFormAuth(client, httpContext));
         loginCache.setGerritAuthOptional(gerritAuthOptional);
@@ -232,7 +259,7 @@ public class GerritRestClient {
     /**
      * Handles LDAP auth (but not LDAP_HTTP) which uses a HTML form.
      */
-    private Optional<String> tryGerritHttpFormAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException {
+    private Optional<String> tryGerritHttpFormAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException, HttpStatusException {
         if (!authData.isLoginAndPasswordAvailable()) {
             return Optional.absent();
         }
@@ -266,31 +293,57 @@ public class GerritRestClient {
      * [Gerrit documentation].
      * [Gerrit documentation]: https://gerrit-review.googlesource.com/Documentation/rest-api.html#authentication
      */
-    private Optional<String> tryGerritHttpAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException {
+    private Optional<String> tryGerritHttpAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException, HttpStatusException {
         String loginUrl = authData.getHost() + "/login/";
         HttpResponse loginResponse = httpRequestExecutor.execute(client, new HttpGetHC4(loginUrl), httpContext);
         return extractGerritAuth(loginResponse);
     }
 
-    private Optional<String> extractGerritAuth(HttpResponse loginResponse) throws IOException {
+    private Optional<String> extractGerritAuth(HttpResponse loginResponse) throws IOException, HttpStatusException {
+        checkStatusCodeServerError(loginResponse);
         if (loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
-            Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
-            if (gerritAccountCookie.isPresent()) {
-                Matcher matcher = GERRIT_AUTH_PATTERN.matcher(EntityUtilsHC4.toString(loginResponse.getEntity(), Consts.UTF_8));
-                if (matcher.find()) {
-                    return Optional.of(matcher.group(1));
-                }
+            return getXsrfCookie().or(getXsrfFromHtmlBody(loginResponse));
+        }
+        return Optional.absent();
+    }
+
+    /**
+     * In Gerrit >= 2.12 the XSRF token got moved to a cookie.
+     * Introduced in: https://gerrit-review.googlesource.com/72031/
+     */
+    private Optional<String> getXsrfCookie() {
+        Optional<Cookie> xsrfCookie = findCookie("XSRF_TOKEN");
+        if (xsrfCookie.isPresent()) {
+            return Optional.of(xsrfCookie.get().getValue());
+        }
+        return Optional.absent();
+    }
+
+
+    /**
+     * In Gerrit < 2.12 the XSRF token was included in the start page HTML.
+     */
+    private Optional<String> getXsrfFromHtmlBody(HttpResponse loginResponse) throws IOException {
+        Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
+        if (gerritAccountCookie.isPresent()) {
+            Matcher matcher = GERRIT_AUTH_PATTERN.matcher(EntityUtilsHC4.toString(loginResponse.getEntity(), Consts.UTF_8));
+            if (matcher.find()) {
+                return Optional.of(matcher.group(1));
             }
         }
         return Optional.absent();
     }
 
     private Optional<Cookie> findGerritAccountCookie() {
+        return findCookie("GerritAccount");
+    }
+
+    private Optional<Cookie> findCookie(final String cookieName) {
         List<Cookie> cookies = cookieStore.getCookies();
         return Iterables.tryFind(cookies, new Predicate<Cookie>() {
             @Override
             public boolean apply(Cookie cookie) {
-                return cookie.getName().equals("GerritAccount");
+                return cookie.getName().equals(cookieName);
             }
         });
     }
@@ -364,29 +417,46 @@ public class GerritRestClient {
         }
     }
 
+    /**
+     * @throws HttpStatusException on any error (client 4xx and server 5xx).
+     */
     private void checkStatusCode(HttpResponse response) throws HttpStatusException, IOException {
+        checkStatusCodeClientError(response);
+        checkStatusCodeServerError(response);
+    }
+
+    /**
+     * @throws HttpStatusException on client error (4xx).
+     */
+    private void checkStatusCodeClientError(HttpResponse response) throws HttpStatusException, IOException {
+        checkStatusCodeError(response, 400, 499);
+    }
+
+    /**
+     * @throws HttpStatusException on server error (5xx).
+     */
+    private void checkStatusCodeServerError(HttpResponse response) throws HttpStatusException, IOException {
+        checkStatusCodeError(response, 500, 599);
+    }
+
+    private void checkStatusCodeError(HttpResponse response, int errorIfMin, int errorIfMax) throws HttpStatusException, IOException {
         StatusLine statusLine = response.getStatusLine();
         int code = statusLine.getStatusCode();
-        switch (code) {
-            case HttpStatus.SC_OK:
-            case HttpStatus.SC_CREATED:
-            case HttpStatus.SC_ACCEPTED:
-            case HttpStatus.SC_NO_CONTENT:
-                return;
-            case HttpStatus.SC_BAD_REQUEST:
-            case HttpStatus.SC_UNAUTHORIZED:
-            case HttpStatus.SC_PAYMENT_REQUIRED:
-            case HttpStatus.SC_FORBIDDEN:
-            default:
-                String body = "<empty>";
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    body = EntityUtilsHC4.toString(entity).trim();
-                }
-                String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
-                        statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
-                throw new HttpStatusException(statusLine.getStatusCode(), statusLine.getReasonPhrase(), message);
+        if (code >= errorIfMin && code <= errorIfMax) {
+            throwHttpStatusException(response);
         }
+    }
+
+    private void throwHttpStatusException(HttpResponse response) throws IOException, HttpStatusException {
+        StatusLine statusLine = response.getStatusLine();
+        String body = "<empty>";
+        HttpEntity entity = response.getEntity();
+        if (entity != null) {
+            body = EntityUtilsHC4.toString(entity).trim();
+        }
+        String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
+                statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
+        throw new HttpStatusException(statusLine.getStatusCode(), statusLine.getReasonPhrase(), message);
     }
 
     private void checkContentType(HttpEntity entity) throws RestApiException {
@@ -410,7 +480,13 @@ public class GerritRestClient {
             this.authData = authData;
         }
 
+        @Override
         public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
+            // never ever send credentials preemptively to a host which is not the configured Gerrit host
+            if (!isForGerritHost(request)) {
+                return;
+            }
+
             AuthStateHC4 authState = (AuthStateHC4) context.getAttribute(HttpClientContext.TARGET_AUTH_STATE);
 
             // if no auth scheme available yet, try to initialize it preemptively
@@ -420,23 +496,28 @@ public class GerritRestClient {
                 authState.update(authScheme, creds);
             }
         }
+
+        /**
+         * Checks if request is intended for Gerrit host.
+         */
+        private boolean isForGerritHost(HttpRequest request) {
+            if (!(request instanceof HttpRequestWrapper)) return false;
+            HttpRequest originalRequest = ((HttpRequestWrapper) request).getOriginal();
+            if (!(originalRequest instanceof HttpRequestBase)) return false;
+            URI uri = ((HttpRequestBase) originalRequest).getURI();
+            URI authDataUri = URI.create(authData.getHost());
+            return (uri.getHost().equals(authDataUri.getHost()) && uri.getPort() == authDataUri.getPort());
+        }
     }
 
     private static class UserAgentHttpRequestInterceptor implements HttpRequestInterceptor {
 
+        @Override
         public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
             Header existingUserAgent = request.getFirstHeader(HttpHeaders.USER_AGENT);
             String userAgent = String.format("gerrit-rest-java-client/%s", Version.get());
             userAgent += " using " + existingUserAgent.getValue();
             request.setHeader(HttpHeaders.USER_AGENT, userAgent);
         }
-    }
-
-    private static Gson initGson() {
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Date.class, new DateDeserializer());
-        builder.registerTypeAdapter(Date.class, new DateSerializer());
-        builder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-        return builder.create();
     }
 }

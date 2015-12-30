@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Input passed to {@code POST /changes/{id}/revisions/{id}/review}. */
+/** Input passed to {@code POST /changes/[id]/revisions/[id]/review}. */
 public class ReviewInput {
   @DefaultInput
   public String message;
@@ -47,6 +47,12 @@ public class ReviewInput {
 
   /** Who to send email notifications to after review is stored. */
   public NotifyHandling notify = NotifyHandling.ALL;
+
+  /**
+   * If true check to make sure that the comments being posted aren't already
+   * present.
+   */
+  public boolean omitDuplicateComments;
 
   /**
    * Account ID, name, email address or username of another user. The review

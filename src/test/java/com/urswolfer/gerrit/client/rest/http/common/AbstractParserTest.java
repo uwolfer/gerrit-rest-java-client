@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2015 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package com.urswolfer.gerrit.client.rest.http.common;
 
-import com.google.gson.*;
-import com.urswolfer.gerrit.client.rest.gson.DateDeserializer;
-import com.urswolfer.gerrit.client.rest.gson.DateSerializer;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
-import java.util.Date;
 
 /**
  * @author Thomas Forrer
@@ -36,10 +36,6 @@ public abstract class AbstractParserTest {
     }
 
     protected static Gson getGson() {
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Date.class, new DateDeserializer());
-        builder.registerTypeAdapter(Date.class, new DateSerializer());
-        builder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-        return builder.create();
+        return GsonFactory.create();
     }
 }

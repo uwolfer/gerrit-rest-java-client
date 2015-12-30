@@ -51,14 +51,22 @@ public class RevisionApiRestClientTest {
                 withRevision("current")
                         .expectReviewUrl("/changes/" + CHANGE_ID + "/revisions/current/review")
                         .expectSubmitUrl("/changes/" + CHANGE_ID + "/submit")
+                        .expectPublishUrl("/changes/" + CHANGE_ID + "/revisions/current/publish")
+                        .expectRebaseUrl("/changes/" + CHANGE_ID + "/revisions/current/rebase")
+                        .expectGetFileUrl("/changes/" + CHANGE_ID + "/revisions/current/files")
                         .expectFileReviewedUrl("/changes/" + CHANGE_ID + "/revisions/current/files/" + FILE_PATH_ENCODED + "/reviewed")
                         .expectGetCommentsUrl("/changes/" + CHANGE_ID + "/revisions/current/comments/")
+                        .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/current/drafts/")
                         .get(),
                 withRevision("3")
                         .expectReviewUrl("/changes/" + CHANGE_ID + "/revisions/3/review")
                         .expectSubmitUrl("/changes/" + CHANGE_ID + "/submit")
+                        .expectPublishUrl("/changes/" + CHANGE_ID + "/revisions/3/publish")
+                        .expectRebaseUrl("/changes/" + CHANGE_ID + "/revisions/3/rebase")
+                        .expectGetFileUrl("/changes/" + CHANGE_ID + "/revisions/3/files")
                         .expectFileReviewedUrl("/changes/" + CHANGE_ID + "/revisions/3/files/" + FILE_PATH_ENCODED + "/reviewed")
                         .expectGetCommentsUrl("/changes/" + CHANGE_ID + "/revisions/3/comments/")
+                        .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/3/drafts/")
                         .get()
         ).iterator();
     }
@@ -68,7 +76,7 @@ public class RevisionApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectPost(
                         testCase.reviewUrl,
-                        "{\"message\":\"Looks good!\",\"labels\":{\"Code-Review\":2},\"strict_labels\":true,\"drafts\":\"DELETE\",\"notify\":\"ALL\"}"
+                        "{\"message\":\"Looks good!\",\"labels\":{\"Code-Review\":2},\"strict_labels\":true,\"drafts\":\"DELETE\",\"notify\":\"ALL\",\"omit_duplicate_comments\":false}"
                 )
                 .expectGetGson()
                 .get();
@@ -106,6 +114,33 @@ public class RevisionApiRestClientTest {
     }
 
     @Test(dataProvider = "TestCases")
+    public void testPublish(RevisionApiTestCase testCase) throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPost(testCase.publishUrl)
+            .get();
+
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).publish();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test(dataProvider = "TestCases")
+    public void testRebase(RevisionApiTestCase testCase) throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPost(testCase.rebaseUrl, "{}")
+            .expectGetGson()
+            .get();
+
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).rebase();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test(dataProvider = "TestCases")
     public void testSubmitWithSubmitInput(RevisionApiTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectPost(testCase.submitUrl, "{\"wait_for_merge\":true,\"on_behalf_of\":\"jdoe\"}")
@@ -137,6 +172,20 @@ public class RevisionApiRestClientTest {
     }
 
     @Test(dataProvider = "TestCases")
+    public void testGetFiles(RevisionApiTestCase testCase) throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+                .expectGet(testCase.fileUrl, jsonElement)
+                .get();
+
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).files();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test(dataProvider = "TestCases")
     public void testDeleteFileReviewed(RevisionApiTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectDelete(testCase.fileReviewedUrl)
@@ -150,19 +199,21 @@ public class RevisionApiRestClientTest {
     }
 
     @Test(dataProvider = "TestCases")
-    public void testGetComments(RevisionApiTestCase testCase) throws Exception {
+    public void testGetCommentsAndDrafts(RevisionApiTestCase testCase) throws Exception {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectGet(testCase.getCommentsUrl, jsonElement)
+                .expectGet(testCase.getDraftsUrl, jsonElement)
                 .get();
 
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
-        EasyMock.expect(commentsParser.parseCommentInfos(jsonElement)).andReturn(null).once();
+        EasyMock.expect(commentsParser.parseCommentInfos(jsonElement)).andReturn(null).times(2);
         EasyMock.replay(commentsParser);
 
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, commentsParser);
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).comments();
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).drafts();
 
         EasyMock.verify(gerritRestClient, commentsParser);
     }
@@ -230,8 +281,12 @@ public class RevisionApiRestClientTest {
         private final String revision;
         private String reviewUrl;
         private String submitUrl;
+        private String publishUrl;
+        private String rebaseUrl;
+        private String fileUrl;
         private String fileReviewedUrl;
         private String getCommentsUrl;
+        private String getDraftsUrl;
 
         private RevisionApiTestCase(String revision) {
             this.revision = revision;
@@ -247,6 +302,21 @@ public class RevisionApiRestClientTest {
             return this;
         }
 
+        private RevisionApiTestCase expectPublishUrl(String publishUrl) {
+            this.publishUrl = publishUrl;
+            return this;
+        }
+
+        private RevisionApiTestCase expectRebaseUrl(String rebaseUrl) {
+            this.rebaseUrl = rebaseUrl;
+            return this;
+        }
+
+        private RevisionApiTestCase expectGetFileUrl(String fileUrl) {
+            this.fileUrl = fileUrl;
+            return this;
+        }
+
         private RevisionApiTestCase expectFileReviewedUrl(String setReviewedUrl) {
             this.fileReviewedUrl = setReviewedUrl;
             return this;
@@ -254,6 +324,11 @@ public class RevisionApiRestClientTest {
 
         private RevisionApiTestCase expectGetCommentsUrl(String getCommentsUrl) {
             this.getCommentsUrl = getCommentsUrl;
+            return this;
+        }
+
+        private RevisionApiTestCase expectGetDraftsUrl(String getDraftsUrl) {
+            this.getDraftsUrl = getDraftsUrl;
             return this;
         }
 
