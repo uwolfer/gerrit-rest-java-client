@@ -37,7 +37,7 @@ public class TagApiRestClientTest {
     public static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
     public static final ProjectInfo MOCK_PROJECT_INFO = EasyMock.createMock(ProjectInfo.class);
     public static final TagInfo MOCK_TAG_INFO = EasyMock.createMock(TagInfo.class);
-    
+
     @Test
     public void testGetTagsForProject() throws Exception {
         String projectName = "sandbox";

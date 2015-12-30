@@ -98,7 +98,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         JsonElement branches = gerritRestClient.getRequest(request);
         return branchInfoParser.parseBranchInfos(branches);
     }
-    
+
     @Override
     public ListRefsRequest<TagInfo> tags() {
         return new ListRefsRequest<TagInfo>() {
@@ -108,12 +108,12 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
             }
         };
     }
-    
+
     @Override
     public TagApi tag(String ref) throws RestApiException {
         return new TagApiRestClient(gerritRestClient, tagInfoParser, this, ref);
     }
-    
+
     private List<TagInfo> getTagInfos(ListRefsRequest<TagInfo> lrr) throws RestApiException {
         String request = projectsUrl() + tagsUrl(lrr);
         JsonElement tags = gerritRestClient.getRequest(request);

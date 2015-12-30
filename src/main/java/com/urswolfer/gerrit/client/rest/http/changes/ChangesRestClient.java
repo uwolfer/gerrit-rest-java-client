@@ -65,7 +65,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     }
 
     @Override
-    public QueryRequest query(String query)  {
+    public QueryRequest query(String query) {
         return query().withQuery(query);
     }
 

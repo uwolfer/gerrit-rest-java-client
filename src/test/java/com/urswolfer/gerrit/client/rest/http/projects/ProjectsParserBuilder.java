@@ -21,8 +21,8 @@ import com.google.gson.JsonElement;
 import org.easymock.EasyMock;
 
 /**
-* @author Thomas Forrer
-*/
+ * @author Thomas Forrer
+ */
 public final class ProjectsParserBuilder {
     private final ProjectsParser projectsParser = EasyMock.createMock(ProjectsParser.class);
 

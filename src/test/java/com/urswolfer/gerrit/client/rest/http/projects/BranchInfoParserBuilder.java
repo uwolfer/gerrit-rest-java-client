@@ -26,16 +26,16 @@ import java.util.List;
  * @author Tim Coulson
  */
 public final class BranchInfoParserBuilder {
-	private final BranchInfoParser branchInfoParser = EasyMock.createMock(BranchInfoParser.class);
+    private final BranchInfoParser branchInfoParser = EasyMock.createMock(BranchInfoParser.class);
 
-	public BranchInfoParser get() {
-		EasyMock.replay(branchInfoParser);
-		return branchInfoParser;
-	}
+    public BranchInfoParser get() {
+        EasyMock.replay(branchInfoParser);
+        return branchInfoParser;
+    }
 
-	public BranchInfoParserBuilder expectParseBranchInfos(JsonElement jsonElement, List<BranchInfo> result) {
-		EasyMock.expect(branchInfoParser.parseBranchInfos(jsonElement))
-		.andReturn(result).once();
-		return this;
-	}
+    public BranchInfoParserBuilder expectParseBranchInfos(JsonElement jsonElement, List<BranchInfo> result) {
+        EasyMock.expect(branchInfoParser.parseBranchInfos(jsonElement))
+                .andReturn(result).once();
+        return this;
+    }
 }
