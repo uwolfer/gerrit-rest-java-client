@@ -9,7 +9,7 @@ import com.urswolfer.gerrit.client.rest.GerritRestApiFactory
 /**
  * This is a very basic example written in Groovy: http://www.groovy-lang.org
  *
- * Once you have installed Groovy, make sure this file is executable. Run it with ./basic.groovy.
+ * Once you have installed Groovy, make sure this file is executable. Run it with ./Basic.groovy.
  */
 GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
 GerritAuthData.Basic authData = new GerritAuthData.Basic("http://localhost:8080"/*, "user", "password"*/);
