@@ -155,7 +155,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public ChangeInfo get(EnumSet<ListChangesOption> options) throws RestApiException {
-        return Iterables.getFirst(changesRestClient.query(id).withOptions(options).get(), null);
+        return Iterables.getOnlyElement(changesRestClient.query(id).withOptions(options).get());
     }
 
     @Override
