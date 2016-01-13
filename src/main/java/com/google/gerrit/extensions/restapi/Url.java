@@ -17,11 +17,11 @@ package com.google.gerrit.extensions.restapi;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.nio.charset.Charset;
 
 /** URL related utility functions. */
 public final class Url {
+  private static final Charset UTF_8 = Charset.forName("UTF-8");
   /**
    * Encode a path segment, escaping characters not valid for a URL.
    * <p>
