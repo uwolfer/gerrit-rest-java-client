@@ -3,6 +3,7 @@ gerrit-rest-java-client
 
 [![Build Status](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
 [![Coverage Status](https://img.shields.io/coveralls/uwolfer/gerrit-rest-java-client.svg)](https://coveralls.io/r/uwolfer/gerrit-rest-java-client)
+[![Dependency Status](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client/badge)](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
 
 Introduction
 -----------
@@ -54,7 +55,7 @@ Releases are available with Maven:
 <dependency>
     <groupId>com.urswolfer.gerrit.client.rest</groupId>
     <artifactId>gerrit-rest-java-client</artifactId>
-    <version>0.8.6</version>
+    <version>0.8.7</version>
 </dependency>
 ```
 

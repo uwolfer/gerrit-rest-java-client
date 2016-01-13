@@ -20,6 +20,7 @@ import com.google.common.collect.Iterables;
 import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
+import com.google.gerrit.extensions.api.changes.FixInput;
 import com.google.gerrit.extensions.api.changes.RevisionApi;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
@@ -41,6 +42,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     private final GerritRestClient gerritRestClient;
     private final ChangesRestClient changesRestClient;
+    private final ChangesParser changesParser;
     private final CommentsParser commentsParser;
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
@@ -49,6 +51,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
+                               ChangesParser changesParser,
                                CommentsParser commentsParser,
                                FileInfoParser fileInfoParser,
                                DiffInfoParser diffInfoParser,
@@ -56,6 +59,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
+        this.changesParser = changesParser;
         this.commentsParser = commentsParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
@@ -151,7 +155,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public ChangeInfo get(EnumSet<ListChangesOption> options) throws RestApiException {
-        return Iterables.getFirst(changesRestClient.query(id).withOptions(options).get(), null);
+        return Iterables.getOnlyElement(changesRestClient.query(id).withOptions(options).get());
     }
 
     @Override
@@ -162,6 +166,21 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     @Override
     public ChangeInfo info() throws RestApiException {
         return get(EnumSet.noneOf(ListChangesOption.class));
+    }
+
+    @Override
+    public ChangeInfo check() throws RestApiException {
+        String request = getRequestPath() + "/check";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return Iterables.getOnlyElement(changesParser.parseChangeInfos(jsonElement));
+    }
+
+    @Override
+    public ChangeInfo check(FixInput in) throws RestApiException {
+        String request = getRequestPath() + "/check";
+        String json = gerritRestClient.getGson().toJson(in);
+        JsonElement jsonElement = gerritRestClient.postRequest(request, json);
+        return Iterables.getOnlyElement(changesParser.parseChangeInfos(jsonElement));
     }
 
     protected String getRequestPath() {

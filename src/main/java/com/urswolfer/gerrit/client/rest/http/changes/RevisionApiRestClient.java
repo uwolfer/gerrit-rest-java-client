@@ -103,7 +103,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public void setReviewed(String path, boolean reviewed) throws RestApiException {
         String encodedPath = Url.encode(path);
-        String url =  String.format("/changes/%s/revisions/%s/files/%s/reviewed", changeApiRestClient.id(), revision, encodedPath);
+        String url = String.format("/changes/%s/revisions/%s/files/%s/reviewed", changeApiRestClient.id(), revision, encodedPath);
         if (reviewed) {
             gerritRestClient.putRequest(url);
         } else {

@@ -150,7 +150,7 @@ public class ProjectsRestClientTest {
             EasyMock.replay(branchInfoParser);
             return branchInfoParser;
         }
-        
+
         public TagInfoParser setupTagInfoParser() throws Exception {
             tagInfoParser = EasyMock.createMock(TagInfoParser.class);
             EasyMock.expect(tagInfoParser.parseTagInfos(mockJsonElement))

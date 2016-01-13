@@ -65,7 +65,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     }
 
     @Override
-    public QueryRequest query(String query)  {
+    public QueryRequest query(String query) {
         return query().withQuery(query);
     }
 
@@ -105,7 +105,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(String id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, id);
+        return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
+            fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, id);
     }
 
     @Override

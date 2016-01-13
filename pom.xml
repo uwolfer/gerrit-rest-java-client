@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.urswolfer.gerrit.client.rest</groupId>
   <artifactId>gerrit-rest-java-client</artifactId>
-  <version>0.8.7-SNAPSHOT</version>
+  <version>0.8.8-SNAPSHOT</version>
 
   <name>gerrit-rest-java-client</name>
   <description>Java REST client for Gerrit Code Review API.</description>
@@ -71,7 +71,7 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>6.9.4</version>
+      <version>6.8.21</version><!-- do not update - this is the last release with Java 6 support -->
       <scope>test</scope>
     </dependency>
     <dependency>
