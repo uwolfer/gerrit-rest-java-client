@@ -21,8 +21,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.UnsupportedCharsetException;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 /**
  * Wrapper around a non-JSON result from a {@link RestView}.
  * <p>
@@ -32,6 +30,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * from a {@code byte[]} or {@code InputSteam}.
  */
 public abstract class BinaryResult implements Closeable {
+  private static final Charset UTF_8 = Charset.forName("UTF-8");
   /** Default MIME type for unknown binary data. */
   static final String OCTET_STREAM = "application/octet-stream";
 
