@@ -507,7 +507,7 @@ public class GerritRestClient implements RestClient {
             if (!(originalRequest instanceof HttpRequestBase)) return false;
             URI uri = ((HttpRequestBase) originalRequest).getURI();
             URI authDataUri = URI.create(authData.getHost());
-            if (uri == null || uri.getHost() != null) return false;
+            if (uri == null || uri.getHost() == null) return false;
             boolean hostEquals = uri.getHost().equals(authDataUri.getHost());
             boolean portEquals = uri.getPort() == authDataUri.getPort();
             return hostEquals && portEquals;
