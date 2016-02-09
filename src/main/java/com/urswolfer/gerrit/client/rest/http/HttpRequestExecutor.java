@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBaseHC4;
+import org.apache.http.client.methods.HttpRequestBaseHC4;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
 
