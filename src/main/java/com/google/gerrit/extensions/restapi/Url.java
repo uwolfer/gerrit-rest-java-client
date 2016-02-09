@@ -17,9 +17,11 @@ package com.google.gerrit.extensions.restapi;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 /** URL related utility functions. */
 public final class Url {
+  private static final Charset UTF_8 = Charset.forName("UTF-8");
   /**
    * Encode a path segment, escaping characters not valid for a URL.
    * <p>
@@ -40,7 +42,7 @@ public final class Url {
   public static String encode(String component) {
     if (component != null) {
       try {
-        return URLEncoder.encode(component, "UTF-8");
+        return URLEncoder.encode(component, UTF_8.name());
       } catch (UnsupportedEncodingException e) {
         throw new RuntimeException("JVM must support UTF-8", e);
       }
@@ -52,7 +54,7 @@ public final class Url {
   public static String decode(String str) {
     if (str != null) {
       try {
-        return URLDecoder.decode(str, "UTF-8");
+        return URLDecoder.decode(str, UTF_8.name());
       } catch (UnsupportedEncodingException e) {
         throw new RuntimeException("JVM must support UTF-8", e);
       }

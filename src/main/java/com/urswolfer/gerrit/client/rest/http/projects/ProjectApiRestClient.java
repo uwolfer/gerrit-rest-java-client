@@ -18,10 +18,14 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.gerrit.extensions.api.projects.BranchApi;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.ProjectApi;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
+import com.google.gerrit.extensions.api.projects.TagApi;
+import com.google.gerrit.extensions.api.projects.TagInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
+import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -36,15 +40,18 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
     private final GerritRestClient gerritRestClient;
     private final ProjectsParser projectsParser;
     private final BranchInfoParser branchInfoParser;
+    private final TagInfoParser tagInfoParser;
     private final String name;
 
     public ProjectApiRestClient(GerritRestClient gerritRestClient,
                                 ProjectsParser projectsParser,
                                 BranchInfoParser branchInfoParser,
+                                TagInfoParser tagInfoParser,
                                 String name) {
         this.gerritRestClient = gerritRestClient;
         this.projectsParser = projectsParser;
         this.branchInfoParser = branchInfoParser;
+        this.tagInfoParser = tagInfoParser;
         this.name = name;
     }
 
@@ -72,8 +79,8 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
     }
 
     @Override
-    public ListBranchesRequest branches() {
-        return new ListBranchesRequest() {
+    public ListRefsRequest<BranchInfo> branches() {
+        return new ListRefsRequest<BranchInfo>() {
             @Override
             public List<BranchInfo> get() throws RestApiException {
                 return ProjectApiRestClient.this.getBranches(this);
@@ -81,17 +88,44 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         };
     }
 
-    private List<BranchInfo> getBranches(ListBranchesRequest lbr) throws RestApiException {
+    @Override
+    public BranchApi branch(String ref) throws RestApiException {
+        return new BranchApiRestClient(gerritRestClient, branchInfoParser, this, ref);
+    }
+
+    private List<BranchInfo> getBranches(ListRefsRequest<BranchInfo> lbr) throws RestApiException {
         String request = projectsUrl() + branchesUrl(lbr);
         JsonElement branches = gerritRestClient.getRequest(request);
         return branchInfoParser.parseBranchInfos(branches);
     }
 
-    private String projectsUrl() {
+    @Override
+    public ListRefsRequest<TagInfo> tags() {
+        return new ListRefsRequest<TagInfo>() {
+            @Override
+            public List<TagInfo> get() throws RestApiException {
+                return ProjectApiRestClient.this.getTagInfos(this);
+            }
+        };
+    }
+
+    @Override
+    public TagApi tag(String ref) throws RestApiException {
+        return new TagApiRestClient(gerritRestClient, tagInfoParser, this, ref);
+    }
+
+    private List<TagInfo> getTagInfos(ListRefsRequest<TagInfo> lrr) throws RestApiException {
+        String request = projectsUrl() + tagsUrl(lrr);
+        JsonElement tags = gerritRestClient.getRequest(request);
+        return tagInfoParser.parseTagInfos(tags);
+    }
+
+
+    protected String projectsUrl() {
         return "/projects/" + name;
     }
 
-    private String branchesUrl(ListBranchesRequest lbr) {
+    private String branchesUrl(ListRefsRequest<BranchInfo> lbr) {
         String query = "";
 
         if (lbr.getLimit() != 0) {
@@ -108,6 +142,26 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         }
 
         String url = "/branches";
+        if (!Strings.isNullOrEmpty(query)) {
+            url += '?' + query;
+        }
+        return url;
+    }
+
+    private String tagsUrl(ListRefsRequest<TagInfo> lrr) {
+        String query = "";
+
+        if (lrr.getLimit() != 0) {
+            query = UrlUtils.appendToUrlQuery(query, "n=" + lrr.getLimit());
+        }
+        if (lrr.getStart() != 0) {
+            query = UrlUtils.appendToUrlQuery(query, "s=" + lrr.getStart());
+        }
+        if (!Strings.isNullOrEmpty(lrr.getSubstring()) || !Strings.isNullOrEmpty(lrr.getRegex())) {
+            throw new NotImplementedException();
+        }
+
+        String url = "/tags";
         if (!Strings.isNullOrEmpty(query)) {
             url += '?' + query;
         }

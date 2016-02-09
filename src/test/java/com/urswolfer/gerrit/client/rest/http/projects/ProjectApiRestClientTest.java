@@ -50,7 +50,8 @@ public class ProjectApiRestClientTest {
                 .expectParseSingleProjectInfo(MOCK_JSON_ELEMENT, MOCK_PROJECT_INFO)
                 .get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser);
+        TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser);
 
         ProjectInfo projectInfo = projectsRestClient.name(projectName).get();
 
@@ -75,7 +76,8 @@ public class ProjectApiRestClientTest {
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder()
                 .expectParseBranchInfos(MOCK_JSON_ELEMENT, mockBranches)
                 .get();
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, projectName);
+        TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectName);
 
         List<BranchInfo> branches = projectApiRestClient.branches()
             .withLimit(5).withStart(1).withRegex(".").withSubstring("s")
@@ -91,7 +93,8 @@ public class ProjectApiRestClientTest {
                 .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser);
+        TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser);
 
         projectsRestClient.name(projectName).get();
         projectsRestClient.name(projectName).branches().get();
@@ -105,7 +108,8 @@ public class ProjectApiRestClientTest {
                 .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser);
+        TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser);
 
         projectsRestClient.name(projectName).create();
 
@@ -134,7 +138,8 @@ public class ProjectApiRestClientTest {
                 .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser);
+        TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser);
 
         projectsRestClient.name(projectName).create(projectInput);
 

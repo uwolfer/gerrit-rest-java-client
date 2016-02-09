@@ -66,4 +66,17 @@ public class BranchInfoParserTest extends AbstractParserTest {
             GerritAssert.assertEquals(actual, expected);
         }
     }
+
+    @Test
+    public void testParseBranchInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("branch.json");
+
+        List<BranchInfo> branchInfos = branchInfoParser.parseBranchInfos(jsonElement);
+
+        Truth.assertThat(branchInfos.size()).isEqualTo(1);
+        GerritAssert.assertEquals(branchInfos.get(0), new BranchInfoBuilder()
+            .withRef("refs/heads/master")
+            .withRevision("5b80af780ae31bee6609ebc1bbab9ce6fd004dbb")
+            .get());
+    }
 }

@@ -21,6 +21,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.Projects;
+import com.google.gerrit.extensions.api.projects.TagInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -91,6 +92,7 @@ public class ProjectsRestClientTest {
         private GerritRestClient gerritRestClient;
         private ProjectsParser projectsParser;
         private BranchInfoParser branchInfoParser;
+        private TagInfoParser tagInfoParser;
 
         public ProjectListTestCase withListParameter(TestListRequest listParameter) {
             this.listParameter = listParameter;
@@ -117,7 +119,8 @@ public class ProjectsRestClientTest {
             return new ProjectsRestClient(
                     setupGerritRestClient(),
                     setupProjectsParser(),
-                    setupBranchInfoParser()
+                    setupBranchInfoParser(),
+                    setupTagInfoParser()
             );
         }
 
@@ -146,6 +149,15 @@ public class ProjectsRestClientTest {
                     .once();
             EasyMock.replay(branchInfoParser);
             return branchInfoParser;
+        }
+
+        public TagInfoParser setupTagInfoParser() throws Exception {
+            tagInfoParser = EasyMock.createMock(TagInfoParser.class);
+            EasyMock.expect(tagInfoParser.parseTagInfos(mockJsonElement))
+                    .andReturn(Lists.<TagInfo>newArrayList())
+                    .once();
+            EasyMock.replay(tagInfoParser);
+            return tagInfoParser;
         }
 
         @Override

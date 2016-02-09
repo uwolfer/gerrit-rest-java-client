@@ -21,6 +21,8 @@ import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
+import com.google.gerrit.extensions.api.changes.FixInput;
+import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -67,6 +69,32 @@ public class ChangeApiRestClientTest {
     }
 
     @Test
+    public void testGetTopic() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+                .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/topic", jsonElement)
+                .get();
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").topic();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testSetTopic() throws Exception {
+        String topic = "my-topic";
+        String json = "{\"topic\":\"" + topic + "\"}";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+                .expectPut("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/topic", json, null)
+                .expectGetGson()
+                .get();
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").topic(topic);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
     public void testAbandonChange() throws Exception {
         GerritRestClient gerritRestClient = getGerritRestClient(
                 "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/abandon",
@@ -105,7 +133,7 @@ public class ChangeApiRestClientTest {
         EasyMock.expect(suggestedReviewerInfoParser.parseSuggestReviewerInfos(jsonElement)).andReturn(expectedSuggestedReviewerInfos).once();
         EasyMock.replay(suggestedReviewerInfoParser);
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null, null,
                 suggestedReviewerInfoParser,
                 "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
@@ -128,7 +156,7 @@ public class ChangeApiRestClientTest {
         EasyMock.expect(suggestedReviewerInfoParser.parseSuggestReviewerInfos(jsonElement)).andReturn(expectedSuggestedReviewerInfos).once();
         EasyMock.replay(suggestedReviewerInfoParser);
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null, null,
                 suggestedReviewerInfoParser,
                 "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
@@ -136,6 +164,55 @@ public class ChangeApiRestClientTest {
 
         Truth.assertThat(suggestedReviewerInfos).isSameAs(expectedSuggestedReviewerInfos);
         EasyMock.verify(gerritRestClient, suggestedReviewerInfoParser);
+    }
+
+    @Test
+    public void testCheck() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/check", jsonElement)
+            .get();
+
+        ChangeInfo expectedChangeInfo = new ChangeInfo();
+        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        EasyMock.expect(changesParser.parseChangeInfos(jsonElement)).andReturn(Lists.newArrayList(expectedChangeInfo)).once();
+        EasyMock.replay(changesParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
+            null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        ChangeInfo changeInfo = changeApiRestClient.check();
+        Truth.assertThat(changeInfo).isSameAs(expectedChangeInfo);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testCheckFix() throws Exception {
+        FixInput fixInput = new FixInput();
+        fixInput.deletePatchSetIfCommitMissing = true;
+        fixInput.expectMergedAs = "mergedAs";
+
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        String json = "{\"delete_patch_set_if_commit_missing\":" + fixInput.deletePatchSetIfCommitMissing
+            + ",\"expect_merged_as\":\"" + fixInput.expectMergedAs + "\"}";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPost("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/check", json, jsonElement)
+            .expectGetGson()
+            .get();
+
+        ChangeInfo expectedChangeInfo = new ChangeInfo();
+        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        EasyMock.expect(changesParser.parseChangeInfos(jsonElement)).andReturn(Lists.newArrayList(expectedChangeInfo)).once();
+        EasyMock.replay(changesParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
+            null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        ChangeInfo changeInfo = changeApiRestClient.check(fixInput);
+        Truth.assertThat(changeInfo).isSameAs(expectedChangeInfo);
+
+        EasyMock.verify(gerritRestClient);
     }
 
     private GerritRestClient getGerritRestClient(String expectedRequest, String expectedJson) throws Exception {

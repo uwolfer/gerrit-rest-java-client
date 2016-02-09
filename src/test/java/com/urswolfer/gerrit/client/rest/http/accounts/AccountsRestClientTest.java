@@ -104,6 +104,7 @@ public class AccountsRestClientTest {
         EasyMock.replay(gerritRestClient);
         return gerritRestClient;
     }
+
     private GerritRestClient gerritRestClientExpectDelete(String expectedUrl) throws Exception {
         GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
         EasyMock.expect(gerritRestClient.deleteRequest(expectedUrl))

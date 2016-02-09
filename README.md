@@ -3,6 +3,7 @@ gerrit-rest-java-client
 
 [![Build Status](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
 [![Coverage Status](https://img.shields.io/coveralls/uwolfer/gerrit-rest-java-client.svg)](https://coveralls.io/r/uwolfer/gerrit-rest-java-client)
+[![Dependency Status](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client/badge)](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
 
 Introduction
 -----------
@@ -33,6 +34,9 @@ GerritApi gerritApi = gerritRestApiFactory.create(authData);
 List<ChangeInfo> changes = gerritApi.changes().query("status:merged").withLimit(10).get();
 ```
 
+If you like to write a script instead of a full Java application, you might want to use [Groovy].
+There is a [basic Groovy example] available.
+
 _Note:_ It is not guaranteed that all interfaces are implemented. If an implementation is missing, you get a
 <code>com.google.gerrit.extensions.restapi.NotImplementedException</code>. Feel free to implement it and create a pull
 request at GitHub - it is quite easy! :)
@@ -41,6 +45,8 @@ _Note:_ The source of <code>com.google.gerrit.extensions</code> is included in t
 moment because not all extensions to this API are merged into Gerrit repository yet.
 
 [com.google.gerrit.extensions.api.GerritApi]: https://gerrit.googlesource.com/gerrit/+/HEAD/gerrit-extension-api/src/main/java/com/google/gerrit/extensions/api/GerritApi.java
+[Groovy]: http://www.groovy-lang.org/
+[basic Groovy example]: https://github.com/uwolfer/gerrit-rest-java-client/blob/master/examples/Basic.groovy
 
 Maven Artifact
 --------------
@@ -49,9 +55,18 @@ Releases are available with Maven:
 <dependency>
     <groupId>com.urswolfer.gerrit.client.rest</groupId>
     <artifactId>gerrit-rest-java-client</artifactId>
-    <version>0.8.5</version>
+    <version>0.8.7</version>
 </dependency>
 ```
+
+Android Support
+---------------
+Apache HttpClient causes problems on Android platform. There is a workaround by using [HttpClient for Android].
+Android support builds are not officially released, but you should be able to create your own build by using the
+[httpclient-android branch]. You probably want to merge master branch into this branch before building it.
+
+[HttpClient for Android]: https://hc.apache.org/httpcomponents-client-4.3.x/android-port.html
+[httpclient-android branch]: https://github.com/uwolfer/gerrit-rest-java-client/tree/httpclient-android
 
 Dependencies
 ------------

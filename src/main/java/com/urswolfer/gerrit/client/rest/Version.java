@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2015 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,18 +33,21 @@ public class Version {
 
     static {
         try {
-            InputStream inputStream = Version.class.getResourceAsStream("/version.properties");
-            VERSION = getVersionProperties(inputStream);
+            VERSION = getVersionFromProperties();
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
     }
 
-    private static String getVersionProperties(InputStream inputStream) throws IOException {
-        Properties properties = new Properties();
-        properties.load(inputStream);
-        inputStream.close();
-        return properties.getProperty("gerrit-rest-java-client.version");
+    private static String getVersionFromProperties() throws IOException {
+        InputStream inputStream = Version.class.getResourceAsStream("/version.properties");
+        try {
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            return properties.getProperty("gerrit-rest-java-client.version");
+        } finally {
+            inputStream.close();
+        }
     }
 
     public static String get() {
