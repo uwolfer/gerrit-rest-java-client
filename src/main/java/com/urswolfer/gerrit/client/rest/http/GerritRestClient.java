@@ -199,7 +199,7 @@ public class GerritRestClient implements RestClient {
                 method = new HttpGetHC4(uri);
                 break;
             case DELETE:
-                method = new HttpGetHC4(uri);
+                method = new HttpDeleteHC4(uri);
                 break;
             case PUT:
                 method = new HttpPutHC4(uri);
