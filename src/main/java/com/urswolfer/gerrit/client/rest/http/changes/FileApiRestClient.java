@@ -33,7 +33,7 @@ import java.io.IOException;
 /**
  * @author Thomas Forrer
  */
-public class FileApiRestClient implements FileApi {
+public class FileApiRestClient extends FileApi.NotImplemented {
 
     private final GerritRestClient gerritRestClient;
     private final RevisionApiRestClient revisionApiRestClient;
