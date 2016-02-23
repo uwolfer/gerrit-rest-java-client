@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.client.DiffPreferencesInfo.Whitespace;
 import com.google.gerrit.extensions.common.DiffInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -114,6 +115,60 @@ public class FileApiRestClientTest {
                 return null;
             }
         }, requestUrl);
+    }
+
+    @Test
+    public void testDiffRequest() throws Exception {
+        final Integer context = 10;
+        String requestUrl = getBaseRequestUrl() + "/diff?context=" + context;
+        testDiff(new Function<FileApiRestClient, Void>() {
+            @Override
+            public Void apply(FileApiRestClient fileApiRestClient) {
+                try {
+                    fileApiRestClient.diffRequest()
+                        .withContext(context)
+                        .get();
+                } catch (RestApiException e) {
+                    throw Throwables.propagate(e);
+                }
+                return null;
+            }
+        }, requestUrl);
+
+        final boolean intraline = true;
+        requestUrl += "&intraline=" + Boolean.toString(intraline);
+        testDiff(new Function<FileApiRestClient, Void>() {
+            @Override
+            public Void apply(FileApiRestClient fileApiRestClient) {
+                  try {
+                      fileApiRestClient.diffRequest()
+                          .withContext(context)
+                          .withIntraline(intraline)
+                          .get();
+                  } catch (RestApiException e) {
+                      throw Throwables.propagate(e);
+                  }
+                  return null;
+              }
+        }, requestUrl);
+
+        final Whitespace whitespace = Whitespace.IGNORE_ALL;
+        requestUrl += "&whitespace=" + whitespace.name();
+        testDiff(new Function<FileApiRestClient, Void>() {
+            @Override
+            public Void apply(FileApiRestClient fileApiRestClient) {
+                try {
+                    fileApiRestClient.diffRequest()
+                        .withContext(context)
+                        .withIntraline(intraline)
+                        .withWhitespace(whitespace)
+                        .get();
+                } catch (RestApiException e) {
+                    throw Throwables.propagate(e);
+                }
+                return null;
+            }
+      }, requestUrl);
     }
 
     private void testDiff(Function<FileApiRestClient, Void> method, String expectedRequestUrl) throws Exception {
