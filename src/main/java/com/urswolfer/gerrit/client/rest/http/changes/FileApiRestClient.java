@@ -16,6 +16,7 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
+import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.gerrit.extensions.api.changes.FileApi;
@@ -26,6 +27,8 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
+import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
+
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
@@ -70,15 +73,46 @@ public class FileApiRestClient extends FileApi.NotImplemented {
 
     @Override
     public DiffInfo diff() throws RestApiException {
-        String request = getRequestPath() + "/diff";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return diffInfoParser.parseDiffInfo(jsonElement);
+        return diffRequest().get();
     }
 
     @Override
     public DiffInfo diff(String base) throws RestApiException {
-        String request = getRequestPath() + "/diff?base=" + base;
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return diffRequest().withBase(base).get();
+    }
+
+    @Override
+    public DiffRequest diffRequest() throws RestApiException {
+        return new DiffRequest() {
+            @Override
+            public DiffInfo get() throws RestApiException {
+                return FileApiRestClient.this.diff(this);
+            }
+        };
+    }
+
+    private DiffInfo diff(DiffRequest diffRequest) throws RestApiException {
+        String query = "";
+
+        if (!Strings.isNullOrEmpty(diffRequest.getBase())) {
+            query = UrlUtils.appendToUrlQuery(query, "base=" + diffRequest.getBase());
+        }
+        if (diffRequest.getContext() != null) {
+            query = UrlUtils.appendToUrlQuery(query, "context=" + diffRequest.getContext());
+        }
+        if (diffRequest.getIntraline() != null) {
+            query = UrlUtils.appendToUrlQuery(query, "intraline=" + diffRequest.getIntraline());
+        }
+        if (diffRequest.getWhitespace() != null) {
+            query = UrlUtils.appendToUrlQuery(query, "whitespace=" + diffRequest.getWhitespace());
+        }
+
+        String url = getRequestPath() +  "/diff";
+        if (!Strings.isNullOrEmpty(query)) {
+            url += '?' + query;
+        }
+
+        JsonElement jsonElement = gerritRestClient.getRequest(url);
         return diffInfoParser.parseDiffInfo(jsonElement);
     }
 
