@@ -49,6 +49,7 @@ public class RevisionApiRestClientTest {
     public Iterator<RevisionApiTestCase[]> testCases() throws Exception {
         return Lists.newArrayList(
                 withRevision("current")
+                        .expectRevisionUrl("/changes/" + CHANGE_ID + "/revisions/current")
                         .expectReviewUrl("/changes/" + CHANGE_ID + "/revisions/current/review")
                         .expectSubmitUrl("/changes/" + CHANGE_ID + "/submit")
                         .expectPublishUrl("/changes/" + CHANGE_ID + "/revisions/current/publish")
@@ -59,6 +60,7 @@ public class RevisionApiRestClientTest {
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/current/drafts/")
                         .get(),
                 withRevision("3")
+                        .expectRevisionUrl("/changes/" + CHANGE_ID + "/revisions/3")
                         .expectReviewUrl("/changes/" + CHANGE_ID + "/revisions/3/review")
                         .expectSubmitUrl("/changes/" + CHANGE_ID + "/submit")
                         .expectPublishUrl("/changes/" + CHANGE_ID + "/revisions/3/publish")
@@ -109,6 +111,19 @@ public class RevisionApiRestClientTest {
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).submit();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test(dataProvider = "TestCases")
+    public void testDelete(RevisionApiTestCase testCase) throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectDelete(testCase.revisionUrl)
+            .get();
+
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).delete();
 
         EasyMock.verify(gerritRestClient);
     }
@@ -279,6 +294,7 @@ public class RevisionApiRestClientTest {
 
     private static final class RevisionApiTestCase {
         private final String revision;
+        private String revisionUrl;
         private String reviewUrl;
         private String submitUrl;
         private String publishUrl;
@@ -290,6 +306,11 @@ public class RevisionApiRestClientTest {
 
         private RevisionApiTestCase(String revision) {
             this.revision = revision;
+        }
+
+        private RevisionApiTestCase expectRevisionUrl(String revisionUrl) {
+            this.revisionUrl = revisionUrl;
+            return this;
         }
 
         private RevisionApiTestCase expectReviewUrl(String reviewUrl) {
