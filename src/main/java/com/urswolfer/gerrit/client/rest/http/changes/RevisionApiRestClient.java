@@ -63,6 +63,12 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     }
 
     @Override
+    public void delete() throws RestApiException {
+        String request = getRequestPath();
+        gerritRestClient.deleteRequest(request);
+    }
+
+    @Override
     public void review(ReviewInput reviewInput) throws RestApiException {
         String request = getRequestPath() + "/review";
         String json = gerritRestClient.getGson().toJson(reviewInput);

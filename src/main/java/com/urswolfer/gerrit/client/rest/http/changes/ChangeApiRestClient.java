@@ -100,6 +100,18 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public void publish() throws RestApiException {
+        String request = getRequestPath() + "/publish";
+        gerritRestClient.postRequest(request);
+    }
+
+    @Override
+    public void delete() throws RestApiException {
+        String request = getRequestPath();
+        gerritRestClient.deleteRequest(request);
+    }
+
+    @Override
     public String topic() throws RestApiException {
         String request = getRequestPath() + "/topic";
         return gerritRestClient.getRequest(request).getAsString();

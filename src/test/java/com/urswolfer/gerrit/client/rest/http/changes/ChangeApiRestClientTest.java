@@ -69,6 +69,28 @@ public class ChangeApiRestClientTest {
     }
 
     @Test
+    public void testPublish() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+                .expectPost("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/publish")
+                .get();
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").publish();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+                .expectDelete("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940")
+                .get();
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").delete();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
     public void testGetTopic() throws Exception {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()

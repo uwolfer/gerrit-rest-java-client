@@ -58,6 +58,19 @@ public interface ChangeApi {
    */
   RevisionApi revision(String id) throws RestApiException;
 
+  /**
+   * Look up the reviewer of the change.
+   * <p>
+   * @param id ID of the account, can be a string of the format
+   *     "Full Name &lt;mail@example.com&gt;", just the email address, a full name
+   *     if it is unique, an account ID, a user name or 'self' for the
+   *     calling user.
+   * @return API for accessing the reviewer.
+   * @throws RestApiException if id is not account ID or is a user that isn't
+   *     known to be a reviewer for this change.
+   */
+  ReviewerApi reviewer(String id) throws RestApiException;
+
   void abandon() throws RestApiException;
   void abandon(AbandonInput in) throws RestApiException;
 
@@ -79,6 +92,16 @@ public interface ChangeApi {
   ChangeApi revert(RevertInput in) throws RestApiException;
 
   List<ChangeInfo> submittedTogether() throws RestApiException;
+
+  /**
+   * Publishes a draft change.
+   */
+  void publish() throws RestApiException;
+
+  /**
+   * Deletes a draft change.
+   */
+  void delete() throws RestApiException;
 
   String topic() throws RestApiException;
   void topic(String topic) throws RestApiException;
@@ -177,6 +200,11 @@ public interface ChangeApi {
     }
 
     @Override
+    public ReviewerApi reviewer(String id) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public RevisionApi revision(String id) throws RestApiException {
       throw new NotImplementedException();
     }
@@ -208,6 +236,16 @@ public interface ChangeApi {
 
     @Override
     public ChangeApi revert(RevertInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void publish() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void delete() throws RestApiException {
       throw new NotImplementedException();
     }
 
