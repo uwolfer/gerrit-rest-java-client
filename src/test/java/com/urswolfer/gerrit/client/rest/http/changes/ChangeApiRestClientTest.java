@@ -22,6 +22,7 @@ import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.FixInput;
+import com.google.gerrit.extensions.api.changes.RestoreInput;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gson.JsonElement;
@@ -138,6 +139,32 @@ public class ChangeApiRestClientTest {
         AbandonInput abandonInput = new AbandonInput();
         abandonInput.message = "Change not necessary.";
         changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").abandon(abandonInput);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testRestoreChange() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+                "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/restore",
+                "{}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").restore();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testRestoreChangeWithMessage() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+                "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/restore",
+                "{\"message\":\"Reviving this change.\"}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        RestoreInput restoreInput = new RestoreInput();
+        restoreInput.message = "Reviving this change.";
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").restore(restoreInput);
 
         EasyMock.verify(gerritRestClient);
     }
