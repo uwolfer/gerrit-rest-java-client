@@ -1,0 +1,27 @@
+environment:
+  MVN_VERSION: 3.3.3
+
+install:
+  - cinst maven --version=%MVN_VERSION% -y
+  - set PATH=C:\tools\apache-maven-%MVN_VERSION%\bin;%PATH%
+
+cache:
+  - C:\Users\appveyor\.m2\repository -> pom.xml
+
+build_script:
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V  # This is what Travis CI does by default.
+
+test_script:
+  - mvn test -B  # This is what Travis CI does by default.
+
+after_test:
+  - ps: |
+      $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
+      $files = Get-ChildItem '.\target\surefire-reports\junitreports\TEST-*.xml'
+      ForEach ($file in $files) {
+          (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
+      }
+
+artifacts:
+  - path: target\*.jar
+    name: Java archive

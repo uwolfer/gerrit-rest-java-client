@@ -1,7 +1,8 @@
 gerrit-rest-java-client
 ======================
 
-[![Build Status](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
+[![Linux Build](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
+[![Windows Build](https://ci.appveyor.com/api/projects/status/7c020g5h5dmuxt77/branch/master?svg=true)](https://ci.appveyor.com/project/sschuberth/gerrit-rest-java-client/branch/master)
 [![Coverage Status](https://img.shields.io/coveralls/uwolfer/gerrit-rest-java-client.svg)](https://coveralls.io/r/uwolfer/gerrit-rest-java-client)
 [![Dependency Status](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client/badge)](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
 
