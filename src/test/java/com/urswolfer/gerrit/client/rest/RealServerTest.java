@@ -42,14 +42,14 @@ public class RealServerTest {
     @DataProvider(name = "LoginData")
     public Object[][] getData() throws Exception {
         URL url = this.getClass().getResource("testhosts.json");
-        File file = new File(url.toURI());
-        if (!file.exists()) {
+        if (url == null) {
             System.out.println(
                 "File 'src/test/resources/com/urswolfer/gerrit/client/rest/testhosts.json' not found.\n" +
                 "Not running any tests.\n" +
                 "Create json file with following content: '[[\"http://gerrit\", null, null], [\"http://host2\", \"user\", \"pw\"]]'.");
             return null;
         }
+        File file = new File(url.toURI());
         return new Gson().fromJson(new FileReader(file), Object[][].class);
     }
 
