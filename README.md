@@ -97,7 +97,7 @@ Please only use the link from github.com/uwolfer/gerrit-intellij-plugin to verif
 Copyright and license
 --------------------
 
-Copyright 2013 - 2015 Urs Wolfer
+Copyright 2013 - 2016 Urs Wolfer
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this work except in compliance with the License.
