@@ -16,6 +16,7 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
+import com.google.gerrit.extensions.api.accounts.EmailInput;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -78,6 +79,23 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
         } catch (IOException e) {
             throw new RestApiException("Failed to get avatar.", e);
         }
+    }
+
+    @Override
+    public void addEmail(EmailInput input) throws RestApiException {
+        String request = getRequestPath() + "/emails/" + Url.encode(input.email);
+
+        // TODO handle the case where no confirmation is specified
+        // This probably requires the creation of an EmailInfo class in the
+        // Google Java API (com.google.gerrit.extensions.api)
+
+        // Perform the request to update the e-mail
+        JsonElement emailResult = gerritRestClient.putRequest(request);
+
+        // Setting the e-mail as preferred must be performed as a separate request
+        //if (input.preferred) {
+        //    JsonElement preferredResult = gerritRestClient.putRequest(request + "/preferred");
+        //}
     }
 
     private String getRequestPath() {
