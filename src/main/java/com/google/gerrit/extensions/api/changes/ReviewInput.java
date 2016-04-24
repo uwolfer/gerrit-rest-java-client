@@ -26,6 +26,8 @@ public class ReviewInput {
   @DefaultInput
   public String message;
 
+  public String tag;
+
   public Map<String, Short> labels;
   public Map<String, List<CommentInput>> comments;
 
@@ -66,7 +68,7 @@ public class ReviewInput {
    */
   public String onBehalfOf;
 
-  public static enum DraftHandling {
+  public enum DraftHandling {
     /** Delete pending drafts on this revision only. */
     DELETE,
 
@@ -80,7 +82,7 @@ public class ReviewInput {
     PUBLISH_ALL_REVISIONS
   }
 
-  public static enum NotifyHandling {
+  public enum NotifyHandling {
     NONE, OWNER, OWNER_REVIEWERS, ALL
   }
 

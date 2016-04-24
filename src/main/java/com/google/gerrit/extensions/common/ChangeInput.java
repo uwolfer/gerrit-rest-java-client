@@ -1,4 +1,4 @@
-// Copyright (C) 2015 The Android Open Source Project
+// Copyright (C) 2016 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.api.config;
+package com.google.gerrit.extensions.common;
 
-import com.google.gerrit.extensions.restapi.NotImplementedException;
+import com.google.gerrit.extensions.client.ChangeStatus;
 
-public interface Config {
-  /**
-   * @return An API for getting server related configurations.
-   */
-  Server server();
+public class ChangeInput {
+  public String project;
+  public String branch;
+  public String subject;
 
-  /**
-   * A default implementation which allows source compatibility
-   * when adding new methods to the interface.
-   **/
-  class NotImplemented implements Config {
-    @Override
-    public Server server() {
-      throw new NotImplementedException();
-    }
-  }
+  public String topic;
+  public ChangeStatus status;
+  public String baseChange;
+  public Boolean newBranch;
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2014 The Android Open Source Project
+// Copyright (C) 2016 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,23 +14,11 @@
 
 package com.google.gerrit.extensions.common;
 
-public class ProblemInfo {
-  public enum Status {
-    FIXED, FIX_FAILED
-  }
-
-  public String message;
-  public Status status;
-  public String outcome;
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName())
-        .append('[').append(message);
-    if (status != null || outcome != null) {
-      sb.append(" (").append(status).append(": ").append(outcome)
-          .append(')');
-    }
-    return sb.append(']').toString();
-  }
+public class SshKeyInfo {
+  public Integer seq;
+  public String sshPublicKey;
+  public String encodedKey;
+  public String algorithm;
+  public String comment;
+  public Boolean valid;
 }

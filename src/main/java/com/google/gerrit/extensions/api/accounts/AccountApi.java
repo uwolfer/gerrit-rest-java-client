@@ -14,8 +14,12 @@
 
 package com.google.gerrit.extensions.api.accounts;
 
+import com.google.gerrit.extensions.client.DiffPreferencesInfo;
+import com.google.gerrit.extensions.client.EditPreferencesInfo;
+import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.GpgKeyInfo;
+import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
@@ -26,9 +30,25 @@ public interface AccountApi {
   AccountInfo get() throws RestApiException;
 
   String getAvatarUrl(int size) throws RestApiException;
+
+  GeneralPreferencesInfo getPreferences() throws RestApiException;
+  GeneralPreferencesInfo setPreferences(GeneralPreferencesInfo in)
+      throws RestApiException;
+
+  DiffPreferencesInfo getDiffPreferences() throws RestApiException;
+  DiffPreferencesInfo setDiffPreferences(DiffPreferencesInfo in)
+      throws RestApiException;
+
+  EditPreferencesInfo getEditPreferences() throws RestApiException;
+  EditPreferencesInfo setEditPreferences(EditPreferencesInfo in)
+      throws RestApiException;
+
   void starChange(String id) throws RestApiException;
   void unstarChange(String id) throws RestApiException;
   void addEmail(EmailInput input) throws RestApiException;
+
+  List<SshKeyInfo> listSshKeys() throws RestApiException;
+  SshKeyInfo addSshKey(String key) throws RestApiException;
 
   Map<String, GpgKeyInfo> listGpgKeys() throws RestApiException;
   Map<String, GpgKeyInfo> putGpgKeys(List<String> add, List<String> remove)
@@ -39,7 +59,7 @@ public interface AccountApi {
    * A default implementation which allows source compatibility
    * when adding new methods to the interface.
    **/
-  public class NotImplemented implements AccountApi {
+  class NotImplemented implements AccountApi {
     @Override
     public AccountInfo get() throws RestApiException {
       throw new NotImplementedException();
@@ -47,6 +67,39 @@ public interface AccountApi {
 
     @Override
     public String getAvatarUrl(int size) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public GeneralPreferencesInfo getPreferences() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public GeneralPreferencesInfo setPreferences(GeneralPreferencesInfo in)
+        throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public DiffPreferencesInfo getDiffPreferences() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public DiffPreferencesInfo setDiffPreferences(DiffPreferencesInfo in)
+        throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public EditPreferencesInfo getEditPreferences() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public EditPreferencesInfo setEditPreferences(EditPreferencesInfo in)
+        throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -62,6 +115,16 @@ public interface AccountApi {
 
     @Override
     public void addEmail(EmailInput input) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<SshKeyInfo> listSshKeys() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public SshKeyInfo addSshKey(String key) throws RestApiException {
       throw new NotImplementedException();
     }
 
