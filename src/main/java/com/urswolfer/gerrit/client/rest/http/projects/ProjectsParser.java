@@ -17,6 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.reflect.TypeToken;
+import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.Gson;
@@ -43,5 +44,9 @@ public class ProjectsParser {
 
     public ProjectInfo parseSingleProjectInfo(JsonElement result) {
         return gson.fromJson(result, ProjectInfo.class);
+    }
+
+    public String generateProjectInput(ProjectInput input) {
+        return gson.toJson(input, ProjectInput.class);
     }
 }
