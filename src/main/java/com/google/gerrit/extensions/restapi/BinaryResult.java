@@ -26,7 +26,7 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.UnsupportedCharsetException;
 
 /**
- * Wrapper around a non-JSON result from a {@link RestView}.
+ * Wrapper around a non-JSON result.
  * <p>
  * Views may return this type to signal they want the server glue to write raw
  * data to the client, instead of attempting automatic conversion to JSON. The
