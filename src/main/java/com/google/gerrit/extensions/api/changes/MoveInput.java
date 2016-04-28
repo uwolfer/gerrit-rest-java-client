@@ -12,25 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.api.config;
+package com.google.gerrit.extensions.api.changes;
 
-import com.google.gerrit.extensions.restapi.NotImplementedException;
-import com.google.gerrit.extensions.restapi.RestApiException;
-
-public interface Server {
-  /**
-   * @return Version of server.
-   */
-  String getVersion() throws RestApiException;
-
-  /**
-   * A default implementation which allows source compatibility
-   * when adding new methods to the interface.
-   **/
-  class NotImplemented implements Server {
-    @Override
-    public String getVersion() throws RestApiException {
-      throw new NotImplementedException();
-    }
-  }
+public class MoveInput {
+  public String message;
+  public String destinationBranch;
 }

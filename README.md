@@ -1,7 +1,8 @@
 gerrit-rest-java-client
 ======================
 
-[![Build Status](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
+[![Linux Build](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
+[![Windows Build](https://ci.appveyor.com/api/projects/status/ctm64o74lxdri26s/branch/master?svg=true)](https://ci.appveyor.com/project/uwolfer/gerrit-rest-java-client/branch/master)
 [![Coverage Status](https://img.shields.io/coveralls/uwolfer/gerrit-rest-java-client.svg)](https://coveralls.io/r/uwolfer/gerrit-rest-java-client)
 [![Dependency Status](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client/badge)](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
 
@@ -96,7 +97,7 @@ Please only use the link from github.com/uwolfer/gerrit-intellij-plugin to verif
 Copyright and license
 --------------------
 
-Copyright 2013 - 2015 Urs Wolfer
+Copyright 2013 - 2016 Urs Wolfer
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this work except in compliance with the License.

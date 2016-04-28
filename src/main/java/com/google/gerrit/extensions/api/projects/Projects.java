@@ -18,7 +18,11 @@ import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
 public interface Projects {
   /**
@@ -56,8 +60,8 @@ public interface Projects {
 
   ListRequest list();
 
-  public abstract class ListRequest {
-    public static enum FilterType {
+  abstract class ListRequest {
+    public enum FilterType {
       CODE, PARENT_CANDIDATES, PERMISSIONS, ALL
     }
 
@@ -171,7 +175,7 @@ public interface Projects {
    * A default implementation which allows source compatibility
    * when adding new methods to the interface.
    **/
-  public class NotImplemented implements Projects {
+  class NotImplemented implements Projects {
     @Override
     public ProjectApi name(String name) throws RestApiException {
       throw new NotImplementedException();

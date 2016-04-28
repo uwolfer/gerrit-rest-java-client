@@ -18,14 +18,21 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.client.ProjectState;
+import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.ProjectInfo;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import com.urswolfer.gerrit.client.rest.http.common.ProjectInfoBuilder;
 import org.testng.annotations.Test;
+import org.testng.reporters.Files;
 
+import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -77,5 +84,20 @@ public class ProjectsParserTest extends AbstractParserTest {
             .withDescription("Hello-World project")
             .withState(ProjectState.ACTIVE)
             .get());
+    }
+
+    @Test
+    public void testGenerateProjectInput() throws Exception {
+        ProjectInput projectInput = new ProjectInput();
+        projectInput.name = "MyProject";
+        projectInput.description = "This is a demo project.";
+        projectInput.owners = Collections.singletonList("MyProject-Owners");
+
+        String outputForTesting = projectsParser.generateProjectInput(projectInput);
+
+        ProjectInput parsedJson = new Gson().fromJson(outputForTesting, ProjectInput.class);
+        Truth.assertThat(parsedJson.name).isEqualTo(projectInput.name);
+        Truth.assertThat(parsedJson.description).isEqualTo(projectInput.description);
+        Truth.assertThat(parsedJson.owners).isEqualTo(projectInput.owners);
     }
 }

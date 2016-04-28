@@ -104,7 +104,7 @@ public class RevisionApiRestClientTest {
     @Test(dataProvider = "TestCases")
     public void testSubmit(RevisionApiTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectPost(testCase.submitUrl, "{\"wait_for_merge\":false}")
+                .expectPost(testCase.submitUrl, "{\"wait_for_merge\":false,\"notify\":\"ALL\"}")
                 .expectGetGson()
                 .get();
 
@@ -158,7 +158,7 @@ public class RevisionApiRestClientTest {
     @Test(dataProvider = "TestCases")
     public void testSubmitWithSubmitInput(RevisionApiTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectPost(testCase.submitUrl, "{\"wait_for_merge\":true,\"on_behalf_of\":\"jdoe\"}")
+                .expectPost(testCase.submitUrl, "{\"wait_for_merge\":true,\"on_behalf_of\":\"jdoe\",\"notify\":\"ALL\"}")
                 .expectGetGson()
                 .get();
 

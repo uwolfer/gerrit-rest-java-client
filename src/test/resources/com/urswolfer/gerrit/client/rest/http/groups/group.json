@@ -1,0 +1,12 @@
+)]}'
+{
+  "id": "6a1e70e1a88782771a91808c8af9bbb7a9871389",
+  "name": "Administrators",
+  "url": "#/admin/groups/uuid-6a1e70e1a88782771a91808c8af9bbb7a9871389",
+  "options": {
+  },
+  "description": "Gerrit Site Administrators",
+  "group_id": 1,
+  "owner": "Administrators",
+  "owner_id": "6a1e70e1a88782771a91808c8af9bbb7a9871389"
+}

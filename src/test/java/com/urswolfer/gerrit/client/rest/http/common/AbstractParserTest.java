@@ -30,12 +30,16 @@ import java.net.URL;
  */
 public abstract class AbstractParserTest {
     protected JsonElement getJsonElement(String resourceName) throws Exception {
-        URL url = this.getClass().getResource(resourceName);
-        File file = new File(url.toURI());
+        File file = getFile(resourceName);
         return new JsonParser().parse(new FileReader(file));
     }
 
     protected static Gson getGson() {
         return GsonFactory.create();
+    }
+
+    protected File getFile(String resourceName) throws Exception {
+        URL url = this.getClass().getResource(resourceName);
+        return new File(url.toURI());
     }
 }

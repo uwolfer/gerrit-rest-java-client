@@ -17,7 +17,6 @@
 package com.urswolfer.gerrit.client.rest.http;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.GerritApi;
 import com.google.gerrit.extensions.common.AccountInfo;
@@ -47,6 +46,7 @@ import org.eclipse.jetty.util.security.Credential;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -161,8 +161,8 @@ public class GerritRestClientTest {
     public void testGetCommitMsgHook() throws Exception {
         GerritRestApi gerritClient = getGerritApiWithJettyHost();
         InputStream commitMessageHook = gerritClient.tools().getCommitMessageHook();
-        String result = CharStreams.toString(new InputStreamReader(commitMessageHook, Charsets.UTF_8));
-        Truth.assertThat(result).isEqualTo("dummy-commit-msg-hook\n");
+        String result = new BufferedReader(new InputStreamReader(commitMessageHook, Charsets.UTF_8)).readLine();
+        Truth.assertThat(result).isEqualTo("dummy-commit-msg-hook");
     }
 
     @Test(expectedExceptions = HttpStatusException.class)

@@ -32,7 +32,7 @@ public class DiffPreferencesInfo {
   public static final short[] CONTEXT_CHOICES =
       {3, 10, 25, 50, 75, 100, WHOLE_FILE_CONTEXT};
 
-  public static enum Whitespace {
+  public enum Whitespace {
     IGNORE_NONE,
     IGNORE_TRAILING,
     IGNORE_LEADING_AND_TRAILING,
@@ -60,6 +60,7 @@ public class DiffPreferencesInfo {
   public Whitespace ignoreWhitespace;
   public Boolean retainHeader;
   public Boolean skipDeleted;
+  public Boolean skipUnchanged;
   public Boolean skipUncommented;
 
   public static DiffPreferencesInfo defaults() {
@@ -78,6 +79,7 @@ public class DiffPreferencesInfo {
     i.showTabs = true;
     i.showWhitespaceErrors = true;
     i.skipDeleted = false;
+    i.skipUnchanged = false;
     i.skipUncommented = false;
     i.syntaxHighlighting = true;
     i.hideTopMenu = false;

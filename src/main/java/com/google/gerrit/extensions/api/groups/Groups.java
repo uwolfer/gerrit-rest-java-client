@@ -16,9 +16,15 @@ package com.google.gerrit.extensions.api.groups;
 
 import com.google.gerrit.extensions.client.ListGroupsOption;
 import com.google.gerrit.extensions.common.GroupInfo;
+import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
 
 public interface Groups {
   /**
@@ -46,7 +52,7 @@ public interface Groups {
   /** @return new request for listing groups. */
   ListRequest list();
 
-  public abstract class ListRequest {
+  abstract class ListRequest {
     private final EnumSet<ListGroupsOption> options =
         EnumSet.noneOf(ListGroupsOption.class);
     private final List<String> projects = new ArrayList<String>();
@@ -109,6 +115,11 @@ public interface Groups {
       return this;
     }
 
+    public ListRequest withOwned(boolean owned) {
+      this.owned = owned;
+      return this;
+    }
+
     public ListRequest withLimit(int limit) {
       this.limit = limit;
       return this;
@@ -167,6 +178,32 @@ public interface Groups {
 
     public String getSuggest() {
       return suggest;
+    }
+  }
+
+  /**
+   * A default implementation which allows source compatibility
+   * when adding new methods to the interface.
+   **/
+  class NotImplemented implements Groups {
+    @Override
+    public GroupApi id(String id) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public GroupApi create(String name) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public GroupApi create(GroupInput input) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ListRequest list() {
+      throw new NotImplementedException();
     }
   }
 }

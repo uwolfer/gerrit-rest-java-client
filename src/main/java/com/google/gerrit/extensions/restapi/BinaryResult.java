@@ -14,7 +14,11 @@
 
 package com.google.gerrit.extensions.restapi;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -22,7 +26,7 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.UnsupportedCharsetException;
 
 /**
- * Wrapper around a non-JSON result from a {@link RestView}.
+ * Wrapper around a non-JSON result.
  * <p>
  * Views may return this type to signal they want the server glue to write raw
  * data to the client, instead of attempting automatic conversion to JSON. The
@@ -57,7 +61,7 @@ public abstract class BinaryResult implements Closeable {
   private Charset characterEncoding;
   private long contentLength = -1;
   private boolean gzip = true;
-  private boolean base64 = false;
+  private boolean base64;
   private String attachmentName;
 
   /** @return the MIME type of the result, for HTTP clients. */

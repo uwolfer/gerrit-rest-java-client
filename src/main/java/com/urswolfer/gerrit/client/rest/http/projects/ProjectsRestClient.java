@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.base.Strings;
 import com.google.gerrit.extensions.api.projects.ProjectApi;
+import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.api.projects.Projects;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -89,5 +90,25 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
             return new TreeMap<String, ProjectInfo>();
         }
         return projectsParser.parseProjectInfos(result);
+    }
+
+    @Override
+    public ProjectApi create(String name) throws RestApiException {
+        ProjectInput projectInput = new ProjectInput();
+        projectInput.name = name;
+        return create(projectInput);
+    }
+
+    @Override
+    public ProjectApi create(ProjectInput in) throws RestApiException {
+        if (in.name == null) {
+            throw new IllegalArgumentException("Name must be set in project creation input.");
+        }
+
+        String url = String.format("/projects/%s", in.name);
+        String projectInput = projectsParser.generateProjectInput(in);
+        JsonElement result = gerritRestClient.putRequest(url, projectInput);
+        ProjectInfo info = projectsParser.parseSingleProjectInfo(result);
+        return new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, info.name);
     }
 }

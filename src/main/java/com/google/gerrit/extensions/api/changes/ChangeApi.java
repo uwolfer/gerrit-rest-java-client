@@ -77,6 +77,9 @@ public interface ChangeApi {
   void restore() throws RestApiException;
   void restore(RestoreInput in) throws RestApiException;
 
+  void move(String destination) throws RestApiException;
+  void move(MoveInput in) throws RestApiException;
+
   /**
    * Create a new change that reverts this change.
    *
@@ -154,7 +157,7 @@ public interface ChangeApi {
   ChangeInfo check() throws RestApiException;
   ChangeInfo check(FixInput fix) throws RestApiException;
 
-  public abstract class SuggestedReviewersRequest {
+  abstract class SuggestedReviewersRequest {
     private String query;
     private int limit;
 
@@ -183,7 +186,7 @@ public interface ChangeApi {
    * A default implementation which allows source compatibility
    * when adding new methods to the interface.
    **/
-  public class NotImplemented implements ChangeApi {
+  class NotImplemented implements ChangeApi {
     @Override
     public String id() {
       throw new NotImplementedException();
@@ -226,6 +229,16 @@ public interface ChangeApi {
 
     @Override
     public void restore(RestoreInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void move(String destination) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void move(MoveInput in) throws RestApiException {
       throw new NotImplementedException();
     }
 

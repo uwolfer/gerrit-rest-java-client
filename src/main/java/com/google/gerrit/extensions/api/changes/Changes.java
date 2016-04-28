@@ -16,6 +16,7 @@ package com.google.gerrit.extensions.api.changes;
 
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
@@ -58,12 +59,12 @@ public interface Changes {
   ChangeApi id(String project, String branch, String id)
       throws RestApiException;
 
-  ChangeApi create(ChangeInfo in) throws RestApiException;
+  ChangeApi create(ChangeInput in) throws RestApiException;
 
   QueryRequest query();
   QueryRequest query(String query);
 
-  public abstract class QueryRequest {
+  abstract class QueryRequest {
     private String query;
     private int limit;
     private int start;
@@ -151,7 +152,7 @@ public interface Changes {
    * A default implementation which allows source compatibility
    * when adding new methods to the interface.
    **/
-  public class NotImplemented implements Changes {
+  class NotImplemented implements Changes {
     @Override
     public ChangeApi id(int id) throws RestApiException {
       throw new NotImplementedException();
@@ -168,7 +169,7 @@ public interface Changes {
     }
 
     @Override
-    public ChangeApi create(ChangeInfo in) throws RestApiException {
+    public ChangeApi create(ChangeInput in) throws RestApiException {
       throw new NotImplementedException();
     }
 

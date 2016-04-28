@@ -21,6 +21,7 @@ import com.google.common.base.Suppliers;
 import com.google.gerrit.extensions.api.GerritApi;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.api.config.Config;
+import com.google.gerrit.extensions.api.groups.Groups;
 import com.google.gerrit.extensions.api.projects.Projects;
 import com.urswolfer.gerrit.client.rest.accounts.Accounts;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -30,6 +31,8 @@ import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsRestClient;
 import com.urswolfer.gerrit.client.rest.http.changes.*;
 import com.urswolfer.gerrit.client.rest.http.config.ConfigRestClient;
+import com.urswolfer.gerrit.client.rest.http.groups.GroupsParser;
+import com.urswolfer.gerrit.client.rest.http.groups.GroupsRestClient;
 import com.urswolfer.gerrit.client.rest.http.projects.BranchInfoParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsRestClient;
@@ -42,6 +45,13 @@ import com.urswolfer.gerrit.client.rest.tools.Tools;
  */
 public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRestApi {
     private final GerritRestClient gerritRestClient;
+
+    private final Supplier<GroupsRestClient> groupsRestClient = Suppliers.memoize(new Supplier<GroupsRestClient>() {
+        @Override
+        public GroupsRestClient get() {
+            return new GroupsRestClient(gerritRestClient, new GroupsParser(gerritRestClient.getGson()));
+        }
+    });
 
     private final Supplier<AccountsRestClient> accountsRestClient = Suppliers.memoize(new Supplier<AccountsRestClient>() {
         @Override
@@ -107,6 +117,11 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
     @Override
     public Config config() {
         return configRestClient.get();
+    }
+
+    @Override
+    public Groups groups() {
+        return groupsRestClient.get();
     }
 
     @Override

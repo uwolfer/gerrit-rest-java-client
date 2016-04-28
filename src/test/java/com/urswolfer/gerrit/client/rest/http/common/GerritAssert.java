@@ -59,6 +59,10 @@ public class GerritAssert {
         assertXmlOutputEqual(actual, expected);
     }
 
+    public static void assertEquals(GroupInfo actual, GroupInfo expected) {
+        assertXmlOutputEqual(actual, expected);
+    }
+
     public static void assertEquals(TreeMap<String, List<CommentInfo>> actual, TreeMap<String, List<CommentInfo>> expected) {
         assertXmlOutputEqual(actual, expected);
     }
