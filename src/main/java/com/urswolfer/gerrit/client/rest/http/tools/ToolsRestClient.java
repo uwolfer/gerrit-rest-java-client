@@ -20,7 +20,6 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
 import org.apache.http.HttpResponse;
-import org.apache.http.impl.io.DefaultHttpResponseWriter;
 
 import java.io.IOException;
 import java.io.InputStream;

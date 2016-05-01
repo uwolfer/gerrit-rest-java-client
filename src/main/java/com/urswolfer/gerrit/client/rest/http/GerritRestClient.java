@@ -35,7 +35,6 @@ import org.apache.http.*;
 import org.apache.http.auth.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.cookie.Cookie;
@@ -381,7 +380,7 @@ public class GerritRestClient implements RestClient {
 
         for (HttpClientBuilderExtension httpClientBuilderExtension : httpClientBuilderExtensions) {
             client = httpClientBuilderExtension.extend(client, authData);
-            credentialsProvider = (BasicCredentialsProviderHC4) httpClientBuilderExtension.extendCredentialProvider(client, credentialsProvider, authData);
+            credentialsProvider = httpClientBuilderExtension.extendCredentialProvider(client, credentialsProvider, authData);
         }
 
         return client;
