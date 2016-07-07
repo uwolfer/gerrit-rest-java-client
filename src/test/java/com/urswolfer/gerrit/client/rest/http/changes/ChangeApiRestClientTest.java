@@ -17,6 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
@@ -24,6 +25,7 @@ import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.FixInput;
 import com.google.gerrit.extensions.api.changes.RestoreInput;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -32,6 +34,8 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Thomas Forrer
@@ -262,6 +266,27 @@ public class ChangeApiRestClientTest {
         Truth.assertThat(changeInfo).isSameAs(expectedChangeInfo);
 
         EasyMock.verify(gerritRestClient);
+    }
+    
+    @Test
+    public void testComments() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+                .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/comments", jsonElement)
+                .get();
+
+        TreeMap<String, List<CommentInfo>> expectedCommentInfos = Maps.newTreeMap();
+        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+        EasyMock.expect(commentsParser.parseCommentInfos(jsonElement)).andReturn(expectedCommentInfos).once();
+        EasyMock.replay(commentsParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, commentsParser,
+                null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        Map<String, List<CommentInfo>> commentInfos = changeApiRestClient.comments();
+
+        Truth.assertThat(commentInfos).isSameAs(expectedCommentInfos);
+        EasyMock.verify(gerritRestClient, commentsParser);
     }
 
     private GerritRestClient getGerritRestClient(String expectedRequest, String expectedJson) throws Exception {
