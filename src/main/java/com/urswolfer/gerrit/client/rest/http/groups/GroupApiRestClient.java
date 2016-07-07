@@ -20,6 +20,7 @@ import com.google.gerrit.extensions.api.groups.GroupApi;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.GroupInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
@@ -55,7 +56,7 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
     }
 
     public static String getRequestPath(String id) {
-        return BASE_URL + "/" + id;
+        return BASE_URL + "/" + Url.encode(id);
     }
 
     protected String getRequestPath() {

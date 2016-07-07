@@ -22,6 +22,7 @@ import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.api.projects.Projects;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
@@ -105,7 +106,7 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
             throw new IllegalArgumentException("Name must be set in project creation input.");
         }
 
-        String url = String.format("/projects/%s", in.name);
+        String url = String.format("/projects/%s", Url.encode(in.name));
         String projectInput = projectsParser.generateProjectInput(in);
         JsonElement result = gerritRestClient.putRequest(url, projectInput);
         ProjectInfo info = projectsParser.parseSingleProjectInfo(result);
