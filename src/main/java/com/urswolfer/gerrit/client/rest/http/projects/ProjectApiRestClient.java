@@ -27,6 +27,7 @@ import com.google.gerrit.extensions.api.projects.TagInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
@@ -122,7 +123,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
 
 
     protected String projectsUrl() {
-        return "/projects/" + name;
+        return "/projects/" + Url.encode(name);
     }
 
     private String branchesUrl(ListRefsRequest<BranchInfo> lbr) {
