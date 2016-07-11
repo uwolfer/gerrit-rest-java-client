@@ -25,6 +25,7 @@ import com.google.gerrit.extensions.api.changes.RestoreInput;
 import com.google.gerrit.extensions.api.changes.RevisionApi;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
@@ -206,6 +207,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String json = gerritRestClient.getGson().toJson(in);
         JsonElement jsonElement = gerritRestClient.postRequest(request, json);
         return Iterables.getOnlyElement(changesParser.parseChangeInfos(jsonElement));
+    }
+    
+    @Override
+    public Map<String, List<CommentInfo>> comments() throws RestApiException {
+      String request = getRequestPath() + "/comments";
+      JsonElement jsonElement = gerritRestClient.getRequest(request);
+      return commentsParser.parseCommentInfos(jsonElement);
     }
 
     protected String getRequestPath() {
