@@ -19,6 +19,7 @@ import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.EditInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
+import com.google.gerrit.extensions.common.ReviewerInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
@@ -108,6 +109,7 @@ public interface ChangeApi {
 
   String topic() throws RestApiException;
   void topic(String topic) throws RestApiException;
+  List<ReviewerInfo> listReviewers() throws RestApiException;
 
   void addReviewer(AddReviewerInput in) throws RestApiException;
   void addReviewer(String in) throws RestApiException;
@@ -269,6 +271,11 @@ public interface ChangeApi {
 
     @Override
     public void topic(String topic) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ReviewerInfo> listReviewers() throws RestApiException {
       throw new NotImplementedException();
     }
 
