@@ -28,6 +28,7 @@ import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.ReviewerInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
+import com.google.gerrit.extensions.common.EditInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
@@ -56,7 +57,7 @@ public class ChangeApiRestClientTest {
         EasyMock.replay(reviewerInfoParser);
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null, null,
-            null, reviewerInfoParser,
+            null, reviewerInfoParser, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<ReviewerInfo> listReviewers = changeApiRestClient.listReviewers();
@@ -211,7 +212,7 @@ public class ChangeApiRestClientTest {
         EasyMock.replay(suggestedReviewerInfoParser);
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null, null,
-                suggestedReviewerInfoParser, null,
+                suggestedReviewerInfoParser, null, null,
                 "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J").get();
@@ -234,7 +235,7 @@ public class ChangeApiRestClientTest {
         EasyMock.replay(suggestedReviewerInfoParser);
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null, null,
-                suggestedReviewerInfoParser, null,
+                suggestedReviewerInfoParser, null, null,
                 "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J").withLimit(5).get();
@@ -256,7 +257,7 @@ public class ChangeApiRestClientTest {
         EasyMock.replay(changesParser);
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
-            null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+            null, null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         ChangeInfo changeInfo = changeApiRestClient.check();
         Truth.assertThat(changeInfo).isSameAs(expectedChangeInfo);
@@ -284,7 +285,7 @@ public class ChangeApiRestClientTest {
         EasyMock.replay(changesParser);
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
-            null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+            null, null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         ChangeInfo changeInfo = changeApiRestClient.check(fixInput);
         Truth.assertThat(changeInfo).isSameAs(expectedChangeInfo);
@@ -305,12 +306,33 @@ public class ChangeApiRestClientTest {
         EasyMock.replay(commentsParser);
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, commentsParser,
-                null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+                null, null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         Map<String, List<CommentInfo>> commentInfos = changeApiRestClient.comments();
 
         Truth.assertThat(commentInfos).isSameAs(expectedCommentInfos);
         EasyMock.verify(gerritRestClient, commentsParser);
+    }
+
+    @Test
+    public void testGetEdit() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/edit", jsonElement)
+            .get();
+
+        EditInfo expectedEditInfo = new EditInfo();
+        EditInfoParser editInfoParser = EasyMock.createMock(EditInfoParser.class);
+        EasyMock.expect(editInfoParser.parseEditInfos(jsonElement)).andReturn(Lists.newArrayList(expectedEditInfo)).once();
+        EasyMock.replay(editInfoParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
+            null, null, null, null, editInfoParser, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        EditInfo editInfo = changeApiRestClient.getEdit();
+        Truth.assertThat(editInfo).isSameAs(expectedEditInfo);
+
+        EasyMock.verify(gerritRestClient);
     }
 
     private GerritRestClient getGerritRestClient(String expectedRequest, String expectedJson) throws Exception {
@@ -328,6 +350,7 @@ public class ChangeApiRestClientTest {
                 EasyMock.createMock(FileInfoParser.class),
                 EasyMock.createMock(DiffInfoParser.class),
                 null,
-                EasyMock.createMock(ReviewerInfoParser.class));
+                EasyMock.createMock(ReviewerInfoParser.class),
+                EasyMock.createMock(EditInfoParser.class));
     }
 }

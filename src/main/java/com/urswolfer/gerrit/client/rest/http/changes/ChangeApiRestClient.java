@@ -28,6 +28,7 @@ import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.ReviewerInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
+import com.google.gerrit.extensions.common.EditInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
@@ -51,6 +52,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final DiffInfoParser diffInfoParser;
     private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
     private final ReviewerInfoParser reviewerInfoParser;
+    private final EditInfoParser editInfoParser;
     private final String id;
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
@@ -61,6 +63,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                DiffInfoParser diffInfoParser,
                                SuggestedReviewerInfoParser suggestedReviewerInfoParser,
                                ReviewerInfoParser reviewerInfoParser,
+                               EditInfoParser editInfoParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
@@ -70,6 +73,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.diffInfoParser = diffInfoParser;
         this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
         this.reviewerInfoParser = reviewerInfoParser;
+        this.editInfoParser = editInfoParser;
         this.id = id;
     }
 
@@ -203,6 +207,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     @Override
     public ChangeInfo info() throws RestApiException {
         return get(EnumSet.noneOf(ListChangesOption.class));
+    }
+
+    @Override
+    public EditInfo getEdit() throws RestApiException {
+        String request = getRequestPath() + "/edit";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return Iterables.getOnlyElement(editInfoParser.parseEditInfos(jsonElement));
     }
 
     @Override

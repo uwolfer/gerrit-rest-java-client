@@ -276,7 +276,8 @@ public class RevisionApiRestClientTest {
         FileInfoParser fileInfoParser = EasyMock.createMock(FileInfoParser.class);
         DiffInfoParser diffInfoParser = EasyMock.createMock(DiffInfoParser.class);
         ReviewerInfoParser reviewerInfoParser = EasyMock.createMock(ReviewerInfoParser.class);
-        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser);
+        EditInfoParser editInfoParser = EasyMock.createMock(EditInfoParser.class);
+        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser);
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
@@ -287,7 +288,8 @@ public class RevisionApiRestClientTest {
                 EasyMock.createMock(FileInfoParser.class),
                 EasyMock.createMock(DiffInfoParser.class),
                 null,
-                EasyMock.createMock(ReviewerInfoParser.class));
+                EasyMock.createMock(ReviewerInfoParser.class),
+                EasyMock.createMock(EditInfoParser.class));
     }
 
     private static RevisionApiTestCase withRevision(String revision) {
