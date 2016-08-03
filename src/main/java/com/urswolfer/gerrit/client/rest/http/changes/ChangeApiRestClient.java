@@ -22,6 +22,8 @@ import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.FixInput;
 import com.google.gerrit.extensions.api.changes.RestoreInput;
+import com.google.gerrit.extensions.api.changes.MoveInput;
+import com.google.gerrit.extensions.api.changes.RevertInput;
 import com.google.gerrit.extensions.api.changes.RevisionApi;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
@@ -119,6 +121,42 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String request = getRequestPath() + "/restore";
         String json = gerritRestClient.getGson().toJson(restoreInput);
         gerritRestClient.postRequest(request, json);
+    }
+
+    @Override
+    public void move(String destinationBranch) throws RestApiException {
+        MoveInput moveInput = new MoveInput();
+        moveInput.destinationBranch = destinationBranch;
+        move(moveInput);
+    }
+
+    @Override
+    public void move(MoveInput moveInput) throws RestApiException {
+        String request = getRequestPath() + "/move";
+        String json = gerritRestClient.getGson().toJson(moveInput);
+        gerritRestClient.postRequest(request, json);
+    }
+
+    @Override
+    public ChangeApi revert() throws RestApiException {
+        return revert(new RevertInput());
+    }
+
+    @Override
+    public ChangeApi revert(RevertInput revertInput) throws RestApiException {
+        String request = getRequestPath() + "/revert";
+        String json = gerritRestClient.getGson().toJson(revertInput);
+        gerritRestClient.postRequest(request, json);
+        return new ChangeApiRestClient(gerritRestClient,
+            changesRestClient,
+            changesParser,
+            commentsParser,
+            fileInfoParser,
+            diffInfoParser,
+            suggestedReviewerInfoParser,
+            reviewerInfoParser,
+            editInfoParser,
+            id);
     }
 
     @Override
