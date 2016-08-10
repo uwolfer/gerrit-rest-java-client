@@ -24,6 +24,8 @@ import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.FixInput;
 import com.google.gerrit.extensions.api.changes.RestoreInput;
+import com.google.gerrit.extensions.api.changes.RevertInput;
+import com.google.gerrit.extensions.api.changes.MoveInput;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.ReviewerInfo;
@@ -194,6 +196,59 @@ public class ChangeApiRestClientTest {
         RestoreInput restoreInput = new RestoreInput();
         restoreInput.message = "Reviving this change.";
         changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").restore(restoreInput);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testMove() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+            "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/move",
+            "{\"destination_branch\":\"destination_branch\"}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").move("destination_branch");
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testMoveWithMessage() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+            "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/move",
+            "{\"message\":\"Move to desination_branch\",\"destination_branch\":\"destination_branch\"}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        MoveInput moveInput = new MoveInput();
+        moveInput.destinationBranch = "destination_branch";
+        moveInput.message = "Move to desination_branch";
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").move(moveInput);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testRevertChange() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+            "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revert",
+            "{}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").revert();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testRevertChangeWithMessage() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+            "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revert",
+            "{\"message\":\"Change need revert.\"}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        RevertInput revertInput = new RevertInput();
+        revertInput.message = "Change need revert.";
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").revert(revertInput);
 
         EasyMock.verify(gerritRestClient);
     }
