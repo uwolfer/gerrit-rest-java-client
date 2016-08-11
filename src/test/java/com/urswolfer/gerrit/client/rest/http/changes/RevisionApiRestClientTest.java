@@ -18,11 +18,15 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.api.changes.CherryPickInput;
 import com.google.gerrit.extensions.api.changes.ReviewInput;
 import com.google.gerrit.extensions.api.changes.SubmitInput;
+import com.google.gerrit.extensions.client.SubmitType;
+import com.google.gerrit.extensions.common.TestSubmitRuleInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
@@ -39,7 +43,7 @@ import java.util.Iterator;
 /**
  * @author Thomas Forrer
  */
-public class RevisionApiRestClientTest {
+public class RevisionApiRestClientTest extends AbstractParserTest {
 
     private static final String CHANGE_ID = "packages%2Ftest~master~Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df";
     private static final String FILE_PATH = "src/main/README.md";
@@ -53,22 +57,28 @@ public class RevisionApiRestClientTest {
                         .expectReviewUrl("/changes/" + CHANGE_ID + "/revisions/current/review")
                         .expectSubmitUrl("/changes/" + CHANGE_ID + "/submit")
                         .expectPublishUrl("/changes/" + CHANGE_ID + "/revisions/current/publish")
+                        .expectCherryPickUrl("/changes/" + CHANGE_ID + "/revisions/current/cherrypick")
                         .expectRebaseUrl("/changes/" + CHANGE_ID + "/revisions/current/rebase")
                         .expectGetFileUrl("/changes/" + CHANGE_ID + "/revisions/current/files")
                         .expectFileReviewedUrl("/changes/" + CHANGE_ID + "/revisions/current/files/" + FILE_PATH_ENCODED + "/reviewed")
                         .expectGetCommentsUrl("/changes/" + CHANGE_ID + "/revisions/current/comments/")
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/current/drafts/")
+                        .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/submit_type")
+                        .expectTestSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/test.submit_type")
                         .get(),
                 withRevision("3")
                         .expectRevisionUrl("/changes/" + CHANGE_ID + "/revisions/3")
                         .expectReviewUrl("/changes/" + CHANGE_ID + "/revisions/3/review")
                         .expectSubmitUrl("/changes/" + CHANGE_ID + "/submit")
                         .expectPublishUrl("/changes/" + CHANGE_ID + "/revisions/3/publish")
+                        .expectCherryPickUrl("/changes/" + CHANGE_ID + "/revisions/3/cherrypick")
                         .expectRebaseUrl("/changes/" + CHANGE_ID + "/revisions/3/rebase")
                         .expectGetFileUrl("/changes/" + CHANGE_ID + "/revisions/3/files")
                         .expectFileReviewedUrl("/changes/" + CHANGE_ID + "/revisions/3/files/" + FILE_PATH_ENCODED + "/reviewed")
                         .expectGetCommentsUrl("/changes/" + CHANGE_ID + "/revisions/3/comments/")
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/3/drafts/")
+                        .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/submit_type")
+                        .expectTestSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/test.submit_type")
                         .get()
         ).iterator();
     }
@@ -137,6 +147,23 @@ public class RevisionApiRestClientTest {
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).publish();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test(dataProvider = "TestCases")
+    public void testCherryPick(RevisionApiTestCase testCase) throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPost(testCase.cherryPickUrl,
+                "{\"message\":\"Implementing Feature X\",\"destination\":\"release-branch\"}")
+            .expectGetGson()
+            .get();
+
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        CherryPickInput cherryPickInput = new CherryPickInput();
+        cherryPickInput.message = "Implementing Feature X";
+        cherryPickInput.destination = "release-branch";
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).cherryPick(cherryPickInput);
 
         EasyMock.verify(gerritRestClient);
     }
@@ -270,6 +297,38 @@ public class RevisionApiRestClientTest {
         }
     }
 
+    @Test(dataProvider = "TestCases")
+    public void testSubmitType(RevisionApiTestCase testCase) throws Exception {
+        JsonElement jsonElement = getJsonElement("submittype.json");
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet(testCase.submitTypeUrl, jsonElement)
+            .expectGetGson()
+            .get();
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        SubmitType expectSubmitType = changesRestClient.id(CHANGE_ID).revision(testCase.revision).submitType();
+
+        Truth.assertThat(expectSubmitType.equals(SubmitType.MERGE_IF_NECESSARY));
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test(dataProvider = "TestCases")
+    public void testTestSubmitType(RevisionApiTestCase testCase) throws Exception {
+        JsonElement jsonElement = getJsonElement("testsubmittype.json");
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPost(testCase.testSubmitTypeUrl, "{\"rule\":\"submit_type(cherry_pick)\",\"filters\":\"SKIP\"}", jsonElement)
+            .expectGetGson()
+            .expectGetGson()
+            .get();
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        TestSubmitRuleInput testSubmitRuleInput = new TestSubmitRuleInput();
+        testSubmitRuleInput.filters = TestSubmitRuleInput.Filters.SKIP;
+        testSubmitRuleInput.rule = "submit_type(cherry_pick)";
+        SubmitType expectSubmitType = changesRestClient.id(CHANGE_ID).revision(testCase.revision).testSubmitType(testSubmitRuleInput);
+
+        Truth.assertThat(expectSubmitType.equals(SubmitType.CHERRY_PICK));
+        EasyMock.verify(gerritRestClient);
+    }
+
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
@@ -302,11 +361,14 @@ public class RevisionApiRestClientTest {
         private String reviewUrl;
         private String submitUrl;
         private String publishUrl;
+        private String cherryPickUrl;
         private String rebaseUrl;
         private String fileUrl;
         private String fileReviewedUrl;
         private String getCommentsUrl;
         private String getDraftsUrl;
+        private String submitTypeUrl;
+        private String testSubmitTypeUrl;
 
         private RevisionApiTestCase(String revision) {
             this.revision = revision;
@@ -332,6 +394,11 @@ public class RevisionApiRestClientTest {
             return this;
         }
 
+        private RevisionApiTestCase expectCherryPickUrl(String cherryPickUrl) {
+            this.cherryPickUrl = cherryPickUrl;
+            return this;
+        }
+
         private RevisionApiTestCase expectRebaseUrl(String rebaseUrl) {
             this.rebaseUrl = rebaseUrl;
             return this;
@@ -354,6 +421,16 @@ public class RevisionApiRestClientTest {
 
         private RevisionApiTestCase expectGetDraftsUrl(String getDraftsUrl) {
             this.getDraftsUrl = getDraftsUrl;
+            return this;
+        }
+
+        private RevisionApiTestCase expectSubmitTypeUrl(String submitTypeUrl) {
+            this.submitTypeUrl = submitTypeUrl;
+            return this;
+        }
+
+        private RevisionApiTestCase expectTestSubmitTypeUrl(String testSubmitTypeUrl) {
+            this.testSubmitTypeUrl = testSubmitTypeUrl;
             return this;
         }
 
