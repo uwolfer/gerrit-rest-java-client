@@ -78,6 +78,11 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         gerritRestClient.postRequest(request, json);
     }
 
+    // for verify-status-reporter plugin
+    public VerifyStatusApi verifyStatus() throws RestApiException {
+        return new VerifyStatusApiRestClient(gerritRestClient, this);
+    }
+
     @Override
     public void submit() throws RestApiException {
         submit(new SubmitInput());
