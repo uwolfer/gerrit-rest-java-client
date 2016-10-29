@@ -14,6 +14,8 @@
 
 package com.google.gerrit.extensions.api.projects;
 
+import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
+import com.google.gerrit.extensions.api.access.ProjectAccessInput;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -26,10 +28,18 @@ public interface ProjectApi {
   ProjectInfo get() throws RestApiException;
 
   String description() throws RestApiException;
-  void description(PutDescriptionInput in) throws RestApiException;
+  void description(DescriptionInput in) throws RestApiException;
+
+  ProjectAccessInfo access() throws RestApiException;
+  ProjectAccessInfo access(ProjectAccessInput p) throws RestApiException;
+
+  ConfigInfo config() throws RestApiException;
+  ConfigInfo config(ConfigInput in) throws RestApiException;
 
   ListRefsRequest<BranchInfo> branches();
   ListRefsRequest<TagInfo> tags();
+
+  void deleteBranches(DeleteBranchesInput in) throws RestApiException;
 
   abstract class ListRefsRequest<T extends RefInfo> {
     protected int limit;
@@ -130,7 +140,28 @@ public interface ProjectApi {
     }
 
     @Override
-    public void description(PutDescriptionInput in)
+    public ProjectAccessInfo access() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ConfigInfo config() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ConfigInfo config(ConfigInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ProjectAccessInfo access(ProjectAccessInput p)
+      throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void description(DescriptionInput in)
         throws RestApiException {
       throw new NotImplementedException();
     }
@@ -167,6 +198,11 @@ public interface ProjectApi {
 
     @Override
     public TagApi tag(String ref) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void deleteBranches(DeleteBranchesInput in) throws RestApiException {
       throw new NotImplementedException();
     }
   }

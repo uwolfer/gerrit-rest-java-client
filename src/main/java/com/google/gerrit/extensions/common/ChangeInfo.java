@@ -28,6 +28,7 @@ public class ChangeInfo {
   public String project;
   public String branch;
   public String topic;
+  public AccountInfo assignee;
   public Collection<String> hashtags;
   public String changeId;
   public String subject;
@@ -36,6 +37,7 @@ public class ChangeInfo {
   public Timestamp updated;
   public Timestamp submitted;
   public Boolean starred;
+  public Collection<String> stars;
   public Boolean reviewed;
   public SubmitType submitType;
   public Boolean mergeable;
@@ -43,7 +45,6 @@ public class ChangeInfo {
   public Integer insertions;
   public Integer deletions;
 
-  public String baseChange;
   public int _number;
 
   public AccountInfo owner;
@@ -53,6 +54,7 @@ public class ChangeInfo {
   public Map<String, Collection<String>> permittedLabels;
   public Collection<AccountInfo> removableReviewers;
   public Map<ReviewerState, Collection<AccountInfo>> reviewers;
+  public Collection<ReviewerUpdateInfo> reviewerUpdates;
   public Collection<ChangeMessageInfo> messages;
 
   public String currentRevision;

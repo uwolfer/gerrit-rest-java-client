@@ -83,6 +83,25 @@ public class GeneralPreferencesInfo {
     DISABLED
   }
 
+  public enum DefaultBase {
+    AUTO_MERGE(null),
+    FIRST_PARENT(-1);
+
+    private final String base;
+
+    DefaultBase(String base) {
+      this.base = base;
+    }
+
+    DefaultBase(int base) {
+      this(Integer.toString(base));
+    }
+
+    public String getBase() {
+      return base;
+    }
+  }
+
   public enum TimeFormat {
     /** 12-hour clock: 1:15 am, 2:13 pm */
     HHMM_12("h:mm a"),
@@ -113,6 +132,7 @@ public class GeneralPreferencesInfo {
   public DownloadCommand downloadCommand;
   public DateFormat dateFormat;
   public TimeFormat timeFormat;
+  public Boolean highlightAssigneeInChangeTable;
   public Boolean relativeDateInChangeTable;
   public DiffView diffView;
   public Boolean sizeBarInChangeTable;
@@ -123,6 +143,7 @@ public class GeneralPreferencesInfo {
   public List<MenuItem> my;
   public Map<String, String> urlAliases;
   public EmailStrategy emailStrategy;
+  public DefaultBase defaultBaseForMerges;
 
   public boolean isShowInfoInReviewCategory() {
     return getReviewCategoryStrategy() != ReviewCategoryStrategy.NONE;
@@ -174,12 +195,14 @@ public class GeneralPreferencesInfo {
     p.downloadCommand = DownloadCommand.CHECKOUT;
     p.dateFormat = DateFormat.STD;
     p.timeFormat = TimeFormat.HHMM_12;
+    p.highlightAssigneeInChangeTable = true;
     p.relativeDateInChangeTable = false;
     p.diffView = DiffView.SIDE_BY_SIDE;
     p.sizeBarInChangeTable = true;
     p.legacycidInChangeTable = false;
     p.muteCommonPathPrefixes = true;
     p.signedOffBy = false;
+    p.defaultBaseForMerges = DefaultBase.FIRST_PARENT;
     return p;
   }
 }

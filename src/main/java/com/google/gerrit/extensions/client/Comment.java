@@ -14,6 +14,8 @@
 
 package com.google.gerrit.extensions.client;
 
+import com.google.common.base.Objects;
+
 import java.sql.Timestamp;
 
 public abstract class Comment {
@@ -27,6 +29,7 @@ public abstract class Comment {
   public String id;
   public String path;
   public Side side;
+  public Integer parent;
   public Integer line;
   public Range range;
   public String inReplyTo;
@@ -38,5 +41,56 @@ public abstract class Comment {
     public int startCharacter;
     public int endLine;
     public int endCharacter;
+
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof Range) {
+        Range r = (Range) o;
+        return Objects.equal(startLine, r.startLine)
+            && Objects.equal(startCharacter, r.startCharacter)
+            && Objects.equal(endLine, r.endLine)
+            && Objects.equal(endCharacter, r.endCharacter);
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(startLine, startCharacter, endLine, endCharacter);
+    }
+  }
+
+  public short side() {
+    if (side == Side.PARENT) {
+      return (short) (parent == null ? 0 : -parent.shortValue());
+    }
+    return 1;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o != null && getClass() == o.getClass()) {
+      Comment c = (Comment) o;
+      return Objects.equal(patchSet, c.patchSet)
+          && Objects.equal(id, c.id)
+          && Objects.equal(path, c.path)
+          && Objects.equal(side, c.side)
+          && Objects.equal(parent, c.parent)
+          && Objects.equal(line, c.line)
+          && Objects.equal(range, c.range)
+          && Objects.equal(inReplyTo, c.inReplyTo)
+          && Objects.equal(updated, c.updated)
+          && Objects.equal(message, c.message);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(patchSet, id, path, side, parent, line, range,
+        inReplyTo, updated, message);
   }
 }

@@ -14,6 +14,8 @@
 
 package com.google.gerrit.extensions.common;
 
+import com.google.common.base.Objects;
+
 public class ProblemInfo {
   public enum Status {
     FIXED, FIX_FAILED
@@ -22,6 +24,22 @@ public class ProblemInfo {
   public String message;
   public Status status;
   public String outcome;
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(message, status, outcome);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof ProblemInfo)) {
+      return false;
+    }
+    ProblemInfo p = (ProblemInfo) o;
+    return Objects.equal(message, p.message)
+        && Objects.equal(status, p.status)
+        && Objects.equal(outcome, p.outcome);
+  }
 
   @Override
   public String toString() {

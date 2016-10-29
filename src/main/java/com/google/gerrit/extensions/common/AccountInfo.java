@@ -20,8 +20,10 @@ public class AccountInfo {
   public Integer _accountId;
   public String name;
   public String email;
+  public List<String> secondaryEmails;
   public String username;
   public List<AvatarInfo> avatars;
+  public Boolean _moreAccounts;
 
   public AccountInfo(Integer id) {
     this._accountId = id;

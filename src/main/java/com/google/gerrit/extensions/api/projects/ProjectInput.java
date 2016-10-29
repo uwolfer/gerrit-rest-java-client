@@ -36,9 +36,4 @@ public class ProjectInput {
   public InheritableBoolean createNewChangeForAllNotInTarget;
   public String maxObjectSizeLimit;
   public Map<String, Map<String, ConfigValue>> pluginConfigValues;
-
-  public static class ConfigValue {
-    public String value;
-    public List<String> values;
-  }
 }

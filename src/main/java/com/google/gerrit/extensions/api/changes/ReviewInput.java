@@ -14,9 +14,13 @@
 
 package com.google.gerrit.extensions.api.changes;
 
+import static com.google.gerrit.extensions.client.ReviewerState.REVIEWER;
+
 import com.google.gerrit.extensions.client.Comment;
+import com.google.gerrit.extensions.client.ReviewerState;
 import com.google.gerrit.extensions.restapi.DefaultInput;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +34,7 @@ public class ReviewInput {
 
   public Map<String, Short> labels;
   public Map<String, List<CommentInput>> comments;
+  public Map<String, List<RobotCommentInput>> robotComments;
 
   /**
    * If true require all labels to be within the user's permitted ranges based
@@ -44,8 +49,11 @@ public class ReviewInput {
   /**
    * How to process draft comments already in the database that were not also
    * described in this input request.
+   * <p>
+   * Defaults to DELETE, unless {@link #onBehalfOf} is set, in which case it
+   * defaults to KEEP and any other value is disallowed.
    */
-  public DraftHandling drafts = DraftHandling.DELETE;
+  public DraftHandling drafts;
 
   /** Who to send email notifications to after review is stored. */
   public NotifyHandling notify = NotifyHandling.ALL;
@@ -68,6 +76,11 @@ public class ReviewInput {
    */
   public String onBehalfOf;
 
+  /**
+   * Reviewers that should be added to this change.
+   */
+  public List<AddReviewerInput> reviewers;
+
   public enum DraftHandling {
     /** Delete pending drafts on this revision only. */
     DELETE,
@@ -82,11 +95,14 @@ public class ReviewInput {
     PUBLISH_ALL_REVISIONS
   }
 
-  public enum NotifyHandling {
-    NONE, OWNER, OWNER_REVIEWERS, ALL
+  public static class CommentInput extends Comment {
   }
 
-  public static class CommentInput extends Comment {
+  public static class RobotCommentInput extends CommentInput {
+    public String robotId;
+    public String robotRunId;
+    public String url;
+    public Map<String, String> properties;
   }
 
   public ReviewInput message(String msg) {
@@ -116,12 +132,33 @@ public class ReviewInput {
     return label(name, (short) 1);
   }
 
+  public ReviewInput reviewer(String reviewer) {
+    return reviewer(reviewer, REVIEWER, false);
+  }
+
+  public ReviewInput reviewer(String reviewer, ReviewerState state,
+      boolean confirmed) {
+    AddReviewerInput input = new AddReviewerInput();
+    input.reviewer = reviewer;
+    input.state = state;
+    input.confirmed = confirmed;
+    if (reviewers == null) {
+      reviewers = new ArrayList<AddReviewerInput>();
+    }
+    reviewers.add(input);
+    return this;
+  }
+
   public static ReviewInput recommend() {
     return new ReviewInput().label("Code-Review", 1);
   }
 
   public static ReviewInput dislike() {
     return new ReviewInput().label("Code-Review", -1);
+  }
+
+  public static ReviewInput noScore() {
+    return new ReviewInput().label("Code-Review", 0);
   }
 
   public static ReviewInput approve() {
