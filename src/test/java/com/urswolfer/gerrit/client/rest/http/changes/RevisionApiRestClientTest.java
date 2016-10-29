@@ -88,7 +88,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectPost(
                         testCase.reviewUrl,
-                        "{\"message\":\"Looks good!\",\"labels\":{\"Code-Review\":2},\"strict_labels\":true,\"drafts\":\"DELETE\",\"notify\":\"ALL\",\"omit_duplicate_comments\":false}"
+                        "{\"message\":\"Looks good!\",\"labels\":{\"Code-Review\":2},\"strict_labels\":true,\"notify\":\"ALL\",\"omit_duplicate_comments\":false}"
                 )
                 .expectGetGson()
                 .get();

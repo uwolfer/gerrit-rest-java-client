@@ -152,7 +152,7 @@ public class ChangeApiRestClientTest {
     public void testAbandonChange() throws Exception {
         GerritRestClient gerritRestClient = getGerritRestClient(
                 "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/abandon",
-                "{}"
+                "{\"notify\":\"ALL\"}"
         );
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
         changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").abandon();
@@ -164,7 +164,7 @@ public class ChangeApiRestClientTest {
     public void testAbandonChangeWithMessage() throws Exception {
         GerritRestClient gerritRestClient = getGerritRestClient(
                 "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/abandon",
-                "{\"message\":\"Change not necessary.\"}"
+                "{\"message\":\"Change not necessary.\",\"notify\":\"ALL\"}"
         );
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
         AbandonInput abandonInput = new AbandonInput();
