@@ -16,8 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.common;
 
-import com.google.common.base.Throwables;
-
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,7 +37,7 @@ public class AbstractBuilder {
             Date parse = DATE_FORMAT.parse(timestamp);
             return new Timestamp(parse.getTime());
         } catch (ParseException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 }
