@@ -1,6 +1,7 @@
 #!/usr/bin/env groovy
 
-@Grab(group = 'com.urswolfer.gerrit.client.rest', module = 'gerrit-rest-java-client', version = '0.8.5')
+@Grab(group = 'com.urswolfer.gerrit.client.rest', module = 'gerrit-rest-java-client', version = '0.8.8')
+
 import com.google.gerrit.extensions.api.GerritApi
 import com.google.gerrit.extensions.common.ChangeInfo
 import com.urswolfer.gerrit.client.rest.GerritAuthData
