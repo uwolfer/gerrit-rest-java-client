@@ -14,12 +14,10 @@
 
 package com.google.gwtorm.server;
 
-import com.google.gwtorm.client.KeyUtil.Encoder;
-
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
-public class StandardKeyEncoder extends Encoder {
+public class StandardKeyEncoder {
   private static final char[] hexc =
       {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
           'E', 'F'};
@@ -56,8 +54,7 @@ public class StandardKeyEncoder extends Encoder {
       hexb[i] = (byte) ((i - 'a') + 10);
   }
 
-  @Override
-  public String encode(final String e) {
+  public static String encode(final String e) {
     final byte[] b;
     try {
       b = e.getBytes("UTF-8");
@@ -80,8 +77,7 @@ public class StandardKeyEncoder extends Encoder {
     return r.toString();
   }
 
-  @Override
-  public String decode(final String e) {
+  public static String decode(final String e) {
     if (e.indexOf('%') < 0) {
       return e.replace('+', ' ');
     }

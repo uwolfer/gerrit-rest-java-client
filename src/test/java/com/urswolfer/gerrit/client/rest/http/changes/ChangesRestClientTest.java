@@ -78,7 +78,10 @@ public class ChangesRestClientTest {
                                 .withLimit(10)
                                 .withOption(ListChangesOption.CURRENT_FILES)
                                 .withStart(30)
-                ).expectUrl("/changes/?q=is:open&n=10&S=30&o=CURRENT_FILES")
+                ).expectUrl("/changes/?q=is:open&n=10&S=30&o=CURRENT_FILES"),
+                queryParameter(
+                    new TestQueryRequest().withQuery("is:merged is:watched").encode()
+                ).expectUrl("/changes/?q=is%3Amerged+is%3Awatched")
         ), WRAP_IN_ARRAY_FUNCTION).iterator();
     }
 
@@ -196,6 +199,7 @@ public class ChangesRestClientTest {
 
     private static final class TestQueryRequest {
         private String query = null;
+        private boolean encode = false;
         private Integer limit = null;
         private Integer start = null;
         private String sortkey = null;
@@ -203,6 +207,11 @@ public class ChangesRestClientTest {
 
         public TestQueryRequest withQuery(String query) {
             this.query = query;
+            return this;
+        }
+
+        public TestQueryRequest encode() {
+            encode = true;
             return this;
         }
 
@@ -229,6 +238,9 @@ public class ChangesRestClientTest {
         public Changes.QueryRequest apply(Changes.QueryRequest queryRequest) {
             if (query != null) {
                 queryRequest.withQuery(query);
+            }
+            if (encode) {
+                queryRequest.encode();
             }
             if (limit != null) {
                 queryRequest.withLimit(limit);

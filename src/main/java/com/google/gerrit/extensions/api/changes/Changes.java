@@ -19,6 +19,7 @@ import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gwtorm.server.StandardKeyEncoder;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -75,6 +76,11 @@ public interface Changes {
 
     public QueryRequest withQuery(String query) {
       this.query = query;
+      return this;
+    }
+
+    public QueryRequest encode() {
+      query = StandardKeyEncoder.encode(query);
       return this;
     }
 
