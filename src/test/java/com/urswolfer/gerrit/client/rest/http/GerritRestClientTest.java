@@ -26,7 +26,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
 import com.urswolfer.gerrit.client.rest.GerritRestApi;
 import com.urswolfer.gerrit.client.rest.GerritRestApiFactory;
-import org.apache.http.impl.client.BasicCredentialsProviderHC4;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -254,7 +254,7 @@ public class GerritRestClientTest {
             }
 
             @Override
-            public BasicCredentialsProviderHC4 extendCredentialProvider(HttpClientBuilder httpClientBuilder, BasicCredentialsProviderHC4 credentialsProvider, GerritAuthData authData) {
+            public BasicCredentialsProvider extendCredentialProvider(HttpClientBuilder httpClientBuilder, BasicCredentialsProvider credentialsProvider, GerritAuthData authData) {
                 extendCredentialProviderCalled[0] = true;
                 return super.extendCredentialProvider(httpClientBuilder, credentialsProvider, authData);
             }
