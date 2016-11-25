@@ -1,19 +1,11 @@
 environment:
-  MVN_VERSION: 3.3.9
+  MVN_VERSION: 3.3.9.1
 
 install:
-  - ps: |
-      Add-Type -AssemblyName System.IO.Compression.FileSystem
-      if (!(Test-Path -Path "C:\maven" )) {
-        (New-Object 'System.Net.WebClient').DownloadFile("http://www.us.apache.org/dist/maven/maven-3/$($env:MVN_VERSION)/binaries/apache-maven-$($env:MVN_VERSION)-bin.zip", "C:\maven-bin.zip")
-        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
-      }
-  - set PATH=C:\maven\apache-maven-%MVN_VERSION%\bin;%PATH%
-  - cmd: mvn --version
-  - cmd: java -version
+  - cinst maven --version=%MVN_VERSION% -y
+  - set PATH=C:\tools\apache-maven-%MVN_VERSION%\bin;%PATH%
 
 cache:
-  - C:\maven\
   - C:\Users\appveyor\.m2\repository -> pom.xml
 
 build_script:
