@@ -1,5 +1,5 @@
 environment:
-  MVN_VERSION: 3.3.3
+  MVN_VERSION: 3.3.9.1
 
 install:
   - cinst maven --version=%MVN_VERSION% -y
