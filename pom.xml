@@ -126,6 +126,7 @@
           <instrumentation>
             <excludes>
               <exclude>com/google/gerrit/extensions/**/*.class</exclude>
+              <exclude>com/google/gwtorm/**/*.class</exclude>
             </excludes>
           </instrumentation>
           <formats>
