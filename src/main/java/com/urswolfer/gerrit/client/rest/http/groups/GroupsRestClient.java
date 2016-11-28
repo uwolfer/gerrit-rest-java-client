@@ -23,6 +23,7 @@ import com.google.gerrit.extensions.api.groups.Groups;
 import com.google.gerrit.extensions.common.GroupInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
@@ -59,7 +60,7 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
 
     @Override
     public GroupApi create(GroupInput input) throws RestApiException {
-        String restPath = GroupApiRestClient.getBaseRequestPath() + "/" + input.name;
+        String restPath = GroupApiRestClient.getBaseRequestPath() + "/" + Url.encode(input.name);
         String body = gerritRestClient.getGson().toJson(input);
         JsonElement result = gerritRestClient.putRequest(restPath, body);
         GroupInfo info = groupsParser.parseGroupInfo(result);

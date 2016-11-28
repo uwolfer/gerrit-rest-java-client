@@ -1,0 +1,22 @@
+)]}'
+[
+    {
+        "approvals": {
+            "Verified": "+1",
+            "Code-Review": "+2"
+        },
+        "_account_id": 1000096,
+        "name": "John Doe",
+        "email": "john.doe@example.com"
+    },
+    {
+        "approvals": {
+            "Verified": "0",
+            "Code-Review": "+1",
+            "My-Own-Label": "-2"
+        },
+        "_account_id": 1000097,
+        "name": "Jane Roe",
+        "email": "jane.roe@example.com"
+    }
+]

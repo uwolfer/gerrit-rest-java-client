@@ -19,5 +19,6 @@ import com.google.gerrit.extensions.restapi.DefaultInput;
 public class AbandonInput {
   @DefaultInput
   public String message;
+  public NotifyHandling notify = NotifyHandling.ALL;
 }
 

@@ -22,10 +22,15 @@ import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.FixInput;
 import com.google.gerrit.extensions.api.changes.RestoreInput;
+import com.google.gerrit.extensions.api.changes.MoveInput;
+import com.google.gerrit.extensions.api.changes.RevertInput;
 import com.google.gerrit.extensions.api.changes.RevisionApi;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.CommentInfo;
+import com.google.gerrit.extensions.common.ReviewerInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
+import com.google.gerrit.extensions.common.EditInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
@@ -48,6 +53,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
     private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
+    private final ReviewerInfoParser reviewerInfoParser;
+    private final EditInfoParser editInfoParser;
     private final String id;
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
@@ -57,6 +64,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                FileInfoParser fileInfoParser,
                                DiffInfoParser diffInfoParser,
                                SuggestedReviewerInfoParser suggestedReviewerInfoParser,
+                               ReviewerInfoParser reviewerInfoParser,
+                               EditInfoParser editInfoParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
@@ -65,6 +74,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
         this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
+        this.reviewerInfoParser = reviewerInfoParser;
+        this.editInfoParser = editInfoParser;
         this.id = id;
     }
 
@@ -113,6 +124,42 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public void move(String destinationBranch) throws RestApiException {
+        MoveInput moveInput = new MoveInput();
+        moveInput.destinationBranch = destinationBranch;
+        move(moveInput);
+    }
+
+    @Override
+    public void move(MoveInput moveInput) throws RestApiException {
+        String request = getRequestPath() + "/move";
+        String json = gerritRestClient.getGson().toJson(moveInput);
+        gerritRestClient.postRequest(request, json);
+    }
+
+    @Override
+    public ChangeApi revert() throws RestApiException {
+        return revert(new RevertInput());
+    }
+
+    @Override
+    public ChangeApi revert(RevertInput revertInput) throws RestApiException {
+        String request = getRequestPath() + "/revert";
+        String json = gerritRestClient.getGson().toJson(revertInput);
+        gerritRestClient.postRequest(request, json);
+        return new ChangeApiRestClient(gerritRestClient,
+            changesRestClient,
+            changesParser,
+            commentsParser,
+            fileInfoParser,
+            diffInfoParser,
+            suggestedReviewerInfoParser,
+            reviewerInfoParser,
+            editInfoParser,
+            id);
+    }
+
+    @Override
     public void publish() throws RestApiException {
         String request = getRequestPath() + "/publish";
         gerritRestClient.postRequest(request);
@@ -136,6 +183,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         Map<String, String> topicInput = Collections.singletonMap("topic", topic);
         String json = gerritRestClient.getGson().toJson(topicInput);
         gerritRestClient.putRequest(request, json);
+    }
+
+    @Override
+    public List<ReviewerInfo> listReviewers() throws RestApiException {
+        String request = getRequestPath() + "/reviewers";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return reviewerInfoParser.parseReviewerInfos(jsonElement);
     }
 
     @Override
@@ -194,6 +248,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public EditInfo getEdit() throws RestApiException {
+        String request = getRequestPath() + "/edit";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return Iterables.getOnlyElement(editInfoParser.parseEditInfos(jsonElement));
+    }
+
+    @Override
     public ChangeInfo check() throws RestApiException {
         String request = getRequestPath() + "/check";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
@@ -206,6 +267,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String json = gerritRestClient.getGson().toJson(in);
         JsonElement jsonElement = gerritRestClient.postRequest(request, json);
         return Iterables.getOnlyElement(changesParser.parseChangeInfos(jsonElement));
+    }
+
+    @Override
+    public Map<String, List<CommentInfo>> comments() throws RestApiException {
+      String request = getRequestPath() + "/comments";
+      JsonElement jsonElement = gerritRestClient.getRequest(request);
+      return commentsParser.parseCommentInfos(jsonElement);
     }
 
     protected String getRequestPath() {

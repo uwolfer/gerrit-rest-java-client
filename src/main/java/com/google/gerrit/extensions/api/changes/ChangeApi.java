@@ -15,10 +15,13 @@
 package com.google.gerrit.extensions.api.changes;
 
 import com.google.gerrit.extensions.client.ListChangesOption;
+import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.EditInfo;
+import com.google.gerrit.extensions.common.MergePatchSetInput;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
+import com.google.gerrit.extensions.common.ReviewerInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
@@ -94,7 +97,15 @@ public interface ChangeApi {
    */
   ChangeApi revert(RevertInput in) throws RestApiException;
 
+  /** Create a merge patch set for the change. */
+  ChangeInfo createMergePatchSet(MergePatchSetInput in) throws RestApiException;
+
   List<ChangeInfo> submittedTogether() throws RestApiException;
+  SubmittedTogetherInfo submittedTogether(
+      EnumSet<SubmittedTogetherOption> options) throws RestApiException;
+  SubmittedTogetherInfo submittedTogether(
+      EnumSet<ListChangesOption> listOptions,
+      EnumSet<SubmittedTogetherOption> submitOptions) throws RestApiException;
 
   /**
    * Publishes a draft change.
@@ -102,12 +113,13 @@ public interface ChangeApi {
   void publish() throws RestApiException;
 
   /**
-   * Deletes a draft change.
+   * Deletes a change.
    */
   void delete() throws RestApiException;
 
   String topic() throws RestApiException;
   void topic(String topic) throws RestApiException;
+  List<ReviewerInfo> listReviewers() throws RestApiException;
 
   void addReviewer(AddReviewerInput in) throws RestApiException;
   void addReviewer(String in) throws RestApiException;
@@ -137,6 +149,26 @@ public interface ChangeApi {
   Set<String> getHashtags() throws RestApiException;
 
   /**
+   * Set the assignee of a change.
+   */
+  AccountInfo setAssignee(AssigneeInput input) throws RestApiException;
+
+  /**
+   * Get the assignee of a change.
+   */
+  AccountInfo getAssignee() throws RestApiException;
+
+  /**
+   * Get all past assignees.
+  */
+  List<AccountInfo> getPastAssignees() throws RestApiException;
+
+  /**
+   * Delete the assignee of a change.
+   */
+  AccountInfo deleteAssignee() throws RestApiException;
+
+  /**
    * Get all published comments on a change.
    *
    * @return comments in a map keyed by path; comments have the {@code revision}
@@ -156,6 +188,7 @@ public interface ChangeApi {
 
   ChangeInfo check() throws RestApiException;
   ChangeInfo check(FixInput fix) throws RestApiException;
+  void index() throws RestApiException;
 
   abstract class SuggestedReviewersRequest {
     private String query;
@@ -273,6 +306,11 @@ public interface ChangeApi {
     }
 
     @Override
+    public List<ReviewerInfo> listReviewers() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public void addReviewer(AddReviewerInput in) throws RestApiException {
       throw new NotImplementedException();
     }
@@ -323,6 +361,27 @@ public interface ChangeApi {
     }
 
     @Override
+    public AccountInfo setAssignee(AssigneeInput input)
+        throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public AccountInfo getAssignee() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<AccountInfo> getPastAssignees() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public AccountInfo deleteAssignee() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public Map<String, List<CommentInfo>> comments() throws RestApiException {
       throw new NotImplementedException();
     }
@@ -343,7 +402,31 @@ public interface ChangeApi {
     }
 
     @Override
+    public void index() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public List<ChangeInfo> submittedTogether() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public SubmittedTogetherInfo submittedTogether(
+        EnumSet<SubmittedTogetherOption> options) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public SubmittedTogetherInfo submittedTogether(
+        EnumSet<ListChangesOption> a,
+        EnumSet<SubmittedTogetherOption> b) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ChangeInfo createMergePatchSet(MergePatchSetInput in)
+        throws RestApiException {
       throw new NotImplementedException();
     }
   }

@@ -39,19 +39,25 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
     private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
+    private final ReviewerInfoParser reviewerInfoParser;
+    private final EditInfoParser editInfoParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
                              CommentsParser commentsParser,
                              FileInfoParser fileInfoParser,
                              DiffInfoParser diffInfoParser,
-                             SuggestedReviewerInfoParser suggestedReviewerInfoParser) {
+                             SuggestedReviewerInfoParser suggestedReviewerInfoParser,
+                             ReviewerInfoParser reviewerInfoParser,
+                             EditInfoParser editInfoParser) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
         this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
+        this.reviewerInfoParser = reviewerInfoParser;
+        this.editInfoParser = editInfoParser;
     }
 
     @Override
@@ -106,7 +112,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     @Override
     public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
-            fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, id);
+            fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, id);
     }
 
     @Override

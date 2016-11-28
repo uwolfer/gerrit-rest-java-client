@@ -17,7 +17,6 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.base.Function;
-import com.google.common.base.Throwables;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.client.DiffPreferencesInfo.Whitespace;
 import com.google.gerrit.extensions.common.DiffInfo;
@@ -93,7 +92,7 @@ public class FileApiRestClientTest {
                 try {
                     fileApiRestClient.diff();
                 } catch (RestApiException e) {
-                    throw Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
                 return null;
             }
@@ -110,7 +109,7 @@ public class FileApiRestClientTest {
                 try {
                     fileApiRestClient.diff(base);
                 } catch (RestApiException e) {
-                    throw Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
                 return null;
             }
@@ -129,7 +128,7 @@ public class FileApiRestClientTest {
                         .withContext(context)
                         .get();
                 } catch (RestApiException e) {
-                    throw Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
                 return null;
             }
@@ -146,7 +145,7 @@ public class FileApiRestClientTest {
                           .withIntraline(intraline)
                           .get();
                   } catch (RestApiException e) {
-                      throw Throwables.propagate(e);
+                      throw new RuntimeException(e);
                   }
                   return null;
               }
@@ -164,7 +163,7 @@ public class FileApiRestClientTest {
                         .withWhitespace(whitespace)
                         .get();
                 } catch (RestApiException e) {
-                    throw Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
                 return null;
             }

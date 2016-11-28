@@ -66,7 +66,13 @@ public enum ListChangesOption {
   COMMIT_FOOTERS(17),
 
   /** Include push certificate information along with any patch sets. */
-  PUSH_CERTIFICATES(18);
+  PUSH_CERTIFICATES(18),
+
+  /** Include change's reviewer updates. */
+  REVIEWER_UPDATES(19),
+
+  /** Set the submittable boolean. */
+  SUBMITTABLE(20);
 
   private final int value;
 

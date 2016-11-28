@@ -17,8 +17,10 @@ package com.google.gerrit.extensions.api.changes;
 import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.ActionInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
+import com.google.gerrit.extensions.common.CommitInfo;
 import com.google.gerrit.extensions.common.FileInfo;
 import com.google.gerrit.extensions.common.MergeableInfo;
+import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gerrit.extensions.common.TestSubmitRuleInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
@@ -35,6 +37,7 @@ public interface RevisionApi {
 
   void submit() throws RestApiException;
   void submit(SubmitInput in) throws RestApiException;
+  BinaryResult submitPreview() throws RestApiException;
   void publish() throws RestApiException;
   ChangeApi cherryPick(CherryPickInput in) throws RestApiException;
   ChangeApi rebase() throws RestApiException;
@@ -46,30 +49,62 @@ public interface RevisionApi {
 
   Map<String, FileInfo> files() throws RestApiException;
   Map<String, FileInfo> files(String base) throws RestApiException;
+  Map<String, FileInfo> files(int parentNum) throws RestApiException;
   FileApi file(String path);
   MergeableInfo mergeable() throws RestApiException;
   MergeableInfo mergeableOtherBranches() throws RestApiException;
 
   Map<String, List<CommentInfo>> comments() throws RestApiException;
+  Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException;
   Map<String, List<CommentInfo>> drafts() throws RestApiException;
 
   List<CommentInfo> commentsAsList() throws RestApiException;
   List<CommentInfo> draftsAsList() throws RestApiException;
+  List<RobotCommentInfo> robotCommentsAsList() throws RestApiException;
 
   DraftApi createDraft(DraftInput in) throws RestApiException;
   DraftApi draft(String id) throws RestApiException;
 
   CommentApi comment(String id) throws RestApiException;
+  RobotCommentApi robotComment(String id) throws RestApiException;
 
   /**
    * Returns patch of revision.
    */
   BinaryResult patch() throws RestApiException;
+  BinaryResult patch(String path) throws RestApiException;
 
   Map<String, ActionInfo> actions() throws RestApiException;
 
   SubmitType submitType() throws RestApiException;
   SubmitType testSubmitType(TestSubmitRuleInput in) throws RestApiException;
+
+  MergeListRequest getMergeList() throws RestApiException;
+
+  abstract class MergeListRequest {
+    private boolean addLinks;
+    private int uninterestingParent = 1;
+
+    public abstract List<CommitInfo> get() throws RestApiException;
+
+    public MergeListRequest withLinks() {
+      this.addLinks = true;
+      return this;
+    }
+
+    public MergeListRequest withUninterestingParent(int uninterestingParent) {
+      this.uninterestingParent = uninterestingParent;
+      return this;
+    }
+
+    public boolean getAddLinks() {
+      return addLinks;
+    }
+
+    public int getUninterestingParent() {
+      return uninterestingParent;
+    }
+  }
 
   /**
    * A default implementation which allows source compatibility
@@ -147,6 +182,11 @@ public interface RevisionApi {
     }
 
     @Override
+    public Map<String, FileInfo> files(int parentNum) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public Map<String, FileInfo> files() throws RestApiException {
       throw new NotImplementedException();
     }
@@ -162,12 +202,24 @@ public interface RevisionApi {
     }
 
     @Override
+    public Map<String, List<RobotCommentInfo>> robotComments()
+        throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public List<CommentInfo> commentsAsList() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
     public List<CommentInfo> draftsAsList() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<RobotCommentInfo> robotCommentsAsList()
+        throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -192,7 +244,17 @@ public interface RevisionApi {
     }
 
     @Override
+    public RobotCommentApi robotComment(String id) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public BinaryResult patch() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public BinaryResult patch(String path) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -207,8 +269,18 @@ public interface RevisionApi {
     }
 
     @Override
+    public BinaryResult submitPreview() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public SubmitType testSubmitType(TestSubmitRuleInput in)
         throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public MergeListRequest getMergeList() throws RestApiException {
       throw new NotImplementedException();
     }
   }

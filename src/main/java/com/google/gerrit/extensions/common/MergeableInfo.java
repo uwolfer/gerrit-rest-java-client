@@ -20,6 +20,10 @@ import java.util.List;
 
 public class MergeableInfo {
   public SubmitType submitType;
+  public String strategy;
   public boolean mergeable;
+  public boolean commitMerged;
+  public boolean contentMerged;
+  public List<String> conflicts;
   public List<String> mergeableInto;
 }

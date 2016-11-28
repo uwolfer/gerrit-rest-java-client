@@ -78,7 +78,10 @@ public class ChangesRestClientTest {
                                 .withLimit(10)
                                 .withOption(ListChangesOption.CURRENT_FILES)
                                 .withStart(30)
-                ).expectUrl("/changes/?q=is:open&n=10&S=30&o=CURRENT_FILES")
+                ).expectUrl("/changes/?q=is:open&n=10&S=30&o=CURRENT_FILES"),
+                queryParameter(
+                    new TestQueryRequest().withQuery("is:merged is:watched").encode()
+                ).expectUrl("/changes/?q=is%3Amerged+is%3Awatched")
         ), WRAP_IN_ARRAY_FUNCTION).iterator();
     }
 
@@ -87,7 +90,7 @@ public class ChangesRestClientTest {
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
         ChangesParser changesParser = setupChangesParser();
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null, null, null);
+        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null, null, null, null, null);
 
         Changes.QueryRequest queryRequest = changes.query();
         testCase.queryParameter.apply(queryRequest).get();
@@ -103,7 +106,7 @@ public class ChangesRestClientTest {
         ChangesParser changesParser = setupChangesParser();
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null);
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null);
         changesRestClient.query("is:open").get();
 
         EasyMock.verify(gerritRestClient);
@@ -115,7 +118,7 @@ public class ChangesRestClientTest {
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null);
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null);
 
         ChangeApi changeApi = changesRestClient.id(123);
 
@@ -128,7 +131,7 @@ public class ChangesRestClientTest {
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null);
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null);
 
         ChangeApi changeApi = changesRestClient.id("packages%2Ftest", "master", "Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
 
@@ -141,7 +144,7 @@ public class ChangesRestClientTest {
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
         ChangesParser changesParser = setupChangesParser();
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null, null, null);
+        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null, null, null, null, null);
 
         changes.query().get();
 
@@ -196,6 +199,7 @@ public class ChangesRestClientTest {
 
     private static final class TestQueryRequest {
         private String query = null;
+        private boolean encode = false;
         private Integer limit = null;
         private Integer start = null;
         private String sortkey = null;
@@ -203,6 +207,11 @@ public class ChangesRestClientTest {
 
         public TestQueryRequest withQuery(String query) {
             this.query = query;
+            return this;
+        }
+
+        public TestQueryRequest encode() {
+            encode = true;
             return this;
         }
 
@@ -229,6 +238,9 @@ public class ChangesRestClientTest {
         public Changes.QueryRequest apply(Changes.QueryRequest queryRequest) {
             if (query != null) {
                 queryRequest.withQuery(query);
+            }
+            if (encode) {
+                queryRequest.encode();
             }
             if (limit != null) {
                 queryRequest.withLimit(limit);

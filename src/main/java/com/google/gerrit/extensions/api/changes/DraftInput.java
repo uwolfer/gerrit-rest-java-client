@@ -14,7 +14,23 @@
 
 package com.google.gerrit.extensions.api.changes;
 
+import com.google.common.base.Objects;
 import com.google.gerrit.extensions.client.Comment;
 
 public class DraftInput extends Comment {
+  public String tag;
+
+  @Override
+  public boolean equals(Object o) {
+    if (super.equals(o)) {
+      DraftInput di = (DraftInput) o;
+      return Objects.equal(tag, di.tag);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(super.hashCode(), tag);
+  }
 }

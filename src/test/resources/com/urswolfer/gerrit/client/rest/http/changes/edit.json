@@ -1,0 +1,47 @@
+)]}'
+{
+    "commit":{
+    "parents":[
+        {
+        "commit":"1eee2c9d8f352483781e772f35dc586a69ff5646"
+        }
+    ],
+    "author":{
+        "name":"Shawn O. Pearce",
+        "email":"sop@google.com",
+        "date":"2012-04-24 18:08:08.000000000",
+        "tz":-420
+    },
+    "committer":{
+        "name":"Shawn O. Pearce",
+        "email":"sop@google.com",
+        "date":"2012-04-24 18:08:08.000000000",
+        "tz":-420
+    },
+    "subject":"Use an EventBus to manage star icons",
+    "message":"Use an EventBus to manage star icons\n\nImage widgets that need to ..."
+    },
+    "base_revision":"184ebe53805e102605d11f6b143486d15c23a09c",
+    "fetch": {
+        "git": {
+            "url": "git://localhost/gerrit",
+            "ref": "refs/changes/97/97/1",
+            "commands": {
+                "Checkout": "git fetch git://localhost/gerrit refs/changes/97/97/1 \u0026\u0026 git checkout FETCH_HEAD",
+                "Cherry-Pick": "git fetch git://localhost/gerrit refs/changes/97/97/1 \u0026\u0026 git cherry-pick FETCH_HEAD",
+                "Format-Patch": "git fetch git://localhost/gerrit refs/changes/97/97/1 \u0026\u0026 git format-patch -1 --stdout FETCH_HEAD",
+                "Pull": "git pull git://localhost/gerrit refs/changes/97/97/1"
+            }
+        }
+    },
+    "files": {
+        "gerrit-gwtui/src/main/java/com/google/gerrit/client/changes/ChangeCache.java": {
+            "lines_deleted": 8,
+            "size_delta": -412
+        },
+        "gerrit-gwtui/src/main/java/com/google/gerrit/client/changes/ChangeDetailCache.java": {
+            "lines_inserted": 1,
+            "size_delta": 23
+        }
+    }
+}

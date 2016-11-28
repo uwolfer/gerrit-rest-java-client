@@ -17,12 +17,15 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.gerrit.extensions.api.changes.*;
+import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.FileInfo;
+import com.google.gerrit.extensions.common.TestSubmitRuleInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
@@ -91,6 +94,14 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     public void publish() throws RestApiException {
         String request = getRequestPath() + "/publish";
         gerritRestClient.postRequest(request);
+    }
+
+    @Override
+    public ChangeApi cherryPick(CherryPickInput in) throws RestApiException {
+        String request = getRequestPath() + "/cherrypick";
+        String json = gerritRestClient.getGson().toJson(in);
+        gerritRestClient.postRequest(request, json);
+        return changeApiRestClient;
     }
 
     @Override
@@ -172,6 +183,21 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         } catch (IOException e) {
             throw new RestApiException("Failed to get patch.", e);
         }
+    }
+
+    @Override
+    public SubmitType submitType() throws RestApiException {
+        String request = getRequestPath() + "/submit_type";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return gerritRestClient.getGson().fromJson(jsonElement, new TypeToken<SubmitType>() {}.getType());
+    }
+
+    @Override
+    public SubmitType testSubmitType(TestSubmitRuleInput in) throws RestApiException {
+        String request = getRequestPath() + "/test.submit_type";
+        String json = gerritRestClient.getGson().toJson(in);
+        JsonElement jsonElement = gerritRestClient.postRequest(request,json);
+        return gerritRestClient.getGson().fromJson(jsonElement, new TypeToken<SubmitType>() {}.getType());
     }
 
     protected String getRequestPath() {
