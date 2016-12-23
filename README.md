@@ -56,7 +56,7 @@ Releases are available with Maven:
 <dependency>
     <groupId>com.urswolfer.gerrit.client.rest</groupId>
     <artifactId>gerrit-rest-java-client</artifactId>
-    <version>0.8.8</version>
+    <version>0.8.9</version>
 </dependency>
 ```
 
