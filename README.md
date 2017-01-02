@@ -66,7 +66,7 @@ Apache HttpClient causes problems on Android platform. There is a workaround by 
 Android support builds are not officially released, but you should be able to create your own build by using the
 [httpclient-android branch]. You probably want to merge master branch into this branch before building it.
 
-[HttpClient for Android]: https://hc.apache.org/httpcomponents-client-4.3.x/android-port.html
+[HttpClient for Android]: https://hc.apache.org/httpcomponents-client-4.5.x/android-port.html
 [httpclient-android branch]: https://github.com/uwolfer/gerrit-rest-java-client/tree/httpclient-android
 
 Dependencies
