@@ -242,7 +242,14 @@ public class GerritRestClient implements RestClient {
             // named "gi" with a 400 HTTP status (as of 01/29/15).
             cookieStore.clear();
             return Optional.absent();
+        } else if (authData.isHttpPassword()) {
+            // Do not use a Gerrit HTTP password token to authenticate against the
+            // login page.  This will cause Gerrit to use the password to authenticate
+            // against the configured authentication source (LDAP, etc) and potentially
+            // lock the account.
+            return Optional.absent();
         }
+
         Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
         if (!gerritAccountCookie.isPresent() || gerritAccountCookie.get().isExpired(new Date())) {
             return updateGerritAuth(httpContext, client);
