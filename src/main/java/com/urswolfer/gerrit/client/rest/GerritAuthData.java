@@ -37,6 +37,22 @@ public interface GerritAuthData {
     String getPassword();
 
     /**
+     * Returns TRUE if the password value is an HTTP password corresponding to
+     * the password token displayed on the user Settings -> HTTP Password page.
+     * Gerrit can accept two types of passwords for authentication, the normal
+     * site password (local user database, LDAP, etc) or a user-generated HTTP
+     * password token.  The HTTP password token is used for REST API requests.
+     *
+     * If this method returns TRUE, API calls should not be redirected to the
+     * /login endpoint, which
+     *
+     * @return TRUE if the password is the HTTP password token used for REST API authentication.
+     * @see <a href="https://gerrit-review.googlesource.com/Documentation/rest-api.html#authentication">Gerrit REST API authentication</a>
+     * @see <a href="https://gerrit-review.googlesource.com/Documentation/rest-api-config.html#get-info">Gerrit REST API configuration</a>
+     */
+    boolean isHttpPassword();
+
+    /**
      * HTTP URL for accessing Gerrit. Please make sure that Gerrit root URL is used.
      *
      * Example: {@code "https://gerrit-review.googlesource.com"}
@@ -58,6 +74,7 @@ public interface GerritAuthData {
         private final String host;
         private final String login;
         private final String password;
+        private final boolean httpPassword;
 
         /**
          * @param host see {@link GerritAuthData#getHost}.
@@ -72,9 +89,25 @@ public interface GerritAuthData {
          * @param password see {@link GerritAuthData#getLogin}.
          */
         public Basic(String host, String login, String password) {
+            this(host, login, password, false);
+        }
+
+        /**
+         * @param host see {@link GerritAuthData#getPassword}.
+         * @param login see {@link GerritAuthData#getLogin}.
+         * @param password see {@link GerritAuthData#getLogin}.
+         * @param httpPassword see {@link GerritAuthData@isHttpPassword}.
+         */
+        public Basic(String host, String login, String password, boolean httpPassword) {
             this.host = stripTrailingSlash(host);
             this.login = login;
             this.password = password;
+            this.httpPassword = httpPassword;
+        }
+
+        @Override
+        public boolean isHttpPassword() {
+            return httpPassword;
         }
 
         @Override
