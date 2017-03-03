@@ -21,6 +21,8 @@ import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.client.ChangeStatus;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.ChangeInput;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.*;
 import org.testng.annotations.Test;
@@ -107,5 +109,32 @@ public class ChangesParserTest extends AbstractParserTest {
         Truth.assertThat(changeInfos.size()).isEqualTo(1);
 
         GerritAssert.assertEquals(changeInfos.get(0), CHANGE_INFOS.get(0));
+    }
+
+    @Test
+    public void testParseSingleChangeInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("change.json");
+
+        ChangeInfo changeInfo = changesParser.parseSingleChangeInfo(jsonElement);
+
+        GerritAssert.assertEquals(changeInfo, CHANGE_INFOS.get(0));
+    }
+
+    @Test
+    public void testGenerateChangeInput()  throws Exception {
+        ChangeInput changeInput = new ChangeInput();
+        changeInput.project = "myProject";
+        changeInput.subject = "Let's support 100% Gerrit workflow direct in browser";
+        changeInput.branch = "master";
+        changeInput.topic = "create-change-in-browser";
+        changeInput.status = ChangeStatus.DRAFT;
+
+        String outputForTesting = changesParser.generateChangeInput(changeInput);
+
+        ChangeInput parsedJson = new Gson().fromJson(outputForTesting, ChangeInput.class);
+        Truth.assertThat(parsedJson.project).isEqualTo(changeInput.project);
+        Truth.assertThat(parsedJson.subject).isEqualTo(changeInput.subject);
+        Truth.assertThat(parsedJson.topic).isEqualTo(changeInput.topic);
+        Truth.assertThat(parsedJson.status).isEqualTo(changeInput.status);
     }
 }

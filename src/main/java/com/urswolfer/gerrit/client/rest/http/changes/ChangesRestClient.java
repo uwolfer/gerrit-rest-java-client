@@ -21,6 +21,7 @@ import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -118,5 +119,27 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     @Override
     public ChangeApi id(String project, String branch, String id) throws RestApiException {
         return id(String.format("%s~%s~%s", project, branch, id));
+    }
+
+    @Override
+    public ChangeApi create(ChangeInput in) throws RestApiException {
+        if (in.branch == null) {
+            throw new IllegalArgumentException("Branch must be set in change creation input.");
+        }
+
+        String url = "/changes/";
+        String changeInput = changesParser.generateChangeInput(in);
+        JsonElement result = gerritRestClient.postRequest(url, changeInput);
+        ChangeInfo info = changesParser.parseSingleChangeInfo(result);
+        return new ChangeApiRestClient(gerritRestClient,
+            this,
+            changesParser,
+            commentsParser,
+            fileInfoParser,
+            diffInfoParser,
+            suggestedReviewerInfoParser,
+            reviewerInfoParser,
+            editInfoParser,
+            info.id);
     }
 }
