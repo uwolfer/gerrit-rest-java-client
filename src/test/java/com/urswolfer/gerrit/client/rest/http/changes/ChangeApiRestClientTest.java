@@ -390,12 +390,31 @@ public class ChangeApiRestClientTest {
         EasyMock.verify(gerritRestClient);
     }
 
+    @Test
+    public void testIndexChange() throws Exception {
+      GerritRestClient gerritRestClient = getGerritRestClient(
+          "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/index");
+      ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
+      ChangeApi changeApi = changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+      changeApi.index();
+
+      EasyMock.verify(gerritRestClient);
+    }
+
     private GerritRestClient getGerritRestClient(String expectedRequest, String expectedJson) throws Exception {
         return new GerritRestClientBuilder()
                 .expectPost(expectedRequest, expectedJson)
                 .expectGetGson()
                 .get();
     }
+
+    private GerritRestClient getGerritRestClient(String expectedRequest) throws Exception {
+      return new GerritRestClientBuilder()
+              .expectPost(expectedRequest)
+              .get();
+  }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {
         return new ChangesRestClient(
