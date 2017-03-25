@@ -276,6 +276,12 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
       return commentsParser.parseCommentInfos(jsonElement);
     }
 
+    @Override
+    public void index() throws RestApiException {
+      String request = getRequestPath() + "/index";
+      gerritRestClient.postRequest(request);
+    }
+
     protected String getRequestPath() {
         return "/changes/" + id;
     }
