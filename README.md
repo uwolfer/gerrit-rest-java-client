@@ -80,24 +80,23 @@ This library depends on [Apache HttpClient], [Gson] and [Guava].
 Your Support
 ------------
 If you like this library, you can support it:
-* Star it: [Star it at GitHub]. GitHub account required.
+* Star it: [Star it at GitHub](https://github.com/uwolfer/gerrit-rest-java-client). GitHub account required.
 * Improve it: Report bugs or feature requests. Or even fix / implement them by yourself - everything is open source!
 * Donate: You can find donation-possibilities at the bottom of this file.
-[Star it at GitHub]: https://github.com/uwolfer/gerrit-rest-java-client
 
 
 Donations
 --------
-If you like this work, you can support it with [this donation link]. If you don't like Paypal
-(Paypal takes 2.9% plus $0.30 per transaction fee from your donation), please contact me.
+If you like this work, you can support it with
+[this donation link](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=8F2GZVBCVEDUQ).
+If you don't like Paypal (Paypal takes 2.9% plus $0.30 per transaction fee from your donation), please contact me.
 Please only use the link from github.com/uwolfer/gerrit-intellij-plugin to verify that it is correct.
-[this donation link]: https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=8F2GZVBCVEDUQ
 
 
 Copyright and license
 --------------------
 
-Copyright 2013 - 2016 Urs Wolfer
+Copyright 2013 - 2017 Urs Wolfer
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this work except in compliance with the License.
