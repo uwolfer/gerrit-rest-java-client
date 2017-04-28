@@ -58,7 +58,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>20.0</version>
+      <version>20.0</version><!-- do not update - this is the last release with Java 6 support -->
       <scope>compile</scope>
     </dependency>
 
