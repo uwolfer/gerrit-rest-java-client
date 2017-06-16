@@ -1,0 +1,14 @@
+)]}'
+{
+    "branches": [
+        "integration/master",
+        "integration/releases/2.12",
+        "master",
+        "releases/2.12"
+    ],
+    "tags": [
+        "2017-12_v2.12",
+        "2017-12_v2.13",
+        "v2.13.1_xyz"
+    ]
+}

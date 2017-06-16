@@ -332,11 +332,12 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+        IncludedInInfoParser includedInInfoParser = EasyMock.createMock(IncludedInInfoParser.class);
         FileInfoParser fileInfoParser = EasyMock.createMock(FileInfoParser.class);
         DiffInfoParser diffInfoParser = EasyMock.createMock(DiffInfoParser.class);
         ReviewerInfoParser reviewerInfoParser = EasyMock.createMock(ReviewerInfoParser.class);
         EditInfoParser editInfoParser = EasyMock.createMock(EditInfoParser.class);
-        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser);
+        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser);
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
@@ -344,6 +345,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                 gerritRestClient,
                 EasyMock.createMock(ChangesParser.class),
                 commentsParser,
+                EasyMock.createMock(IncludedInInfoParser.class),
                 EasyMock.createMock(FileInfoParser.class),
                 EasyMock.createMock(DiffInfoParser.class),
                 null,
