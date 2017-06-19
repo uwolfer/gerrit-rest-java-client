@@ -37,6 +37,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final GerritRestClient gerritRestClient;
     private final ChangesParser changesParser;
     private final CommentsParser commentsParser;
+    private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
     private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
@@ -46,6 +47,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
                              CommentsParser commentsParser,
+                             IncludedInInfoParser includedInInfoParser,
                              FileInfoParser fileInfoParser,
                              DiffInfoParser diffInfoParser,
                              SuggestedReviewerInfoParser suggestedReviewerInfoParser,
@@ -54,6 +56,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
+        this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
         this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
@@ -113,7 +116,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     @Override
     public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
-            fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, id);
+            includedInInfoParser, fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, id);
     }
 
     @Override
@@ -135,6 +138,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
             this,
             changesParser,
             commentsParser,
+            includedInInfoParser,
             fileInfoParser,
             diffInfoParser,
             suggestedReviewerInfoParser,
