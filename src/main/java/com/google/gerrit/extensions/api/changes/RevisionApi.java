@@ -34,6 +34,8 @@ public interface RevisionApi {
   void delete() throws RestApiException;
 
   void review(ReviewInput in) throws RestApiException;
+  // for verify-status-reporter plugin
+  VerifyStatusApi verifyStatus() throws RestApiException;
 
   void submit() throws RestApiException;
   void submit(SubmitInput in) throws RestApiException;
@@ -118,6 +120,12 @@ public interface RevisionApi {
 
     @Override
     public void review(ReviewInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    // for verify-status-reporter plugin
+    @Override
+    public VerifyStatusApi verifyStatus() throws RestApiException {
       throw new NotImplementedException();
     }
 
