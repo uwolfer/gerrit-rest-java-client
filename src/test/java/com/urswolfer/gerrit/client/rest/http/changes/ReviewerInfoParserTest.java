@@ -17,7 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.truth.Truth;
-import com.google.gerrit.extensions.common.ReviewerInfo;
+import com.google.gerrit.extensions.api.changes.ReviewerInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import org.testng.annotations.Test;

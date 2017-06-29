@@ -28,7 +28,11 @@ public class GeneralPreferencesInfo {
 
   /** Preferred method to download a change. */
   public enum DownloadCommand {
-    REPO_DOWNLOAD, PULL, CHECKOUT, CHERRY_PICK, FORMAT_PATCH
+    REPO_DOWNLOAD,
+    PULL,
+    CHECKOUT,
+    CHERRY_PICK,
+    FORMAT_PATCH
   }
 
   public enum DateFormat {
@@ -83,6 +87,11 @@ public class GeneralPreferencesInfo {
     DISABLED
   }
 
+  public enum EmailFormat {
+    PLAINTEXT,
+    HTML_PLAINTEXT
+  }
+
   public enum DefaultBase {
     AUTO_MERGE(null),
     FIRST_PARENT(-1);
@@ -130,8 +139,10 @@ public class GeneralPreferencesInfo {
   public String downloadScheme;
   /** Type of download command the user prefers to use. */
   public DownloadCommand downloadCommand;
+
   public DateFormat dateFormat;
   public TimeFormat timeFormat;
+  public Boolean expandInlineDiffs;
   public Boolean highlightAssigneeInChangeTable;
   public Boolean relativeDateInChangeTable;
   public DiffView diffView;
@@ -141,9 +152,12 @@ public class GeneralPreferencesInfo {
   public Boolean muteCommonPathPrefixes;
   public Boolean signedOffBy;
   public List<MenuItem> my;
+  public List<String> changeTable;
   public Map<String, String> urlAliases;
   public EmailStrategy emailStrategy;
+  public EmailFormat emailFormat;
   public DefaultBase defaultBaseForMerges;
+  public Boolean publishCommentsOnPush;
 
   public boolean isShowInfoInReviewCategory() {
     return getReviewCategoryStrategy() != ReviewCategoryStrategy.NONE;
@@ -184,17 +198,26 @@ public class GeneralPreferencesInfo {
     return emailStrategy;
   }
 
+  public EmailFormat getEmailFormat() {
+    if (emailFormat == null) {
+      return EmailFormat.HTML_PLAINTEXT;
+    }
+    return emailFormat;
+  }
+
   public static GeneralPreferencesInfo defaults() {
     GeneralPreferencesInfo p = new GeneralPreferencesInfo();
     p.changesPerPage = DEFAULT_PAGESIZE;
     p.showSiteHeader = true;
     p.useFlashClipboard = true;
     p.emailStrategy = EmailStrategy.ENABLED;
+    p.emailFormat = EmailFormat.HTML_PLAINTEXT;
     p.reviewCategoryStrategy = ReviewCategoryStrategy.NONE;
     p.downloadScheme = null;
     p.downloadCommand = DownloadCommand.CHECKOUT;
     p.dateFormat = DateFormat.STD;
     p.timeFormat = TimeFormat.HHMM_12;
+    p.expandInlineDiffs = false;
     p.highlightAssigneeInChangeTable = true;
     p.relativeDateInChangeTable = false;
     p.diffView = DiffView.SIDE_BY_SIDE;
@@ -203,6 +226,7 @@ public class GeneralPreferencesInfo {
     p.muteCommonPathPrefixes = true;
     p.signedOffBy = false;
     p.defaultBaseForMerges = DefaultBase.FIRST_PARENT;
+    p.publishCommentsOnPush = false;
     return p;
   }
 }

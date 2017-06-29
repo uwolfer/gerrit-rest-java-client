@@ -19,17 +19,18 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.common.collect.Iterables;
 import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
+import com.google.gerrit.extensions.api.changes.AddReviewerResult;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.FixInput;
 import com.google.gerrit.extensions.api.changes.RestoreInput;
 import com.google.gerrit.extensions.api.changes.MoveInput;
 import com.google.gerrit.extensions.api.changes.RevertInput;
+import com.google.gerrit.extensions.api.changes.ReviewerInfo;
 import com.google.gerrit.extensions.api.changes.RevisionApi;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.api.changes.IncludedInInfo;
-import com.google.gerrit.extensions.common.ReviewerInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gerrit.extensions.common.EditInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -54,6 +55,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
+    private final AddReviewerResultParser addReviewerResultParser;
+    private final ReviewResultParser reviewResultParser;
     private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
     private final ReviewerInfoParser reviewerInfoParser;
     private final EditInfoParser editInfoParser;
@@ -66,6 +69,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                IncludedInInfoParser includedInInfoParser,
                                FileInfoParser fileInfoParser,
                                DiffInfoParser diffInfoParser,
+                               AddReviewerResultParser addReviewerResultParser,
+                               ReviewResultParser reviewResultParser,
                                SuggestedReviewerInfoParser suggestedReviewerInfoParser,
                                ReviewerInfoParser reviewerInfoParser,
                                EditInfoParser editInfoParser,
@@ -77,6 +82,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
+        this.addReviewerResultParser = addReviewerResultParser;
+        this.reviewResultParser = reviewResultParser;
         this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
         this.reviewerInfoParser = reviewerInfoParser;
         this.editInfoParser = editInfoParser;
@@ -100,7 +107,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public RevisionApi revision(String id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, id);
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, reviewResultParser, id);
     }
 
     @Override
@@ -158,6 +165,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             includedInInfoParser,
             fileInfoParser,
             diffInfoParser,
+            addReviewerResultParser,
+            reviewResultParser,
             suggestedReviewerInfoParser,
             reviewerInfoParser,
             editInfoParser,
@@ -205,17 +214,18 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
-    public void addReviewer(AddReviewerInput in) throws RestApiException {
+    public AddReviewerResult addReviewer(AddReviewerInput in) throws RestApiException {
         String request = getRequestPath() + "/reviewers";
         String json = gerritRestClient.getGson().toJson(in);
-        gerritRestClient.postRequest(request, json);
+        JsonElement reviewerResult = gerritRestClient.postRequest(request, json);
+        return addReviewerResultParser.parseAddReviewerResult(reviewerResult);
     }
 
     @Override
-    public void addReviewer(String in) throws RestApiException {
+    public AddReviewerResult addReviewer(String in) throws RestApiException {
         AddReviewerInput input = new AddReviewerInput();
         input.reviewer = in;
-        addReviewer(input);
+        return addReviewer(input);
     }
 
     @Override

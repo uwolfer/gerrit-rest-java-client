@@ -1,0 +1,15 @@
+)]}'
+{
+    "input": "john.doe@example.com",
+    "reviewers": [
+      {
+        "_account_id": 1000096,
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "approvals": {
+          "Verified": " 0",
+          "Code-Review": " 0"
+        }
+      }
+    ]
+}

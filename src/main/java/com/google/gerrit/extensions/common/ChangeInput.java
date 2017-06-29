@@ -14,7 +14,11 @@
 
 package com.google.gerrit.extensions.common;
 
+import com.google.gerrit.extensions.api.changes.NotifyHandling;
+import com.google.gerrit.extensions.api.changes.NotifyInfo;
+import com.google.gerrit.extensions.api.changes.RecipientType;
 import com.google.gerrit.extensions.client.ChangeStatus;
+import java.util.Map;
 
 public class ChangeInput {
   public String project;
@@ -23,7 +27,30 @@ public class ChangeInput {
 
   public String topic;
   public ChangeStatus status;
+  public Boolean isPrivate;
+  public Boolean workInProgress;
   public String baseChange;
   public Boolean newBranch;
   public MergeInput merge;
+
+  public ChangeInput() {}
+
+  /**
+   * Creates a new {@code ChangeInput} with the minimal attributes required for a successful
+   * creation of a new change.
+   *
+   * @param project the project name for the new change
+   * @param branch the branch name for the new change
+   * @param subject the subject (commit message) for the new change
+   */
+  public ChangeInput(String project, String branch, String subject) {
+    this.project = project;
+    this.branch = branch;
+    this.subject = subject;
+  }
+
+  /** Who to send email notifications to after change is created. */
+  public NotifyHandling notify = NotifyHandling.ALL;
+
+  public Map<RecipientType, NotifyInfo> notifyDetails;
 }

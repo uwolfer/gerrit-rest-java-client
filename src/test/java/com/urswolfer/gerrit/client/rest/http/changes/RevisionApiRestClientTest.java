@@ -88,7 +88,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectPost(
                         testCase.reviewUrl,
-                        "{\"message\":\"Looks good!\",\"labels\":{\"Code-Review\":2},\"strict_labels\":true,\"notify\":\"ALL\",\"omit_duplicate_comments\":false}"
+                        "{\"message\":\"Looks good!\",\"labels\":{\"Code-Review\":2},\"strict_labels\":true,\"omit_duplicate_comments\":false}"
                 )
                 .expectGetGson()
                 .get();
@@ -155,7 +155,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     public void testCherryPick(RevisionApiTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost(testCase.cherryPickUrl,
-                "{\"message\":\"Implementing Feature X\",\"destination\":\"release-branch\"}")
+                "{\"message\":\"Implementing Feature X\",\"destination\":\"release-branch\",\"notify\":\"NONE\"}")
             .expectGetGson()
             .get();
 
@@ -337,7 +337,9 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         DiffInfoParser diffInfoParser = EasyMock.createMock(DiffInfoParser.class);
         ReviewerInfoParser reviewerInfoParser = EasyMock.createMock(ReviewerInfoParser.class);
         EditInfoParser editInfoParser = EasyMock.createMock(EditInfoParser.class);
-        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser);
+        AddReviewerResultParser addReviewerResultParser = EasyMock.createMock(AddReviewerResultParser.class);
+        ReviewResultParser reviewResultParser = EasyMock.createMock(ReviewResultParser.class);
+        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser, addReviewerResultParser, reviewResultParser);
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
@@ -350,7 +352,9 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                 EasyMock.createMock(DiffInfoParser.class),
                 null,
                 EasyMock.createMock(ReviewerInfoParser.class),
-                EasyMock.createMock(EditInfoParser.class));
+                EasyMock.createMock(EditInfoParser.class),
+                EasyMock.createMock(AddReviewerResultParser.class),
+                EasyMock.createMock(ReviewResultParser.class));
     }
 
     private static RevisionApiTestCase withRevision(String revision) {

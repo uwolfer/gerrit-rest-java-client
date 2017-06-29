@@ -17,6 +17,7 @@ package com.google.gerrit.extensions.api.projects;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import java.util.List;
 
 public interface BranchApi {
   BranchApi create(BranchInput in) throws RestApiException;
@@ -25,15 +26,15 @@ public interface BranchApi {
 
   void delete() throws RestApiException;
 
-  /**
-   * Returns the content of a file from the HEAD revision.
-   */
+  /** Returns the content of a file from the HEAD revision. */
   BinaryResult file(String path) throws RestApiException;
 
+  List<ReflogEntryInfo> reflog() throws RestApiException;
+
   /**
-   * A default implementation which allows source compatibility
-   * when adding new methods to the interface.
-   **/
+   * A default implementation which allows source compatibility when adding new methods to the
+   * interface.
+   */
   class NotImplemented implements BranchApi {
     @Override
     public BranchApi create(BranchInput in) throws RestApiException {
@@ -52,6 +53,11 @@ public interface BranchApi {
 
     @Override
     public BinaryResult file(String path) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ReflogEntryInfo> reflog() throws RestApiException {
       throw new NotImplementedException();
     }
   }

@@ -21,24 +21,27 @@ import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 
 public interface Server {
-  /**
-   * @return Version of server.
-   */
+  /** @return Version of server. */
   String getVersion() throws RestApiException;
 
   ServerInfo getInfo() throws RestApiException;
 
   GeneralPreferencesInfo getDefaultPreferences() throws RestApiException;
-  GeneralPreferencesInfo setDefaultPreferences(GeneralPreferencesInfo in)
-      throws RestApiException;
+
+  GeneralPreferencesInfo setDefaultPreferences(GeneralPreferencesInfo in) throws RestApiException;
+
   DiffPreferencesInfo getDefaultDiffPreferences() throws RestApiException;
-  DiffPreferencesInfo setDefaultDiffPreferences(DiffPreferencesInfo in)
-      throws RestApiException;
+
+  DiffPreferencesInfo setDefaultDiffPreferences(DiffPreferencesInfo in) throws RestApiException;
+
+  ConsistencyCheckInfo checkConsistency(ConsistencyCheckInput in) throws RestApiException;
+
+  AccessCheckInfo checkAccess(AccessCheckInput in) throws RestApiException;
 
   /**
-   * A default implementation which allows source compatibility
-   * when adding new methods to the interface.
-   **/
+   * A default implementation which allows source compatibility when adding new methods to the
+   * interface.
+   */
   class NotImplemented implements Server {
     @Override
     public String getVersion() throws RestApiException {
@@ -51,26 +54,34 @@ public interface Server {
     }
 
     @Override
-    public GeneralPreferencesInfo getDefaultPreferences()
+    public GeneralPreferencesInfo getDefaultPreferences() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public GeneralPreferencesInfo setDefaultPreferences(GeneralPreferencesInfo in)
         throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public GeneralPreferencesInfo setDefaultPreferences(
-        GeneralPreferencesInfo in) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public DiffPreferencesInfo getDefaultDiffPreferences()
-        throws RestApiException {
+    public DiffPreferencesInfo getDefaultDiffPreferences() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
     public DiffPreferencesInfo setDefaultDiffPreferences(DiffPreferencesInfo in)
         throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ConsistencyCheckInfo checkConsistency(ConsistencyCheckInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public AccessCheckInfo checkAccess(AccessCheckInput in) throws RestApiException {
       throw new NotImplementedException();
     }
   }

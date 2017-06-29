@@ -22,7 +22,7 @@ import com.google.gerrit.extensions.api.projects.TagInfo;
  * @author Pavel Bely
  */
 public class TagInfoBuilder {
-    private final TagInfo tagInfo = new TagInfo(null, null);
+    private final TagInfo tagInfo = new TagInfo(null, null, false);
 
     public TagInfo get() {
         return tagInfo;
@@ -35,6 +35,11 @@ public class TagInfoBuilder {
 
     public TagInfoBuilder withRevision(String revision) {
         tagInfo.revision = revision;
+        return this;
+    }
+
+    public TagInfoBuilder withCanDelete(boolean canDelete) {
+        tagInfo.canDelete = canDelete;
         return this;
     }
 }
