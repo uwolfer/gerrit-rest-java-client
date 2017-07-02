@@ -19,6 +19,6 @@ public class CommitInfoParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("commit.json");
         List<CommitInfo> commitInfos = commitInfoParser.parseCommitInfos(jsonElement);
         Truth.assertThat(commitInfos).hasSize(1);
-        Truth.assertThat(commitInfos.get(0).message.equals("Use an EventBus to manage star icons  Image widgets that need to ..."));
+        Truth.assertThat(commitInfos.get(0).message).isEqualTo("Use an EventBus to manage star icons  Image widgets that need to ...");
     }
 }

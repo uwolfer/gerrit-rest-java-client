@@ -307,7 +307,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
         SubmitType expectSubmitType = changesRestClient.id(CHANGE_ID).revision(testCase.revision).submitType();
 
-        Truth.assertThat(expectSubmitType.equals(SubmitType.MERGE_IF_NECESSARY));
+        Truth.assertThat(expectSubmitType).isEqualTo(SubmitType.MERGE_IF_NECESSARY);
         EasyMock.verify(gerritRestClient);
     }
 
@@ -325,7 +325,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         testSubmitRuleInput.rule = "submit_type(cherry_pick)";
         SubmitType expectSubmitType = changesRestClient.id(CHANGE_ID).revision(testCase.revision).testSubmitType(testSubmitRuleInput);
 
-        Truth.assertThat(expectSubmitType.equals(SubmitType.CHERRY_PICK));
+        Truth.assertThat(expectSubmitType).isEqualTo(SubmitType.CHERRY_PICK);
         EasyMock.verify(gerritRestClient);
     }
 

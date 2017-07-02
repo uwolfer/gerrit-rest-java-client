@@ -32,7 +32,7 @@ public class ReviewerInfoParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("reviewer.json");
         List<ReviewerInfo> reviewerInfos = reviewerInfoParser.parseReviewerInfos(jsonElement);
         Truth.assertThat(reviewerInfos).hasSize(1);
-        Truth.assertThat(reviewerInfos.get(0).approvals.get("Code-Review").equals("+2"));
+        Truth.assertThat(reviewerInfos.get(0).approvals.get("Code-Review")).isEqualTo("+2");
     }
 
     @Test
@@ -40,7 +40,7 @@ public class ReviewerInfoParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("reviewers.json");
         List<ReviewerInfo> reviewerInfos = reviewerInfoParser.parseReviewerInfos(jsonElement);
         Truth.assertThat(reviewerInfos).hasSize(2);
-        Truth.assertThat(reviewerInfos.get(1).approvals.get("My-Own-Label").equals("-2"));
+        Truth.assertThat(reviewerInfos.get(1).approvals.get("My-Own-Label")).isEqualTo("-2");
     }
 
 }

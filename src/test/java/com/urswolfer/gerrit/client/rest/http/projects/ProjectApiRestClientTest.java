@@ -82,7 +82,7 @@ public class ProjectApiRestClientTest {
         List<BranchInfo> branches = projectApiRestClient.branches()
             .withLimit(5).withStart(1).withRegex(".").withSubstring("s")
             .get();
-        Truth.assertThat(branches.equals(mockBranches));
+        Truth.assertThat(branches).isEqualTo(mockBranches);
     }
 
     @Test(expectedExceptions = RuntimeException.class)

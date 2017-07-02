@@ -78,7 +78,7 @@ public class CommentsParserTest extends AbstractParserTest {
     @Test
     public void testParseCommentsFileName() throws Exception {
         TreeMap<String, List<CommentInfo>> comments = parseComments();
-        Truth.assertThat((Iterable) comments.keySet()).isEqualTo(COMMENT_INFOS.keySet());
+        Truth.assertThat(comments.keySet()).isEqualTo(COMMENT_INFOS.keySet());
     }
 
     @Test
