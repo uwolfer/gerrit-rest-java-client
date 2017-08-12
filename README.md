@@ -4,6 +4,8 @@ gerrit-rest-java-client
 [![Linux Build](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
 [![Windows Build](https://ci.appveyor.com/api/projects/status/ctm64o74lxdri26s/branch/master?svg=true)](https://ci.appveyor.com/project/uwolfer/gerrit-rest-java-client/branch/master)
 [![Coverage Status](https://img.shields.io/coveralls/uwolfer/gerrit-rest-java-client.svg)](https://coveralls.io/r/uwolfer/gerrit-rest-java-client)
+[![Quality Gate](https://sonarcloud.io/api/badges/gate?key=com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)](https://sonarcloud.io/dashboard/index/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
+[![Technical Dept](https://sonarcloud.io/api/badges/measure?key=com.urswolfer.gerrit.client.rest:gerrit-rest-java-client&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard/index/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
 [![Dependency Status](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client/badge)](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.urswolfer.gerrit.client.rest/gerrit-rest-java-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.urswolfer.gerrit.client.rest/gerrit-rest-java-client)
 
