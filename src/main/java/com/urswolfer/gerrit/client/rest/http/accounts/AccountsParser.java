@@ -18,7 +18,6 @@ package com.urswolfer.gerrit.client.rest.http.accounts;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.common.AccountInfo;
-import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
@@ -38,11 +37,11 @@ public class AccountsParser {
         this.gson = gson;
     }
 
-    public AccountInfo parseAccountInfo(JsonElement result) throws RestApiException {
+    public AccountInfo parseAccountInfo(JsonElement result) {
         return gson.fromJson(result, AccountInfo.class);
     }
 
-    public List<AccountInfo> parseAccountInfos(JsonElement result) throws RestApiException {
+    public List<AccountInfo> parseAccountInfos(JsonElement result) {
         if (!result.isJsonArray()) {
             return Collections.singletonList(parseAccountInfo(result));
         }

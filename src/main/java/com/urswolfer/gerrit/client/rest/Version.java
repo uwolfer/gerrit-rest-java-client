@@ -37,6 +37,8 @@ public class Version {
         }
     }
 
+    private Version() {}
+
     private static String getVersionFromProperties() throws IOException {
         InputStream inputStream = Version.class.getResourceAsStream("/version.properties");
         try {

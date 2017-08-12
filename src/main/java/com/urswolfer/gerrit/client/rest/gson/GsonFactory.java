@@ -27,6 +27,8 @@ import java.util.Date;
  */
 public class GsonFactory {
 
+    private GsonFactory() {}
+
     public static Gson create() {
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(Date.class, new DateDeserializer());

@@ -19,7 +19,6 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.common.ProjectInfo;
-import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
@@ -38,7 +37,7 @@ public class ProjectsParser {
         this.gson = gson;
     }
 
-    public SortedMap<String, ProjectInfo> parseProjectInfos(JsonElement result) throws RestApiException {
+    public SortedMap<String, ProjectInfo> parseProjectInfos(JsonElement result) {
         return gson.fromJson(result, TYPE);
     }
 

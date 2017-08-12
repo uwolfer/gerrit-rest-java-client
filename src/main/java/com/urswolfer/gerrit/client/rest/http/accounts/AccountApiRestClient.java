@@ -65,7 +65,7 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
     /**
      * Star-endpoint added in Gerrit 2.8.
      */
-    private String createStarUrl(String id) throws RestApiException {
+    private String createStarUrl(String id) {
         return getRequestPath() + "/starred.changes/" + id;
     }
 

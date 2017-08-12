@@ -116,7 +116,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(int id) throws RestApiException {
-        return id("" + id);
+        return id(Integer.toString(id));
     }
 
     @Override

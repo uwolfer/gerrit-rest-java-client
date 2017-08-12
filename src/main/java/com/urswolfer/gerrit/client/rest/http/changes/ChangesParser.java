@@ -19,7 +19,6 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ChangeInput;
-import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
@@ -39,7 +38,7 @@ public class ChangesParser {
         this.gson = gson;
     }
 
-    public List<ChangeInfo> parseChangeInfos(JsonElement result) throws RestApiException {
+    public List<ChangeInfo> parseChangeInfos(JsonElement result) {
         if (!result.isJsonArray()) {
             return Collections.singletonList(gson.fromJson(result, ChangeInfo.class));
         }

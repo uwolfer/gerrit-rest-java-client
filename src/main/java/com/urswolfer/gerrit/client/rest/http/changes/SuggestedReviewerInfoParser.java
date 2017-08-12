@@ -18,7 +18,6 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
-import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
@@ -38,7 +37,7 @@ public class SuggestedReviewerInfoParser {
         this.gson = gson;
     }
 
-    public List<SuggestedReviewerInfo> parseSuggestReviewerInfos(JsonElement result) throws RestApiException {
+    public List<SuggestedReviewerInfo> parseSuggestReviewerInfos(JsonElement result) {
         if (!result.isJsonArray()) {
             return Collections.singletonList(gson.fromJson(result, SuggestedReviewerInfo.class));
         }
