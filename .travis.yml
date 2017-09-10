@@ -2,6 +2,9 @@ sudo: false
 
 language: java
 
+# precise required for openjdk6, see https://github.com/travis-ci/travis-ci/issues/8199
+dist: precise
+
 jdk:
   - openjdk6
 #  - openjdk7
