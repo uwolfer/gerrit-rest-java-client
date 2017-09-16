@@ -45,6 +45,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     private final CommentsParser commentsParser;
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
+    private final ReviewResultParser reviewResultParser;
     private final String revision;
 
     public RevisionApiRestClient(GerritRestClient gerritRestClient,
@@ -52,12 +53,14 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
                                  CommentsParser commentsParser,
                                  FileInfoParser fileInfoParser,
                                  DiffInfoParser diffInfoParser,
+                                 ReviewResultParser reviewResultParser,
                                  String revision) {
         this.gerritRestClient = gerritRestClient;
         this.changeApiRestClient = changeApiRestClient;
         this.commentsParser = commentsParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
+        this.reviewResultParser = reviewResultParser;
         this.revision = revision;
     }
 
@@ -72,10 +75,11 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     }
 
     @Override
-    public void review(ReviewInput reviewInput) throws RestApiException {
+    public ReviewResult review(ReviewInput reviewInput) throws RestApiException {
         String request = getRequestPath() + "/review";
         String json = gerritRestClient.getGson().toJson(reviewInput);
-        gerritRestClient.postRequest(request, json);
+        JsonElement reviewResult = gerritRestClient.postRequest(request, json);
+        return reviewResultParser.parseReviewResult(reviewResult);
     }
 
     @Override

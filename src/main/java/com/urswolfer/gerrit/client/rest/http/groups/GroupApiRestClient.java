@@ -160,4 +160,14 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
 
         gerritRestClient.postRequest(restPath, json);
     }
+
+    @Override
+    public void removeGroups(String... groups) throws RestApiException {
+        String restPath = getRequestPath() + "/groups.delete";
+        Map<String, List<String>> groupMap =
+            Collections.singletonMap("groups", Arrays.asList(groups));
+        String json = gerritRestClient.getGson().toJson(groupMap);
+
+        gerritRestClient.postRequest(restPath, json);
+    }
 }

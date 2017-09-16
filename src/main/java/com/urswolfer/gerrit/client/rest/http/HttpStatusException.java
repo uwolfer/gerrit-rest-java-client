@@ -22,8 +22,8 @@ import com.google.gerrit.extensions.restapi.RestApiException;
  * @author Urs Wolfer
  */
 public class HttpStatusException extends RestApiException {
-    private int statusCode;
-    private String statusText;
+    private final int statusCode;
+    private final String statusText;
 
     public HttpStatusException(int statusCode, String statusText, String message) {
         super(message);

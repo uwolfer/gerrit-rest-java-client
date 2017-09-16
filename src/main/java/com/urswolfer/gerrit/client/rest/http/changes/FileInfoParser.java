@@ -18,7 +18,6 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.common.FileInfo;
-import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
@@ -38,7 +37,7 @@ public class FileInfoParser {
         this.gson = gson;
     }
 
-    public Map<String, FileInfo> parseFileInfos(JsonElement jsonElement) throws RestApiException {
+    public Map<String, FileInfo> parseFileInfos(JsonElement jsonElement) {
         return gson.fromJson(jsonElement, TYPE);
     }
 }

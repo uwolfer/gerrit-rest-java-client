@@ -37,14 +37,17 @@ public class TagInfoParserTest extends AbstractParserTest {
         TAG_INFO_LIST.add(new TagInfoBuilder()
                 .withRef("refs/tags/v0.0.1")
                 .withRevision("a6e054e9c220e4fa16802ccab074a00d384067fc")
+                .withCanDelete(false)
                 .get());
         TAG_INFO_LIST.add(new TagInfoBuilder()
                 .withRef("refs/tags/v0.0.2")
                 .withRevision("fd608fbe625a2b456d9f15c2b1dc41f252057dd7")
+                .withCanDelete(false)
                 .get());
         TAG_INFO_LIST.add(new TagInfoBuilder()
                 .withRef("refs/tags/v0.0.3")
                 .withRevision("8bbde7aacf771a9afb6992434f1ae413e010c6d8")
+                .withCanDelete(true)
                 .get());
     }
 
@@ -73,6 +76,7 @@ public class TagInfoParserTest extends AbstractParserTest {
         Truth.assertThat(tagInfos.size()).isEqualTo(1);
         GerritAssert.assertEquals(tagInfos.get(0), new TagInfoBuilder()
             .withRef("refs/tags/v0.0.1")
+            .withCanDelete(false)
             .withRevision("a6e054e9c220e4fa16802ccab074a00d384067fc")
             .get());
     }

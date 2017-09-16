@@ -227,4 +227,18 @@ public class GroupApiRestClientTest {
 
         EasyMock.verify(gerritRestClient, groupsParser);
     }
+
+    @Test
+    public void testRemoveGroups() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGetGson()
+            .expectPost("/groups/foo/groups.delete", "{\"groups\":[\"g1\",\"g2\"]}")
+            .get();
+        GroupsParser groupsParser = new GroupsParserBuilder().get();
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+
+        groupApiRestClient.removeGroups("g1", "g2");
+
+        EasyMock.verify(gerritRestClient, groupsParser);
+    }
 }

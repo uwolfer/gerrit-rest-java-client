@@ -17,7 +17,6 @@ package com.google.gerrit.extensions.common;
 import com.google.gerrit.extensions.client.ChangeStatus;
 import com.google.gerrit.extensions.client.ReviewerState;
 import com.google.gerrit.extensions.client.SubmitType;
-
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +36,7 @@ public class ChangeInfo {
   public Timestamp updated;
   public Timestamp submitted;
   public Boolean starred;
+  public Boolean muted;
   public Collection<String> stars;
   public Boolean reviewed;
   public SubmitType submitType;
@@ -44,6 +44,10 @@ public class ChangeInfo {
   public Boolean submittable;
   public Integer insertions;
   public Integer deletions;
+  public Integer unresolvedCommentCount;
+  public Boolean isPrivate;
+  public Boolean workInProgress;
+  public Boolean hasReviewStarted;
 
   public int _number;
 
@@ -54,6 +58,7 @@ public class ChangeInfo {
   public Map<String, Collection<String>> permittedLabels;
   public Collection<AccountInfo> removableReviewers;
   public Map<ReviewerState, Collection<AccountInfo>> reviewers;
+  public Map<ReviewerState, Collection<AccountInfo>> pendingReviewers;
   public Collection<ReviewerUpdateInfo> reviewerUpdates;
   public Collection<ChangeMessageInfo> messages;
 
@@ -63,4 +68,5 @@ public class ChangeInfo {
   public String _sortkey; // server version < 2.9, needed for change list paging
 
   public List<ProblemInfo> problems;
+  public List<PluginDefinedInfo> plugins;
 }

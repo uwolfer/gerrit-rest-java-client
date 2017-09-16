@@ -2,10 +2,26 @@ sudo: false
 
 language: java
 
+# precise required for openjdk6, see https://github.com/travis-ci/travis-ci/issues/8199
+dist: precise
+
 jdk:
   - openjdk6
 #  - openjdk7
 #  - oraclejdk7
+  - oraclejdk8
+
+addons:
+  sonarcloud:
+    organization: "uwolfer-github"
+    token: $SONAR_TOKEN
+
+cache:
+  directories:
+    - $HOME/.m2/repository/
+    - $HOME/.sonar/cache/
 
 after_success:
-  - mvn clean cobertura:cobertura coveralls:report
+  if [ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ]; then
+    mvn clean cobertura:cobertura coveralls:report jacoco:prepare-agent test jacoco:report sonar:sonar;
+  fi

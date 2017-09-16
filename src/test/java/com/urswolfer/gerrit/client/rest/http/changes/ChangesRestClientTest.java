@@ -24,6 +24,7 @@ import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
@@ -90,7 +91,7 @@ public class ChangesRestClientTest {
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
         ChangesParser changesParser = setupChangesParser();
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null, null, null, null, null);
+        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null, null, null, null, null, null, null, null);
 
         Changes.QueryRequest queryRequest = changes.query();
         testCase.queryParameter.apply(queryRequest).get();
@@ -106,7 +107,7 @@ public class ChangesRestClientTest {
         ChangesParser changesParser = setupChangesParser();
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null);
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null, null, null, null);
         changesRestClient.query("is:open").get();
 
         EasyMock.verify(gerritRestClient);
@@ -118,7 +119,7 @@ public class ChangesRestClientTest {
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null);
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null, null, null, null);
 
         ChangeApi changeApi = changesRestClient.id(123);
 
@@ -131,7 +132,7 @@ public class ChangesRestClientTest {
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null);
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null, null, null, null);
 
         ChangeApi changeApi = changesRestClient.id("packages%2Ftest", "master", "Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
 
@@ -144,10 +145,30 @@ public class ChangesRestClientTest {
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
         ChangesParser changesParser = setupChangesParser();
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null, null, null, null, null);
+        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null, null, null, null, null, null, null, null);
 
         changes.query().get();
 
+        EasyMock.verify(gerritRestClient, changesParser);
+    }
+
+    @Test
+    public void testCreate() throws Exception {
+        ChangesCreateTestCase testCase = new ChangesCreateTestCase().expectUrl("/changes/");
+        ChangeInput changeInput = new ChangeInput();
+        changeInput.branch = "master";
+        String changeInputJsonString = "{}";
+        GerritRestClient gerritRestClient = setupGerritRestClient(testCase, changeInputJsonString);
+        ChangeInfo changeInfo = new ChangeInfo();
+        changeInfo.id = "id";
+        ChangesParser changesParser = setupChangesParserForCreate(changeInput,
+            changeInputJsonString, changeInfo);
+
+        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null, null, null, null, null, null, null, null);
+
+        ChangeApi changeApi = changes.create(changeInput);
+
+        Truth.assertThat(changeApi.id()).isEqualTo(changeInfo.id);
         EasyMock.verify(gerritRestClient, changesParser);
     }
 
@@ -163,11 +184,35 @@ public class ChangesRestClientTest {
         return gerritRestClient;
     }
 
+    private GerritRestClient setupGerritRestClient(ChangesCreateTestCase testCase, String body) throws Exception {
+        GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
+
+        EasyMock.expect(gerritRestClient.postRequest(testCase.expectedUrl, body))
+            .andReturn(MOCK_JSON_ELEMENT)
+            .once();
+
+        EasyMock.replay(gerritRestClient);
+        return gerritRestClient;
+    }
+
     private ChangesParser setupChangesParser() throws Exception {
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
         EasyMock.expect(changesParser.parseChangeInfos(MOCK_JSON_ELEMENT))
                 .andReturn(Lists.<ChangeInfo>newArrayList())
                 .once();
+        EasyMock.replay(changesParser);
+        return changesParser;
+    }
+
+    private ChangesParser setupChangesParserForCreate(ChangeInput changeInput,
+        String changeInputJsonString, ChangeInfo changeInfo) throws Exception {
+        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        EasyMock.expect(changesParser.generateChangeInput(changeInput))
+            .andReturn(changeInputJsonString)
+            .once();
+        EasyMock.expect(changesParser.parseSingleChangeInfo(MOCK_JSON_ELEMENT))
+            .andReturn(changeInfo)
+            .once();
         EasyMock.replay(changesParser);
         return changesParser;
     }
@@ -255,6 +300,21 @@ public class ChangesRestClientTest {
                 queryRequest.withOptions(options);
             }
             return queryRequest;
+        }
+    }
+
+    private static final class ChangesCreateTestCase {
+
+        private String expectedUrl;
+
+        private ChangesCreateTestCase expectUrl(String expectedUrl) {
+            this.expectedUrl = expectedUrl;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return expectedUrl;
         }
     }
 }

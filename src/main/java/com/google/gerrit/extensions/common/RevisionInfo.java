@@ -15,7 +15,6 @@
 package com.google.gerrit.extensions.common;
 
 import com.google.gerrit.extensions.client.ChangeKind;
-
 import java.sql.Timestamp;
 import java.util.Map;
 
@@ -33,4 +32,5 @@ public class RevisionInfo {
   public Map<String, ActionInfo> actions;
   public String commitWithFooters;
   public PushCertificateInfo pushCertificate;
+  public String description;
 }

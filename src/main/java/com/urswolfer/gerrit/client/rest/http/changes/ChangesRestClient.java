@@ -21,6 +21,7 @@ import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -36,28 +37,37 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final GerritRestClient gerritRestClient;
     private final ChangesParser changesParser;
     private final CommentsParser commentsParser;
+    private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
     private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
     private final ReviewerInfoParser reviewerInfoParser;
     private final EditInfoParser editInfoParser;
+    private final AddReviewerResultParser addReviewerResultParser;
+    private final ReviewResultParser reviewResultParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
                              CommentsParser commentsParser,
+                             IncludedInInfoParser includedInInfoParser,
                              FileInfoParser fileInfoParser,
                              DiffInfoParser diffInfoParser,
                              SuggestedReviewerInfoParser suggestedReviewerInfoParser,
                              ReviewerInfoParser reviewerInfoParser,
-                             EditInfoParser editInfoParser) {
+                             EditInfoParser editInfoParser,
+                             AddReviewerResultParser addReviewerResultParser,
+                             ReviewResultParser reviewResultParser) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
+        this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
         this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
         this.reviewerInfoParser = reviewerInfoParser;
         this.editInfoParser = editInfoParser;
+        this.addReviewerResultParser = addReviewerResultParser;
+        this.reviewResultParser = reviewResultParser;
     }
 
     @Override
@@ -106,17 +116,42 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(int id) throws RestApiException {
-        return id("" + id);
+        return id(Integer.toString(id));
     }
 
     @Override
     public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
-            fileInfoParser, diffInfoParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, id);
+            includedInInfoParser, fileInfoParser, diffInfoParser, addReviewerResultParser, reviewResultParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, id);
     }
 
     @Override
     public ChangeApi id(String project, String branch, String id) throws RestApiException {
         return id(String.format("%s~%s~%s", project, branch, id));
+    }
+
+    @Override
+    public ChangeApi create(ChangeInput in) throws RestApiException {
+        if (in.branch == null) {
+            throw new IllegalArgumentException("Branch must be set in change creation input.");
+        }
+
+        String url = "/changes/";
+        String changeInput = changesParser.generateChangeInput(in);
+        JsonElement result = gerritRestClient.postRequest(url, changeInput);
+        ChangeInfo info = changesParser.parseSingleChangeInfo(result);
+        return new ChangeApiRestClient(gerritRestClient,
+            this,
+            changesParser,
+            commentsParser,
+            includedInInfoParser,
+            fileInfoParser,
+            diffInfoParser,
+            addReviewerResultParser,
+            reviewResultParser,
+            suggestedReviewerInfoParser,
+            reviewerInfoParser,
+            editInfoParser,
+            info.id);
     }
 }

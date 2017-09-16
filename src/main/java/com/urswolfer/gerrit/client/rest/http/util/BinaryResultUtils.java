@@ -49,10 +49,8 @@ public class BinaryResultUtils {
 
     private static void setContentEncoding(HttpResponse response, BinaryResult binaryResult) {
         Header contentEncoding = response.getFirstHeader("X-FYI-Content-Encoding");
-        if (contentEncoding != null) {
-            if ("base64".equals(contentEncoding.getValue())) {
-                binaryResult.base64();
-            }
+        if (contentEncoding != null && "base64".equals(contentEncoding.getValue())) {
+            binaryResult.base64();
         }
     }
 }

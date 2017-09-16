@@ -32,9 +32,9 @@ public class EditInfoParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("edit.json");
         List<EditInfo> editInfos = editInfoParser.parseEditInfos(jsonElement);
         Truth.assertThat(editInfos).hasSize(1);
-        Truth.assertThat(editInfos.get(0).baseRevision.equals("184ebe53805e102605d11f6b143486d15c23a09c"));
-        Truth.assertThat(editInfos.get(0).fetch.get("git").url.equals("git://localhost/gerrit"));
-        Truth.assertThat(editInfos.get(0).files.size() == 2);
+        Truth.assertThat(editInfos.get(0).baseRevision).isEqualTo("184ebe53805e102605d11f6b143486d15c23a09c");
+        Truth.assertThat(editInfos.get(0).fetch.get("git").url).isEqualTo("git://localhost/gerrit");
+        Truth.assertThat(editInfos.get(0).files.size()).isEqualTo(2);
     }
 
 }

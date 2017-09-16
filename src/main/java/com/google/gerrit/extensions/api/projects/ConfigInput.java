@@ -17,7 +17,6 @@ package com.google.gerrit.extensions.api.projects;
 import com.google.gerrit.extensions.client.InheritableBoolean;
 import com.google.gerrit.extensions.client.ProjectState;
 import com.google.gerrit.extensions.client.SubmitType;
-
 import java.util.Map;
 
 public class ConfigInput {
@@ -30,6 +29,8 @@ public class ConfigInput {
   public InheritableBoolean enableSignedPush;
   public InheritableBoolean requireSignedPush;
   public InheritableBoolean rejectImplicitMerges;
+  public InheritableBoolean enableReviewerByEmail;
+  public InheritableBoolean matchAuthorToCommitterDate;
   public String maxObjectSizeLimit;
   public SubmitType submitType;
   public ProjectState state;

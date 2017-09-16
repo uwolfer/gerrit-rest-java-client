@@ -63,7 +63,7 @@ public class TagApiRestClientTest {
                 .withLimit(3)
                 .withStart(1)
                 .get();
-        Truth.assertThat(tags.equals(mockTags));
+        Truth.assertThat(tags).isEqualTo(mockTags);
     }
 
     @Test
@@ -87,6 +87,6 @@ public class TagApiRestClientTest {
 
         TagInfo tags = projectApiRestClient.tag("v0.0.1")
                 .get();
-        Truth.assertThat(tags.equals(MOCK_TAG_INFO));
+        Truth.assertThat(tags).isEqualTo(MOCK_TAG_INFO);
     }
 }

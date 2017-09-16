@@ -26,7 +26,7 @@ public class UrlUtils {
 
     public static String appendToUrlQuery(String query, String parameter) {
         if (!Strings.isNullOrEmpty(query)) {
-            query += '&';
+            query += "&";
         }
         query += parameter;
         return query;

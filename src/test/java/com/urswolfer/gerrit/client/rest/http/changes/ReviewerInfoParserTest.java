@@ -17,7 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.truth.Truth;
-import com.google.gerrit.extensions.common.ReviewerInfo;
+import com.google.gerrit.extensions.api.changes.ReviewerInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import org.testng.annotations.Test;
@@ -32,7 +32,7 @@ public class ReviewerInfoParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("reviewer.json");
         List<ReviewerInfo> reviewerInfos = reviewerInfoParser.parseReviewerInfos(jsonElement);
         Truth.assertThat(reviewerInfos).hasSize(1);
-        Truth.assertThat(reviewerInfos.get(0).approvals.get("Code-Review").equals("+2"));
+        Truth.assertThat(reviewerInfos.get(0).approvals.get("Code-Review")).isEqualTo("+2");
     }
 
     @Test
@@ -40,7 +40,7 @@ public class ReviewerInfoParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("reviewers.json");
         List<ReviewerInfo> reviewerInfos = reviewerInfoParser.parseReviewerInfos(jsonElement);
         Truth.assertThat(reviewerInfos).hasSize(2);
-        Truth.assertThat(reviewerInfos.get(1).approvals.get("My-Own-Label").equals("-2"));
+        Truth.assertThat(reviewerInfos.get(1).approvals.get("My-Own-Label")).isEqualTo("-2");
     }
 
 }

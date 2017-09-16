@@ -30,7 +30,7 @@ import java.util.Date;
  */
 public class DateDeserializer extends DateFormatter implements JsonDeserializer<Date> {
     @Override
-    public Date deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public Date deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
         String date = jsonElement.getAsString();
         try {
             return DATE_FORMAT.get().parse(date);

@@ -19,14 +19,15 @@ import com.google.gerrit.extensions.client.DiffPreferencesInfo;
 import com.google.gerrit.extensions.client.EditPreferencesInfo;
 import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
 import com.google.gerrit.extensions.client.ProjectWatchInfo;
+import com.google.gerrit.extensions.common.AccountExternalIdInfo;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.AgreementInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.EmailInfo;
 import com.google.gerrit.extensions.common.GpgKeyInfo;
 import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
-
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -35,52 +36,73 @@ public interface AccountApi {
   AccountInfo get() throws RestApiException;
 
   boolean getActive() throws RestApiException;
+
   void setActive(boolean active) throws RestApiException;
 
   String getAvatarUrl(int size) throws RestApiException;
 
   GeneralPreferencesInfo getPreferences() throws RestApiException;
-  GeneralPreferencesInfo setPreferences(GeneralPreferencesInfo in)
-      throws RestApiException;
+
+  GeneralPreferencesInfo setPreferences(GeneralPreferencesInfo in) throws RestApiException;
 
   DiffPreferencesInfo getDiffPreferences() throws RestApiException;
-  DiffPreferencesInfo setDiffPreferences(DiffPreferencesInfo in)
-      throws RestApiException;
+
+  DiffPreferencesInfo setDiffPreferences(DiffPreferencesInfo in) throws RestApiException;
 
   EditPreferencesInfo getEditPreferences() throws RestApiException;
-  EditPreferencesInfo setEditPreferences(EditPreferencesInfo in)
-      throws RestApiException;
+
+  EditPreferencesInfo setEditPreferences(EditPreferencesInfo in) throws RestApiException;
 
   List<ProjectWatchInfo> getWatchedProjects() throws RestApiException;
-  List<ProjectWatchInfo> setWatchedProjects(List<ProjectWatchInfo> in)
-      throws RestApiException;
-  void deleteWatchedProjects(List<ProjectWatchInfo> in)
-      throws RestApiException;
+
+  List<ProjectWatchInfo> setWatchedProjects(List<ProjectWatchInfo> in) throws RestApiException;
+
+  void deleteWatchedProjects(List<ProjectWatchInfo> in) throws RestApiException;
 
   void starChange(String changeId) throws RestApiException;
+
   void unstarChange(String changeId) throws RestApiException;
+
   void setStars(String changeId, StarsInput input) throws RestApiException;
+
   SortedSet<String> getStars(String changeId) throws RestApiException;
+
   List<ChangeInfo> getStarredChanges() throws RestApiException;
+
+  List<EmailInfo> getEmails() throws RestApiException;
 
   void addEmail(EmailInput input) throws RestApiException;
 
+  void deleteEmail(String email) throws RestApiException;
+
+  void setStatus(String status) throws RestApiException;
+
   List<SshKeyInfo> listSshKeys() throws RestApiException;
+
   SshKeyInfo addSshKey(String key) throws RestApiException;
+
   void deleteSshKey(int seq) throws RestApiException;
 
   Map<String, GpgKeyInfo> listGpgKeys() throws RestApiException;
-  Map<String, GpgKeyInfo> putGpgKeys(List<String> add, List<String> remove)
-      throws RestApiException;
+
+  Map<String, GpgKeyInfo> putGpgKeys(List<String> add, List<String> remove) throws RestApiException;
+
   GpgKeyApi gpgKey(String id) throws RestApiException;
 
   List<AgreementInfo> listAgreements() throws RestApiException;
+
   void signAgreement(String agreementName) throws RestApiException;
 
+  void index() throws RestApiException;
+
+  List<AccountExternalIdInfo> getExternalIds() throws RestApiException;
+
+  void deleteExternalIds(List<String> externalIds) throws RestApiException;
+
   /**
-   * A default implementation which allows source compatibility
-   * when adding new methods to the interface.
-   **/
+   * A default implementation which allows source compatibility when adding new methods to the
+   * interface.
+   */
   class NotImplemented implements AccountApi {
     @Override
     public AccountInfo get() throws RestApiException {
@@ -119,8 +141,7 @@ public interface AccountApi {
     }
 
     @Override
-    public DiffPreferencesInfo setDiffPreferences(DiffPreferencesInfo in)
-        throws RestApiException {
+    public DiffPreferencesInfo setDiffPreferences(DiffPreferencesInfo in) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -130,26 +151,23 @@ public interface AccountApi {
     }
 
     @Override
-    public EditPreferencesInfo setEditPreferences(EditPreferencesInfo in)
+    public EditPreferencesInfo setEditPreferences(EditPreferencesInfo in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ProjectWatchInfo> getWatchedProjects() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ProjectWatchInfo> setWatchedProjects(List<ProjectWatchInfo> in)
         throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public List<ProjectWatchInfo> getWatchedProjects()
-        throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public List<ProjectWatchInfo> setWatchedProjects(
-        List<ProjectWatchInfo> in) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public void deleteWatchedProjects(List<ProjectWatchInfo> in)
-        throws RestApiException {
+    public void deleteWatchedProjects(List<ProjectWatchInfo> in) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -164,8 +182,7 @@ public interface AccountApi {
     }
 
     @Override
-    public void setStars(String changeId, StarsInput input)
-        throws RestApiException {
+    public void setStars(String changeId, StarsInput input) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -180,7 +197,22 @@ public interface AccountApi {
     }
 
     @Override
+    public List<EmailInfo> getEmails() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public void addEmail(EmailInput input) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void deleteEmail(String email) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void setStatus(String status) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -200,8 +232,8 @@ public interface AccountApi {
     }
 
     @Override
-    public Map<String, GpgKeyInfo> putGpgKeys(List<String> add,
-        List<String> remove) throws RestApiException {
+    public Map<String, GpgKeyInfo> putGpgKeys(List<String> add, List<String> remove)
+        throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -222,6 +254,21 @@ public interface AccountApi {
 
     @Override
     public void signAgreement(String agreementName) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void index() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<AccountExternalIdInfo> getExternalIds() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void deleteExternalIds(List<String> externalIds) throws RestApiException {
       throw new NotImplementedException();
     }
   }

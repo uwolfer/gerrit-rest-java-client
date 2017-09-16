@@ -4,7 +4,10 @@ gerrit-rest-java-client
 [![Linux Build](https://travis-ci.org/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://travis-ci.org/uwolfer/gerrit-rest-java-client)
 [![Windows Build](https://ci.appveyor.com/api/projects/status/ctm64o74lxdri26s/branch/master?svg=true)](https://ci.appveyor.com/project/uwolfer/gerrit-rest-java-client/branch/master)
 [![Coverage Status](https://img.shields.io/coveralls/uwolfer/gerrit-rest-java-client.svg)](https://coveralls.io/r/uwolfer/gerrit-rest-java-client)
+[![Quality Gate](https://sonarcloud.io/api/badges/gate?key=com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)](https://sonarcloud.io/dashboard/index/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
+[![Technical Dept](https://sonarcloud.io/api/badges/measure?key=com.urswolfer.gerrit.client.rest:gerrit-rest-java-client&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard/index/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
 [![Dependency Status](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client/badge)](https://www.versioneye.com/java/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.urswolfer.gerrit.client.rest/gerrit-rest-java-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.urswolfer.gerrit.client.rest/gerrit-rest-java-client)
 
 Introduction
 -----------
@@ -18,7 +21,7 @@ This implementation is used for example as base for the [Gerrit IntelliJ Plugin]
 Many different authentication-methods are supported (HTTP basic, HTTP digest, LDAP with form,
 HTTP password from Gerrit setting, ...).
 
-[Gerrit Code Review Tool]: http://code.google.com/p/gerrit/
+[Gerrit Code Review Tool]: https://www.gerritcodereview.com/
 [Gerrit IntelliJ Plugin]: https://github.com/uwolfer/gerrit-intellij-plugin
 
 
@@ -30,7 +33,7 @@ You just need a few lines to get it working:
 ```java
 GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
 GerritAuthData.Basic authData = new GerritAuthData.Basic("http://localhost:8080");
-// or: authData = new GerritAuthData.Basic("https://example.com/gerrit", "user", "password"");
+// or: authData = new GerritAuthData.Basic("https://example.com/gerrit", "user", "password");
 GerritApi gerritApi = gerritRestApiFactory.create(authData);
 List<ChangeInfo> changes = gerritApi.changes().query("status:merged").withLimit(10).get();
 ```
@@ -56,7 +59,7 @@ Releases are available with Maven:
 <dependency>
     <groupId>com.urswolfer.gerrit.client.rest</groupId>
     <artifactId>gerrit-rest-java-client</artifactId>
-    <version>0.8.9</version>
+    <version>0.8.12</version>
 </dependency>
 ```
 
@@ -80,24 +83,23 @@ This library depends on [Apache HttpClient], [Gson] and [Guava].
 Your Support
 ------------
 If you like this library, you can support it:
-* Star it: [Star it at GitHub]. GitHub account required.
+* Star it: [Star it at GitHub](https://github.com/uwolfer/gerrit-rest-java-client). GitHub account required.
 * Improve it: Report bugs or feature requests. Or even fix / implement them by yourself - everything is open source!
 * Donate: You can find donation-possibilities at the bottom of this file.
-[Star it at GitHub]: https://github.com/uwolfer/gerrit-rest-java-client
 
 
 Donations
 --------
-If you like this work, you can support it with [this donation link]. If you don't like Paypal
-(Paypal takes 2.9% plus $0.30 per transaction fee from your donation), please contact me.
+If you like this work, you can support it with
+[this donation link](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=8F2GZVBCVEDUQ).
+If you don't like Paypal (Paypal takes 2.9% plus $0.30 per transaction fee from your donation), please contact me.
 Please only use the link from github.com/uwolfer/gerrit-intellij-plugin to verify that it is correct.
-[this donation link]: https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=8F2GZVBCVEDUQ
 
 
 Copyright and license
 --------------------
 
-Copyright 2013 - 2016 Urs Wolfer
+Copyright 2013 - 2017 Urs Wolfer
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this work except in compliance with the License.

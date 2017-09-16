@@ -16,8 +16,8 @@ package com.google.gerrit.extensions.restapi;
 
 /**
  * Resource identifier split out from a URL.
- * <p>
- * Identifiers are URL encoded and usually need to be decoded.
+ *
+ * <p>Identifiers are URL encoded and usually need to be decoded.
  */
 public class IdString {
   /** Construct an identifier from an already encoded string. */
@@ -60,8 +60,6 @@ public class IdString {
   public boolean equals(Object other) {
     if (other instanceof IdString) {
       return urlEncoded.equals(((IdString) other).urlEncoded);
-    } else if (other instanceof String) {
-      return urlEncoded.equals(other);
     }
     return false;
   }

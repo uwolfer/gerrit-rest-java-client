@@ -17,21 +17,16 @@
 package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.base.Function;
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
-import com.google.gerrit.extensions.api.projects.ProjectApi;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.api.projects.Projects;
 import com.google.gerrit.extensions.api.projects.TagInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.easymock.IArgumentMatcher;
 import org.easymock.LogicalOperator;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

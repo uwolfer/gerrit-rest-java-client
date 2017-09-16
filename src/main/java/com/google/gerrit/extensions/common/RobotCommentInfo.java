@@ -14,6 +14,7 @@
 
 package com.google.gerrit.extensions.common;
 
+import java.util.List;
 import java.util.Map;
 
 public class RobotCommentInfo extends CommentInfo {
@@ -21,4 +22,5 @@ public class RobotCommentInfo extends CommentInfo {
   public String robotRunId;
   public String url;
   public Map<String, String> properties;
+  public List<FixSuggestionInfo> fixSuggestions;
 }
