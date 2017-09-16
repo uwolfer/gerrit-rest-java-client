@@ -17,7 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http;
 
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
-import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProviderHC4;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 /**
@@ -31,7 +31,7 @@ public abstract class HttpClientBuilderExtension {
         return httpClientBuilder;
     }
 
-    public CredentialsProvider extendCredentialProvider(HttpClientBuilder httpClientBuilder, CredentialsProvider credentialsProvider, GerritAuthData authData) {
+    public BasicCredentialsProviderHC4 extendCredentialProvider(HttpClientBuilder httpClientBuilder, BasicCredentialsProviderHC4 credentialsProvider, GerritAuthData authData) {
         return credentialsProvider;
     }
 }
