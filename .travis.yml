@@ -15,6 +15,9 @@ addons:
   sonarcloud:
     organization: "uwolfer-github"
     token: $SONAR_TOKEN
+  hosts:
+    - buildhost
+  hostname: buildhost
 
 cache:
   directories:
