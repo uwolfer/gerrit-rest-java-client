@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.config;
 
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+
 import com.google.gerrit.extensions.api.config.Server;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
@@ -39,7 +41,7 @@ public class ServerRestClient extends Server.NotImplemented implements Server {
             return jsonElement.getAsString();
         } catch (HttpStatusException e) {
             int statusCode = e.getStatusCode();
-            if (statusCode >= 400 && statusCode < 500) { // Gerrit older than 2.8
+            if (statusCode == SC_NOT_FOUND) { // Gerrit older than 2.8
                 return "<2.8";
             } else {
                 throw e;
