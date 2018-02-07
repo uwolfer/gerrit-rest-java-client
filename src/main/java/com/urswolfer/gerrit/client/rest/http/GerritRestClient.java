@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Urs Wolfer
+ * Copyright 2013-2018 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package com.urswolfer.gerrit.client.rest.http;
 
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.http.HttpStatus.SC_OK;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -31,18 +34,41 @@ import com.urswolfer.gerrit.client.rest.GerritAuthData;
 import com.urswolfer.gerrit.client.rest.RestClient;
 import com.urswolfer.gerrit.client.rest.Version;
 import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
-import org.apache.http.*;
-import org.apache.http.auth.*;
+import org.apache.http.Consts;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScheme;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.AuthState;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpRequestWrapper;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.*;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
@@ -218,7 +244,7 @@ public class GerritRestClient implements RestClient {
 
         HttpResponse response = httpRequestExecutor.execute(client, method, httpContext);
 
-        if (!isRetry && response.getStatusLine().getStatusCode() == 403 && loginCache.getGerritAuthOptional().isPresent()) {
+        if (!isRetry && response.getStatusLine().getStatusCode() == SC_FORBIDDEN && loginCache.getGerritAuthOptional().isPresent()) {
             // handle expired sessions: try again with a fresh login
             loginCache.invalidate();
             response = requestRest(path, requestBody, verb, true);
@@ -237,21 +263,24 @@ public class GerritRestClient implements RestClient {
 
     private Optional<String> updateGerritAuthWhenRequired(HttpContext httpContext, HttpClientBuilder client) throws IOException, HttpStatusException {
         if (!loginCache.getHostSupportsGerritAuth()) {
-            // We do not not need a cookie here since we are sending credentials as HTTP basic / digest header again.
+            // We do not need a cookie here since we are sending credentials as HTTP basic / digest header again.
             // In fact cookies could hurt: googlesource.com Gerrit instances block requests which send a magic cookie
-            // named "gi" with a 400 HTTP status (as of 01/29/15).
+            // named "gi" with a 400 HTTP status (as of 2015-01-29).
             cookieStore.clear();
             return Optional.absent();
-        } else if (authData.isHttpPassword()) {
+        }
+        if (authData.isHttpPassword()) {
             // Do not use a Gerrit HTTP password token to authenticate against the
-            // login page.  This will cause Gerrit to use the password to authenticate
+            // login page. This will cause Gerrit to use the password to authenticate
             // against the configured authentication source (LDAP, etc) and potentially
             // lock the account.
             return Optional.absent();
         }
 
         Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
-        if (!gerritAccountCookie.isPresent() || gerritAccountCookie.get().isExpired(new Date())) {
+        if (!gerritAccountCookie.isPresent()
+            || gerritAccountCookie.get().isExpired(new Date())
+            || !isSessionValid(client, httpContext)) {
             return updateGerritAuth(httpContext, client);
         }
         return loginCache.getGerritAuthOptional();
@@ -313,6 +342,13 @@ public class GerritRestClient implements RestClient {
             return getXsrfCookie().or(getXsrfFromHtmlBody(loginResponse));
         }
         return Optional.absent();
+    }
+
+    private boolean isSessionValid(HttpClientBuilder client, HttpContext httpContext) throws IOException {
+        String accountsSelfUrl = authData.getHost() + "/accounts/self";
+        // HEAD could be used instead when we only support Gerrit >=2.12; https://gerrit-review.googlesource.com/c/80962
+        HttpResponse response = httpRequestExecutor.execute(client, new HttpGet(accountsSelfUrl), httpContext);
+        return response.getStatusLine().getStatusCode() == SC_OK;
     }
 
     /**
