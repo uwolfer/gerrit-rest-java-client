@@ -16,6 +16,7 @@
 
 package com.urswolfer.gerrit.client.rest.http;
 
+import static com.urswolfer.gerrit.client.rest.http.PreemptiveAuthHttpRequestInterceptor.PREEMPTIVE_AUTH;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_OK;
 
@@ -32,21 +33,14 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
 import com.urswolfer.gerrit.client.rest.RestClient;
-import com.urswolfer.gerrit.client.rest.Version;
 import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthScheme;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.AuthState;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -58,7 +52,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpRequestWrapper;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
@@ -79,7 +72,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -96,7 +88,6 @@ public class GerritRestClient implements RestClient {
     private static final String JSON_MIME_TYPE = ContentType.APPLICATION_JSON.getMimeType();
     private static final Pattern GERRIT_AUTH_PATTERN = Pattern.compile(".*?xGerritAuth=\"(.+?)\"");
     private static final int CONNECTION_TIMEOUT_MS = 30000;
-    private static final String PREEMPTIVE_AUTH = "preemptive-auth";
     private static final Gson GSON = GsonFactory.create();
 
     private final GerritAuthData authData;
@@ -507,64 +498,6 @@ public class GerritRestClient implements RestClient {
         Header contentType = entity.getContentType();
         if (contentType != null && !contentType.getValue().contains(JSON_MIME_TYPE)) {
             throw new RestApiException(String.format("Expected JSON but got '%s'.", contentType.getValue()));
-        }
-    }
-
-    /**
-     * With preemptive auth, it will send the basic authentication response even before the server gives an unauthorized
-     * response in certain situations, thus reducing the overhead of making the connection again.
-     *
-     * Based on:
-     * https://subversion.jfrog.org/jfrog/build-info/trunk/build-info-client/src/main/java/org/jfrog/build/client/PreemptiveHttpClient.java
-     */
-    private static class PreemptiveAuthHttpRequestInterceptor implements HttpRequestInterceptor {
-        private GerritAuthData authData;
-
-        public PreemptiveAuthHttpRequestInterceptor(GerritAuthData authData) {
-            this.authData = authData;
-        }
-
-        @Override
-        public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
-            // never ever send credentials preemptively to a host which is not the configured Gerrit host
-            if (!isForGerritHost(request)) {
-                return;
-            }
-
-            AuthState authState = (AuthState) context.getAttribute(HttpClientContext.TARGET_AUTH_STATE);
-
-            // if no auth scheme available yet, try to initialize it preemptively
-            if (authState.getAuthScheme() == null) {
-                AuthScheme authScheme = (AuthScheme) context.getAttribute(PREEMPTIVE_AUTH);
-                UsernamePasswordCredentials creds = new UsernamePasswordCredentials(authData.getLogin(), authData.getPassword());
-                authState.update(authScheme, creds);
-            }
-        }
-
-        /**
-         * Checks if request is intended for Gerrit host.
-         */
-        private boolean isForGerritHost(HttpRequest request) {
-            if (!(request instanceof HttpRequestWrapper)) return false;
-            HttpRequest originalRequest = ((HttpRequestWrapper) request).getOriginal();
-            if (!(originalRequest instanceof HttpRequestBase)) return false;
-            URI uri = ((HttpRequestBase) originalRequest).getURI();
-            URI authDataUri = URI.create(authData.getHost());
-            if (uri == null || uri.getHost() == null) return false;
-            boolean hostEquals = uri.getHost().equals(authDataUri.getHost());
-            boolean portEquals = uri.getPort() == authDataUri.getPort();
-            return hostEquals && portEquals;
-        }
-    }
-
-    private static class UserAgentHttpRequestInterceptor implements HttpRequestInterceptor {
-
-        @Override
-        public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
-            Header existingUserAgent = request.getFirstHeader(HttpHeaders.USER_AGENT);
-            String userAgent = String.format("gerrit-rest-java-client/%s", Version.get());
-            userAgent += " using " + existingUserAgent.getValue();
-            request.setHeader(HttpHeaders.USER_AGENT, userAgent);
         }
     }
 }
