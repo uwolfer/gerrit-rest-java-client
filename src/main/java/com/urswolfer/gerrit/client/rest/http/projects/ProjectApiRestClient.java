@@ -16,7 +16,11 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import java.util.List;
+
 import com.google.common.base.Strings;
+import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
+import com.google.gerrit.extensions.api.access.ProjectAccessInput;
 import com.google.gerrit.extensions.api.projects.BranchApi;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.ProjectApi;
@@ -30,8 +34,6 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
-
-import java.util.List;
 
 /**
  * @author Thomas Forrer
@@ -119,8 +121,21 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         JsonElement tags = gerritRestClient.getRequest(request);
         return tagInfoParser.parseTagInfos(tags);
     }
-
-
+    
+    @Override
+    public ProjectAccessInfo access() throws RestApiException {
+    	String request = projectsUrl() + "/access";
+    	JsonElement result =  gerritRestClient.getRequest(request);
+    	return projectsParser.parseProjectAccessInfo(result);
+    }
+    
+    @Override
+    public ProjectAccessInfo access(ProjectAccessInput p) throws RestApiException {
+    	String request = projectsUrl() + "/access";
+    	String params = projectsParser.toJson(p);
+    	JsonElement result = gerritRestClient.postRequest(request,params);
+    	return projectsParser.parseProjectAccessInfo(result);
+    }
     protected String projectsUrl() {
         return "/projects/" + Url.encode(name);
     }
