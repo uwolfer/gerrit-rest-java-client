@@ -1,12 +1,11 @@
 environment:
-  MVN_VERSION: 3.5.0
+  JAVA_HOME: C:\Program Files\Java\jdk1.8.0
 
 install:
-  - cinst maven --version=%MVN_VERSION% -y
-  - set PATH=C:\tools\apache-maven-%MVN_VERSION%\bin;%PATH%
+  - set PATH=%JAVA_HOME%\bin;%PATH%
 
 cache:
-  - C:\Users\appveyor\.m2\repository -> pom.xml
+  - C:\Users\appveyor\.m2\ -> pom.xml
 
 build_script:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V  # This is what Travis CI does by default.
