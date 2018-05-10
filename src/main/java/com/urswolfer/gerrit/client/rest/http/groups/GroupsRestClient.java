@@ -133,4 +133,47 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
             return groupsParser.parseGroupInfos(result);
         }
     }
+
+    @Override
+    public QueryRequest query() {
+        return new QueryRequest() {
+            @Override
+            public List<GroupInfo> get() throws RestApiException {
+                return GroupsRestClient.this.query(this);
+            }
+        };
+    }
+
+    protected List<GroupInfo> query(QueryRequest queryRequest) throws RestApiException {
+        String query = "";
+        if (!Strings.isNullOrEmpty(queryRequest.getQuery())) {
+            // param is "query2", not "query".
+            query = UrlUtils.appendToUrlQuery(query, "query2=" + queryRequest.getQuery());
+        }
+        if (queryRequest.getLimit() > 0) {
+            query = UrlUtils.appendToUrlQuery(query, "limit=" + queryRequest.getLimit());
+        }
+        if (queryRequest.getStart() > 0) {
+            query = UrlUtils.appendToUrlQuery(query, "start=" + queryRequest.getStart());
+        }
+        if (!queryRequest.getOptions().isEmpty()) {
+            throw new NotImplementedException();
+        }
+
+        String url = GroupApiRestClient.getBaseRequestPath() + "/";
+        if (!Strings.isNullOrEmpty(query)) {
+            url += '?' + query;
+        }
+        JsonElement result = gerritRestClient.getRequest(url);
+        if (result == null) {
+            return Collections.emptyList();
+        } else {
+            return groupsParser.parseGroupInfos(result);
+        }
+    }
+
+    @Override
+    public QueryRequest query(String query) {
+        return query().withQuery(query);
+    }
 }
