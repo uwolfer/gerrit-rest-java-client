@@ -81,7 +81,7 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
     }
 
     private List<AccountInfo> getSuggestAccounts(String queryPart) throws RestApiException {
-        String request = String.format("/accounts/?%s", queryPart);
+        String request = String.format("/accounts/?suggest&%s", queryPart);
         JsonElement suggestedReviewers = gerritRestClient.getRequest(request);
         return accountsParser.parseAccountInfos(suggestedReviewers);
     }

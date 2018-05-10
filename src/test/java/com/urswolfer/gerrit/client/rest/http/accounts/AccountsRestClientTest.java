@@ -79,7 +79,7 @@ public class AccountsRestClientTest {
     @Test
     public void testSuggestAccount() throws Exception {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet(
-                "/accounts/?q=jdoe&n=5");
+                "/accounts/?suggest&q=jdoe&n=5");
         AccountsRestClient accountsRestClient = new AccountsRestClient(
                 gerritRestClient,
                 EasyMock.createMock(AccountsParser.class));
