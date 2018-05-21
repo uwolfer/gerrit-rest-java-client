@@ -23,15 +23,15 @@ import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.FixInput;
+import com.google.gerrit.extensions.api.changes.IncludedInInfo;
+import com.google.gerrit.extensions.api.changes.MoveInput;
 import com.google.gerrit.extensions.api.changes.RestoreInput;
 import com.google.gerrit.extensions.api.changes.RevertInput;
-import com.google.gerrit.extensions.api.changes.MoveInput;
 import com.google.gerrit.extensions.api.changes.ReviewerInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
-import com.google.gerrit.extensions.api.changes.IncludedInInfo;
-import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gerrit.extensions.common.EditInfo;
+import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
@@ -309,7 +309,7 @@ public class ChangeApiRestClientTest {
 
         ChangeInfo expectedChangeInfo = new ChangeInfo();
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
-        EasyMock.expect(changesParser.parseChangeInfos(jsonElement)).andReturn(Lists.newArrayList(expectedChangeInfo)).once();
+        EasyMock.expect(changesParser.parseSingleChangeInfo(jsonElement)).andReturn(expectedChangeInfo).once();
         EasyMock.replay(changesParser);
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
@@ -358,7 +358,7 @@ public class ChangeApiRestClientTest {
 
         ChangeInfo expectedChangeInfo = new ChangeInfo();
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
-        EasyMock.expect(changesParser.parseChangeInfos(jsonElement)).andReturn(Lists.newArrayList(expectedChangeInfo)).once();
+        EasyMock.expect(changesParser.parseSingleChangeInfo(jsonElement)).andReturn(expectedChangeInfo).once();
         EasyMock.replay(changesParser);
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,

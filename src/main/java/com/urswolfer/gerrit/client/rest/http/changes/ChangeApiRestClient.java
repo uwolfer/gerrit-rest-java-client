@@ -280,7 +280,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     public ChangeInfo check() throws RestApiException {
         String request = getRequestPath() + "/check";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return Iterables.getOnlyElement(changesParser.parseChangeInfos(jsonElement));
+        return changesParser.parseSingleChangeInfo(jsonElement);
     }
 
     @Override
@@ -288,7 +288,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String request = getRequestPath() + "/check";
         String json = gerritRestClient.getGson().toJson(in);
         JsonElement jsonElement = gerritRestClient.postRequest(request, json);
-        return Iterables.getOnlyElement(changesParser.parseChangeInfos(jsonElement));
+        return changesParser.parseSingleChangeInfo(jsonElement);
     }
 
     @Override

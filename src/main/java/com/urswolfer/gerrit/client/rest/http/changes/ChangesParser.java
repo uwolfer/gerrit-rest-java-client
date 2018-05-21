@@ -40,7 +40,7 @@ public class ChangesParser {
 
     public List<ChangeInfo> parseChangeInfos(JsonElement result) {
         if (!result.isJsonArray()) {
-            return Collections.singletonList(gson.fromJson(result, ChangeInfo.class));
+            return Collections.singletonList(parseSingleChangeInfo(result));
         }
         return gson.fromJson(result, TYPE);
     }
