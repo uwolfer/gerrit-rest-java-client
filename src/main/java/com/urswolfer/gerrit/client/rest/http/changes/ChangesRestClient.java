@@ -127,6 +127,11 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     }
 
     @Override
+    public ChangeApi id(String project, int id) throws RestApiException {
+        return id(String.format("%s~%s", Url.encode(project), id));
+    }
+
+    @Override
     public ChangeApi id(String project, String branch, String id) throws RestApiException {
         return id(String.format("%s~%s~%s", Url.encode(project), Url.encode(branch), id));
     }

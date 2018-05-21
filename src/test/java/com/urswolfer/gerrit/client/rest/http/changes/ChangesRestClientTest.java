@@ -127,6 +127,19 @@ public class ChangesRestClientTest {
     }
 
     @Test
+    public void testIdAsProjectWithNr() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
+        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null, null, null, null);
+
+        ChangeApi changeApi = changesRestClient.id("packages/test", 123);
+
+        Truth.assertThat(changeApi.id()).isEqualTo("packages%2Ftest~123");
+    }
+
+    @Test
     public void testIdAsTriplet() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
