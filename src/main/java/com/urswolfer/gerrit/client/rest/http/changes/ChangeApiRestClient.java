@@ -261,7 +261,9 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public ChangeInfo get() throws RestApiException {
-        return get(EnumSet.allOf(ListChangesOption.class));
+        EnumSet<ListChangesOption> options = EnumSet.allOf(ListChangesOption.class);
+        options.remove(ListChangesOption.CHECK);
+        return get(options);
     }
 
     @Override
