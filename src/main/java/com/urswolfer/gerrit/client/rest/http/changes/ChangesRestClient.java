@@ -23,6 +23,7 @@ import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
@@ -127,7 +128,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(String project, String branch, String id) throws RestApiException {
-        return id(String.format("%s~%s~%s", project, branch, id));
+        return id(String.format("%s~%s~%s", Url.encode(project), Url.encode(branch), id));
     }
 
     @Override

@@ -134,7 +134,7 @@ public class ChangesRestClientTest {
 
         ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null, null, null, null, null, null, null, null);
 
-        ChangeApi changeApi = changesRestClient.id("packages%2Ftest", "master", "Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
+        ChangeApi changeApi = changesRestClient.id("packages/test", "master", "Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
 
         Truth.assertThat(changeApi.id()).isEqualTo("packages%2Ftest~master~Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
     }
