@@ -16,6 +16,7 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
@@ -37,6 +38,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -256,7 +258,16 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public ChangeInfo get(EnumSet<ListChangesOption> options) throws RestApiException {
-        return Iterables.getOnlyElement(changesRestClient.query(id).withOptions(options).get());
+        String query = "";
+        for (ListChangesOption option : options) {
+            query = UrlUtils.appendToUrlQuery(query, "o=" + option);
+        }
+        String url = getRequestPath();
+        if (!Strings.isNullOrEmpty(query)) {
+            url += '?' + query;
+        }
+        JsonElement jsonElement = gerritRestClient.getRequest(url);
+        return changesParser.parseSingleChangeInfo(jsonElement);
     }
 
     @Override
