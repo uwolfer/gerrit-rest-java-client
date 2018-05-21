@@ -140,18 +140,6 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         String changeInput = changesParser.generateChangeInput(in);
         JsonElement result = gerritRestClient.postRequest(url, changeInput);
         ChangeInfo info = changesParser.parseSingleChangeInfo(result);
-        return new ChangeApiRestClient(gerritRestClient,
-            this,
-            changesParser,
-            commentsParser,
-            includedInInfoParser,
-            fileInfoParser,
-            diffInfoParser,
-            addReviewerResultParser,
-            reviewResultParser,
-            suggestedReviewerInfoParser,
-            reviewerInfoParser,
-            editInfoParser,
-            info.id);
+        return id(info._number);
     }
 }

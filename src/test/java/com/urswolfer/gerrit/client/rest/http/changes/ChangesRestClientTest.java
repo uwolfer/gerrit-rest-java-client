@@ -160,7 +160,7 @@ public class ChangesRestClientTest {
         String changeInputJsonString = "{}";
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase, changeInputJsonString);
         ChangeInfo changeInfo = new ChangeInfo();
-        changeInfo.id = "id";
+        changeInfo._number = 29;
         ChangesParser changesParser = setupChangesParserForCreate(changeInput,
             changeInputJsonString, changeInfo);
 
@@ -168,7 +168,7 @@ public class ChangesRestClientTest {
 
         ChangeApi changeApi = changes.create(changeInput);
 
-        Truth.assertThat(changeApi.id()).isEqualTo(changeInfo.id);
+        Truth.assertThat(changeApi.id()).isEqualTo(Integer.toString(changeInfo._number));
         EasyMock.verify(gerritRestClient, changesParser);
     }
 
