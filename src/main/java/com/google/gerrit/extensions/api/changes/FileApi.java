@@ -43,6 +43,7 @@ public interface FileApi {
     private Integer context;
     private Boolean intraline;
     private Whitespace whitespace;
+//    private OptionalInt parent = OptionalInt.empty();
 
     public abstract DiffInfo get() throws RestApiException;
 
@@ -66,6 +67,11 @@ public interface FileApi {
       return this;
     }
 
+//    public DiffRequest withParent(int parent) {
+//      this.parent = OptionalInt.of(parent);
+//      return this;
+//    }
+
     public String getBase() {
       return base;
     }
@@ -81,6 +87,10 @@ public interface FileApi {
     public Whitespace getWhitespace() {
       return whitespace;
     }
+
+//    public OptionalInt getParent() {
+//      return parent;
+//    }
   }
 
   /**

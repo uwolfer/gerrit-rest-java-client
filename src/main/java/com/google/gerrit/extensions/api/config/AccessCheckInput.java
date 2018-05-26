@@ -22,11 +22,6 @@ public class AccessCheckInput {
 
   @Nullable public String ref;
 
-  public AccessCheckInput(String account, String project, @Nullable String ref) {
-    this.account = account;
-    this.project = project;
-    this.ref = ref;
-  }
-
-  public AccessCheckInput() {}
+  // If permission is given, ref must also be given.
+  @Nullable public String permission;
 }

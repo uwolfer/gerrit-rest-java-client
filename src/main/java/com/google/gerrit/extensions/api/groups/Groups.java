@@ -18,6 +18,7 @@ import com.google.gerrit.extensions.client.ListGroupsOption;
 import com.google.gerrit.extensions.common.GroupInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -79,6 +80,8 @@ public interface Groups {
     private int start;
     private String substring;
     private String suggest;
+    private String regex;
+    private String ownedBy;
 
     public List<GroupInfo> get() throws RestApiException {
       Map<String, GroupInfo> map = getAsMap();
@@ -149,8 +152,18 @@ public interface Groups {
       return this;
     }
 
+    public ListRequest withRegex(String regex) {
+      this.regex = regex;
+      return this;
+    }
+
     public ListRequest withSuggest(String suggest) {
       this.suggest = suggest;
+      return this;
+    }
+
+    public ListRequest withOwnedBy(String ownedBy) {
+      this.ownedBy = ownedBy;
       return this;
     }
 
@@ -190,8 +203,16 @@ public interface Groups {
       return substring;
     }
 
+    public String getRegex() {
+      return regex;
+    }
+
     public String getSuggest() {
       return suggest;
+    }
+
+    public String getOwnedBy() {
+      return ownedBy;
     }
   }
 

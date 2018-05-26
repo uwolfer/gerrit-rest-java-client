@@ -18,6 +18,7 @@ import com.google.gerrit.extensions.api.changes.NotifyHandling;
 import com.google.gerrit.extensions.api.changes.NotifyInfo;
 import com.google.gerrit.extensions.api.changes.RecipientType;
 import com.google.gerrit.extensions.client.ChangeStatus;
+
 import java.util.Map;
 
 public class ChangeInput {
@@ -30,6 +31,7 @@ public class ChangeInput {
   public Boolean isPrivate;
   public Boolean workInProgress;
   public String baseChange;
+  public String baseCommit;
   public Boolean newBranch;
   public MergeInput merge;
 

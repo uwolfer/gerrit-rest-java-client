@@ -22,7 +22,7 @@ import com.google.gerrit.extensions.api.projects.TagInfo;
  * @author Pavel Bely
  */
 public class TagInfoBuilder {
-    private final TagInfo tagInfo = new TagInfo(null, null, false);
+    private final TagInfo tagInfo = new TagInfo(null, null, false, null);
 
     public TagInfo get() {
         return tagInfo;

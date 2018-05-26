@@ -18,13 +18,17 @@ import com.google.gerrit.common.Nullable;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.ChangeMessageInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
+import com.google.gerrit.extensions.common.CommitMessageInput;
 import com.google.gerrit.extensions.common.EditInfo;
 import com.google.gerrit.extensions.common.MergePatchSetInput;
+import com.google.gerrit.extensions.common.PureRevertInfo;
 import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -108,11 +112,19 @@ public interface ChangeApi {
   void ignore(boolean ignore) throws RestApiException;
 
   /**
-   * Mute or un-mute this change.
+   * Check if this change is ignored.
    *
-   * @param mute mute the change if true
+   * @return true if the change is ignored
    */
-  void mute(boolean mute) throws RestApiException;
+  boolean ignored() throws RestApiException;
+
+  /**
+   * Mark this change as reviewed/unreviewed.
+   *
+   * @param reviewed flag to decide if this change should be marked as reviewed ({@code true}) or
+   *     unreviewed ({@code false})
+   */
+  void markAsReviewed(boolean reviewed) throws RestApiException;
 
   /**
    * Create a new change that reverts this change.
@@ -141,6 +153,7 @@ public interface ChangeApi {
       throws RestApiException;
 
   /** Publishes a draft change. */
+  @Deprecated
   void publish() throws RestApiException;
 
   /** Rebase the current revision of a change using default options. */
@@ -170,6 +183,14 @@ public interface ChangeApi {
 
   ChangeInfo get(EnumSet<ListChangesOption> options) throws RestApiException;
 
+//  default ChangeInfo get(Iterable<ListChangesOption> options) throws RestApiException {
+//    return get(Sets.newEnumSet(options, ListChangesOption.class));
+//  }
+
+//  default ChangeInfo get(ListChangesOption... options) throws RestApiException {
+//    return get(Arrays.asList(options));
+//  }
+
   /** {@code get} with {@link ListChangesOption} set to all except CHECK. */
   ChangeInfo get() throws RestApiException;
   /** {@code get} with {@link ListChangesOption} set to none. */
@@ -194,6 +215,9 @@ public interface ChangeApi {
 
   /** Create a new patch set with a new commit message. */
   void setMessage(String message) throws RestApiException;
+
+  /** Create a new patch set with a new commit message. */
+  void setMessage(CommitMessageInput in) throws RestApiException;
 
   /** Set hashtags on a change */
   void setHashtags(HashtagsInput input) throws RestApiException;
@@ -254,6 +278,31 @@ public interface ChangeApi {
   ChangeInfo check(FixInput fix) throws RestApiException;
 
   void index() throws RestApiException;
+
+  /** Check if this change is a pure revert of the change stored in revertOf. */
+  PureRevertInfo pureRevert() throws RestApiException;
+
+  /** Check if this change is a pure revert of claimedOriginal (SHA1 in 40 digit hex). */
+  PureRevertInfo pureRevert(String claimedOriginal) throws RestApiException;
+
+  /**
+   * Get all messages of a change with detailed account info.
+   *
+   * @return a list of messages sorted by their creation time.
+   * @throws RestApiException
+   */
+  List<ChangeMessageInfo> messages() throws RestApiException;
+
+  /**
+   * Look up a change message of a change by its id.
+   *
+   * @param id the id of the change message. Note that in NoteDb, this id is the {@code ObjectId} of
+   *     a commit on the change meta branch. In ReviewDb, it's a UUID generated randomly. That means
+   *     a change message id could be different between NoteDb and ReviewDb.
+   * @return API for accessing a change message.
+   * @throws RestApiException if the id is invalid.
+   */
+  ChangeMessageApi message(String id) throws RestApiException;
 
   abstract class SuggestedReviewersRequest {
     private String query;
@@ -370,6 +419,7 @@ public interface ChangeApi {
       throw new NotImplementedException();
     }
 
+    @Deprecated
     @Override
     public void rebase() throws RestApiException {
       throw new NotImplementedException();
@@ -442,6 +492,11 @@ public interface ChangeApi {
 
     @Override
     public void setMessage(String message) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void setMessage(CommitMessageInput in) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -543,7 +598,32 @@ public interface ChangeApi {
     }
 
     @Override
-    public void mute(boolean mute) throws RestApiException {
+    public boolean ignored() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void markAsReviewed(boolean reviewed) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public PureRevertInfo pureRevert() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public PureRevertInfo pureRevert(String claimedOriginal) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ChangeMessageInfo> messages() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ChangeMessageApi message(String id) throws RestApiException {
       throw new NotImplementedException();
     }
   }

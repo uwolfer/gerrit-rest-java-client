@@ -18,11 +18,13 @@ import com.google.gerrit.extensions.client.InheritableBoolean;
 import com.google.gerrit.extensions.client.ProjectState;
 import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.ActionInfo;
+
 import java.util.List;
 import java.util.Map;
 
 public class ConfigInfo {
   public String description;
+
   public InheritedBooleanInfo useContributorAgreements;
   public InheritedBooleanInfo useContentMerge;
   public InheritedBooleanInfo useSignedOffBy;
@@ -31,10 +33,15 @@ public class ConfigInfo {
   public InheritedBooleanInfo enableSignedPush;
   public InheritedBooleanInfo requireSignedPush;
   public InheritedBooleanInfo rejectImplicitMerges;
+  public InheritedBooleanInfo privateByDefault;
   public InheritedBooleanInfo enableReviewerByEmail;
   public InheritedBooleanInfo matchAuthorToCommitterDate;
+  public InheritedBooleanInfo rejectEmptyCommit;
+
   public MaxObjectSizeLimitInfo maxObjectSizeLimit;
+  @Deprecated // Equivalent to defaultSubmitType.value
   public SubmitType submitType;
+  public SubmitTypeInfo defaultSubmitType;
   public ProjectState state;
   public Map<String, Map<String, ConfigParameterInfo>> pluginConfig;
   public Map<String, ActionInfo> actions;
@@ -68,5 +75,11 @@ public class ConfigInfo {
     public String inheritedValue;
     public List<String> permittedValues;
     public List<String> values;
+  }
+
+  public static class SubmitTypeInfo {
+    public SubmitType value;
+    public SubmitType configuredValue;
+    public SubmitType inheritedValue;
   }
 }

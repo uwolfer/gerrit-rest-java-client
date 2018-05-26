@@ -20,6 +20,7 @@ import com.google.gerrit.extensions.client.Comment;
 import com.google.gerrit.extensions.client.ReviewerState;
 import com.google.gerrit.extensions.common.FixSuggestionInfo;
 import com.google.gerrit.extensions.restapi.DefaultInput;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,8 +49,8 @@ public class ReviewInput {
    * How to process draft comments already in the database that were not also described in this
    * input request.
    *
-   * <p>Defaults to DELETE, unless {@link #onBehalfOf} is set, in which case it defaults to KEEP and
-   * any other value is disallowed.
+   * <p>If not set, the default is {@link DraftHandling#KEEP}. If {@link #onBehalfOf} is set, then
+   * no other value besides {@code KEEP} is allowed.
    */
   public DraftHandling drafts;
 
@@ -66,23 +67,33 @@ public class ReviewInput {
    * on behalf of this named user instead of the caller. Caller must have the labelAs-$NAME
    * permission granted for each label that appears in {@link #labels}. This is in addition to the
    * named user also needing to have permission to use the labels.
-   *
-   * <p>{@link #strictLabels} impacts how labels is processed for the named user, not the caller.
    */
   public String onBehalfOf;
 
   /** Reviewers that should be added to this change. */
   public List<AddReviewerInput> reviewers;
 
+  /**
+   * If true mark the change as work in progress. It is an error for both {@link #workInProgress}
+   * and {@link #ready} to be true.
+   */
+  public Boolean workInProgress;
+
+  /**
+   * If true mark the change as ready for review. It is an error for both {@link #workInProgress}
+   * and {@link #ready} to be true.
+   */
+  public Boolean ready;
+
   public enum DraftHandling {
     /** Delete pending drafts on this revision only. */
     DELETE,
 
-    /** Publish pending drafts on this revision only. */
-    PUBLISH,
-
     /** Leave pending drafts alone. */
     KEEP,
+
+    /** Publish pending drafts on this revision only. */
+    PUBLISH,
 
     /** Publish pending drafts on all revisions. */
     PUBLISH_ALL_REVISIONS
@@ -138,6 +149,18 @@ public class ReviewInput {
       reviewers = new ArrayList<AddReviewerInput>();
     }
     reviewers.add(input);
+    return this;
+  }
+
+  public ReviewInput setWorkInProgress(boolean workInProgress) {
+    this.workInProgress = workInProgress;
+    ready = !workInProgress;
+    return this;
+  }
+
+  public ReviewInput setReady(boolean ready) {
+    this.ready = ready;
+    workInProgress = !ready;
     return this;
   }
 

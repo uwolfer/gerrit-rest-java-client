@@ -17,6 +17,7 @@ package com.google.gerrit.extensions.common;
 import com.google.gerrit.extensions.client.ChangeStatus;
 import com.google.gerrit.extensions.client.ReviewerState;
 import com.google.gerrit.extensions.client.SubmitType;
+
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -35,6 +36,7 @@ public class ChangeInfo {
   public Timestamp created;
   public Timestamp updated;
   public Timestamp submitted;
+  public AccountInfo submitter;
   public Boolean starred;
   public Boolean muted;
   public Collection<String> stars;
@@ -48,6 +50,7 @@ public class ChangeInfo {
   public Boolean isPrivate;
   public Boolean workInProgress;
   public Boolean hasReviewStarted;
+  public Integer revertOf;
 
   public int _number;
 
@@ -69,4 +72,6 @@ public class ChangeInfo {
 
   public List<ProblemInfo> problems;
   public List<PluginDefinedInfo> plugins;
+  public Collection<TrackingIdInfo> trackingIds;
+  public Collection<SubmitRequirementInfo> requirements;
 }

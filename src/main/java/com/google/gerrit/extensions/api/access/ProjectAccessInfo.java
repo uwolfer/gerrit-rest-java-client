@@ -14,7 +14,11 @@
 
 package com.google.gerrit.extensions.api.access;
 
+import com.google.gerrit.extensions.common.GroupInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
+import com.google.gerrit.extensions.common.WebLinkInfo;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,4 +31,6 @@ public class ProjectAccessInfo {
   public Boolean canUpload;
   public Boolean canAdd;
   public Boolean configVisible;
+  public Map<String, GroupInfo> groups;
+  public List<WebLinkInfo> configWebLinks;
 }

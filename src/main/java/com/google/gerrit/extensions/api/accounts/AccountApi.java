@@ -25,9 +25,11 @@ import com.google.gerrit.extensions.common.AgreementInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.EmailInfo;
 import com.google.gerrit.extensions.common.GpgKeyInfo;
+import com.google.gerrit.extensions.common.GroupInfo;
 import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -69,11 +71,17 @@ public interface AccountApi {
 
   List<ChangeInfo> getStarredChanges() throws RestApiException;
 
+  List<GroupInfo> getGroups() throws RestApiException;
+
   List<EmailInfo> getEmails() throws RestApiException;
 
   void addEmail(EmailInput input) throws RestApiException;
 
   void deleteEmail(String email) throws RestApiException;
+
+  EmailApi createEmail(EmailInput emailInput) throws RestApiException;
+
+  EmailApi email(String email) throws RestApiException;
 
   void setStatus(String status) throws RestApiException;
 
@@ -197,6 +205,11 @@ public interface AccountApi {
     }
 
     @Override
+    public List<GroupInfo> getGroups() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public List<EmailInfo> getEmails() throws RestApiException {
       throw new NotImplementedException();
     }
@@ -208,6 +221,16 @@ public interface AccountApi {
 
     @Override
     public void deleteEmail(String email) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public EmailApi createEmail(EmailInput input) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public EmailApi email(String email) throws RestApiException {
       throw new NotImplementedException();
     }
 

@@ -26,11 +26,13 @@ import com.google.gerrit.extensions.common.TestSubmitRuleInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public interface RevisionApi {
+  @Deprecated
   void delete() throws RestApiException;
 
   String description() throws RestApiException;
@@ -47,6 +49,7 @@ public interface RevisionApi {
 
   BinaryResult submitPreview(String format) throws RestApiException;
 
+  @Deprecated
   void publish() throws RestApiException;
 
   ChangeApi cherryPick(CherryPickInput in) throws RestApiException;
@@ -68,6 +71,8 @@ public interface RevisionApi {
   Map<String, FileInfo> files(String base) throws RestApiException;
 
   Map<String, FileInfo> files(int parentNum) throws RestApiException;
+
+  List<String> queryFiles(String query) throws RestApiException;
 
   FileApi file(String path);
 
@@ -153,6 +158,7 @@ public interface RevisionApi {
    * interface.
    */
   class NotImplemented implements RevisionApi {
+    @Deprecated
     @Override
     public void delete() throws RestApiException {
       throw new NotImplementedException();
@@ -173,6 +179,7 @@ public interface RevisionApi {
       throw new NotImplementedException();
     }
 
+    @Deprecated
     @Override
     public void publish() throws RestApiException {
       throw new NotImplementedException();
@@ -235,6 +242,11 @@ public interface RevisionApi {
 
     @Override
     public Map<String, FileInfo> files() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<String> queryFiles(String query) throws RestApiException {
       throw new NotImplementedException();
     }
 

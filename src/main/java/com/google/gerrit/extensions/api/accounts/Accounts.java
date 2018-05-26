@@ -18,6 +18,7 @@ import com.google.gerrit.extensions.client.ListAccountsOption;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -137,6 +138,7 @@ public interface Accounts {
     private String query;
     private int limit;
     private int start;
+    private boolean suggest;
     private EnumSet<ListAccountsOption> options = EnumSet.noneOf(ListAccountsOption.class);
 
     /** Execute query and return a list of accounts. */
@@ -166,6 +168,11 @@ public interface Accounts {
       return this;
     }
 
+    public QueryRequest withSuggest(boolean suggest) {
+      this.suggest = suggest;
+      return this;
+    }
+
     public QueryRequest withOption(ListAccountsOption options) {
       this.options.add(options);
       return this;
@@ -191,6 +198,10 @@ public interface Accounts {
 
     public int getStart() {
       return start;
+    }
+
+    public boolean getSuggest() {
+      return suggest;
     }
 
     public EnumSet<ListAccountsOption> getOptions() {

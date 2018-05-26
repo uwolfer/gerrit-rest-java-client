@@ -17,6 +17,7 @@ package com.google.gerrit.extensions.common;
 import java.util.Map;
 
 public class ServerInfo {
+  public AccountsInfo accounts;
   public AuthInfo auth;
   public ChangeConfigInfo change;
   public DownloadInfo download;
@@ -28,4 +29,5 @@ public class ServerInfo {
   public Map<String, String> urlAliases;
   public UserConfigInfo user;
   public ReceiveInfo receive;
+  public String defaultTheme;
 }

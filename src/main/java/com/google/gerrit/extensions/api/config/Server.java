@@ -15,6 +15,7 @@
 package com.google.gerrit.extensions.api.config;
 
 import com.google.gerrit.extensions.client.DiffPreferencesInfo;
+import com.google.gerrit.extensions.client.EditPreferencesInfo;
 import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
 import com.google.gerrit.extensions.common.ServerInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
@@ -34,9 +35,11 @@ public interface Server {
 
   DiffPreferencesInfo setDefaultDiffPreferences(DiffPreferencesInfo in) throws RestApiException;
 
-  ConsistencyCheckInfo checkConsistency(ConsistencyCheckInput in) throws RestApiException;
+  EditPreferencesInfo getDefaultEditPreferences() throws RestApiException;
 
-  AccessCheckInfo checkAccess(AccessCheckInput in) throws RestApiException;
+  EditPreferencesInfo setDefaultEditPreferences(EditPreferencesInfo in) throws RestApiException;
+
+  ConsistencyCheckInfo checkConsistency(ConsistencyCheckInput in) throws RestApiException;
 
   /**
    * A default implementation which allows source compatibility when adding new methods to the
@@ -76,12 +79,18 @@ public interface Server {
     }
 
     @Override
-    public ConsistencyCheckInfo checkConsistency(ConsistencyCheckInput in) throws RestApiException {
+    public EditPreferencesInfo getDefaultEditPreferences() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public AccessCheckInfo checkAccess(AccessCheckInput in) throws RestApiException {
+    public EditPreferencesInfo setDefaultEditPreferences(EditPreferencesInfo in)
+        throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ConsistencyCheckInfo checkConsistency(ConsistencyCheckInput in) throws RestApiException {
       throw new NotImplementedException();
     }
   }

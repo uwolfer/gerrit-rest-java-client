@@ -14,6 +14,9 @@
 
 package com.google.gerrit.extensions.api.projects;
 
+
+import com.google.common.base.Objects;
+
 public class CommentLinkInfo {
   public String match;
   public String link;
@@ -21,4 +24,24 @@ public class CommentLinkInfo {
   public Boolean enabled; // null means true
 
   public transient String name;
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (o instanceof CommentLinkInfo) {
+      CommentLinkInfo that = (CommentLinkInfo) o;
+      return Objects.equal(this.match, that.match)
+          && Objects.equal(this.link, that.link)
+          && Objects.equal(this.html, that.html)
+          && Objects.equal(this.enabled, that.enabled);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(match, link, html, enabled);
+  }
 }

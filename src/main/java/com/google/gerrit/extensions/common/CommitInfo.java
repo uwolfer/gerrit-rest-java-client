@@ -14,6 +14,8 @@
 
 package com.google.gerrit.extensions.common;
 
+import com.google.common.base.Objects;
+
 import java.util.List;
 
 public class CommitInfo {
@@ -24,4 +26,40 @@ public class CommitInfo {
   public String subject;
   public String message;
   public List<WebLinkInfo> webLinks;
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof CommitInfo)) {
+      return false;
+    }
+    CommitInfo c = (CommitInfo) o;
+    return Objects.equal(commit, c.commit)
+        && Objects.equal(parents, c.parents)
+        && Objects.equal(author, c.author)
+        && Objects.equal(committer, c.committer)
+        && Objects.equal(subject, c.subject)
+        && Objects.equal(message, c.message)
+        && Objects.equal(webLinks, c.webLinks);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(commit, parents, author, committer, subject, message, webLinks);
+  }
+
+  @Override
+  public String toString() {
+    // Using something like the raw commit format might be nice, but we can't depend on JGit here.
+    StringBuilder sb = new StringBuilder().append(getClass().getSimpleName()).append('{');
+    sb.append(commit);
+//    sb.append(", parents=").append(parents.stream().map(p -> p.commit).collect(joining(", ")));
+    sb.append(", author=").append(author);
+    sb.append(", committer=").append(committer);
+    sb.append(", subject=").append(subject);
+    sb.append(", message=").append(message);
+    if (webLinks != null) {
+      sb.append(", webLinks=").append(webLinks);
+    }
+    return sb.append('}').toString();
+  }
 }

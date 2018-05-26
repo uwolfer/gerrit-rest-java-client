@@ -1,4 +1,4 @@
-// Copyright (C) 2014 The Android Open Source Project
+// Copyright (C) 2012 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,18 +14,20 @@
 
 package com.google.gerrit.extensions.common;
 
-import com.google.gerrit.extensions.client.ProjectState;
+/** Visibility level of other accounts to a given user. */
+public enum AccountVisibility {
+  /** All accounts are visible to all users. */
+  ALL,
 
-import java.util.List;
-import java.util.Map;
+  /** Accounts sharing a group with the given user. */
+  SAME_GROUP,
 
-public class ProjectInfo {
-  public String id;
-  public String name;
-  public String parent;
-  public String description;
-  public ProjectState state;
-  public Map<String, String> branches;
-  public List<WebLinkInfo> webLinks;
-  public Map<String, LabelTypeInfo> labels;
+  /** Accounts in a group that is visible to the given user. */
+  VISIBLE_GROUP,
+
+  /**
+   * Other accounts are not visible to the given user unless they are explicitly collaborating on a
+   * change.
+   */
+  NONE
 }
