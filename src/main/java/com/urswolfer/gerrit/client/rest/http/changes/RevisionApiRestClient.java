@@ -168,12 +168,20 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
     @Override
     public Map<String, FileInfo> files() throws RestApiException {
-        String request = getRequestPath() + "/files";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return fileInfoParser.parseFileInfos(jsonElement);
+        return files(0);
     }
 
     @Override
+	public Map<String, FileInfo> files(int parentNum) throws RestApiException {
+    	String request = getRequestPath() + "/files";
+    	if (parentNum > 0) {
+    		request += "?parent=" + parentNum;
+    	}
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return fileInfoParser.parseFileInfos(jsonElement);
+	}
+
+	@Override
     public FileApi file(String path) {
         return new FileApiRestClient(gerritRestClient, this, diffInfoParser, path);
     }
