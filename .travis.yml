@@ -5,6 +5,7 @@ jdk:
 #  - openjdk7
 #  - oraclejdk7
   - oraclejdk8
+  - openjdk11
 
 addons:
   apt:
@@ -33,6 +34,6 @@ install:
     fi
 
 after_success:
-  if [ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ]; then
+  if [ "$TRAVIS_JDK_VERSION" == "openjdk11" ]; then
     mvn clean cobertura:cobertura coveralls:report jacoco:prepare-agent test jacoco:report sonar:sonar;
   fi
