@@ -82,6 +82,11 @@ public class FileApiRestClient extends FileApi.NotImplemented {
     }
 
     @Override
+    public DiffInfo diff(int parent) throws RestApiException {
+        return diff(diffRequest(), parent);
+    }
+
+    @Override
     public DiffRequest diffRequest() throws RestApiException {
         return new DiffRequest() {
             @Override
@@ -92,6 +97,10 @@ public class FileApiRestClient extends FileApi.NotImplemented {
     }
 
     private DiffInfo diff(DiffRequest diffRequest) throws RestApiException {
+        return diff(diffRequest, 0);
+    }
+    
+    private DiffInfo diff(DiffRequest diffRequest, int parent) throws RestApiException {
         String query = "";
 
         if (!Strings.isNullOrEmpty(diffRequest.getBase())) {
@@ -105,6 +114,9 @@ public class FileApiRestClient extends FileApi.NotImplemented {
         }
         if (diffRequest.getWhitespace() != null) {
             query = UrlUtils.appendToUrlQuery(query, "whitespace=" + diffRequest.getWhitespace());
+        }
+        if (parent > 0) {
+            query = UrlUtils.appendToUrlQuery(query, "parent=" + parent);
         }
 
         String url = getRequestPath() +  "/diff";
