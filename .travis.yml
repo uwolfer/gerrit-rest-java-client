@@ -1,16 +1,16 @@
 language: java
 
 jdk:
-  - openjdk6
+#  - openjdk6
 #  - openjdk7
 #  - oraclejdk7
   - oraclejdk8
   - openjdk11
 
 addons:
-  apt:
-    packages:
-      - openjdk-6-jdk
+#  apt:
+#    packages:
+#      - openjdk-6-jdk
   sonarcloud:
     organization: "uwolfer-github"
     token: $SONAR_TOKEN
@@ -23,16 +23,15 @@ cache:
     - $HOME/.m2/repository/
     - $HOME/.sonar/cache/
 
-before_install:
-  - if [[ $JAVA_HOME = *java-6* ]]; then jdk_switcher use openjdk6; fi
-  - if [[ "$TRAVIS_JDK_VERSION" == "openjdk6" ]]; then
-      echo "Downloading Maven 3.0";
-      wget https://archive.apache.org/dist/maven/binaries/apache-maven-3.0-bin.zip || travis_terminate 1;
-      unzip -qq apache-maven-3.0-bin.zip || travis_terminate 1;
-      export M2_HOME=$PWD/apache-maven-3.0;
-      export PATH=$M2_HOME/bin:$PATH;
-      mvn -version;
-    fi
+#install:
+#  - if [[ "$TRAVIS_JDK_VERSION" == "openjdk6" ]]; then
+#      echo "Downloading Maven 3.0";
+#      wget https://archive.apache.org/dist/maven/binaries/apache-maven-3.0-bin.zip || travis_terminate 1;
+#      unzip -qq apache-maven-3.0-bin.zip || travis_terminate 1;
+#      export M2_HOME=$PWD/apache-maven-3.0;
+#      export PATH=$M2_HOME/bin:$PATH;
+#      mvn -version;
+#    fi
 
 after_success:
   if [ "$TRAVIS_JDK_VERSION" == "openjdk11" ]; then
