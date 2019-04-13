@@ -23,7 +23,8 @@ cache:
     - $HOME/.m2/repository/
     - $HOME/.sonar/cache/
 
-install:
+before_install:
+  - if [[ $JAVA_HOME = *java-6* ]]; then jdk_switcher use openjdk6; fi
   - if [[ "$TRAVIS_JDK_VERSION" == "openjdk6" ]]; then
       echo "Downloading Maven 3.0";
       wget https://archive.apache.org/dist/maven/binaries/apache-maven-3.0-bin.zip || travis_terminate 1;
