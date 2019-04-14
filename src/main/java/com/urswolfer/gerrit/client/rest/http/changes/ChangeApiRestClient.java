@@ -317,6 +317,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
       gerritRestClient.postRequest(request);
     }
 
+    @Override
+    public List<ChangeInfo> submittedTogether() throws RestApiException {
+        String url = getRequestPath() + "/submitted_together";
+        JsonElement jsonElement = gerritRestClient.getRequest(url);
+        return changesParser.parseChangeInfos(jsonElement);
+    }
+
     protected String getRequestPath() {
         return "/changes/" + id;
     }
