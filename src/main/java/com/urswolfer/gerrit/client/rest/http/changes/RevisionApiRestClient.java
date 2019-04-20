@@ -16,6 +16,7 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
+import com.google.common.base.Strings;
 import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.CommentInfo;
@@ -202,6 +203,27 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         String request = getRequestPath() + "/submit_type";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return gerritRestClient.getGson().fromJson(jsonElement, new TypeToken<SubmitType>() {}.getType());
+    }
+
+    @Override
+    public BinaryResult submitPreview() throws RestApiException {
+        return submitPreview(null);
+    }
+
+    @Override
+    public BinaryResult submitPreview(String format) throws RestApiException {
+        String request = getRequestPath() + "/preview_submit";
+        if (!Strings.isNullOrEmpty(format)) {
+            request += "?format=" + format;
+        }
+
+        try {
+            HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
+            BinaryResult result = BinaryResultUtils.createBinaryResult(response);
+            return result;
+        } catch (IOException e) {
+            throw new RestApiException("Request failed.", e);
+        }
     }
 
     @Override
