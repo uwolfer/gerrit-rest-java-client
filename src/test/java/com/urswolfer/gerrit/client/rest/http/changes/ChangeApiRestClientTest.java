@@ -466,6 +466,27 @@ public class ChangeApiRestClientTest {
       EasyMock.verify(gerritRestClient);
     }
 
+    @Test
+    public void testSubmittedTogether() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/submitted_together", jsonElement)
+            .get();
+
+        List<ChangeInfo> expectedChangeInfos = Lists.newArrayList();
+        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        EasyMock.expect(changesParser.parseChangeInfos(jsonElement)).andReturn(expectedChangeInfos).once();
+        EasyMock.replay(changesParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
+            null, null, null, null, null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        List<ChangeInfo> changeInfos = changeApiRestClient.submittedTogether();
+        Truth.assertThat(changeInfos).isSameAs(expectedChangeInfos);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
     private GerritRestClient getGerritRestClient(String expectedRequest, String expectedJson) throws Exception {
         return new GerritRestClientBuilder()
                 .expectPost(expectedRequest, expectedJson)
