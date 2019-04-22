@@ -329,6 +329,41 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         EasyMock.verify(gerritRestClient);
     }
 
+    @Test
+    public void testSubmitPreview() throws Exception {
+        String previewContent = "binary data";
+        String requestUrl = "/changes/" + CHANGE_ID + "/revisions/current/preview_submit?format=zip";
+        HttpResponse httpResponse = EasyMock.createMock(HttpResponse.class);
+        HttpEntity httpEntity = EasyMock.createMock(HttpEntity.class);
+        EasyMock.expect(httpEntity.getContent()).andStubReturn(new ByteArrayInputStream(previewContent.getBytes()));
+        EasyMock.expect(httpResponse.getEntity()).andStubReturn(httpEntity);
+        EasyMock.expect(httpResponse.getFirstHeader("X-FYI-Content-Type")).andStubReturn(null);
+        EasyMock.expect(httpResponse.getFirstHeader("Content-Type")).andStubReturn(
+            new BasicHeader("Content-Type", "application/x-zip"));
+        EasyMock.expect(httpResponse.getFirstHeader("X-FYI-Content-Encoding")).andStubReturn(null);
+        EasyMock.replay(httpEntity, httpResponse);
+
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectRequest(requestUrl, null, GerritRestClient.HttpVerb.GET, httpResponse)
+            .get();
+
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        BinaryResult binaryResult = changesRestClient.id(CHANGE_ID).revision("current").submitPreview("zip");
+        try {
+            binaryResult.writeTo(byteArrayOutputStream);
+            String actualContent = new String(byteArrayOutputStream.toString());
+
+            Truth.assertThat(actualContent).isEqualTo(previewContent);
+            Truth.assertThat(binaryResult.getContentType()).isEqualTo("application/x-zip");
+            EasyMock.verify(gerritRestClient);
+        } finally {
+            binaryResult.close();
+            byteArrayOutputStream.close();
+        }
+    }
+
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
