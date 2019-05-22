@@ -124,6 +124,17 @@ public interface ChangeEditApi {
   void modifyFile(String filePath, RawInput newContent) throws RestApiException;
 
   /**
+   * Modify the contents of the specified file of the change edit. If no content is provided, the
+   * content of the file is erased but the file isn't deleted. If the change edit doesn't exist, it
+   * will be created based on the current patch set of the change.
+   *
+   * @param filePath the path of the file which should be modified
+   * @param content the desired content of the file
+   * @throws RestApiException if the content of the file couldn't be modified
+   */
+  void modifyFile(String filePath, String content) throws RestApiException;
+
+  /**
    * Deletes the specified file from the change edit. If the change edit doesn't exist, it will be
    * created based on the current patch set of the change.
    *
@@ -202,6 +213,11 @@ public interface ChangeEditApi {
 
     @Override
     public void modifyFile(String filePath, RawInput newContent) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void modifyFile(String filePath, String content) throws RestApiException {
       throw new NotImplementedException();
     }
 

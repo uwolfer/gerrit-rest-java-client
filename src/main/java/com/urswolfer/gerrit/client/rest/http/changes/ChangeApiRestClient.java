@@ -22,6 +22,7 @@ import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerResult;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
+import com.google.gerrit.extensions.api.changes.ChangeEditApi;
 import com.google.gerrit.extensions.api.changes.FixInput;
 import com.google.gerrit.extensions.api.changes.IncludedInInfo;
 import com.google.gerrit.extensions.api.changes.MoveInput;
@@ -290,6 +291,11 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public ChangeEditApi edit() throws RestApiException {
+        return new ChangeEditApiRestClient(gerritRestClient, id);
+    }
+
+    @Override
     public ChangeInfo check() throws RestApiException {
         String request = getRequestPath() + "/check";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
@@ -323,6 +329,20 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         JsonElement jsonElement = gerritRestClient.getRequest(url);
         return changesParser.parseChangeInfos(jsonElement);
     }
+
+    @Override
+    public void setCodeReviewVerified(String revisionId) throws RestApiException {
+       String url = getRequestPath() + "/revisions/" + revisionId + "/review";
+       String reviewAndVerified = "{labels: {Code-Review: 2, Verified: 1}, strict_labels: true, drafts: \"PUBLISH_ALL_REVISIONS\"}";
+       gerritRestClient.postRequest(url, reviewAndVerified);
+   }
+
+   @Override
+   public void submit(String revisionId) throws RestApiException {
+        String url = getRequestPath() + "/revisions/" + revisionId + "/submit";
+        String data = "{}";
+        gerritRestClient.postRequest(url, data);
+   }
 
     protected String getRequestPath() {
         return "/changes/" + id;

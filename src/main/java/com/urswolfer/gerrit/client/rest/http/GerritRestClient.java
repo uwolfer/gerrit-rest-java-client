@@ -87,7 +87,7 @@ public class GerritRestClient implements RestClient {
 
     private static final String JSON_MIME_TYPE = ContentType.APPLICATION_JSON.getMimeType();
     private static final Pattern GERRIT_AUTH_PATTERN = Pattern.compile(".*?xGerritAuth=\"(.+?)\"");
-    private static final int CONNECTION_TIMEOUT_MS = 30000;
+    private static final int CONNECTION_TIMEOUT_MS = 300000; //30000;
     private static final Gson GSON = GsonFactory.create();
 
     private final GerritAuthData authData;
@@ -222,6 +222,10 @@ public class GerritRestClient implements RestClient {
                 method = new HttpPut(uri);
                 setRequestBody(requestBody, method);
                 break;
+            case PUT_TEXT_PLAIN:
+                method = new HttpPut(uri);
+                setRequestBodyTextPlain(requestBody, method);
+                break;
             default:
                 throw new IllegalStateException("Unknown or unsupported HttpVerb method: " + verb.toString());
         }
@@ -249,6 +253,12 @@ public class GerritRestClient implements RestClient {
     private void setRequestBody(String requestBody, HttpRequestBase method) {
         if (requestBody != null) {
             ((HttpEntityEnclosingRequestBase) method).setEntity(new StringEntity(requestBody, ContentType.APPLICATION_JSON));
+        }
+    }
+
+    private void setRequestBodyTextPlain(String requestBody, HttpRequestBase method) {
+        if (requestBody != null) {
+            ((HttpEntityEnclosingRequestBase) method).setEntity(new StringEntity(requestBody, ContentType.TEXT_PLAIN));
         }
     }
 
