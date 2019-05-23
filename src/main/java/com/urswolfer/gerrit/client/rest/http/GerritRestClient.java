@@ -224,7 +224,7 @@ public class GerritRestClient implements RestClient {
                 break;
             case PUT_TEXT_PLAIN:
                 method = new HttpPut(uri);
-                setRequestBodyTextPlain(requestBody, method);
+                setRequestBody(requestBody, method, ContentType.TEXT_PLAIN);
                 break;
             default:
                 throw new IllegalStateException("Unknown or unsupported HttpVerb method: " + verb.toString());
@@ -252,13 +252,13 @@ public class GerritRestClient implements RestClient {
 
     private void setRequestBody(String requestBody, HttpRequestBase method) {
         if (requestBody != null) {
-            ((HttpEntityEnclosingRequestBase) method).setEntity(new StringEntity(requestBody, ContentType.APPLICATION_JSON));
+            setRequestBody(requestBody, method, ContentType.APPLICATION_JSON);
         }
     }
 
-    private void setRequestBodyTextPlain(String requestBody, HttpRequestBase method) {
+    private void setRequestBody(String requestBody, HttpRequestBase method, ContentType contentType) {
         if (requestBody != null) {
-            ((HttpEntityEnclosingRequestBase) method).setEntity(new StringEntity(requestBody, ContentType.TEXT_PLAIN));
+            ((HttpEntityEnclosingRequestBase) method).setEntity(new StringEntity(requestBody, contentType));
         }
     }
 

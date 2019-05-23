@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.base.Optional;
 import com.google.gerrit.extensions.api.changes.ChangeEditApi;
+import com.google.gerrit.extensions.api.changes.PublishChangeEditInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
@@ -61,9 +62,10 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
     }
 
     @Override
-    public void publish() throws RestApiException {
-        String request = getRequestPath() + ":publish";
-        gerritRestClient.postRequest(request,"{\"notify\":\"NONE\"}");
+    public void publish(PublishChangeEditInput input) throws RestApiException {
+	String request = "/changes/"+id+"/edit:publish";
+        String json = gerritRestClient.getGson().toJson(input);
+        gerritRestClient.postRequest(request,json);
     }
 
     protected String getRequestPath() { return "/changes/" + id + "/edit"; }
