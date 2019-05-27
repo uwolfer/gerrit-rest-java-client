@@ -330,20 +330,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         return changesParser.parseChangeInfos(jsonElement);
     }
 
-    @Override
-    public void setCodeReviewVerified(String revisionId) throws RestApiException {
-       String url = getRequestPath() + "/revisions/" + revisionId + "/review";
-       String reviewAndVerified = "{labels: {Code-Review: 2, Verified: 1}, strict_labels: true, drafts: \"PUBLISH_ALL_REVISIONS\"}";
-       gerritRestClient.postRequest(url, reviewAndVerified);
-   }
-
-   @Override
-   public void submit(String revisionId) throws RestApiException {
-        String url = getRequestPath() + "/revisions/" + revisionId + "/submit";
-        String data = "{}";
-        gerritRestClient.postRequest(url, data);
-   }
-
     protected String getRequestPath() {
         return "/changes/" + id;
     }

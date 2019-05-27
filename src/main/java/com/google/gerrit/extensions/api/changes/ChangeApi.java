@@ -156,12 +156,6 @@ public interface ChangeApi {
   @Deprecated
   void publish() throws RestApiException;
 
-  /** Set Code Review on a change*/
-  void setCodeReviewVerified(String revisionId) throws RestApiException;
-
-  /** Submit a change */
-  void submit(String revisionId) throws RestApiException;
-
   /** Rebase the current revision of a change using default options. */
   void rebase() throws RestApiException;
 
@@ -417,16 +411,6 @@ public interface ChangeApi {
 
     @Override
     public ChangeApi revert(RevertInput in) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public void setCodeReviewVerified(String revisionId) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public void submit(String revisionId) throws RestApiException {
       throw new NotImplementedException();
     }
 

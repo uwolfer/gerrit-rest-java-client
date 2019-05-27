@@ -63,7 +63,7 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
 
     @Override
     public void publish(PublishChangeEditInput input) throws RestApiException {
-	String request = "/changes/"+id+"/edit:publish";
+	String request = getRequestPath() + ":publish";
         String json = gerritRestClient.getGson().toJson(input);
         gerritRestClient.postRequest(request,json);
     }
