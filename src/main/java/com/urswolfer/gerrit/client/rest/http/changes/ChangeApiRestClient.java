@@ -22,6 +22,7 @@ import com.google.gerrit.extensions.api.changes.AbandonInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerInput;
 import com.google.gerrit.extensions.api.changes.AddReviewerResult;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
+import com.google.gerrit.extensions.api.changes.ChangeEditApi;
 import com.google.gerrit.extensions.api.changes.FixInput;
 import com.google.gerrit.extensions.api.changes.IncludedInInfo;
 import com.google.gerrit.extensions.api.changes.MoveInput;
@@ -287,6 +288,11 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String request = getRequestPath() + "/edit";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return Iterables.getOnlyElement(editInfoParser.parseEditInfos(jsonElement));
+    }
+
+    @Override
+    public ChangeEditApi edit() throws RestApiException {
+        return new ChangeEditApiRestClient(gerritRestClient, id);
     }
 
     @Override
