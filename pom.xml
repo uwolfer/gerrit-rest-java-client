@@ -83,7 +83,7 @@
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
-      <version>1.4.10</version><!-- do not update - this is the last release with Java 6 support -->
+      <version>1.4.10-java7</version><!-- do not update - this is the last release with Java 6 support -->
       <scope>test</scope>
     </dependency>
     <dependency>
