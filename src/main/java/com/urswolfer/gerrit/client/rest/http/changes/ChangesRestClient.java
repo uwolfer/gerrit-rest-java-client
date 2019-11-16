@@ -46,6 +46,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final EditInfoParser editInfoParser;
     private final AddReviewerResultParser addReviewerResultParser;
     private final ReviewResultParser reviewResultParser;
+    private final CommitInfoParser commitInfoParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
@@ -57,7 +58,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
                              ReviewerInfoParser reviewerInfoParser,
                              EditInfoParser editInfoParser,
                              AddReviewerResultParser addReviewerResultParser,
-                             ReviewResultParser reviewResultParser) {
+                             ReviewResultParser reviewResultParser,
+                             CommitInfoParser commitInfoParser) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
@@ -69,6 +71,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         this.editInfoParser = editInfoParser;
         this.addReviewerResultParser = addReviewerResultParser;
         this.reviewResultParser = reviewResultParser;
+        this.commitInfoParser = commitInfoParser;
     }
 
     @Override
@@ -123,7 +126,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     @Override
     public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
-            includedInInfoParser, fileInfoParser, diffInfoParser, addReviewerResultParser, reviewResultParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, id);
+            includedInInfoParser, fileInfoParser, diffInfoParser, addReviewerResultParser, reviewResultParser,
+            suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, commitInfoParser, id);
     }
 
     @Override

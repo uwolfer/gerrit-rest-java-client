@@ -65,6 +65,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/current/drafts/")
                         .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/submit_type")
                         .expectTestSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/test.submit_type")
+                        .expectGetCommitUrl("/changes/" + CHANGE_ID + "/revisions/current/commit")
                         .get(),
                 withRevision("3")
                         .expectRevisionUrl("/changes/" + CHANGE_ID + "/revisions/3")
@@ -79,6 +80,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/3/drafts/")
                         .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/submit_type")
                         .expectTestSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/test.submit_type")
+                        .expectGetCommitUrl("/changes/" + CHANGE_ID + "/revisions/3/commit")
                         .get()
         ).iterator();
     }
@@ -223,6 +225,20 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).files();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test(dataProvider = "TestCases")
+    public void testGetCommit(RevisionApiTestCase testCase) throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet(testCase.getCommitUrl, jsonElement)
+            .get();
+
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).commit(false);
 
         EasyMock.verify(gerritRestClient);
     }
@@ -374,7 +390,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         EditInfoParser editInfoParser = EasyMock.createMock(EditInfoParser.class);
         AddReviewerResultParser addReviewerResultParser = EasyMock.createMock(AddReviewerResultParser.class);
         ReviewResultParser reviewResultParser = EasyMock.createMock(ReviewResultParser.class);
-        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser, addReviewerResultParser, reviewResultParser);
+        CommitInfoParser commitInfoParser = EasyMock.createMock(CommitInfoParser.class);
+        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser, addReviewerResultParser, reviewResultParser, commitInfoParser);
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
@@ -389,7 +406,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                 EasyMock.createMock(ReviewerInfoParser.class),
                 EasyMock.createMock(EditInfoParser.class),
                 EasyMock.createMock(AddReviewerResultParser.class),
-                EasyMock.createMock(ReviewResultParser.class));
+                EasyMock.createMock(ReviewResultParser.class),
+                EasyMock.createMock(CommitInfoParser.class));
     }
 
     private static RevisionApiTestCase withRevision(String revision) {
@@ -410,6 +428,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         private String getDraftsUrl;
         private String submitTypeUrl;
         private String testSubmitTypeUrl;
+        private String getCommitUrl;
 
         private RevisionApiTestCase(String revision) {
             this.revision = revision;
@@ -472,6 +491,11 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
         private RevisionApiTestCase expectTestSubmitTypeUrl(String testSubmitTypeUrl) {
             this.testSubmitTypeUrl = testSubmitTypeUrl;
+            return this;
+        }
+
+        private RevisionApiTestCase expectGetCommitUrl(String getCommitUrl) {
+            this.getCommitUrl = getCommitUrl;
             return this;
         }
 

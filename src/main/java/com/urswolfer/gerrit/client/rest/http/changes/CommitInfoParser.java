@@ -20,6 +20,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.common.CommitInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -42,6 +43,10 @@ public class CommitInfoParser {
             return Collections.singletonList(gson.fromJson(result, CommitInfo.class));
         }
         return gson.fromJson(result, TYPE);
+    }
+
+    public CommitInfo parseSingleCommentInfo(JsonObject result) {
+        return gson.fromJson(result, CommitInfo.class);
     }
 
 }

@@ -63,6 +63,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
     private final ReviewerInfoParser reviewerInfoParser;
     private final EditInfoParser editInfoParser;
+    private final CommitInfoParser commitInfoParser;
     private final String id;
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
@@ -77,6 +78,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                SuggestedReviewerInfoParser suggestedReviewerInfoParser,
                                ReviewerInfoParser reviewerInfoParser,
                                EditInfoParser editInfoParser,
+                               CommitInfoParser commitInfoParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
@@ -90,6 +92,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
         this.reviewerInfoParser = reviewerInfoParser;
         this.editInfoParser = editInfoParser;
+        this.commitInfoParser = commitInfoParser;
         this.id = id;
     }
 
@@ -110,7 +113,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public RevisionApi revision(String id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, reviewResultParser, id);
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, reviewResultParser, commitInfoParser, id);
     }
 
     @Override
@@ -173,6 +176,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             suggestedReviewerInfoParser,
             reviewerInfoParser,
             editInfoParser,
+            commitInfoParser,
             id);
     }
 
