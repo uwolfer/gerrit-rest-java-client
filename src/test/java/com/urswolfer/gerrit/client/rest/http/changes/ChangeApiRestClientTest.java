@@ -19,30 +19,16 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.truth.Truth;
-import com.google.gerrit.extensions.api.changes.AbandonInput;
-import com.google.gerrit.extensions.api.changes.AddReviewerInput;
-import com.google.gerrit.extensions.api.changes.ChangeApi;
-import com.google.gerrit.extensions.api.changes.FixInput;
-import com.google.gerrit.extensions.api.changes.IncludedInInfo;
-import com.google.gerrit.extensions.api.changes.MoveInput;
-import com.google.gerrit.extensions.api.changes.RestoreInput;
-import com.google.gerrit.extensions.api.changes.RevertInput;
-import com.google.gerrit.extensions.api.changes.ReviewerInfo;
+import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.client.ListChangesOption;
-import com.google.gerrit.extensions.common.ChangeInfo;
-import com.google.gerrit.extensions.common.CommentInfo;
-import com.google.gerrit.extensions.common.EditInfo;
-import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
+import com.google.gerrit.extensions.common.*;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author Thomas Forrer
@@ -391,6 +377,28 @@ public class ChangeApiRestClientTest {
 
         Truth.assertThat(commentInfos).isSameAs(expectedCommentInfos);
         EasyMock.verify(gerritRestClient, commentsParser);
+    }
+
+    @Test
+    public void testMessages() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/messages", jsonElement)
+            .get();
+
+        List<ChangeMessageInfo> expectedMessageInfos = new ArrayList<ChangeMessageInfo>();
+        MessagesParser messagesParser = EasyMock.createMock(MessagesParser.class);
+        EasyMock.expect(messagesParser.parseChangeMessageInfos(jsonElement)).andReturn(expectedMessageInfos).once();
+        EasyMock.replay(messagesParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
+            null, null, null, null, null, null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        changeApiRestClient.setMessagesParser(messagesParser);
+
+        List<ChangeMessageInfo> messageInfos = changeApiRestClient.messages();
+
+        Truth.assertThat(messageInfos).isSameAs(expectedMessageInfos);
+        EasyMock.verify(gerritRestClient, messagesParser);
     }
 
     @Test

@@ -31,10 +31,7 @@ import com.google.gerrit.extensions.api.changes.RevertInput;
 import com.google.gerrit.extensions.api.changes.ReviewerInfo;
 import com.google.gerrit.extensions.api.changes.RevisionApi;
 import com.google.gerrit.extensions.client.ListChangesOption;
-import com.google.gerrit.extensions.common.ChangeInfo;
-import com.google.gerrit.extensions.common.CommentInfo;
-import com.google.gerrit.extensions.common.EditInfo;
-import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
+import com.google.gerrit.extensions.common.*;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
@@ -66,6 +63,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final CommitInfoParser commitInfoParser;
     private final String id;
 
+    private MessagesParser messagesParser;
+
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
                                ChangesParser changesParser,
@@ -94,6 +93,10 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.editInfoParser = editInfoParser;
         this.commitInfoParser = commitInfoParser;
         this.id = id;
+    }
+
+    public void setMessagesParser(MessagesParser messagesParser) {
+        this.messagesParser = messagesParser;
     }
 
     @Override
@@ -332,6 +335,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String url = getRequestPath() + "/submitted_together";
         JsonElement jsonElement = gerritRestClient.getRequest(url);
         return changesParser.parseChangeInfos(jsonElement);
+    }
+
+    @Override
+    public List<ChangeMessageInfo> messages() throws RestApiException {
+        String request = getRequestPath() + "/messages";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return messagesParser.parseChangeMessageInfos(jsonElement);
     }
 
     protected String getRequestPath() {
