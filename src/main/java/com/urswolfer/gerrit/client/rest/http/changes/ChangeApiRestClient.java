@@ -52,6 +52,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final ChangesRestClient changesRestClient;
     private final ChangesParser changesParser;
     private final CommentsParser commentsParser;
+    private final MessagesParser messagesParser;
     private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
@@ -63,12 +64,11 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final CommitInfoParser commitInfoParser;
     private final String id;
 
-    private MessagesParser messagesParser;
-
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
                                ChangesParser changesParser,
                                CommentsParser commentsParser,
+                               MessagesParser messagesParser,
                                IncludedInInfoParser includedInInfoParser,
                                FileInfoParser fileInfoParser,
                                DiffInfoParser diffInfoParser,
@@ -83,6 +83,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.changesRestClient = changesRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
+        this.messagesParser = messagesParser;
         this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
@@ -93,10 +94,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.editInfoParser = editInfoParser;
         this.commitInfoParser = commitInfoParser;
         this.id = id;
-    }
-
-    public void setMessagesParser(MessagesParser messagesParser) {
-        this.messagesParser = messagesParser;
     }
 
     @Override
@@ -171,6 +168,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             changesRestClient,
             changesParser,
             commentsParser,
+            messagesParser,
             includedInInfoParser,
             fileInfoParser,
             diffInfoParser,
