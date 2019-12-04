@@ -71,6 +71,10 @@ public class GerritAssert {
         assertXmlOutputEqual(actual, expected);
     }
 
+    public static void assertEquals(List<ChangeMessageInfo> actual, List<ChangeMessageInfo> expected) {
+        assertXmlOutputEqual(actual, expected);
+    }
+
     public static void assertEquals(DiffInfo actual, DiffInfo expected) {
         assertXmlOutputEqual(actual, expected);
     }
