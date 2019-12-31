@@ -23,6 +23,7 @@ import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.*;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
@@ -436,6 +437,77 @@ public class ChangeApiRestClientTest {
             null, null,  null, null, null, null, null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         EnumSet<ListChangesOption> options = EnumSet.of(ListChangesOption.LABELS, ListChangesOption.DETAILED_LABELS);
         ChangeInfo result = changeApiRestClient.get(options);
+
+        Truth.assertThat(result).isSameAs(expectedChangeInfo);
+        EasyMock.verify(gerritRestClient, changesParser);
+    }
+
+    @Test
+    public void testChangeGetOnGerrit214() throws Exception {
+        String expectedChangeId = "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940";
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        String listOptions =
+            String.join("&o=", Arrays.asList("LABELS", "DETAILED_LABELS",
+                "CURRENT_REVISION",
+                "ALL_REVISIONS",
+                "CURRENT_COMMIT",
+                "ALL_COMMITS",
+                "CURRENT_FILES",
+                "ALL_FILES",
+                "DETAILED_ACCOUNTS",
+                "MESSAGES",
+                "CURRENT_ACTIONS",
+                "REVIEWED",
+                "DRAFT_COMMENTS",
+                "DOWNLOAD_COMMANDS",
+                "WEB_LINKS",
+                "CHANGE_ACTIONS",
+                "COMMIT_FOOTERS",
+                "PUSH_CERTIFICATES",
+                "REVIEWER_UPDATES",
+                "SUBMITTABLE"));
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/changes/" + expectedChangeId + "?o=" + listOptions, jsonElement)
+            .expectGet("/config/server/version", new JsonPrimitive("2.14.20-102-g0b53142"))
+            .get();
+        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        ChangeInfo expectedChangeInfo = EasyMock.createMock(ChangeInfo.class);
+        EasyMock.expect(changesParser.parseSingleChangeInfo(jsonElement)).andReturn(expectedChangeInfo).once();
+        EasyMock.replay(changesParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
+            null, null,  null, null, null, null, null, null, null, null, expectedChangeId);
+        ChangeInfo result = changeApiRestClient.get();
+
+        Truth.assertThat(result).isSameAs(expectedChangeInfo);
+        EasyMock.verify(gerritRestClient, changesParser);
+    }
+
+    @Test
+    public void testChangeGetShouldUseAllOptionsOnLatestGerrit() throws Exception {
+        String expectedChangeId = "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940";
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        List<String> allOptions = new ArrayList<String>();
+        for(Iterator<ListChangesOption> optionIterator = EnumSet.allOf(ListChangesOption.class).iterator(); optionIterator.hasNext(); ) {
+            ListChangesOption option = optionIterator.next();
+            if(option != ListChangesOption.CHECK) {
+                allOptions.add(option.toString());
+            }
+        }
+        String listOptions =
+            String.join("&o=", allOptions);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/changes/" + expectedChangeId + "?o=" + listOptions, jsonElement)
+            .expectGet("/config/server/version", new JsonPrimitive("99.99"))
+            .get();
+        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        ChangeInfo expectedChangeInfo = EasyMock.createMock(ChangeInfo.class);
+        EasyMock.expect(changesParser.parseSingleChangeInfo(jsonElement)).andReturn(expectedChangeInfo).once();
+        EasyMock.replay(changesParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
+            null, null,  null, null, null, null, null, null, null, null, expectedChangeId);
+        ChangeInfo result = changeApiRestClient.get();
 
         Truth.assertThat(result).isSameAs(expectedChangeInfo);
         EasyMock.verify(gerritRestClient, changesParser);

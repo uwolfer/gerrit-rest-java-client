@@ -36,6 +36,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.config.ServerRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.Collections;
@@ -63,6 +64,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final EditInfoParser editInfoParser;
     private final CommitInfoParser commitInfoParser;
     private final String id;
+    private final ServerRestClient serverRestClient;
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
@@ -94,6 +96,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.editInfoParser = editInfoParser;
         this.commitInfoParser = commitInfoParser;
         this.id = id;
+        this.serverRestClient = new ServerRestClient(gerritRestClient);
     }
 
     @Override
@@ -278,9 +281,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public ChangeInfo get() throws RestApiException {
-        EnumSet<ListChangesOption> options = EnumSet.allOf(ListChangesOption.class);
-        options.remove(ListChangesOption.CHECK);
-        return get(options);
+        return get(ListChangesOptionByVersion.allSupported(serverRestClient.getVersionCached()));
     }
 
     @Override

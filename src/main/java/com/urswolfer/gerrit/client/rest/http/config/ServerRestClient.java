@@ -24,11 +24,14 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.HttpStatusException;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * @author Urs Wolfer
  */
 public class ServerRestClient extends Server.NotImplemented implements Server {
     private final GerritRestClient gerritRestClient;
+    private final AtomicReference<String> version = new AtomicReference<String>();
 
     public ServerRestClient(GerritRestClient gerritRestClient) {
         this.gerritRestClient = gerritRestClient;
@@ -38,7 +41,8 @@ public class ServerRestClient extends Server.NotImplemented implements Server {
     public String getVersion() throws RestApiException {
         try {
             JsonElement jsonElement = gerritRestClient.getRequest("/config/server/version");
-            return jsonElement.getAsString();
+            version.set(jsonElement.getAsString());
+            return version.get();
         } catch (HttpStatusException e) {
             int statusCode = e.getStatusCode();
             if (statusCode == SC_NOT_FOUND) { // Gerrit older than 2.8
@@ -47,5 +51,10 @@ public class ServerRestClient extends Server.NotImplemented implements Server {
                 throw e;
             }
         }
+    }
+
+    public String getVersionCached() throws RestApiException {
+        String gerritVersion = version.get();
+        return gerritVersion == null ? getVersion() : gerritVersion;
     }
 }
