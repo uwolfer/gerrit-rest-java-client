@@ -72,6 +72,13 @@ public class RealServerTest {
 
         Truth.assertThat(changeInfoList.size()).isLessThan(2);
 
+        if(changeInfoList.size() > 0) {
+            int changeNum = changeInfoList.get(0)._number;
+            System.out.println(String.format("Accessing details of change #%d", changeNum));
+            ChangeInfo change = gerritApi.changes().id(changeNum).get();
+            Truth.assertThat(change._number).isEqualTo(changeNum);
+        }
+
         if (authData.isLoginAndPasswordAvailable()) {
             if (!changeInfoList.isEmpty()) {
                 String id = changeInfoList.get(0).id;
