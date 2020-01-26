@@ -1,0 +1,49 @@
+)]}'
+{
+    "playingfield.iml": [
+        {
+            "id": "TvcXrmjM",
+            "line": 1,
+            "message": "Unused import",
+            "updated": "2014-05-28 19:14:50.629000000",
+            "author": {
+                "_account_id": 1000000,
+                "name": "CodeAnalyzer",
+                "email": "code.analyzer@example.com",
+                "username": "C_Analyzer"
+            },
+            "robot_id": "importChecker",
+            "robot_run_id": "12x1375aa8626ea7149792831fe2ed85e80s1r03"
+        }
+    ],
+    "src/ch/tf/playingfield/PlayingField.java": [
+        {
+            "id": "BsaWsvaK",
+            "line": 4,
+            "message": "Reformat imports",
+            "updated": "2014-05-28 19:04:21.629000000",
+            "author": {
+                "_account_id": 1000000,
+                "name": "CodeAnalyzer",
+                "email": "code.analyzer@example.com",
+                "username": "C_Analyzer"
+            },
+            "robot_id": "importChecker",
+            "robot_run_id": "12x1375aa8626ea7149792831fe2ed85e80s1r03"
+        },
+        {
+            "id": "TalZsvaK",
+            "line": 12,
+            "message": "Wrong indentation",
+            "updated": "2014-05-28 19:14:50.629000000",
+            "author": {
+                "_account_id": 1000000,
+                "name": "CodeAnalyzer",
+                "email": "code.analyzer@example.com",
+                "username": "C_Analyzer"
+            },
+            "robot_id": "styleChecker",
+            "robot_run_id": "24x1375aa8626ea7149792831fe2ed85e80bst12"
+        }
+    ]
+}

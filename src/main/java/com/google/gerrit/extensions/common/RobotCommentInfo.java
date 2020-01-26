@@ -14,13 +14,22 @@
 
 package com.google.gerrit.extensions.common;
 
+import com.google.common.base.Objects;
+
 import java.util.List;
 import java.util.Map;
 
 public class RobotCommentInfo extends CommentInfo {
+
   public String robotId;
   public String robotRunId;
   public String url;
   public Map<String, String> properties;
   public List<FixSuggestionInfo> fixSuggestions;
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(super.hashCode(), robotId, robotRunId, url, properties, fixSuggestions);
+  }
 }
+
