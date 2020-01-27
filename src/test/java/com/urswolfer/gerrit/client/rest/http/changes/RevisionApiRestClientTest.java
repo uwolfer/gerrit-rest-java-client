@@ -383,6 +383,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+        RobotCommentsParser robotCommentsParser = EasyMock.createMock(RobotCommentsParser.class);
         MessagesParser messagesParser = EasyMock.createMock(MessagesParser.class);
         IncludedInInfoParser includedInInfoParser = EasyMock.createMock(IncludedInInfoParser.class);
         FileInfoParser fileInfoParser = EasyMock.createMock(FileInfoParser.class);
@@ -392,7 +393,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         AddReviewerResultParser addReviewerResultParser = EasyMock.createMock(AddReviewerResultParser.class);
         ReviewResultParser reviewResultParser = EasyMock.createMock(ReviewResultParser.class);
         CommitInfoParser commitInfoParser = EasyMock.createMock(CommitInfoParser.class);
-        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser, addReviewerResultParser, reviewResultParser, commitInfoParser);
+        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, robotCommentsParser, messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser, addReviewerResultParser, reviewResultParser, commitInfoParser);
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
@@ -400,6 +401,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                 gerritRestClient,
                 EasyMock.createMock(ChangesParser.class),
                 commentsParser,
+                EasyMock.createMock(RobotCommentsParser.class),
                 EasyMock.createMock(MessagesParser.class),
                 EasyMock.createMock(IncludedInInfoParser.class),
                 EasyMock.createMock(FileInfoParser.class),
