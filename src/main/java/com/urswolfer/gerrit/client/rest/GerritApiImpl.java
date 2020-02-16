@@ -77,7 +77,8 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
                     new EditInfoParser(gerritRestClient.getGson()),
                     new AddReviewerResultParser(gerritRestClient.getGson()),
                     new ReviewResultParser(gerritRestClient.getGson()),
-                    new CommitInfoParser(gerritRestClient.getGson()));
+                    new CommitInfoParser(gerritRestClient.getGson()),
+                    new HashtagsParser(gerritRestClient.getGson()));
         }
     });
 

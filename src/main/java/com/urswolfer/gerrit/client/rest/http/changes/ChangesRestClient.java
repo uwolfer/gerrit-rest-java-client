@@ -49,6 +49,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final AddReviewerResultParser addReviewerResultParser;
     private final ReviewResultParser reviewResultParser;
     private final CommitInfoParser commitInfoParser;
+    private final HashtagsParser hashtagsParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
@@ -63,7 +64,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
                              EditInfoParser editInfoParser,
                              AddReviewerResultParser addReviewerResultParser,
                              ReviewResultParser reviewResultParser,
-                             CommitInfoParser commitInfoParser) {
+                             CommitInfoParser commitInfoParser,
+                             HashtagsParser hashtagsParser) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
@@ -78,6 +80,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         this.addReviewerResultParser = addReviewerResultParser;
         this.reviewResultParser = reviewResultParser;
         this.commitInfoParser = commitInfoParser;
+        this.hashtagsParser = hashtagsParser;
     }
 
     @Override
@@ -133,7 +136,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
             robotCommentsParser, messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser, addReviewerResultParser,
-            reviewResultParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, commitInfoParser, id);
+            reviewResultParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, commitInfoParser, hashtagsParser, id);
     }
 
     @Override
