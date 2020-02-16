@@ -393,7 +393,10 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         AddReviewerResultParser addReviewerResultParser = EasyMock.createMock(AddReviewerResultParser.class);
         ReviewResultParser reviewResultParser = EasyMock.createMock(ReviewResultParser.class);
         CommitInfoParser commitInfoParser = EasyMock.createMock(CommitInfoParser.class);
-        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, robotCommentsParser, messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser, addReviewerResultParser, reviewResultParser, commitInfoParser);
+        HashtagsParser hashtagsParser = EasyMock.createMock(HashtagsParser.class);
+        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, robotCommentsParser, messagesParser,
+            includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser,
+            addReviewerResultParser, reviewResultParser, commitInfoParser, hashtagsParser);
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
@@ -411,7 +414,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                 EasyMock.createMock(EditInfoParser.class),
                 EasyMock.createMock(AddReviewerResultParser.class),
                 EasyMock.createMock(ReviewResultParser.class),
-                EasyMock.createMock(CommitInfoParser.class));
+                EasyMock.createMock(CommitInfoParser.class),
+                EasyMock.createMock(HashtagsParser.class));
     }
 
     private static RevisionApiTestCase withRevision(String revision) {

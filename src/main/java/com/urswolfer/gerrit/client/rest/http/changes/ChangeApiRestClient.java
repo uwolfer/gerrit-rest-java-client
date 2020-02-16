@@ -39,10 +39,7 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.config.ServerRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Urs Wolfer
@@ -64,6 +61,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final ReviewerInfoParser reviewerInfoParser;
     private final EditInfoParser editInfoParser;
     private final CommitInfoParser commitInfoParser;
+    private final HashtagsParser hashtagsParser;
     private final String id;
     private final ServerRestClient serverRestClient;
 
@@ -82,6 +80,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                ReviewerInfoParser reviewerInfoParser,
                                EditInfoParser editInfoParser,
                                CommitInfoParser commitInfoParser,
+                               HashtagsParser hashtagsParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
@@ -98,6 +97,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.reviewerInfoParser = reviewerInfoParser;
         this.editInfoParser = editInfoParser;
         this.commitInfoParser = commitInfoParser;
+        this.hashtagsParser = hashtagsParser;
         this.id = id;
         this.serverRestClient = new ServerRestClient(gerritRestClient);
     }
@@ -185,6 +185,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             reviewerInfoParser,
             editInfoParser,
             commitInfoParser,
+            hashtagsParser,
             id);
     }
 
@@ -352,6 +353,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String request = getRequestPath() + "/messages";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return messagesParser.parseChangeMessageInfos(jsonElement);
+    }
+
+    @Override
+    public Set<String> getHashtags() throws RestApiException {
+        String request = getRequestPath() + "/hashtags";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return hashtagsParser.parseHashtags(jsonElement);
     }
 
     protected String getRequestPath() {
