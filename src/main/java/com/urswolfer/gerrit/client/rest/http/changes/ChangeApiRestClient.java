@@ -50,7 +50,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final ChangesRestClient changesRestClient;
     private final ChangesParser changesParser;
     private final CommentsParser commentsParser;
-    private final RobotCommentsParser robotCommentsParser;
     private final MessagesParser messagesParser;
     private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
@@ -69,7 +68,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                ChangesRestClient changesRestClient,
                                ChangesParser changesParser,
                                CommentsParser commentsParser,
-                               RobotCommentsParser robotCommentsParser,
                                MessagesParser messagesParser,
                                IncludedInInfoParser includedInInfoParser,
                                FileInfoParser fileInfoParser,
@@ -86,7 +84,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.changesRestClient = changesRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
-        this.robotCommentsParser = robotCommentsParser;
         this.messagesParser = messagesParser;
         this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
@@ -174,7 +171,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             changesRestClient,
             changesParser,
             commentsParser,
-            robotCommentsParser,
             messagesParser,
             includedInInfoParser,
             fileInfoParser,
@@ -332,7 +328,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     public  Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException {
         String request = getRequestPath() + "/robotcomments";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return robotCommentsParser.parseRobotCommentInfos(jsonElement);
+        return commentsParser.parseRobotCommentInfos(jsonElement);
     }
 
     @Override

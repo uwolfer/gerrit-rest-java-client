@@ -38,7 +38,6 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final GerritRestClient gerritRestClient;
     private final ChangesParser changesParser;
     private final CommentsParser commentsParser;
-    private final RobotCommentsParser robotCommentsParser;
     private final MessagesParser messagesParser;
     private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
@@ -54,7 +53,6 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
                              CommentsParser commentsParser,
-                             RobotCommentsParser robotCommentsParser,
                              MessagesParser messagesParser,
                              IncludedInInfoParser includedInInfoParser,
                              FileInfoParser fileInfoParser,
@@ -69,7 +67,6 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
-        this.robotCommentsParser = robotCommentsParser;
         this.messagesParser = messagesParser;
         this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
@@ -135,7 +132,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     @Override
     public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
-            robotCommentsParser, messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser, addReviewerResultParser,
+            messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser, addReviewerResultParser,
             reviewResultParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, commitInfoParser, hashtagsParser, id);
     }
 

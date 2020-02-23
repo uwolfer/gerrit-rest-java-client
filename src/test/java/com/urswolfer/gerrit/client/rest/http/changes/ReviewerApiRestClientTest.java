@@ -43,7 +43,7 @@ public class ReviewerApiRestClientTest extends AbstractParserTest {
             .get();
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null, null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         ReviewerApiRestClient reviewerApiRestClient = new ReviewerApiRestClient(gerritRestClient, changeApiRestClient, ACCOUNT_ID);
         Map<String, Short> votes = reviewerApiRestClient.votes();
@@ -60,7 +60,7 @@ public class ReviewerApiRestClientTest extends AbstractParserTest {
             .get();
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null, null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         ReviewerApiRestClient reviewerApiRestClient = new ReviewerApiRestClient(gerritRestClient, changeApiRestClient, ACCOUNT_ID);
         reviewerApiRestClient.deleteVote(LABEL);
