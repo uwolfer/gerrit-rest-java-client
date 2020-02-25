@@ -50,7 +50,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null, null, null, null,
-            null,  reviewerInfoParser, null, null, null,
+            null, reviewerInfoParser, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<ReviewerInfo> listReviewers = changeApiRestClient.listReviewers();
@@ -257,7 +257,7 @@ public class ChangeApiRestClientTest {
         EasyMock.expect(suggestedReviewerInfoParser.parseSuggestReviewerInfos(jsonElement)).andReturn(expectedSuggestedReviewerInfos).once();
         EasyMock.replay(suggestedReviewerInfoParser);
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null,null,
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
             null, null, null, null, null,
             null, suggestedReviewerInfoParser, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
@@ -449,7 +449,7 @@ public class ChangeApiRestClientTest {
         EasyMock.expect(hashtagsParser.parseHashtags(jsonElement)).andReturn(expectedHashtags).once();
         EasyMock.replay(hashtagsParser);
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null,null,
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
             null, null, null, null, null,
             null, null, null, null, null, hashtagsParser,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
