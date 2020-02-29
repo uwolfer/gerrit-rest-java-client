@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.common.CommentInfo;
+import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -30,7 +31,8 @@ import java.util.TreeMap;
  * @author Thomas Forrer
  */
 public class CommentsParser {
-    private static final Type TYPE = new TypeToken<TreeMap<String, List<CommentInfo>>>() {}.getType();
+    private static final Type COMMENT_TYPE = new TypeToken<TreeMap<String, List<CommentInfo>>>() {}.getType();
+    private static final Type ROBOT_COMMENT_TYPE = new TypeToken<TreeMap<String, List<RobotCommentInfo>>>() {}.getType();
 
     private final Gson gson;
 
@@ -39,10 +41,18 @@ public class CommentsParser {
     }
 
     public TreeMap<String, List<CommentInfo>> parseCommentInfos(JsonElement result) {
-        return gson.fromJson(result, TYPE);
+        return gson.fromJson(result, COMMENT_TYPE);
     }
 
     public CommentInfo parseSingleCommentInfo(JsonObject result) {
         return gson.fromJson(result, CommentInfo.class);
+    }
+
+    public TreeMap<String, List<RobotCommentInfo>> parseRobotCommentInfos(JsonElement result) {
+        return gson.fromJson(result, ROBOT_COMMENT_TYPE);
+    }
+
+    public RobotCommentInfo parseSingleRobotCommentInfo(JsonObject result) {
+        return gson.fromJson(result, RobotCommentInfo.class);
     }
 }

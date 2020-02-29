@@ -45,7 +45,7 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
             .get();
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, commentsParser, null,
-            null, null, null, null, null, null, null,
+            null, null, null, null,null, null,
             null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, commentsParser, null, null, null, null, revisionId);
@@ -67,7 +67,7 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null, null, null, null,
-            null, null, null, null, null, null,
+            null, null, null,null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null, null, null, revisionId);
         DraftApiRestClient draftApiRestClient = new DraftApiRestClient(gerritRestClient, changeApiRestClient,
@@ -92,7 +92,7 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null, null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null, null, null, revisionId);
         DraftApiRestClient draftApiRestClient = new DraftApiRestClient(gerritRestClient, changeApiRestClient,
@@ -114,7 +114,7 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null,null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null, null, null, revisionId);
         DraftApiRestClient draftApiRestClient = new DraftApiRestClient(gerritRestClient, changeApiRestClient,
