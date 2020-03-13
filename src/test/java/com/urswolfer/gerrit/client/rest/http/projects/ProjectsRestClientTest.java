@@ -61,6 +61,12 @@ public class ProjectsRestClientTest {
                         new TestListRequest().withDescription(false)
                 ).expectUrl("/projects/"),
                 listTestCase().withListParameter(
+                        new TestListRequest().withTree(true)
+                ).expectUrl("/projects/?t"),
+                listTestCase().withListParameter(
+                        new TestListRequest().withTree(false)
+                ).expectUrl("/projects/"),
+                listTestCase().withListParameter(
                         new TestListRequest().withLimit(10)
                 ).expectUrl("/projects/?n=10"),
                 listTestCase().withListParameter(
@@ -171,12 +177,18 @@ public class ProjectsRestClientTest {
 
     private final static class TestListRequest {
         private Boolean description = null;
+        private Boolean tree = null;
         private String prefix = null;
         private Integer limit = null;
         private Integer start = null;
 
         public TestListRequest withDescription(boolean description) {
             this.description = description;
+            return this;
+        }
+
+        public TestListRequest withTree(boolean tree) {
+            this.tree = tree;
             return this;
         }
 
@@ -198,6 +210,9 @@ public class ProjectsRestClientTest {
         public Projects.ListRequest apply(Projects.ListRequest target) {
             if (description != null) {
                 target.withDescription(description);
+            }
+            if (tree != null) {
+                target.withTree(tree);
             }
             if (prefix != null) {
                 target.withPrefix(prefix);
