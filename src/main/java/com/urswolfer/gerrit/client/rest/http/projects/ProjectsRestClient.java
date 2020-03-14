@@ -71,6 +71,9 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
         if (listParameter.getDescription()) {
             query = UrlUtils.appendToUrlQuery(query, "d");
         }
+        if (listParameter.getShowTree()) {
+            query = UrlUtils.appendToUrlQuery(query, "t");
+        }
         if (!Strings.isNullOrEmpty(listParameter.getPrefix())) {
             query = UrlUtils.appendToUrlQuery(query, "p=" + listParameter.getPrefix());
         }
