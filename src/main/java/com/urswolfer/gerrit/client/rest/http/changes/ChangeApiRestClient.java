@@ -36,6 +36,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.config.ServerRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
@@ -61,6 +62,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final EditInfoParser editInfoParser;
     private final CommitInfoParser commitInfoParser;
     private final HashtagsParser hashtagsParser;
+    private final AccountsParser accountsParser;
     private final String id;
     private final ServerRestClient serverRestClient;
 
@@ -79,6 +81,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                EditInfoParser editInfoParser,
                                CommitInfoParser commitInfoParser,
                                HashtagsParser hashtagsParser,
+                               AccountsParser accountsParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
@@ -95,6 +98,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.editInfoParser = editInfoParser;
         this.commitInfoParser = commitInfoParser;
         this.hashtagsParser = hashtagsParser;
+        this.accountsParser = accountsParser;
         this.id = id;
         this.serverRestClient = new ServerRestClient(gerritRestClient);
     }
@@ -182,6 +186,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             editInfoParser,
             commitInfoParser,
             hashtagsParser,
+            accountsParser,
             id);
     }
 
@@ -303,6 +308,20 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public Set<String> getHashtags() throws RestApiException {
+        String request = getRequestPath() + "/hashtags";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return hashtagsParser.parseHashtags(jsonElement);
+    }
+
+    @Override
+    public AccountInfo getAssignee() throws RestApiException {
+        String request = getRequestPath() + "/assignee";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return accountsParser.parseAccountInfo(jsonElement);
+    }
+
+    @Override
     public ChangeInfo check() throws RestApiException {
         String request = getRequestPath() + "/check";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
@@ -349,13 +368,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String request = getRequestPath() + "/messages";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return messagesParser.parseChangeMessageInfos(jsonElement);
-    }
-
-    @Override
-    public Set<String> getHashtags() throws RestApiException {
-        String request = getRequestPath() + "/hashtags";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return hashtagsParser.parseHashtags(jsonElement);
     }
 
     protected String getRequestPath() {

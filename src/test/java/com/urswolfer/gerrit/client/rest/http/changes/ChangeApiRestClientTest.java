@@ -25,6 +25,7 @@ import com.google.gerrit.extensions.common.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
@@ -50,7 +51,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null, null, null, null,
-            null, reviewerInfoParser, null, null, null,
+            null, reviewerInfoParser, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<ReviewerInfo> listReviewers = changeApiRestClient.listReviewers();
@@ -259,7 +260,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
             null, null, null, null, null,
-            null, suggestedReviewerInfoParser, null, null, null, null,
+            null, suggestedReviewerInfoParser, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J").get();
@@ -283,7 +284,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
             null, null, null, null, null,
-            null, suggestedReviewerInfoParser, null, null, null, null,
+            null, suggestedReviewerInfoParser, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J").withLimit(5).get();
@@ -306,7 +307,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
             null, null, null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         ChangeInfo changeInfo = changeApiRestClient.check();
@@ -329,7 +330,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
             null, includedInInfoParser, null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         IncludedInInfo includedInInfo = changeApiRestClient.includedIn();
@@ -359,7 +360,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
             null,null, null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         ChangeInfo changeInfo = changeApiRestClient.check(fixInput);
@@ -382,7 +383,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, commentsParser,
             null, null, null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         Map<String, List<CommentInfo>> commentInfos = changeApiRestClient.comments();
@@ -405,7 +406,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, commentsParser,
             null, null, null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         Map<String, List<RobotCommentInfo>> robotCommentInfos = changeApiRestClient.robotComments();
@@ -428,7 +429,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
             messagesParser, null, null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<ChangeMessageInfo> messageInfos = changeApiRestClient.messages();
@@ -451,7 +452,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
             null, null, null, null, null,
-            null, null, null, null, null, hashtagsParser,
+            null, null, null, null, null, hashtagsParser, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         Set<String> hashtags = changeApiRestClient.getHashtags();
@@ -474,13 +475,36 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
             null, null, null, null, null,
-            null, null, null, editInfoParser, null, null,
+            null, null, null, editInfoParser, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         EditInfo editInfo = changeApiRestClient.getEdit();
         Truth.assertThat(editInfo).isSameAs(expectedEditInfo);
 
         EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testGetAssignee() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/assignee", jsonElement)
+            .get();
+
+        AccountInfo expectedAssignee = new AccountInfo(null);
+        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
+        EasyMock.expect(accountsParser.parseAccountInfo(jsonElement)).andReturn(expectedAssignee).once();
+        EasyMock.replay(accountsParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
+            null, null, null, null, null,
+            null, null, null, null, null, null,
+             accountsParser, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        AccountInfo assigneeInfo = changeApiRestClient.getAssignee();
+
+        Truth.assertThat(assigneeInfo).isSameAs(expectedAssignee);
+        EasyMock.verify(gerritRestClient, accountsParser);
     }
 
     @Test
@@ -496,7 +520,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
             null, null,  null, null, null,
-            null, null, null, null, null, null,
+            null, null, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         EnumSet<ListChangesOption> options = EnumSet.of(ListChangesOption.LABELS, ListChangesOption.DETAILED_LABELS);
         ChangeInfo result = changeApiRestClient.get(options);
@@ -540,7 +564,8 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
             null, null,  null, null, null,
-            null, null, null, null, null, null, expectedChangeId);
+            null, null, null, null, null, null, null,
+            expectedChangeId);
         ChangeInfo result = changeApiRestClient.get();
 
         Truth.assertThat(result).isSameAs(expectedChangeInfo);
@@ -571,7 +596,8 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null,
             null, null,  null, null, null,
-            null, null, null, null, null, null, expectedChangeId);
+            null, null, null, null, null, null, null,
+            expectedChangeId);
         ChangeInfo result = changeApiRestClient.get();
 
         Truth.assertThat(result).isSameAs(expectedChangeInfo);
@@ -591,7 +617,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null, null,
             null, null,  null, null, null,
-            null, null, null, null, null,
+            null, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         ChangeInfo result = changeApiRestClient.info();
 
@@ -626,7 +652,7 @@ public class ChangeApiRestClientTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, changesParser, null, null,
             null, null, null, null, null,
-            null, null, null, null, null,
+            null, null, null, null, null, null,
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<ChangeInfo> changeInfos = changeApiRestClient.submittedTogether();
@@ -663,6 +689,7 @@ public class ChangeApiRestClientTest {
                 EasyMock.createMock(AddReviewerResultParser.class),
                 EasyMock.createMock(ReviewResultParser.class),
                 EasyMock.createMock(CommitInfoParser.class),
-                EasyMock.createMock(HashtagsParser.class));
+                EasyMock.createMock(HashtagsParser.class),
+                EasyMock.createMock(AccountsParser.class));
     }
 }

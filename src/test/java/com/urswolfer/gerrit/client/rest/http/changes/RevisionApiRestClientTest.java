@@ -26,6 +26,7 @@ import com.google.gerrit.extensions.common.TestSubmitRuleInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.apache.commons.codec.binary.Base64;
@@ -393,9 +394,10 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         ReviewResultParser reviewResultParser = EasyMock.createMock(ReviewResultParser.class);
         CommitInfoParser commitInfoParser = EasyMock.createMock(CommitInfoParser.class);
         HashtagsParser hashtagsParser = EasyMock.createMock(HashtagsParser.class);
+        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
         return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, messagesParser,
             includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser,
-            addReviewerResultParser, reviewResultParser, commitInfoParser, hashtagsParser);
+            addReviewerResultParser, reviewResultParser, commitInfoParser, hashtagsParser, accountsParser);
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
@@ -413,7 +415,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                 EasyMock.createMock(AddReviewerResultParser.class),
                 EasyMock.createMock(ReviewResultParser.class),
                 EasyMock.createMock(CommitInfoParser.class),
-                EasyMock.createMock(HashtagsParser.class));
+                EasyMock.createMock(HashtagsParser.class),
+                EasyMock.createMock(AccountsParser.class));
     }
 
     private static RevisionApiTestCase withRevision(String revision) {
