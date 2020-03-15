@@ -26,6 +26,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.List;
@@ -49,6 +50,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final ReviewResultParser reviewResultParser;
     private final CommitInfoParser commitInfoParser;
     private final HashtagsParser hashtagsParser;
+    private final AccountsParser accountsParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
@@ -63,7 +65,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
                              AddReviewerResultParser addReviewerResultParser,
                              ReviewResultParser reviewResultParser,
                              CommitInfoParser commitInfoParser,
-                             HashtagsParser hashtagsParser) {
+                             HashtagsParser hashtagsParser,
+                             AccountsParser accountsParser) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
@@ -78,6 +81,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         this.reviewResultParser = reviewResultParser;
         this.commitInfoParser = commitInfoParser;
         this.hashtagsParser = hashtagsParser;
+        this.accountsParser = accountsParser;
     }
 
     @Override
@@ -133,7 +137,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
             messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser, addReviewerResultParser,
-            reviewResultParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, commitInfoParser, hashtagsParser, id);
+            reviewResultParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, commitInfoParser,
+            hashtagsParser, accountsParser, id);
     }
 
     @Override

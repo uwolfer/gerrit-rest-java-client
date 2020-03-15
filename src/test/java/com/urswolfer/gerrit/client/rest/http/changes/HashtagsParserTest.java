@@ -21,7 +21,6 @@ import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import org.testng.annotations.Test;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
