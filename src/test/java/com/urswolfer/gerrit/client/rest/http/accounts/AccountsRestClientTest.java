@@ -17,6 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
 import com.google.gerrit.extensions.common.AccountInfo;
+import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import org.easymock.EasyMock;
@@ -28,12 +29,14 @@ import org.testng.annotations.Test;
 public class AccountsRestClientTest {
     private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
     private static final AccountInfo MOCK_ACCOUNT_INFO = EasyMock.createMock(AccountInfo.class);
+    private static final SshKeyInfo MOCK_SSHKEY_INFO = EasyMock.createMock(SshKeyInfo.class);
 
     @Test
     public void testId() throws Exception {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet("/accounts/jdoe");
         AccountsParser accountsParser = getAccountsParser();
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser);
+        SshKeysParser sshKeysParser = getSshKeysParser();
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser,sshKeysParser);
         accountsRestClient.id("jdoe").get();
 
         EasyMock.verify(gerritRestClient, accountsParser);
@@ -43,8 +46,9 @@ public class AccountsRestClientTest {
     public void testSelf() throws Exception {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet("/accounts/self");
         AccountsParser accountsParser = getAccountsParser();
+        SshKeysParser sshKeysParser = getSshKeysParser();
 
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser,sshKeysParser);
         accountsRestClient.self().get();
 
         EasyMock.verify(gerritRestClient, accountsParser);
@@ -56,7 +60,8 @@ public class AccountsRestClientTest {
                 "/accounts/jdoe/starred.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9");
         AccountsRestClient accountsRestClient = new AccountsRestClient(
                 gerritRestClient,
-                EasyMock.createMock(AccountsParser.class));
+                EasyMock.createMock(AccountsParser.class),
+                EasyMock.createMock(SshKeysParser.class));
 
         accountsRestClient.id("jdoe").starChange("Iccf90a8284f8371a211db9a2824d0617e95a79f9");
 
@@ -69,7 +74,8 @@ public class AccountsRestClientTest {
                 "/accounts/jdoe/starred.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9");
         AccountsRestClient accountsRestClient = new AccountsRestClient(
                 gerritRestClient,
-                EasyMock.createMock(AccountsParser.class));
+                EasyMock.createMock(AccountsParser.class),
+                EasyMock.createMock(SshKeysParser.class));
 
         accountsRestClient.id("jdoe").unstarChange("Iccf90a8284f8371a211db9a2824d0617e95a79f9");
 
@@ -82,7 +88,8 @@ public class AccountsRestClientTest {
                 "/accounts/?suggest&q=jdoe&n=5");
         AccountsRestClient accountsRestClient = new AccountsRestClient(
                 gerritRestClient,
-                EasyMock.createMock(AccountsParser.class));
+                EasyMock.createMock(AccountsParser.class),
+                EasyMock.createMock(SshKeysParser.class));
 
         accountsRestClient.suggestAccounts("jdoe").withLimit(5).get();
 
@@ -117,6 +124,14 @@ public class AccountsRestClientTest {
         AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
         EasyMock.expect(accountsParser.parseAccountInfo(MOCK_JSON_ELEMENT))
                 .andReturn(MOCK_ACCOUNT_INFO).once();
+        EasyMock.replay(accountsParser);
+        return accountsParser;
+    }
+
+    private SshKeysParser getSshKeysParser() throws Exception {
+        SshKeysParser accountsParser = EasyMock.createMock(SshKeysParser.class);
+        EasyMock.expect(accountsParser.parseSshKeyInfo(MOCK_JSON_ELEMENT))
+            .andReturn(MOCK_SSHKEY_INFO).once();
         EasyMock.replay(accountsParser);
         return accountsParser;
     }

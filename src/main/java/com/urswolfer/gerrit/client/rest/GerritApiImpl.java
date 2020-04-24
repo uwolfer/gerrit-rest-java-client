@@ -29,6 +29,7 @@ import com.urswolfer.gerrit.client.rest.http.HttpClientBuilderExtension;
 import com.urswolfer.gerrit.client.rest.http.HttpRequestExecutor;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsRestClient;
+import com.urswolfer.gerrit.client.rest.http.accounts.SshKeysParser;
 import com.urswolfer.gerrit.client.rest.http.changes.*;
 import com.urswolfer.gerrit.client.rest.http.config.ConfigRestClient;
 import com.urswolfer.gerrit.client.rest.http.groups.GroupsParser;
@@ -56,7 +57,8 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
     private final Supplier<AccountsRestClient> accountsRestClient = Suppliers.memoize(new Supplier<AccountsRestClient>() {
         @Override
         public AccountsRestClient get() {
-            return new AccountsRestClient(gerritRestClient, new AccountsParser(gerritRestClient.getGson()));
+            return new AccountsRestClient(gerritRestClient, new AccountsParser(gerritRestClient.getGson()),
+                new SshKeysParser(gerritRestClient.getGson()));
         }
     });
 

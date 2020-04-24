@@ -17,16 +17,20 @@
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
 import com.google.gerrit.extensions.common.AccountInfo;
+import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.RestClient;
+import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
 import com.urswolfer.gerrit.client.rest.accounts.AccountApi;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Urs Wolfer
@@ -34,15 +38,18 @@ import java.io.IOException;
 public class AccountApiRestClient extends AccountApi.NotImplemented implements AccountApi {
 
     private final AccountsParser accountsParser;
+    private final SshKeysParser sshKeysParser;
 
     private final GerritRestClient gerritRestClient;
     private final String name;
 
     public AccountApiRestClient(GerritRestClient gerritRestClient,
                                 AccountsParser accountsParser,
+                                SshKeysParser sshKeysParser,
                                 String name) {
         this.gerritRestClient = gerritRestClient;
         this.accountsParser = accountsParser;
+        this.sshKeysParser = sshKeysParser;
         this.name = name;
     }
 
@@ -82,5 +89,25 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
 
     private String getRequestPath() {
         return "/accounts/" + Url.encode(name);
+    }
+
+    @Override
+    public SshKeyInfo addSshKey(String key) throws RestApiException {
+        String request = getRequestPath() + "/sshkeys";
+        JsonElement result = gerritRestClient.requestJson(request,key, HttpVerb.POST_TEXT_PLAIN);
+        return sshKeysParser.parseSshKeyInfo(result);
+    }
+
+    @Override
+    public List<SshKeyInfo> listSshKeys() throws RestApiException {
+        String request = getRequestPath() + "/sshkeys";
+        JsonElement result = gerritRestClient.getRequest(request);
+        return sshKeysParser.parseSshKeyInfos(result);
+    }
+
+    @Override
+    public void deleteSshKey(int seq) throws RestApiException {
+        String request = getRequestPath()+ "/sshkeys/"+ seq;
+        gerritRestClient.deleteRequest(request);
     }
 }

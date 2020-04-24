@@ -76,6 +76,10 @@ public class GerritAssert {
         assertXmlOutputEqual(actual, expected);
     }
 
+    public static void assertEquals(SshKeyInfo actual, SshKeyInfo expected) {
+        assertXmlOutputEqual(actual, expected);
+    }
+
     public static void assertEquals(DiffInfo actual, DiffInfo expected) {
         assertXmlOutputEqual(actual, expected);
     }
