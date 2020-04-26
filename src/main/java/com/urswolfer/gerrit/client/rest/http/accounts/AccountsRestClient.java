@@ -33,15 +33,18 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
 
     private final GerritRestClient gerritRestClient;
     private final AccountsParser accountsParser;
+    private final SshKeysParser sshKeysParser;
 
-    public AccountsRestClient(GerritRestClient gerritRestClient, AccountsParser accountsParser) {
+    public AccountsRestClient(GerritRestClient gerritRestClient, AccountsParser accountsParser,
+                              SshKeysParser sshKeysParser) {
         this.gerritRestClient = gerritRestClient;
         this.accountsParser = accountsParser;
+        this.sshKeysParser = sshKeysParser;
     }
 
     @Override
     public AccountApi id(String id) throws RestApiException {
-        return new AccountApiRestClient(gerritRestClient, accountsParser, id);
+        return new AccountApiRestClient(gerritRestClient, accountsParser, sshKeysParser, id);
     }
 
     @Override

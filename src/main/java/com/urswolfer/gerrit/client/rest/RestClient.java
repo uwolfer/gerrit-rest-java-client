@@ -88,6 +88,6 @@ public interface RestClient {
                          Header... headers) throws IOException, HttpStatusException;
 
     enum HttpVerb {
-        GET, POST, DELETE, HEAD, PUT, PUT_TEXT_PLAIN
+        GET, POST, POST_TEXT_PLAIN, DELETE, HEAD, PUT, PUT_TEXT_PLAIN
     }
 }

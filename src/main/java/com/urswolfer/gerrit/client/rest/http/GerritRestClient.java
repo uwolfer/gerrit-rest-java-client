@@ -212,6 +212,10 @@ public class GerritRestClient implements RestClient {
                 method = new HttpPost(uri);
                 setRequestBody(requestBody, method);
                 break;
+            case POST_TEXT_PLAIN:
+                method = new HttpPost(uri);
+                setRequestBody(requestBody, method, ContentType.TEXT_PLAIN);
+                break;
             case GET:
                 method = new HttpGet(uri);
                 break;
