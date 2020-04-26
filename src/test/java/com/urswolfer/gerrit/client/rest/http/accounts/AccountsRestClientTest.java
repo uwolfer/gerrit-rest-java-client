@@ -36,7 +36,7 @@ public class AccountsRestClientTest {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet("/accounts/jdoe");
         AccountsParser accountsParser = getAccountsParser();
         SshKeysParser sshKeysParser = getSshKeysParser();
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser,sshKeysParser);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser, sshKeysParser);
         accountsRestClient.id("jdoe").get();
 
         EasyMock.verify(gerritRestClient, accountsParser);
@@ -48,7 +48,7 @@ public class AccountsRestClientTest {
         AccountsParser accountsParser = getAccountsParser();
         SshKeysParser sshKeysParser = getSshKeysParser();
 
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser,sshKeysParser);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser, sshKeysParser);
         accountsRestClient.self().get();
 
         EasyMock.verify(gerritRestClient, accountsParser);

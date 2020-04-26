@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Thomas Forrer
+ * @author Philip Moore
  */
 public class SshKeyParserTest extends AbstractParserTest {
     private final SshKeysParser sshKeysParser = new SshKeysParser(getGson());

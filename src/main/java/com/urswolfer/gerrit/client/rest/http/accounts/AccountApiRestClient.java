@@ -107,7 +107,7 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
 
     @Override
     public void deleteSshKey(int seq) throws RestApiException {
-        String request = getRequestPath()+ "/sshkeys/"+ seq;
+        String request = getRequestPath()+ "/sshkeys/" + seq;
         gerritRestClient.deleteRequest(request);
     }
 }
