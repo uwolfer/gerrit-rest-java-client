@@ -73,6 +73,6 @@ public class AccountApiRestClientTest {
     private AccountsRestClient getAccountsRestClient(GerritRestClient gerritRestClient) {
         AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
         SshKeysParser sshKeyParser = EasyMock.createMock(SshKeysParser.class);
-        return new AccountsRestClient(gerritRestClient, accountsParser,sshKeyParser);
+        return new AccountsRestClient(gerritRestClient, accountsParser, sshKeyParser);
     }
 }
