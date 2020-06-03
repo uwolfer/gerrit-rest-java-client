@@ -46,6 +46,7 @@ import org.eclipse.jetty.util.security.Credential;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import javax.servlet.http.HttpServlet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,9 +60,15 @@ import java.util.List;
  */
 public class GerritRestClientTest {
     private String jettyUrl;
+    private String githubOAuthJettyUrl;
 
     @BeforeClass
     public void startJetty() throws Exception {
+        jettyUrl = startJetty(LoginSimulationServlet.class);
+        githubOAuthJettyUrl = startJetty(GitHubOAuthLoginSimulationServlet.class);
+    }
+
+    public String startJetty(Class<? extends HttpServlet> loginServletClass) throws Exception {
         Server server = new Server(0);
 
         ResourceHandler resourceHandler = new ResourceHandler();
@@ -73,7 +80,7 @@ public class GerritRestClientTest {
         resourceHandler.setWelcomeFiles(new String[] {"changes.json", "projects.json", "account.json"});
 
         ServletContextHandler servletContextHandler = new ServletContextHandler();
-        servletContextHandler.addServlet(LoginSimulationServlet.class, "/login/");
+        servletContextHandler.addServlet(loginServletClass, "/login/");
 
         ServletContextHandler basicAuthContextHandler = new ServletContextHandler(ServletContextHandler.SECURITY);
         basicAuthContextHandler.setSecurityHandler(basicAuth("foo", "bar", "Gerrit Auth"));
@@ -92,7 +99,7 @@ public class GerritRestClientTest {
         Connector connector = server.getConnectors()[0];
         String host = "localhost";
         int port = connector.getLocalPort();
-        jettyUrl = String.format("http://%s:%s", host, port);
+        return String.format("http://%s:%s", host, port);
     }
 
     private static SecurityHandler basicAuth(String username, String password, String realm) {
@@ -324,6 +331,26 @@ public class GerritRestClientTest {
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
         requestChanges(gerritRestClient);
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+    }
+
+    /**
+     * Tests that the login cache is used correctly for a host that has GitHub/OAuth
+     * configured as authentication method. It tries the first time to get the GerritAccount-cookie
+     * and, after having detected the GitHub/OAuth handshake, use HTTP auth.
+     */
+    @Test
+    public void testGerritWithGitHubOAuth() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClient(
+            new GerritAuthData.Basic(githubOAuthJettyUrl, "foo", "bar"), new HttpRequestExecutor());
+        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
+        loginCacheField.setAccessible(true);
+        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+
+        Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+        requestChanges(gerritRestClient);
+        Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isFalse();
+        Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+        Truth.assertThat(loginCache.isGithubOAuthDetected()).isTrue();
     }
 
     private void requestChanges(GerritRestClient gerritRestClient) throws IOException, HttpStatusException {

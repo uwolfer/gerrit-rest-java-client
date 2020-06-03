@@ -18,7 +18,10 @@ package com.urswolfer.gerrit.client.rest.http;
 
 import com.google.common.base.Optional;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 
 /**
  * @author Urs Wolfer
@@ -26,6 +29,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 public class LoginCache {
     private final BasicCookieStore cookieStore;
     private final GerritAuthData authData;
+    private boolean githubOAuthDetected;
 
     private Optional<String> gerritAuthOptional = Optional.absent();
     // remember when host does not support gerrit-auth login method so we don't have to try again
@@ -57,6 +61,15 @@ public class LoginCache {
         gerritAuthOptional = Optional.absent();
         hostSupportsGerritAuth = true;
         cookieStore.clear();
+    }
+
+    public boolean isGithubOAuthDetected() {
+        return githubOAuthDetected;
+    }
+
+    public boolean isGitHubOAuthRequested(HttpContext loginContext) {
+        HttpUriRequest lastRequest = (HttpUriRequest) loginContext.getAttribute(HttpCoreContext.HTTP_REQUEST);
+        return githubOAuthDetected || (githubOAuthDetected = (lastRequest != null && lastRequest.getURI().getPath().contains("github-plugin")));
     }
 
     /**
