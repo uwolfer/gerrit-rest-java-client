@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Urs Wolfer
+ * Copyright 2020 Luca Milanesio
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,21 +28,23 @@ import java.io.IOException;
 
 
 /**
- * @author Urs Wolfer
+ * @author Luca Milanesio
  */
-public class LoginSimulationServlet extends HttpServlet {
-    public static final String INDEX_HTML = "src/test/resources/com/urswolfer/gerrit/client/rest/http/login/index.html";
+public class GitHubOAuthLoginSimulationServlet extends HttpServlet {
+    private static final String OAUTH_SCOPE_PATH = "/plugins/github-plugin/static/scope.html";
 
     /**
-     * Only handle case when no "Authorization" header is sent. When "Authorization" header is sent,
-     * leave it to GerritRestClientTest#basicAuth.
+     * Always redirect to the OAuth scope selection, simulating the GitHub/OAuth authentication
+     * behaviour.
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getHeader("Authorization") != null) {
-            return;
-        }
+        resp.sendRedirect(OAUTH_SCOPE_PATH);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.addCookie(new Cookie("GerritAccount", "value"));
-        ByteStreams.copy(new FileInputStream(INDEX_HTML), resp.getOutputStream());
+        ByteStreams.copy(new FileInputStream(LoginSimulationServlet.INDEX_HTML), resp.getOutputStream());
     }
 }

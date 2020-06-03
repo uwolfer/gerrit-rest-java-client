@@ -64,8 +64,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -282,6 +284,13 @@ public class GerritRestClient implements RestClient {
             return Optional.absent();
         }
 
+        if (loginCache.isGithubOAuthDetected()) {
+            // When Gerrit is configured with GitHub/OAuth authentication, do not keep on
+            // trying the /login page as it would just result in a continuous loop of failed
+            // login attempts.
+            return Optional.absent();
+        }
+
         Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
         if (!gerritAccountCookie.isPresent()
             || gerritAccountCookie.get().isExpired(new Date())
@@ -313,7 +322,7 @@ public class GerritRestClient implements RestClient {
         );
         method.setEntity(new UrlEncodedFormEntity(parameters, Consts.UTF_8));
         HttpResponse loginResponse = httpRequestExecutor.execute(client, method, httpContext);
-        return extractGerritAuth(loginResponse);
+        return extractGerritAuth(loginResponse, httpContext);
     }
 
     /**
@@ -338,12 +347,12 @@ public class GerritRestClient implements RestClient {
     private Optional<String> tryGerritHttpAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException, HttpStatusException {
         String loginUrl = authData.getHost() + "/login/";
         HttpResponse loginResponse = httpRequestExecutor.execute(client, new HttpGet(loginUrl), httpContext);
-        return extractGerritAuth(loginResponse);
+        return extractGerritAuth(loginResponse, httpContext);
     }
 
-    private Optional<String> extractGerritAuth(HttpResponse loginResponse) throws IOException, HttpStatusException {
+    private Optional<String> extractGerritAuth(HttpResponse loginResponse, HttpContext httpContext) throws IOException, HttpStatusException {
         checkStatusCodeServerError(loginResponse);
-        if (loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
+        if (!loginCache.isGitHubOAuthRequested(httpContext) && loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
             return getXsrfCookie().or(getXsrfFromHtmlBody(loginResponse));
         }
         return Optional.absent();
