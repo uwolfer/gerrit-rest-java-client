@@ -322,6 +322,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public List<AccountInfo> getPastAssignees() throws RestApiException {
+        String request = getRequestPath() + "/past_assignees";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return accountsParser.parseAccountInfos(jsonElement);
+    }
+
+    @Override
     public ChangeInfo check() throws RestApiException {
         String request = getRequestPath() + "/check";
         JsonElement jsonElement = gerritRestClient.getRequest(request);

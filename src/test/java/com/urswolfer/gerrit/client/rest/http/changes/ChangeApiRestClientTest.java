@@ -508,6 +508,29 @@ public class ChangeApiRestClientTest {
     }
 
     @Test
+    public void testGetPastAssignees() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/past_assignees", jsonElement)
+            .get();
+
+        List<AccountInfo> expectedPastAssignees = new ArrayList<AccountInfo>();
+        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
+        EasyMock.expect(accountsParser.parseAccountInfos(jsonElement)).andReturn(expectedPastAssignees).once();
+        EasyMock.replay(accountsParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null,
+            null, null, null, null, null,
+            null, null, null, null, null, null,
+            accountsParser, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        List<AccountInfo> pastAssigneesInfo = changeApiRestClient.getPastAssignees();
+
+        Truth.assertThat(pastAssigneesInfo).isSameAs(expectedPastAssignees);
+        EasyMock.verify(gerritRestClient, accountsParser);
+    }
+
+    @Test
     public void testChangeGet() throws Exception {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
