@@ -49,6 +49,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     private final DiffInfoParser diffInfoParser;
     private final ReviewResultParser reviewResultParser;
     private final CommitInfoParser commitInfoParser;
+    private final ReviewerInfoParser reviewerInfoParser;
     private final String revision;
 
     public RevisionApiRestClient(GerritRestClient gerritRestClient,
@@ -58,6 +59,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
                                  DiffInfoParser diffInfoParser,
                                  ReviewResultParser reviewResultParser,
                                  CommitInfoParser commitInfoParser,
+                                 ReviewerInfoParser reviewerInfoParser,
                                  String revision) {
         this.gerritRestClient = gerritRestClient;
         this.changeApiRestClient = changeApiRestClient;
@@ -66,6 +68,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         this.diffInfoParser = diffInfoParser;
         this.reviewResultParser = reviewResultParser;
         this.commitInfoParser = commitInfoParser;
+        this.reviewerInfoParser = reviewerInfoParser;
         this.revision = revision;
     }
 
@@ -143,6 +146,13 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public TreeMap<String, List<CommentInfo>> comments() throws RestApiException {
         return comments("comments");
+    }
+
+    @Override
+    public List<ReviewerInfo> listReviewers() throws RestApiException {
+        String request = getRequestPath() + "/reviewers/";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return reviewerInfoParser.parseReviewerInfos(jsonElement);
     }
 
     @Override

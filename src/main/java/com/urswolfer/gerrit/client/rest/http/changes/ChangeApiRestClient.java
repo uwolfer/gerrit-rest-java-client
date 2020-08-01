@@ -120,7 +120,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public RevisionApi revision(String id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, reviewResultParser, commitInfoParser, id);
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, reviewResultParser, commitInfoParser, reviewerInfoParser, id);
     }
 
     @Override

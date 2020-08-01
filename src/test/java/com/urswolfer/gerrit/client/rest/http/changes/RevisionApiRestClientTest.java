@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.CherryPickInput;
 import com.google.gerrit.extensions.api.changes.ReviewInput;
+import com.google.gerrit.extensions.api.changes.ReviewerInfo;
 import com.google.gerrit.extensions.api.changes.SubmitInput;
 import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.TestSubmitRuleInput;
@@ -39,6 +40,7 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -63,6 +65,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         .expectGetFileUrl("/changes/" + CHANGE_ID + "/revisions/current/files")
                         .expectFileReviewedUrl("/changes/" + CHANGE_ID + "/revisions/current/files/" + FILE_PATH_ENCODED + "/reviewed")
                         .expectGetCommentsUrl("/changes/" + CHANGE_ID + "/revisions/current/comments/")
+                        .expectGetListReviewersUrl("/changes/" + CHANGE_ID + "/revisions/current/reviewers/")
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/current/drafts/")
                         .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/submit_type")
                         .expectTestSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/test.submit_type")
@@ -78,6 +81,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         .expectGetFileUrl("/changes/" + CHANGE_ID + "/revisions/3/files")
                         .expectFileReviewedUrl("/changes/" + CHANGE_ID + "/revisions/3/files/" + FILE_PATH_ENCODED + "/reviewed")
                         .expectGetCommentsUrl("/changes/" + CHANGE_ID + "/revisions/3/comments/")
+                        .expectGetListReviewersUrl("/changes/" + CHANGE_ID + "/revisions/3/reviewers/")
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/3/drafts/")
                         .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/submit_type")
                         .expectTestSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/test.submit_type")
@@ -277,6 +281,24 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         EasyMock.verify(gerritRestClient, commentsParser);
     }
 
+    @Test(dataProvider = "TestCases")
+    public void testGetListReviewers(RevisionApiTestCase testCase) throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet(testCase.getListReviewersUrl, jsonElement)
+            .get();
+
+        ReviewerInfoParser reviewerInfoParser = EasyMock.createMock(ReviewerInfoParser.class);
+        EasyMock.expect(reviewerInfoParser.parseReviewerInfos(jsonElement)).andReturn(null).times(1);
+        EasyMock.replay(reviewerInfoParser);
+
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, reviewerInfoParser);
+
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).listReviewers();
+
+        EasyMock.verify(gerritRestClient, reviewerInfoParser);
+    }
+
     @Test
     public void testPatch() throws Exception {
         String patchContent = "patch content";
@@ -419,6 +441,25 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                 EasyMock.createMock(AccountsParser.class));
     }
 
+    private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, ReviewerInfoParser reviewerInfoParser) {
+        return new ChangesRestClient(
+            gerritRestClient,
+            EasyMock.createMock(ChangesParser.class),
+            EasyMock.createMock(CommentsParser.class),
+            EasyMock.createMock(MessagesParser.class),
+            EasyMock.createMock(IncludedInInfoParser.class),
+            EasyMock.createMock(FileInfoParser.class),
+            EasyMock.createMock(DiffInfoParser.class),
+            null,
+            reviewerInfoParser,
+            EasyMock.createMock(EditInfoParser.class),
+            EasyMock.createMock(AddReviewerResultParser.class),
+            EasyMock.createMock(ReviewResultParser.class),
+            EasyMock.createMock(CommitInfoParser.class),
+            EasyMock.createMock(HashtagsParser.class),
+            EasyMock.createMock(AccountsParser.class));
+    }
+
     private static RevisionApiTestCase withRevision(String revision) {
         return new RevisionApiTestCase(revision);
     }
@@ -434,6 +475,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         private String fileUrl;
         private String fileReviewedUrl;
         private String getCommentsUrl;
+        private String getListReviewersUrl;
         private String getDraftsUrl;
         private String submitTypeUrl;
         private String testSubmitTypeUrl;
@@ -485,6 +527,11 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
         private RevisionApiTestCase expectGetCommentsUrl(String getCommentsUrl) {
             this.getCommentsUrl = getCommentsUrl;
+            return this;
+        }
+
+        private RevisionApiTestCase expectGetListReviewersUrl(String getListReviewersUrl) {
+            this.getListReviewersUrl = getListReviewersUrl;
             return this;
         }
 
