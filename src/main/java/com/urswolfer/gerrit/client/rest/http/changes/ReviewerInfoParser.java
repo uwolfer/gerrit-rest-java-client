@@ -38,7 +38,6 @@ public class ReviewerInfoParser {
     }
 
     public List<ReviewerInfo> parseReviewerInfos(JsonElement result) {
-        System.out.println("test 2");
         if (!result.isJsonArray()) {
             return Collections.singletonList(gson.fromJson(result,  ReviewerInfo.class));
         }
