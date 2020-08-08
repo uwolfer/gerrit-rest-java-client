@@ -18,7 +18,6 @@ import com.google.gerrit.extensions.client.ProjectState;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -81,12 +80,11 @@ public interface Projects {
   abstract class ListRequest {
     public enum FilterType {
       CODE,
-      PARENT_CANDIDATES,
       PERMISSIONS,
       ALL
     }
 
-    private final List<String> branches = new ArrayList<String>();
+    private final List<String> branches = new ArrayList<>();
     private boolean description;
     private String prefix;
     private String substring;
@@ -100,7 +98,7 @@ public interface Projects {
 
     public List<ProjectInfo> get() throws RestApiException {
       Map<String, ProjectInfo> map = getAsMap();
-      List<ProjectInfo> result = new ArrayList<ProjectInfo>(map.size());
+      List<ProjectInfo> result = new ArrayList<>(map.size());
       for (Map.Entry<String, ProjectInfo> e : map.entrySet()) {
         // ListProjects "helpfully" nulls out names when converting to a map.
         e.getValue().name = e.getKey();

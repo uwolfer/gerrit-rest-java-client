@@ -14,9 +14,12 @@
 
 package com.google.gerrit.extensions.common;
 
-import com.google.common.base.Objects;
+import static java.util.stream.Collectors.joining;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import java.util.List;
+import java.util.Objects;
 
 public class CommitInfo {
   public String commit;
@@ -33,33 +36,34 @@ public class CommitInfo {
       return false;
     }
     CommitInfo c = (CommitInfo) o;
-    return Objects.equal(commit, c.commit)
-        && Objects.equal(parents, c.parents)
-        && Objects.equal(author, c.author)
-        && Objects.equal(committer, c.committer)
-        && Objects.equal(subject, c.subject)
-        && Objects.equal(message, c.message)
-        && Objects.equal(webLinks, c.webLinks);
+    return Objects.equals(commit, c.commit)
+        && Objects.equals(parents, c.parents)
+        && Objects.equals(author, c.author)
+        && Objects.equals(committer, c.committer)
+        && Objects.equals(subject, c.subject)
+        && Objects.equals(message, c.message)
+        && Objects.equals(webLinks, c.webLinks);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(commit, parents, author, committer, subject, message, webLinks);
+    return Objects.hash(commit, parents, author, committer, subject, message, webLinks);
   }
 
   @Override
   public String toString() {
-    // Using something like the raw commit format might be nice, but we can't depend on JGit here.
-    StringBuilder sb = new StringBuilder().append(getClass().getSimpleName()).append('{');
-    sb.append(commit);
-//    sb.append(", parents=").append(parents.stream().map(p -> p.commit).collect(joining(", ")));
-    sb.append(", author=").append(author);
-    sb.append(", committer=").append(committer);
-    sb.append(", subject=").append(subject);
-    sb.append(", message=").append(message);
-    if (webLinks != null) {
-      sb.append(", webLinks=").append(webLinks);
+    ToStringHelper helper = MoreObjects.toStringHelper(this).addValue(commit);
+    if (parents != null) {
+      helper.add("parents", parents.stream().map(p -> p.commit).collect(joining(", ")));
     }
-    return sb.append('}').toString();
+    helper
+        .add("author", author)
+        .add("committer", committer)
+        .add("subject", subject)
+        .add("message", message);
+    if (webLinks != null) {
+      helper.add("webLinks", webLinks);
+    }
+    return helper.toString();
   }
 }

@@ -14,19 +14,25 @@
 
 package com.google.gerrit.extensions.api.changes;
 
+import com.google.common.collect.ListMultimap;
+import com.google.gerrit.common.Nullable;
+import com.google.gerrit.extensions.client.ArchiveFormat;
 import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.ActionInfo;
+import com.google.gerrit.extensions.common.ApprovalInfo;
+import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.CommitInfo;
+import com.google.gerrit.extensions.common.DiffInfo;
 import com.google.gerrit.extensions.common.EditInfo;
 import com.google.gerrit.extensions.common.FileInfo;
 import com.google.gerrit.extensions.common.MergeableInfo;
 import com.google.gerrit.extensions.common.RobotCommentInfo;
+import com.google.gerrit.extensions.common.TestSubmitRuleInfo;
 import com.google.gerrit.extensions.common.TestSubmitRuleInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,11 +47,16 @@ public interface RevisionApi {
 
   ReviewResult review(ReviewInput in) throws RestApiException;
 
-  void submit() throws RestApiException;
+  default void submit() throws RestApiException {
+    SubmitInput in = new SubmitInput();
+    submit(in);
+  }
 
   void submit(SubmitInput in) throws RestApiException;
 
-  BinaryResult submitPreview() throws RestApiException;
+  default BinaryResult submitPreview() throws RestApiException {
+    return submitPreview("zip");
+  }
 
   BinaryResult submitPreview(String format) throws RestApiException;
 
@@ -54,7 +65,12 @@ public interface RevisionApi {
 
   ChangeApi cherryPick(CherryPickInput in) throws RestApiException;
 
-  ChangeApi rebase() throws RestApiException;
+  ChangeInfo cherryPickAsInfo(CherryPickInput in) throws RestApiException;
+
+  default ChangeApi rebase() throws RestApiException {
+    RebaseInput in = new RebaseInput();
+    return rebase(in);
+  }
 
   ChangeApi rebase(RebaseInput in) throws RestApiException;
 
@@ -66,9 +82,11 @@ public interface RevisionApi {
 
   Set<String> reviewed() throws RestApiException;
 
-  Map<String, FileInfo> files() throws RestApiException;
+  default Map<String, FileInfo> files() throws RestApiException {
+    return files(null);
+  }
 
-  Map<String, FileInfo> files(String base) throws RestApiException;
+  Map<String, FileInfo> files(@Nullable String base) throws RestApiException;
 
   Map<String, FileInfo> files(int parentNum) throws RestApiException;
 
@@ -105,6 +123,8 @@ public interface RevisionApi {
    */
   EditInfo applyFix(String fixId) throws RestApiException;
 
+  Map<String, DiffInfo> getFixPreview(String fixId) throws RestApiException;
+
   DraftApi createDraft(DraftInput in) throws RestApiException;
 
   DraftApi draft(String id) throws RestApiException;
@@ -126,7 +146,23 @@ public interface RevisionApi {
 
   SubmitType testSubmitType(TestSubmitRuleInput in) throws RestApiException;
 
+  TestSubmitRuleInfo testSubmitRule(TestSubmitRuleInput in) throws RestApiException;
+
   MergeListRequest getMergeList() throws RestApiException;
+
+  RelatedChangesInfo related() throws RestApiException;
+
+  /** Returns votes on the revision. */
+  ListMultimap<String, ApprovalInfo> votes() throws RestApiException;
+
+  /**
+   * Retrieves the revision as an archive.
+   *
+   * @param format the format of the archive
+   * @return the archive as {@link BinaryResult}
+   * @throws RestApiException
+   */
+  BinaryResult getArchive(ArchiveFormat format) throws RestApiException;
 
   abstract class MergeListRequest {
     private boolean addLinks;
@@ -170,11 +206,6 @@ public interface RevisionApi {
     }
 
     @Override
-    public void submit() throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
     public void submit(SubmitInput in) throws RestApiException {
       throw new NotImplementedException();
     }
@@ -191,7 +222,7 @@ public interface RevisionApi {
     }
 
     @Override
-    public ChangeApi rebase() throws RestApiException {
+    public ChangeInfo cherryPickAsInfo(CherryPickInput in) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -241,11 +272,6 @@ public interface RevisionApi {
     }
 
     @Override
-    public Map<String, FileInfo> files() throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
     public List<String> queryFiles(String query) throws RestApiException {
       throw new NotImplementedException();
     }
@@ -287,6 +313,11 @@ public interface RevisionApi {
 
     @Override
     public EditInfo applyFix(String fixId) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public Map<String, DiffInfo> getFixPreview(String fixId) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -336,11 +367,6 @@ public interface RevisionApi {
     }
 
     @Override
-    public BinaryResult submitPreview() throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
     public BinaryResult submitPreview(String format) throws RestApiException {
       throw new NotImplementedException();
     }
@@ -351,7 +377,22 @@ public interface RevisionApi {
     }
 
     @Override
+    public TestSubmitRuleInfo testSubmitRule(TestSubmitRuleInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public MergeListRequest getMergeList() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public RelatedChangesInfo related() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ListMultimap<String, ApprovalInfo> votes() throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -367,6 +408,11 @@ public interface RevisionApi {
 
     @Override
     public String etag() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public BinaryResult getArchive(ArchiveFormat format) throws RestApiException {
       throw new NotImplementedException();
     }
   }

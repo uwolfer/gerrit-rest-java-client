@@ -30,7 +30,7 @@ public class DashboardInfo {
   public Boolean isDefault;
 
   public String title;
-  public List<DashboardSectionInfo> sections = new ArrayList<DashboardSectionInfo>();
+  public List<DashboardSectionInfo> sections = new ArrayList<>();
 
   public DashboardInfo() {}
 }

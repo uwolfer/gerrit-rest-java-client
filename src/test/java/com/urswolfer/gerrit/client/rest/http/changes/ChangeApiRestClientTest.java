@@ -323,7 +323,7 @@ public class ChangeApiRestClientTest {
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/in", jsonElement)
             .get();
 
-        IncludedInInfo expectedIncludedInInfo = new IncludedInInfo(null, null, null);
+        IncludedInInfo expectedIncludedInInfo = new IncludedInInfo(new ArrayList<>(), new ArrayList<>(), null);
         IncludedInInfoParser includedInInfoParser = EasyMock.createMock(IncludedInInfoParser.class);
         EasyMock.expect(includedInInfoParser.parseIncludedInInfos(jsonElement)).andReturn(expectedIncludedInInfo).once();
         EasyMock.replay(includedInInfoParser);

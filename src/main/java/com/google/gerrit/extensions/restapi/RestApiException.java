@@ -14,18 +14,24 @@
 
 package com.google.gerrit.extensions.restapi;
 
-/** Root exception type for JSON API failures. */
+import static java.util.Objects.requireNonNull;
+
+/** Root exception type for REST API failures. */
 public class RestApiException extends Exception {
   private static final long serialVersionUID = 1L;
   private CacheControl caching = CacheControl.NONE;
 
-  public RestApiException() {}
+  public static RestApiException wrap(String msg, Exception e) {
+    return new RestApiException(msg, e);
+  }
 
-  public RestApiException(String msg) {
+  protected RestApiException() {}
+
+  protected RestApiException(String msg) {
     super(msg);
   }
 
-  public RestApiException(String msg, Throwable cause) {
+  protected RestApiException(String msg, Throwable cause) {
     super(msg, cause);
   }
 
@@ -33,9 +39,7 @@ public class RestApiException extends Exception {
     return caching;
   }
 
-  @SuppressWarnings("unchecked")
-  public <T extends RestApiException> T caching(CacheControl c) {
-    caching = c;
-    return (T) this;
+  protected void setCaching(CacheControl caching) {
+    this.caching = requireNonNull(caching);
   }
 }

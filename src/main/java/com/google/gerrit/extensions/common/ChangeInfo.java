@@ -17,17 +17,30 @@ package com.google.gerrit.extensions.common;
 import com.google.gerrit.extensions.client.ChangeStatus;
 import com.google.gerrit.extensions.client.ReviewerState;
 import com.google.gerrit.extensions.client.SubmitType;
-
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Representation of a change used in the API.
+ *
+ * <p>Many fields are actually nullable.
+ */
 public class ChangeInfo {
+  // ActionJson#copy(List, ChangeInfo) must be adapted if new fields are added that are not
+  // protected by any ListChangesOption.
+
   public String id;
   public String project;
   public String branch;
   public String topic;
+  /**
+   * The <a href="https://www.gerritcodereview.com/design-docs/attention-set.html">attention set</a>
+   * for this change. Keyed by account ID.
+   */
+  public Map<Integer, AttentionSetInfo> attentionSet;
+
   public AccountInfo assignee;
   public Collection<String> hashtags;
   public String changeId;
@@ -38,7 +51,6 @@ public class ChangeInfo {
   public Timestamp submitted;
   public AccountInfo submitter;
   public Boolean starred;
-  public Boolean muted;
   public Collection<String> stars;
   public Boolean reviewed;
   public SubmitType submitType;
@@ -46,11 +58,26 @@ public class ChangeInfo {
   public Boolean submittable;
   public Integer insertions;
   public Integer deletions;
+  public Integer totalCommentCount;
   public Integer unresolvedCommentCount;
   public Boolean isPrivate;
   public Boolean workInProgress;
   public Boolean hasReviewStarted;
   public Integer revertOf;
+  public String submissionId;
+  public Integer cherryPickOfChange;
+  public Integer cherryPickOfPatchSet;
+
+  /**
+   * Whether the change contains conflicts.
+   *
+   * <p>If {@code true}, some of the file contents of the change contain git conflict markers to
+   * indicate the conflicts.
+   *
+   * <p>Only set if this change info is returned in response to a request that creates a new change
+   * or patch set and conflicts are allowed.
+   */
+  public Boolean containsGitConflicts;
 
   public int _number;
 

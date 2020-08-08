@@ -159,11 +159,11 @@ public class GerritRestClient implements RestClient {
 
             JsonElement ret = parseResponse(entity.getContent());
             if (ret.isJsonNull()) {
-                throw new RestApiException("Unexpectedly empty response.");
+                throw RestApiException.wrap("Unexpectedly empty response.", null);
             }
             return ret;
         } catch (IOException e) {
-            throw new RestApiException("Request failed.", e);
+            throw RestApiException.wrap("Request failed.", e);
         }
     }
 
@@ -520,7 +520,7 @@ public class GerritRestClient implements RestClient {
     private void checkContentType(HttpEntity entity) throws RestApiException {
         Header contentType = entity.getContentType();
         if (contentType != null && !contentType.getValue().contains(JSON_MIME_TYPE)) {
-            throw new RestApiException(String.format("Expected JSON but got '%s'.", contentType.getValue()));
+            throw RestApiException.wrap(String.format("Expected JSON but got '%s'.", contentType.getValue()), null);
         }
     }
 }

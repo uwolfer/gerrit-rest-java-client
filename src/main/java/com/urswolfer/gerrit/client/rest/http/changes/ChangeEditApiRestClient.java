@@ -16,8 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.base.Optional;
 import com.google.gerrit.extensions.api.changes.ChangeEditApi;
+import com.google.gerrit.extensions.api.changes.FileContentInput;
 import com.google.gerrit.extensions.api.changes.PublishChangeEditInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -25,6 +25,8 @@ import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import java.io.IOException;
+import java.util.Optional;
+
 import org.apache.http.HttpResponse;
 
 /**
@@ -47,17 +49,17 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
             HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
             return Optional.of(BinaryResultUtils.createBinaryResult(response));
         } catch (IOException e) {
-            throw new RestApiException("Failed to get file content.", e);
+            throw RestApiException.wrap("Failed to get file content.", e);
         }
     }
 
     @Override
-    public void modifyFile(String filePath, String content) throws RestApiException {
+    public void modifyFile(String filePath, FileContentInput input) throws RestApiException {
         String request = getRequestPath() + "/" + filePath;
         try {
-            gerritRestClient.request(request, content, HttpVerb.PUT_TEXT_PLAIN);
+            gerritRestClient.request(request, input.binary_content, HttpVerb.PUT_TEXT_PLAIN);
         } catch (IOException e) {
-            throw new RestApiException("Failed to modify file.", e);
+            throw RestApiException.wrap("Failed to modify file.", e);
         }
     }
 

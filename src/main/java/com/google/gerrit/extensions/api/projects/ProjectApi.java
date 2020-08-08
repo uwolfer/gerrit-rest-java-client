@@ -18,11 +18,12 @@ import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.access.ProjectAccessInput;
 import com.google.gerrit.extensions.api.config.AccessCheckInfo;
 import com.google.gerrit.extensions.api.config.AccessCheckInput;
+import com.google.gerrit.extensions.common.BatchLabelInput;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.LabelDefinitionInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
-
 import java.util.List;
 
 public interface ProjectApi {
@@ -43,6 +44,8 @@ public interface ProjectApi {
   ChangeInfo accessChange(ProjectAccessInput p) throws RestApiException;
 
   AccessCheckInfo checkAccess(AccessCheckInput in) throws RestApiException;
+
+  CheckProjectResultInfo check(CheckProjectInput in) throws RestApiException;
 
   ConfigInfo config() throws RestApiException;
 
@@ -104,6 +107,8 @@ public interface ProjectApi {
   List<ProjectInfo> children() throws RestApiException;
 
   List<ProjectInfo> children(boolean recursive) throws RestApiException;
+
+  List<ProjectInfo> children(int limit) throws RestApiException;
 
   ChildProjectApi child(String name) throws RestApiException;
 
@@ -192,6 +197,38 @@ public interface ProjectApi {
   void parent(String parent) throws RestApiException;
 
   /**
+   * Reindex the project and children in case {@code indexChildren} is specified.
+   *
+   * @param indexChildren decides if children should be indexed recursively
+   */
+  void index(boolean indexChildren) throws RestApiException;
+
+  /** Reindexes all changes of the project. */
+  void indexChanges() throws RestApiException;
+
+  ListLabelsRequest labels() throws RestApiException;
+
+  abstract class ListLabelsRequest {
+    protected boolean inherited;
+
+    public abstract List<LabelDefinitionInfo> get() throws RestApiException;
+
+    public ListLabelsRequest withInherited(boolean inherited) {
+      this.inherited = inherited;
+      return this;
+    }
+  }
+
+  LabelApi label(String labelName) throws RestApiException;
+
+  /**
+   * Adds, updates and deletes label definitions in a batch.
+   *
+   * @param input input that describes additions, updates and deletions of label definitions
+   */
+  void labels(BatchLabelInput input) throws RestApiException;
+
+  /**
    * A default implementation which allows source compatibility when adding new methods to the
    * interface.
    */
@@ -237,6 +274,11 @@ public interface ProjectApi {
     }
 
     @Override
+    public CheckProjectResultInfo check(CheckProjectInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public ConfigInfo config() throws RestApiException {
       throw new NotImplementedException();
     }
@@ -268,6 +310,11 @@ public interface ProjectApi {
 
     @Override
     public List<ProjectInfo> children(boolean recursive) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ProjectInfo> children(int limit) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -343,6 +390,31 @@ public interface ProjectApi {
 
     @Override
     public void parent(String parent) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void index(boolean indexChildren) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void indexChanges() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ListLabelsRequest labels() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public LabelApi label(String labelName) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void labels(BatchLabelInput input) throws RestApiException {
       throw new NotImplementedException();
     }
   }

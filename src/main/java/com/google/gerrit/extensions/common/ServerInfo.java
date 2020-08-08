@@ -14,8 +14,7 @@
 
 package com.google.gerrit.extensions.common;
 
-import java.util.Map;
-
+/** API response containing values from {@code gerrit.config} as nested objects. */
 public class ServerInfo {
   public AccountsInfo accounts;
   public AuthInfo auth;
@@ -26,7 +25,6 @@ public class ServerInfo {
   public PluginConfigInfo plugin;
   public SshdInfo sshd;
   public SuggestInfo suggest;
-  public Map<String, String> urlAliases;
   public UserConfigInfo user;
   public ReceiveInfo receive;
   public String defaultTheme;

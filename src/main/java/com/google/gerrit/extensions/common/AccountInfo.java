@@ -14,19 +14,58 @@
 
 package com.google.gerrit.extensions.common;
 
-import com.google.common.base.Objects;
-
+import com.google.common.base.MoreObjects;
 import java.util.List;
+import java.util.Objects;
 
+/**
+ * Representation of an account in the REST API.
+ *
+ * <p>This class determines the JSON format of accounts in the REST API.
+ *
+ * <p>This class defines fields for account properties that are frequently used. Additional fields
+ * are defined in {@link AccountDetailInfo}.
+ */
 public class AccountInfo {
+  /** The numeric ID of the account. */
   public Integer _accountId;
+
+  /** The full name of the user. */
   public String name;
+
+  /**
+   * The display name of the user. This allows users to control how their name is displayed in the
+   * UI. It will likely be unset for most users. This account property is just a way to opt out of
+   * the host wide default strategy of choosing the display name, see
+   * accounts.accountDefaultDisplayName in the server config. The default strategy is not applied by
+   * the backend. The display name will just be left unset, and the client has to load and apply the
+   * default strategy.
+   */
+  public String displayName;
+
+  /** The preferred email address of the user. */
   public String email;
+
+  /** List of the secondary email addresses of the user. */
   public List<String> secondaryEmails;
+
+  /** The username of the user. */
   public String username;
+
+  /** List of avatars of the user. */
   public List<AvatarInfo> avatars;
+
+  /**
+   * Whether the query would deliver more results if not limited. Only set on the last account that
+   * is returned as a query result.
+   */
   public Boolean _moreAccounts;
+
+  /** Status message of the account (e.g. 'OOO' for out-of-office). */
   public String status;
+
+  /** Whether the account is inactive. */
+  public Boolean inactive;
 
   public AccountInfo(Integer id) {
     this._accountId = id;
@@ -42,22 +81,42 @@ public class AccountInfo {
   public boolean equals(Object o) {
     if (o instanceof AccountInfo) {
       AccountInfo accountInfo = (AccountInfo) o;
-      return Objects.equal(_accountId, accountInfo._accountId)
-          && Objects.equal(name, accountInfo.name)
-          && Objects.equal(email, accountInfo.email)
-          && Objects.equal(secondaryEmails, accountInfo.secondaryEmails)
-          && Objects.equal(username, accountInfo.username)
-          && Objects.equal(avatars, accountInfo.avatars)
-          && Objects.equal(_moreAccounts, accountInfo._moreAccounts)
-          && Objects.equal(status, accountInfo.status);
+      return Objects.equals(_accountId, accountInfo._accountId)
+          && Objects.equals(name, accountInfo.name)
+          && Objects.equals(displayName, accountInfo.displayName)
+          && Objects.equals(email, accountInfo.email)
+          && Objects.equals(secondaryEmails, accountInfo.secondaryEmails)
+          && Objects.equals(username, accountInfo.username)
+          && Objects.equals(avatars, accountInfo.avatars)
+          && Objects.equals(_moreAccounts, accountInfo._moreAccounts)
+          && Objects.equals(status, accountInfo.status);
     }
     return false;
   }
 
   @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("id", _accountId)
+        .add("name", name)
+        .add("displayname", displayName)
+        .add("email", email)
+        .add("username", username)
+        .toString();
+  }
+
+  @Override
   public int hashCode() {
-    return Objects.hashCode(
-      _accountId, name, email, secondaryEmails, username, avatars, _moreAccounts, status);
+    return Objects.hash(
+        _accountId,
+        name,
+        displayName,
+        email,
+        secondaryEmails,
+        username,
+        avatars,
+        _moreAccounts,
+        status);
   }
 
   protected AccountInfo() {}

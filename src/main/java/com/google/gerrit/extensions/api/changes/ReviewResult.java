@@ -15,7 +15,6 @@
 package com.google.gerrit.extensions.api.changes;
 
 import com.google.gerrit.common.Nullable;
-
 import java.util.Map;
 
 /** Result object representing the outcome of a review request. */

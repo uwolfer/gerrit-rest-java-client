@@ -24,4 +24,3 @@ public class RobotCommentInfo extends CommentInfo {
   public Map<String, String> properties;
   public List<FixSuggestionInfo> fixSuggestions;
 }
-

@@ -223,8 +223,14 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         return includedInInfoParser.parseIncludedInInfos(jsonElement);
     }
 
+    @Deprecated
     @Override
     public List<ReviewerInfo> listReviewers() throws RestApiException {
+        return reviewers();
+    }
+
+    @Override
+    public List<ReviewerInfo> reviewers() throws RestApiException {
         String request = getRequestPath() + "/reviewers";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return reviewerInfoParser.parseReviewerInfos(jsonElement);

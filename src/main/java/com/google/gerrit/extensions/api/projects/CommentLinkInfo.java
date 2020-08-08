@@ -14,8 +14,8 @@
 
 package com.google.gerrit.extensions.api.projects;
 
-
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
+import java.util.Objects;
 
 public class CommentLinkInfo {
   public String match;
@@ -32,16 +32,27 @@ public class CommentLinkInfo {
     }
     if (o instanceof CommentLinkInfo) {
       CommentLinkInfo that = (CommentLinkInfo) o;
-      return Objects.equal(this.match, that.match)
-          && Objects.equal(this.link, that.link)
-          && Objects.equal(this.html, that.html)
-          && Objects.equal(this.enabled, that.enabled);
+      return Objects.equals(this.match, that.match)
+          && Objects.equals(this.link, that.link)
+          && Objects.equals(this.html, that.html)
+          && Objects.equals(this.enabled, that.enabled);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(match, link, html, enabled);
+    return Objects.hash(match, link, html, enabled);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("name", name)
+        .add("match", match)
+        .add("link", link)
+        .add("html", html)
+        .add("enabled", enabled)
+        .toString();
   }
 }

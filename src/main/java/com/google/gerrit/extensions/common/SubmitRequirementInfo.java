@@ -14,22 +14,18 @@
 
 package com.google.gerrit.extensions.common;
 
-import com.google.common.base.Objects;
-
-import java.util.Map;
+import com.google.common.base.MoreObjects;
+import java.util.Objects;
 
 public class SubmitRequirementInfo {
   public final String status;
   public final String fallbackText;
   public final String type;
-  public final Map<String, String> data;
 
-  public SubmitRequirementInfo(
-      String status, String fallbackText, String type, Map<String, String> data) {
+  public SubmitRequirementInfo(String status, String fallbackText, String type) {
     this.status = status;
     this.fallbackText = fallbackText;
     this.type = type;
-    this.data = data;
   }
 
   @Override
@@ -41,14 +37,22 @@ public class SubmitRequirementInfo {
       return false;
     }
     SubmitRequirementInfo that = (SubmitRequirementInfo) o;
-    return Objects.equal(status, that.status)
-        && Objects.equal(fallbackText, that.fallbackText)
-        && Objects.equal(type, that.type)
-        && Objects.equal(data, that.data);
+    return Objects.equals(status, that.status)
+        && Objects.equals(fallbackText, that.fallbackText)
+        && Objects.equals(type, that.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(status, fallbackText, type, data);
+    return Objects.hash(status, fallbackText, type);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("status", status)
+        .add("fallbackText", fallbackText)
+        .add("type", type)
+        .toString();
   }
 }

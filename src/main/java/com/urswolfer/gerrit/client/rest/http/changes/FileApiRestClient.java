@@ -67,7 +67,7 @@ public class FileApiRestClient extends FileApi.NotImplemented {
             HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
             return BinaryResultUtils.createBinaryResult(response);
         } catch (IOException e) {
-            throw new RestApiException("Failed to get file content.", e);
+            throw RestApiException.wrap("Failed to get file content.", e);
         }
     }
 
@@ -99,7 +99,7 @@ public class FileApiRestClient extends FileApi.NotImplemented {
     private DiffInfo diff(DiffRequest diffRequest) throws RestApiException {
         return diff(diffRequest, 0);
     }
-    
+
     private DiffInfo diff(DiffRequest diffRequest, int parent) throws RestApiException {
         String query = "";
 

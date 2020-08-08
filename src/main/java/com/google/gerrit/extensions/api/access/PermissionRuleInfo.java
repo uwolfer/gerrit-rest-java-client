@@ -13,7 +13,7 @@
 // limitations under the License.
 package com.google.gerrit.extensions.api.access;
 
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 public class PermissionRuleInfo {
   public enum Action {
@@ -38,16 +38,16 @@ public class PermissionRuleInfo {
   public boolean equals(Object obj) {
     if (obj instanceof PermissionRuleInfo) {
       PermissionRuleInfo p = (PermissionRuleInfo) obj;
-      return Objects.equal(action, p.action)
-          && Objects.equal(force, p.force)
-          && Objects.equal(min, p.min)
-          && Objects.equal(max, p.max);
+      return Objects.equals(action, p.action)
+          && Objects.equals(force, p.force)
+          && Objects.equals(min, p.min)
+          && Objects.equals(max, p.max);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(action, force, min, max);
+    return Objects.hash(action, force, min, max);
   }
 }

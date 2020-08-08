@@ -15,7 +15,6 @@
 package com.google.gerrit.extensions.client;
 
 import java.util.List;
-import java.util.Map;
 
 /** Preferences about a single user. */
 public class GeneralPreferencesInfo {
@@ -68,14 +67,6 @@ public class GeneralPreferencesInfo {
     }
   }
 
-  public enum ReviewCategoryStrategy {
-    NONE,
-    NAME,
-    EMAIL,
-    USERNAME,
-    ABBREV
-  }
-
   public enum DiffView {
     SIDE_BY_SIDE,
     UNIFIED_DIFF
@@ -111,6 +102,11 @@ public class GeneralPreferencesInfo {
     }
   }
 
+  public enum Theme {
+    DARK,
+    LIGHT
+  }
+
   public enum TimeFormat {
     /** 12-hour clock: 1:15 am, 2:13 pm */
     HHMM_12("h:mm a"),
@@ -131,15 +127,10 @@ public class GeneralPreferencesInfo {
 
   /** Number of changes to show in a screen. */
   public Integer changesPerPage;
-  /** Should the site header be displayed when logged in ? */
-  public Boolean showSiteHeader;
-  /** Should the Flash helper movie be used to copy text to the clipboard? */
-  public Boolean useFlashClipboard;
   /** Type of download URL the user prefers to use. */
   public String downloadScheme;
-  /** Type of download command the user prefers to use. */
-  public DownloadCommand downloadCommand;
 
+  public Theme theme;
   public DateFormat dateFormat;
   public TimeFormat timeFormat;
   public Boolean expandInlineDiffs;
@@ -148,20 +139,15 @@ public class GeneralPreferencesInfo {
   public DiffView diffView;
   public Boolean sizeBarInChangeTable;
   public Boolean legacycidInChangeTable;
-  public ReviewCategoryStrategy reviewCategoryStrategy;
   public Boolean muteCommonPathPrefixes;
   public Boolean signedOffBy;
-  public List<MenuItem> my;
-  public List<String> changeTable;
-  public Map<String, String> urlAliases;
   public EmailStrategy emailStrategy;
   public EmailFormat emailFormat;
   public DefaultBase defaultBaseForMerges;
   public Boolean publishCommentsOnPush;
-
-  public boolean isShowInfoInReviewCategory() {
-    return getReviewCategoryStrategy() != ReviewCategoryStrategy.NONE;
-  }
+  public Boolean workInProgressByDefault;
+  public List<MenuItem> my;
+  public List<String> changeTable;
 
   public DateFormat getDateFormat() {
     if (dateFormat == null) {
@@ -175,13 +161,6 @@ public class GeneralPreferencesInfo {
       return TimeFormat.HHMM_12;
     }
     return timeFormat;
-  }
-
-  public ReviewCategoryStrategy getReviewCategoryStrategy() {
-    if (reviewCategoryStrategy == null) {
-      return ReviewCategoryStrategy.NONE;
-    }
-    return reviewCategoryStrategy;
   }
 
   public DiffView getDiffView() {
@@ -208,13 +187,8 @@ public class GeneralPreferencesInfo {
   public static GeneralPreferencesInfo defaults() {
     GeneralPreferencesInfo p = new GeneralPreferencesInfo();
     p.changesPerPage = DEFAULT_PAGESIZE;
-    p.showSiteHeader = true;
-    p.useFlashClipboard = true;
-    p.emailStrategy = EmailStrategy.ENABLED;
-    p.emailFormat = EmailFormat.HTML_PLAINTEXT;
-    p.reviewCategoryStrategy = ReviewCategoryStrategy.NONE;
     p.downloadScheme = null;
-    p.downloadCommand = DownloadCommand.CHECKOUT;
+    p.theme = Theme.LIGHT;
     p.dateFormat = DateFormat.STD;
     p.timeFormat = TimeFormat.HHMM_12;
     p.expandInlineDiffs = false;
@@ -225,8 +199,11 @@ public class GeneralPreferencesInfo {
     p.legacycidInChangeTable = false;
     p.muteCommonPathPrefixes = true;
     p.signedOffBy = false;
+    p.emailStrategy = EmailStrategy.ENABLED;
+    p.emailFormat = EmailFormat.HTML_PLAINTEXT;
     p.defaultBaseForMerges = DefaultBase.FIRST_PARENT;
     p.publishCommentsOnPush = false;
+    p.workInProgressByDefault = false;
     return p;
   }
 }

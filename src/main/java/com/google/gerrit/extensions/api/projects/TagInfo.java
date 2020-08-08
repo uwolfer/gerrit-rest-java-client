@@ -16,7 +16,6 @@ package com.google.gerrit.extensions.api.projects;
 
 import com.google.gerrit.extensions.common.GitPerson;
 import com.google.gerrit.extensions.common.WebLinkInfo;
-
 import java.sql.Timestamp;
 import java.util.List;
 

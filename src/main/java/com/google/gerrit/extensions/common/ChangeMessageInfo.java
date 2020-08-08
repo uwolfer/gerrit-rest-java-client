@@ -14,9 +14,8 @@
 
 package com.google.gerrit.extensions.common;
 
-import com.google.common.base.Objects;
-
 import java.sql.Timestamp;
+import java.util.Objects;
 
 public class ChangeMessageInfo {
   public String id;
@@ -31,19 +30,39 @@ public class ChangeMessageInfo {
   public boolean equals(Object o) {
     if (o instanceof ChangeMessageInfo) {
       ChangeMessageInfo cmi = (ChangeMessageInfo) o;
-      return Objects.equal(id, cmi.id)
-          && Objects.equal(tag, cmi.tag)
-          && Objects.equal(author, cmi.author)
-          && Objects.equal(realAuthor, cmi.realAuthor)
-          && Objects.equal(date, cmi.date)
-          && Objects.equal(message, cmi.message)
-          && Objects.equal(_revisionNumber, cmi._revisionNumber);
+      return Objects.equals(id, cmi.id)
+          && Objects.equals(tag, cmi.tag)
+          && Objects.equals(author, cmi.author)
+          && Objects.equals(realAuthor, cmi.realAuthor)
+          && Objects.equals(date, cmi.date)
+          && Objects.equals(message, cmi.message)
+          && Objects.equals(_revisionNumber, cmi._revisionNumber);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id, tag, author, realAuthor, date, message, _revisionNumber);
+    return Objects.hash(id, tag, author, realAuthor, date, message, _revisionNumber);
+  }
+
+  @Override
+  public String toString() {
+    return "ChangeMessageInfo{"
+        + "id="
+        + id
+        + ", tag="
+        + tag
+        + ", author="
+        + author
+        + ", realAuthor="
+        + realAuthor
+        + ", date="
+        + date
+        + ", _revisionNumber"
+        + _revisionNumber
+        + ", message=["
+        + message
+        + "]}";
   }
 }

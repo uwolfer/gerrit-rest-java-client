@@ -83,7 +83,7 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
             HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
             return BinaryResultUtils.createBinaryResult(response);
         } catch (IOException e) {
-            throw new RestApiException("Failed to get avatar.", e);
+            throw RestApiException.wrap("Failed to get avatar.", e);
         }
     }
 

@@ -17,7 +17,6 @@ package com.google.gerrit.extensions.api.projects;
 import com.google.gerrit.extensions.client.InheritableBoolean;
 import com.google.gerrit.extensions.client.ProjectState;
 import com.google.gerrit.extensions.client.SubmitType;
-
 import java.util.Map;
 
 public class ConfigInput {
@@ -31,6 +30,7 @@ public class ConfigInput {
   public InheritableBoolean requireSignedPush;
   public InheritableBoolean rejectImplicitMerges;
   public InheritableBoolean privateByDefault;
+  public InheritableBoolean workInProgressByDefault;
   public InheritableBoolean enableReviewerByEmail;
   public InheritableBoolean matchAuthorToCommitterDate;
   public InheritableBoolean rejectEmptyCommit;
@@ -38,4 +38,5 @@ public class ConfigInput {
   public SubmitType submitType;
   public ProjectState state;
   public Map<String, Map<String, ConfigValue>> pluginConfigValues;
+  public Map<String, CommentLinkInput> commentLinks;
 }

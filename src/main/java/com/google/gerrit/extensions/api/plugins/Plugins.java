@@ -14,11 +14,9 @@
 
 package com.google.gerrit.extensions.api.plugins;
 
-import com.google.gerrit.extensions.common.InstallPluginInput;
 import com.google.gerrit.extensions.common.PluginInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +27,10 @@ public interface Plugins {
   ListRequest list() throws RestApiException;
 
   PluginApi name(String name) throws RestApiException;
+
+  @Deprecated
+  PluginApi install(String name, com.google.gerrit.extensions.common.InstallPluginInput input)
+      throws RestApiException;
 
   PluginApi install(String name, InstallPluginInput input) throws RestApiException;
 
@@ -42,7 +44,7 @@ public interface Plugins {
 
     public List<PluginInfo> get() throws RestApiException {
       Map<String, PluginInfo> map = getAsMap();
-      List<PluginInfo> result = new ArrayList<PluginInfo>(map.size());
+      List<PluginInfo> result = new ArrayList<>(map.size());
       for (Map.Entry<String, PluginInfo> e : map.entrySet()) {
         result.add(e.getValue());
       }
@@ -122,7 +124,15 @@ public interface Plugins {
     }
 
     @Override
-    public PluginApi install(String name, InstallPluginInput input) throws RestApiException {
+    @Deprecated
+    public PluginApi install(
+        String name, com.google.gerrit.extensions.common.InstallPluginInput input)
+        throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public PluginApi install(String name, InstallPluginInput input) {
       throw new NotImplementedException();
     }
   }

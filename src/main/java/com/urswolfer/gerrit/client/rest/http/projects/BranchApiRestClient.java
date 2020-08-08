@@ -75,7 +75,7 @@ public class BranchApiRestClient extends BranchApi.NotImplemented implements Bra
             HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
             return BinaryResultUtils.createBinaryResult(response);
         } catch (IOException e) {
-            throw new RestApiException("Failed to get file content.", e);
+            throw RestApiException.wrap("Failed to get file content.", e);
         }
     }
 

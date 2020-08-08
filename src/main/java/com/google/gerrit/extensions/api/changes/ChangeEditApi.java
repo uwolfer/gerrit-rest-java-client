@@ -14,12 +14,15 @@
 
 package com.google.gerrit.extensions.api.changes;
 
-import com.google.common.base.Optional;
+import com.google.gerrit.extensions.client.ChangeEditDetailOption;
 import com.google.gerrit.extensions.common.EditInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RawInput;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import java.util.EnumSet;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * An API for the change edit of a change. A change edit is similar to a patch set and will become
@@ -28,6 +31,33 @@ import com.google.gerrit.extensions.restapi.RestApiException;
  * represented by the change edit. A change can have at most one change edit at each point in time.
  */
 public interface ChangeEditApi {
+
+  abstract class ChangeEditDetailRequest {
+    private String base;
+    private EnumSet<ChangeEditDetailOption> options = EnumSet.noneOf(ChangeEditDetailOption.class);
+
+    public abstract Optional<EditInfo> get() throws RestApiException;
+
+    public ChangeEditDetailRequest withBase(String base) {
+      this.base = base;
+      return this;
+    }
+
+    public ChangeEditDetailRequest withOption(ChangeEditDetailOption option) {
+      this.options.add(option);
+      return this;
+    }
+
+    public String getBase() {
+      return base;
+    }
+
+    public Set<ChangeEditDetailOption> options() {
+      return options;
+    }
+  }
+
+  ChangeEditDetailRequest detail() throws RestApiException;
 
   /**
    * Retrieves details regarding the change edit.
@@ -121,7 +151,11 @@ public interface ChangeEditApi {
    * @param newContent the desired content of the file
    * @throws RestApiException if the content of the file couldn't be modified
    */
-  void modifyFile(String filePath, RawInput newContent) throws RestApiException;
+  default void modifyFile(String filePath, RawInput newContent) throws RestApiException {
+    FileContentInput input = new FileContentInput();
+    input.content = newContent;
+    modifyFile(filePath, input);
+  }
 
   /**
    * Modify the contents of the specified file of the change edit. If no content is provided, the
@@ -129,10 +163,10 @@ public interface ChangeEditApi {
    * will be created based on the current patch set of the change.
    *
    * @param filePath the path of the file which should be modified
-   * @param content the desired content of the file
+   * @param input the desired content of the file
    * @throws RestApiException if the content of the file couldn't be modified
    */
-  void modifyFile(String filePath, String content) throws RestApiException;
+  void modifyFile(String filePath, FileContentInput input) throws RestApiException;
 
   /**
    * Deletes the specified file from the change edit. If the change edit doesn't exist, it will be
@@ -166,6 +200,11 @@ public interface ChangeEditApi {
    * interface.
    */
   class NotImplemented implements ChangeEditApi {
+    @Override
+    public ChangeEditDetailRequest detail() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
     @Override
     public Optional<EditInfo> get() throws RestApiException {
       throw new NotImplementedException();
@@ -212,12 +251,7 @@ public interface ChangeEditApi {
     }
 
     @Override
-    public void modifyFile(String filePath, RawInput newContent) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public void modifyFile(String filePath, String content) throws RestApiException {
+    public void modifyFile(String filePath, FileContentInput input) throws RestApiException {
       throw new NotImplementedException();
     }
 

@@ -18,8 +18,6 @@ import com.google.gerrit.common.Nullable;
 
 public class AccessCheckInput {
   public String account;
-  public String project;
-
   @Nullable public String ref;
 
   // If permission is given, ref must also be given.

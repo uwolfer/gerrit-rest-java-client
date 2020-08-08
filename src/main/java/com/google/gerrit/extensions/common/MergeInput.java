@@ -24,9 +24,23 @@ public class MergeInput {
   public String source;
 
   /**
+   * If specified, visibility of the {@code source} commit will only be checked against {@code
+   * source_branch}, rather than all visible branches.
+   */
+  public String sourceBranch;
+
+  /**
    * {@code strategy} name of the merge strategy.
    *
    * @see org.eclipse.jgit.merge.MergeStrategy
    */
   public String strategy;
+
+  /**
+   * Whether the creation of the merge should succeed if there are conflicts.
+   *
+   * <p>If there are conflicts the file contents of the created change contain git conflict markers
+   * to indicate the conflicts.
+   */
+  public boolean allowConflicts;
 }
