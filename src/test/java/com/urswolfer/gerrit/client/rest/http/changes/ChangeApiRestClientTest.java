@@ -416,6 +416,29 @@ public class ChangeApiRestClientTest {
     }
 
     @Test
+    public void testDrafts() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/drafts", jsonElement)
+            .get();
+
+        TreeMap<String, List<CommentInfo>> expectedDraftInfos = Maps.newTreeMap();
+        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+        EasyMock.expect(commentsParser.parseCommentInfos(jsonElement)).andReturn(expectedDraftInfos).once();
+        EasyMock.replay(commentsParser);
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, commentsParser,
+            null, null, null, null, null,
+            null, null, null, null, null, null, null,
+            "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        Map<String, List<CommentInfo>> draftInfos = changeApiRestClient.drafts();
+
+        Truth.assertThat(draftInfos).isSameAs(expectedDraftInfos);
+        EasyMock.verify(gerritRestClient, commentsParser);
+    }
+
+    @Test
     public void testMessages() throws Exception {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
