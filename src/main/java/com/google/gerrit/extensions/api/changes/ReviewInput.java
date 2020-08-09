@@ -20,7 +20,6 @@ import com.google.gerrit.extensions.client.Comment;
 import com.google.gerrit.extensions.client.ReviewerState;
 import com.google.gerrit.extensions.common.FixSuggestionInfo;
 import com.google.gerrit.extensions.restapi.DefaultInput;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,15 +34,6 @@ public class ReviewInput {
   public Map<String, Short> labels;
   public Map<String, List<CommentInput>> comments;
   public Map<String, List<RobotCommentInput>> robotComments;
-
-  /**
-   * If true require all labels to be within the user's permitted ranges based on access controls,
-   * attempting to use a label not granted to the user will fail the entire modify operation early.
-   * If false the operation will execute anyway, but the proposed labels given by the user will be
-   * modified to be the "best" value allowed by the access controls, or ignored if the label does
-   * not exist.
-   */
-  public boolean strictLabels = true;
 
   /**
    * How to process draft comments already in the database that were not also described in this
@@ -77,18 +67,29 @@ public class ReviewInput {
    * If true mark the change as work in progress. It is an error for both {@link #workInProgress}
    * and {@link #ready} to be true.
    */
-  public Boolean workInProgress;
+  public boolean workInProgress;
 
   /**
    * If true mark the change as ready for review. It is an error for both {@link #workInProgress}
    * and {@link #ready} to be true.
    */
-  public Boolean ready;
+  public boolean ready;
+
+  /** Users that should be added to the attention set of this change. */
+  public List<AttentionSetInput> addToAttentionSet;
+
+  /** Users that should be removed from the attention set of this change. */
+  public List<AttentionSetInput> removeFromAttentionSet;
+
+  /**
+   * Users in the attention set will only be added and removed based on {@link #addToAttentionSet}
+   * and {@link #removeFromAttentionSet}. Normally, they are also added and removed when some events
+   * occur. E.g, adding/removing reviewers, marking a change ready for review or work in progress,
+   * and replying on changes.
+   */
+  public boolean ignoreAutomaticAttentionSetRules;
 
   public enum DraftHandling {
-    /** Delete pending drafts on this revision only. */
-    DELETE,
-
     /** Leave pending drafts alone. */
     KEEP,
 
@@ -119,7 +120,7 @@ public class ReviewInput {
       throw new IllegalArgumentException();
     }
     if (labels == null) {
-      labels = new LinkedHashMap<String, Short>(4);
+      labels = new LinkedHashMap<>(4);
     }
     labels.put(name, value);
     return this;
@@ -146,9 +147,36 @@ public class ReviewInput {
     input.state = state;
     input.confirmed = confirmed;
     if (reviewers == null) {
-      reviewers = new ArrayList<AddReviewerInput>();
+      reviewers = new ArrayList<>();
     }
     reviewers.add(input);
+    return this;
+  }
+
+  public ReviewInput addUserToAttentionSet(String user, String reason) {
+    AttentionSetInput input = new AttentionSetInput();
+    input.user = user;
+    input.reason = reason;
+    if (addToAttentionSet == null) {
+      addToAttentionSet = new ArrayList<>();
+    }
+    addToAttentionSet.add(input);
+    return this;
+  }
+
+  public ReviewInput removeUserFromAttentionSet(String user, String reason) {
+    AttentionSetInput input = new AttentionSetInput();
+    input.user = user;
+    input.reason = reason;
+    if (removeFromAttentionSet == null) {
+      removeFromAttentionSet = new ArrayList<>();
+    }
+    removeFromAttentionSet.add(input);
+    return this;
+  }
+
+  public ReviewInput blockAutomaticAttentionSetRules() {
+    ignoreAutomaticAttentionSetRules = true;
     return this;
   }
 
@@ -182,5 +210,9 @@ public class ReviewInput {
 
   public static ReviewInput reject() {
     return new ReviewInput().label("Code-Review", -2);
+  }
+
+  public static ReviewInput create() {
+    return new ReviewInput();
   }
 }

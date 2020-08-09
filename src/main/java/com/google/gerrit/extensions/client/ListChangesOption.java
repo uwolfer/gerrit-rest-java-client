@@ -14,11 +14,8 @@
 
 package com.google.gerrit.extensions.client;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-/** Output options available for retrieval change details. */
-public enum ListChangesOption {
+/** Output options available for retrieval of change details. */
+public enum ListChangesOption implements ListOption {
   LABELS(0),
   DETAILED_LABELS(8),
 
@@ -77,8 +74,18 @@ public enum ListChangesOption {
   /** If tracking Ids are included, include detailed tracking Ids info. */
   TRACKING_IDS(21),
 
-  /** Skip mergeability data */
-  SKIP_MERGEABLE(22);
+  /**
+   * Use {@code gerrit.config} instead to turn this off for your instance. See {@code
+   * change.mergeabilityComputationBehavior}.
+   */
+  @Deprecated
+  SKIP_MERGEABLE(22),
+
+  /**
+   * Skip diffstat computation that compute the insertions field (number of lines inserted) and
+   * deletions field (number of lines deleted)
+   */
+  SKIP_DIFFSTAT(23);
 
   private final int value;
 
@@ -86,32 +93,8 @@ public enum ListChangesOption {
     this.value = v;
   }
 
+  @Override
   public int getValue() {
     return value;
-  }
-
-  public static EnumSet<ListChangesOption> fromBits(int v) {
-    EnumSet<ListChangesOption> r = EnumSet.noneOf(ListChangesOption.class);
-    for (ListChangesOption o : ListChangesOption.values()) {
-      if ((v & (1 << o.value)) != 0) {
-        r.add(o);
-        v &= ~(1 << o.value);
-      }
-      if (v == 0) {
-        return r;
-      }
-    }
-    if (v != 0) {
-      throw new IllegalArgumentException("unknown " + Integer.toHexString(v));
-    }
-    return r;
-  }
-
-  public static int toBits(Set<ListChangesOption> set) {
-    int r = 0;
-    for (ListChangesOption o : set) {
-      r |= 1 << o.value;
-    }
-    return r;
   }
 }

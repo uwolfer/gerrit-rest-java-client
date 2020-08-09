@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Android Open Source Project
+// Copyright (C) 2019 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,21 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.client;
+package com.google.gerrit.extensions.api.changes;
 
-public enum UiType {
-  NONE,
-  GWT,
-  POLYGERRIT;
+import com.google.gerrit.extensions.restapi.DefaultInput;
+import com.google.gerrit.extensions.restapi.RawInput;
 
-  public static UiType parse(String str) {
-    if (str != null) {
-      for (UiType type : UiType.values()) {
-        if (type.name().equalsIgnoreCase(str)) {
-          return type;
-        }
-      }
-    }
-    return null;
-  }
+/** Content to be added to a file (new or existing) via change edit. */
+public class FileContentInput {
+  @DefaultInput public RawInput content;
+  public String binary_content;
 }

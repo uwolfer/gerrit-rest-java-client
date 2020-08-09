@@ -41,7 +41,7 @@ public class ToolsRestClient implements Tools {
             HttpResponse response = gerritRestClient.request("/tools/hooks/commit-msg", null, GerritRestClient.HttpVerb.GET);
             return response.getEntity().getContent();
         } catch (IOException e) {
-            throw new RestApiException("Failed to get commit message hook.", e);
+            throw RestApiException.wrap("Failed to get commit message hook.", e);
         }
     }
 }

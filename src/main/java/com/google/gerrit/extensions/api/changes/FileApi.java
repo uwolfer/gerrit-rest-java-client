@@ -15,10 +15,13 @@
 package com.google.gerrit.extensions.api.changes;
 
 import com.google.gerrit.extensions.client.DiffPreferencesInfo.Whitespace;
+import com.google.gerrit.extensions.common.BlameInfo;
 import com.google.gerrit.extensions.common.DiffInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import java.util.List;
+import java.util.OptionalInt;
 
 public interface FileApi {
   BinaryResult content() throws RestApiException;
@@ -38,12 +41,21 @@ public interface FileApi {
    */
   DiffRequest diffRequest() throws RestApiException;
 
+  /** Set the file reviewed or not reviewed */
+  void setReviewed(boolean reviewed) throws RestApiException;
+
+  /**
+   * Creates a request to retrieve the blame information. On the returned request formatting options
+   * for the blame request can be set.
+   */
+  BlameRequest blameRequest() throws RestApiException;
+
   abstract class DiffRequest {
     private String base;
     private Integer context;
     private Boolean intraline;
     private Whitespace whitespace;
-//    private OptionalInt parent = OptionalInt.empty();
+    private OptionalInt parent = OptionalInt.empty();
 
     public abstract DiffInfo get() throws RestApiException;
 
@@ -67,10 +79,10 @@ public interface FileApi {
       return this;
     }
 
-//    public DiffRequest withParent(int parent) {
-//      this.parent = OptionalInt.of(parent);
-//      return this;
-//    }
+    public DiffRequest withParent(int parent) {
+      this.parent = OptionalInt.of(parent);
+      return this;
+    }
 
     public String getBase() {
       return base;
@@ -88,9 +100,24 @@ public interface FileApi {
       return whitespace;
     }
 
-//    public OptionalInt getParent() {
-//      return parent;
-//    }
+    public OptionalInt getParent() {
+      return parent;
+    }
+  }
+
+  abstract class BlameRequest {
+    private boolean forBase;
+
+    public abstract List<BlameInfo> get() throws RestApiException;
+
+    public BlameRequest forBase(boolean forBase) {
+      this.forBase = forBase;
+      return this;
+    }
+
+    public boolean isForBase() {
+      return forBase;
+    }
   }
 
   /**
@@ -120,6 +147,16 @@ public interface FileApi {
 
     @Override
     public DiffRequest diffRequest() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void setReviewed(boolean reviewed) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public BlameRequest blameRequest() throws RestApiException {
       throw new NotImplementedException();
     }
   }

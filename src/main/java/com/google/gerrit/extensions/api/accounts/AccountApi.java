@@ -19,6 +19,7 @@ import com.google.gerrit.extensions.client.DiffPreferencesInfo;
 import com.google.gerrit.extensions.client.EditPreferencesInfo;
 import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
 import com.google.gerrit.extensions.client.ProjectWatchInfo;
+import com.google.gerrit.extensions.common.AccountDetailInfo;
 import com.google.gerrit.extensions.common.AccountExternalIdInfo;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.AgreementInfo;
@@ -29,13 +30,14 @@ import com.google.gerrit.extensions.common.GroupInfo;
 import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
-
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
 public interface AccountApi {
   AccountInfo get() throws RestApiException;
+
+  AccountDetailInfo detail() throws RestApiException;
 
   boolean getActive() throws RestApiException;
 
@@ -85,6 +87,8 @@ public interface AccountApi {
 
   void setStatus(String status) throws RestApiException;
 
+  void setDisplayName(String displayName) throws RestApiException;
+
   List<SshKeyInfo> listSshKeys() throws RestApiException;
 
   SshKeyInfo addSshKey(String key) throws RestApiException;
@@ -107,6 +111,28 @@ public interface AccountApi {
 
   void deleteExternalIds(List<String> externalIds) throws RestApiException;
 
+  List<DeletedDraftCommentInfo> deleteDraftComments(DeleteDraftCommentsInput input)
+      throws RestApiException;
+
+  void setName(String name) throws RestApiException;
+
+  /**
+   * Generate a new HTTP password.
+   *
+   * @return the generated password.
+   */
+  String generateHttpPassword() throws RestApiException;
+
+  /**
+   * Set a new HTTP password.
+   *
+   * <p>May only be invoked by administrators.
+   *
+   * @param httpPassword the new password, {@code null} to remove the password.
+   * @return the new password, {@code null} if the password was removed.
+   */
+  String setHttpPassword(String httpPassword) throws RestApiException;
+
   /**
    * A default implementation which allows source compatibility when adding new methods to the
    * interface.
@@ -114,6 +140,11 @@ public interface AccountApi {
   class NotImplemented implements AccountApi {
     @Override
     public AccountInfo get() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public AccountDetailInfo detail() throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -240,6 +271,11 @@ public interface AccountApi {
     }
 
     @Override
+    public void setDisplayName(String displayName) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public List<SshKeyInfo> listSshKeys() throws RestApiException {
       throw new NotImplementedException();
     }
@@ -292,6 +328,27 @@ public interface AccountApi {
 
     @Override
     public void deleteExternalIds(List<String> externalIds) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<DeletedDraftCommentInfo> deleteDraftComments(DeleteDraftCommentsInput input)
+        throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void setName(String name) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public String generateHttpPassword() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public String setHttpPassword(String httpPassword) throws RestApiException {
       throw new NotImplementedException();
     }
   }

@@ -14,9 +14,9 @@
 
 package com.google.gerrit.extensions.client;
 
-import com.google.common.base.Objects;
-
 import java.sql.Timestamp;
+import java.util.Comparator;
+import java.util.Objects;
 
 public abstract class Comment {
   /**
@@ -30,24 +30,33 @@ public abstract class Comment {
   public String path;
   public Side side;
   public Integer parent;
-  public Integer line; // value 0 or null indicates a file comment, normal lines start at 1
+  /** Value 0 or null indicates a file comment, normal lines start at 1. */
+  public Integer line;
+
   public Range range;
   public String inReplyTo;
   public Timestamp updated;
   public String message;
   public Boolean unresolved;
 
-  public static class Range /*implements Comparable<Range>*/ {
-//    private static final Comparator<Range> RANGE_COMPARATOR =
-//        Comparator.<Range>comparingInt(range -> range.startLine)
-//            .thenComparingInt(range -> range.startCharacter)
-//            .thenComparingInt(range -> range.endLine)
-//            .thenComparingInt(range -> range.endCharacter);
+  /**
+   * Hex commit SHA1 (as 40 characters hex string) of the commit of the patchset to which this
+   * comment applies.
+   */
+  public String commitId;
 
-    public int startLine; // 1-based, inclusive
-    public int startCharacter; // 0-based, inclusive
-    public int endLine; // 1-based, exclusive
-    public int endCharacter; // 0-based, exclusive
+  public static class Range implements Comparable<Range> {
+    private static final Comparator<Range> RANGE_COMPARATOR =
+        Comparator.<Range>comparingInt(range -> range.startLine)
+            .thenComparingInt(range -> range.startCharacter)
+            .thenComparingInt(range -> range.endLine)
+            .thenComparingInt(range -> range.endCharacter);
+
+    // Start position is inclusive; end position is exclusive.
+    public int startLine; // 1-based
+    public int startCharacter; // 0-based
+    public int endLine; // 1-based
+    public int endCharacter; // 0-based
 
     public boolean isValid() {
       return startLine > 0
@@ -62,17 +71,17 @@ public abstract class Comment {
     public boolean equals(Object o) {
       if (o instanceof Range) {
         Range r = (Range) o;
-        return Objects.equal(startLine, r.startLine)
-            && Objects.equal(startCharacter, r.startCharacter)
-            && Objects.equal(endLine, r.endLine)
-            && Objects.equal(endCharacter, r.endCharacter);
+        return Objects.equals(startLine, r.startLine)
+            && Objects.equals(startCharacter, r.startCharacter)
+            && Objects.equals(endLine, r.endLine)
+            && Objects.equals(endCharacter, r.endCharacter);
       }
       return false;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(startLine, startCharacter, endLine, endCharacter);
+      return Objects.hash(startLine, startCharacter, endLine, endCharacter);
     }
 
     @Override
@@ -89,10 +98,10 @@ public abstract class Comment {
           + '}';
     }
 
-//    @Override
-//    public int compareTo(Range otherRange) {
-//      return RANGE_COMPARATOR.compare(this, otherRange);
-//    }
+    @Override
+    public int compareTo(Range otherRange) {
+      return RANGE_COMPARATOR.compare(this, otherRange);
+    }
   }
 
   public short side() {
@@ -109,23 +118,24 @@ public abstract class Comment {
     }
     if (o != null && getClass() == o.getClass()) {
       Comment c = (Comment) o;
-      return Objects.equal(patchSet, c.patchSet)
-          && Objects.equal(id, c.id)
-          && Objects.equal(path, c.path)
-          && Objects.equal(side, c.side)
-          && Objects.equal(parent, c.parent)
-          && Objects.equal(line, c.line)
-          && Objects.equal(range, c.range)
-          && Objects.equal(inReplyTo, c.inReplyTo)
-          && Objects.equal(updated, c.updated)
-          && Objects.equal(message, c.message)
-          && Objects.equal(unresolved, c.unresolved);
+      return Objects.equals(patchSet, c.patchSet)
+          && Objects.equals(id, c.id)
+          && Objects.equals(path, c.path)
+          && Objects.equals(side, c.side)
+          && Objects.equals(parent, c.parent)
+          && Objects.equals(line, c.line)
+          && Objects.equals(range, c.range)
+          && Objects.equals(inReplyTo, c.inReplyTo)
+          && Objects.equals(updated, c.updated)
+          && Objects.equals(message, c.message)
+          && Objects.equals(unresolved, c.unresolved)
+          && Objects.equals(commitId, c.commitId);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(patchSet, id, path, side, parent, line, range, inReplyTo, updated, message);
+    return Objects.hash(patchSet, id, path, side, parent, line, range, inReplyTo, updated, message);
   }
 }

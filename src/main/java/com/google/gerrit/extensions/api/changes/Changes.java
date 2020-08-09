@@ -14,6 +14,8 @@
 
 package com.google.gerrit.extensions.api.changes;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ChangeInput;
@@ -24,6 +26,7 @@ import com.google.gwtorm.server.StandardKeyEncoder;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 public interface Changes {
   /**
@@ -69,6 +72,8 @@ public interface Changes {
 
   ChangeApi create(ChangeInput in) throws RestApiException;
 
+  ChangeInfo createAsInfo(ChangeInput in) throws RestApiException;
+
   QueryRequest query();
 
   QueryRequest query(String query);
@@ -78,7 +83,9 @@ public interface Changes {
     private int limit;
     private int start;
     private String sortkey; // server version < 2.9, needed for change list paging
-    private EnumSet<ListChangesOption> options = EnumSet.noneOf(ListChangesOption.class);
+    private boolean isNoLimit;
+    private Set<ListChangesOption> options = EnumSet.noneOf(ListChangesOption.class);
+    private ListMultimap<String, String> pluginOptions = ArrayListMultimap.create();
 
     public abstract List<ChangeInfo> get() throws RestApiException;
 
@@ -97,6 +104,11 @@ public interface Changes {
       return this;
     }
 
+    public QueryRequest withNoLimit() {
+      this.isNoLimit = true;
+      return this;
+    }
+
     public QueryRequest withStart(int start) {
       this.start = start;
       return this;
@@ -108,18 +120,33 @@ public interface Changes {
       return this;
     }
 
+    /** Set an option on the request, appending to existing options. */
     public QueryRequest withOption(ListChangesOption options) {
       this.options.add(options);
       return this;
     }
 
+    /** Set options on the request, appending to existing options. */
     public QueryRequest withOptions(ListChangesOption... options) {
       this.options.addAll(Arrays.asList(options));
       return this;
     }
 
-    public QueryRequest withOptions(EnumSet<ListChangesOption> options) {
+    /** Set options on the request, replacing existing options. */
+    public QueryRequest withOptions(Set<ListChangesOption> options) {
       this.options = options;
+      return this;
+    }
+
+    /** Set a plugin option on the request, appending to existing options. */
+    public QueryRequest withPluginOption(String name, String value) {
+      this.pluginOptions.put(name, value);
+      return this;
+    }
+
+    /** Set a plugin option on the request, replacing existing options. */
+    public QueryRequest withPluginOptions(ListMultimap<String, String> options) {
+      this.pluginOptions = ArrayListMultimap.create(options);
       return this;
     }
 
@@ -131,6 +158,10 @@ public interface Changes {
       return limit;
     }
 
+    public boolean getNoLimit() {
+      return isNoLimit;
+    }
+
     public int getStart() {
       return start;
     }
@@ -140,8 +171,12 @@ public interface Changes {
       return sortkey;
     }
 
-    public EnumSet<ListChangesOption> getOptions() {
+    public Set<ListChangesOption> getOptions() {
       return options;
+    }
+
+    public ListMultimap<String, String> getPluginOptions() {
+      return pluginOptions;
     }
 
     @Override
@@ -156,7 +191,11 @@ public interface Changes {
       if (!options.isEmpty()) {
         sb.append("options=").append(options);
       }
-      return sb.append('}').toString();
+      sb.append('}');
+      if (isNoLimit == true) {
+        sb.append(" --no-limit");
+      }
+      return sb.toString();
     }
   }
 
@@ -187,6 +226,11 @@ public interface Changes {
 
     @Override
     public ChangeApi create(ChangeInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ChangeInfo createAsInfo(ChangeInput in) throws RestApiException {
       throw new NotImplementedException();
     }
 

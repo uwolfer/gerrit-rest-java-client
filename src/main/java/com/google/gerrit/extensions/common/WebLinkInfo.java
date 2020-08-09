@@ -15,8 +15,7 @@
 package com.google.gerrit.extensions.common;
 
 //import com.google.gerrit.extensions.webui.WebLink.Target;
-
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 public class WebLinkInfo {
   public String name;
@@ -41,15 +40,15 @@ public class WebLinkInfo {
       return false;
     }
     WebLinkInfo i = (WebLinkInfo) o;
-    return Objects.equal(name, i.name)
-        && Objects.equal(imageUrl, i.imageUrl)
-        && Objects.equal(url, i.url)
-        && Objects.equal(target, i.target);
+    return Objects.equals(name, i.name)
+        && Objects.equals(imageUrl, i.imageUrl)
+        && Objects.equals(url, i.url)
+        && Objects.equals(target, i.target);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, imageUrl, url, target);
+    return Objects.hash(name, imageUrl, url, target);
   }
 
   @Override

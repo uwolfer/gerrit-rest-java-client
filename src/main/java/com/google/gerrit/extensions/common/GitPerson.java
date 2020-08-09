@@ -14,9 +14,8 @@
 
 package com.google.gerrit.extensions.common;
 
-import com.google.common.base.Objects;
-
 import java.sql.Timestamp;
+import java.util.Objects;
 
 public class GitPerson {
   public String name;
@@ -30,15 +29,15 @@ public class GitPerson {
       return false;
     }
     GitPerson p = (GitPerson) o;
-    return Objects.equal(name, p.name)
-        && Objects.equal(email, p.email)
-        && Objects.equal(date, p.date)
+    return Objects.equals(name, p.name)
+        && Objects.equals(email, p.email)
+        && Objects.equals(date, p.date)
         && tz == p.tz;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, email, date, tz);
+    return Objects.hash(name, email, date, tz);
   }
 
   @Override

@@ -205,7 +205,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
             HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
             return BinaryResultUtils.createBinaryResult(response);
         } catch (IOException e) {
-            throw new RestApiException("Failed to get patch.", e);
+            throw RestApiException.wrap("Failed to get patch.", e);
         }
     }
 
@@ -233,7 +233,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
             BinaryResult result = BinaryResultUtils.createBinaryResult(response);
             return result;
         } catch (IOException e) {
-            throw new RestApiException("Request failed.", e);
+            throw RestApiException.wrap("Request failed.", e);
         }
     }
 

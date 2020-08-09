@@ -14,11 +14,13 @@
 
 package com.google.gerrit.extensions.api.projects;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gerrit.common.Nullable;
 import com.google.gerrit.extensions.client.InheritableBoolean;
 import com.google.gerrit.extensions.client.ProjectState;
 import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.ActionInfo;
-
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +36,7 @@ public class ConfigInfo {
   public InheritedBooleanInfo requireSignedPush;
   public InheritedBooleanInfo rejectImplicitMerges;
   public InheritedBooleanInfo privateByDefault;
+  public InheritedBooleanInfo workInProgressByDefault;
   public InheritedBooleanInfo enableReviewerByEmail;
   public InheritedBooleanInfo matchAuthorToCommitterDate;
   public InheritedBooleanInfo rejectEmptyCommit;
@@ -47,9 +50,8 @@ public class ConfigInfo {
   public Map<String, ActionInfo> actions;
 
   public Map<String, CommentLinkInfo> commentlinks;
-  public ThemeInfo theme;
 
-  public Map<String, List<String>> extensionPanelNames;
+  public ImmutableMap<String, ImmutableList<String>> extensionPanelNames;
 
   public static class InheritedBooleanInfo {
     public Boolean value;
@@ -58,9 +60,17 @@ public class ConfigInfo {
   }
 
   public static class MaxObjectSizeLimitInfo {
-    public String value;
-    public String configuredValue;
-    public String inheritedValue;
+    /** The effective value in bytes. Null if not set. */
+    @Nullable public String value;
+
+    /** The value configured explicitly on the project as a formatted string. Null if not set. */
+    @Nullable public String configuredValue;
+
+    /**
+     * Whether the value was inherited or overridden from the project's parent hierarchy or global
+     * config. Null if not inherited or overridden.
+     */
+    @Nullable public String summary;
   }
 
   public static class ConfigParameterInfo {

@@ -97,7 +97,7 @@ public class ProjectApiRestClientTest {
     public void testGetProjectInfoServerException() throws Exception {
         String projectName = "sandbox";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectGet("/projects/sandbox", new RestApiException())
+                .expectGet("/projects/sandbox", RestApiException.wrap(null, null))
                 .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();

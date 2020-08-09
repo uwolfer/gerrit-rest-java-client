@@ -14,9 +14,8 @@
 
 package com.google.gerrit.extensions.api.config;
 
-import com.google.common.base.Objects;
-
 import java.util.List;
+import java.util.Objects;
 
 public class ConsistencyCheckInfo {
   public CheckAccountsResultInfo checkAccountsResult;
@@ -65,14 +64,14 @@ public class ConsistencyCheckInfo {
     public boolean equals(Object o) {
       if (o instanceof ConsistencyProblemInfo) {
         ConsistencyProblemInfo other = ((ConsistencyProblemInfo) o);
-        return Objects.equal(status, other.status) && Objects.equal(message, other.message);
+        return Objects.equals(status, other.status) && Objects.equals(message, other.message);
       }
       return false;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(status, message);
+      return Objects.hash(status, message);
     }
 
     @Override

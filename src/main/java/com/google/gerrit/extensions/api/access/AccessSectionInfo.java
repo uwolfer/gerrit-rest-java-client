@@ -13,9 +13,8 @@
 // limitations under the License.
 package com.google.gerrit.extensions.api.access;
 
-import com.google.common.base.Objects;
-
 import java.util.Map;
+import java.util.Objects;
 
 public class AccessSectionInfo {
 
@@ -24,13 +23,13 @@ public class AccessSectionInfo {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof AccessSectionInfo) {
-      return Objects.equal(permissions, ((AccessSectionInfo) obj).permissions);
+      return Objects.equals(permissions, ((AccessSectionInfo) obj).permissions);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(permissions);
+    return Objects.hash(permissions);
   }
 }

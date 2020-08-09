@@ -14,7 +14,7 @@
 
 package com.google.gerrit.extensions.common;
 
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 public class ProblemInfo {
   public enum Status {
@@ -28,7 +28,7 @@ public class ProblemInfo {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(message, status, outcome);
+    return Objects.hash(message, status, outcome);
   }
 
   @Override
@@ -37,9 +37,9 @@ public class ProblemInfo {
       return false;
     }
     ProblemInfo p = (ProblemInfo) o;
-    return Objects.equal(message, p.message)
-        && Objects.equal(status, p.status)
-        && Objects.equal(outcome, p.outcome);
+    return Objects.equals(message, p.message)
+        && Objects.equals(status, p.status)
+        && Objects.equals(outcome, p.outcome);
   }
 
   @Override

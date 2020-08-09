@@ -16,7 +16,6 @@ package com.google.gerrit.extensions.api.projects;
 
 import com.google.gerrit.extensions.client.InheritableBoolean;
 import com.google.gerrit.extensions.client.SubmitType;
-
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +34,8 @@ public class ProjectInput {
   public InheritableBoolean requireChangeId;
   public InheritableBoolean createNewChangeForAllNotInTarget;
   public InheritableBoolean rejectEmptyCommit;
+  public InheritableBoolean enableSignedPush;
+  public InheritableBoolean requireSignedPush;
   public String maxObjectSizeLimit;
   public Map<String, Map<String, ConfigValue>> pluginConfigValues;
 }

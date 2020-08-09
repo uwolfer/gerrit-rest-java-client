@@ -13,9 +13,8 @@
 // limitations under the License.
 package com.google.gerrit.extensions.api.access;
 
-import com.google.common.base.Objects;
-
 import java.util.Map;
+import java.util.Objects;
 
 public class PermissionInfo {
   public String label;
@@ -31,15 +30,15 @@ public class PermissionInfo {
   public boolean equals(Object obj) {
     if (obj instanceof PermissionInfo) {
       PermissionInfo p = (PermissionInfo) obj;
-      return Objects.equal(label, p.label)
-          && Objects.equal(exclusive, p.exclusive)
-          && Objects.equal(rules, p.rules);
+      return Objects.equals(label, p.label)
+          && Objects.equals(exclusive, p.exclusive)
+          && Objects.equals(rules, p.rules);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(label, exclusive, rules);
+    return Objects.hash(label, exclusive, rules);
   }
 }

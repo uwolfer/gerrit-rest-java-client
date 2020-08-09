@@ -14,19 +14,13 @@
 
 package com.google.gerrit.extensions.client;
 
-
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 public class MenuItem {
   public final String url;
   public final String name;
   public final String target;
   public final String id;
-
-  // Needed for GWT
-  public MenuItem() {
-    this(null, null, null, null);
-  }
 
   public MenuItem(String name, String url) {
     this(name, url, "_blank");
@@ -47,17 +41,17 @@ public class MenuItem {
   public boolean equals(Object obj) {
     if (obj instanceof MenuItem) {
       MenuItem o = (MenuItem) obj;
-      return Objects.equal(url, o.url)
-          && Objects.equal(name, o.name)
-          && Objects.equal(target, o.target)
-          && Objects.equal(id, o.id);
+      return Objects.equals(url, o.url)
+          && Objects.equals(name, o.name)
+          && Objects.equals(target, o.target)
+          && Objects.equals(id, o.id);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(url, name, target, id);
+    return Objects.hash(url, name, target, id);
   }
 
   @Override

@@ -14,6 +14,8 @@
 
 package com.google.gerrit.extensions.restapi;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
@@ -33,7 +35,6 @@ import java.nio.charset.UnsupportedCharsetException;
  * handle plain text from a String, or binary data from a {@code byte[]} or {@code InputSteam}.
  */
 public abstract class BinaryResult implements Closeable {
-  private static final Charset UTF_8 = Charset.forName("UTF-8");
   /** Default MIME type for unknown binary data. */
   static final String OCTET_STREAM = "application/octet-stream";
 
@@ -186,14 +187,7 @@ public abstract class BinaryResult implements Closeable {
           .onUnmappableCharacter(CodingErrorAction.REPORT)
           .decode(ByteBuffer.wrap(data))
           .toString();
-    } catch (UnsupportedCharsetException e) {
-      // Fallback to ISO-8850-1 style encoding.
-      StringBuilder r = new StringBuilder(data.length);
-      for (byte b : data) {
-        r.append((char) (b & 0xff));
-      }
-      return r.toString();
-    } catch (CharacterCodingException e) {
+    } catch (UnsupportedCharsetException | CharacterCodingException e) {
       // Fallback to ISO-8850-1 style encoding.
       StringBuilder r = new StringBuilder(data.length);
       for (byte b : data) {

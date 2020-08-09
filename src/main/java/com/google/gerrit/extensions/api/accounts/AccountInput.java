@@ -20,6 +20,7 @@ import java.util.List;
 public class AccountInput {
   @DefaultInput public String username;
   public String name;
+  public String displayName;
   public String email;
   public String sshKey;
   public String httpPassword;

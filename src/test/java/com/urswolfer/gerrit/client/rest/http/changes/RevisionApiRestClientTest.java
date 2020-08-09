@@ -91,7 +91,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectPost(
                         testCase.reviewUrl,
-                        "{\"message\":\"Looks good!\",\"labels\":{\"Code-Review\":2},\"strict_labels\":true,\"omit_duplicate_comments\":false}"
+                        "{\"message\":\"Looks good!\",\"labels\":{\"Code-Review\":2},\"omit_duplicate_comments\":false,\"work_in_progress\":false,\"ready\":false,\"ignore_automatic_attention_set_rules\":false}"
                 )
                 .expectGetGson()
                 .get();
@@ -158,7 +158,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     public void testCherryPick(RevisionApiTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost(testCase.cherryPickUrl,
-                "{\"message\":\"Implementing Feature X\",\"destination\":\"release-branch\",\"notify\":\"NONE\"}")
+                "{\"message\":\"Implementing Feature X\",\"destination\":\"release-branch\",\"notify\":\"ALL\",\"keep_reviewers\":false,\"allow_conflicts\":false,\"allow_empty\":false}")
             .expectGetGson()
             .get();
 

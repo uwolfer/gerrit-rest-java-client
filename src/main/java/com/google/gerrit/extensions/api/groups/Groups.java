@@ -18,13 +18,13 @@ import com.google.gerrit.extensions.client.ListGroupsOption;
 import com.google.gerrit.extensions.common.GroupInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface Groups {
   /**
@@ -70,8 +70,8 @@ public interface Groups {
 
   abstract class ListRequest {
     private final EnumSet<ListGroupsOption> options = EnumSet.noneOf(ListGroupsOption.class);
-    private final List<String> projects = new ArrayList<String>();
-    private final List<String> groups = new ArrayList<String>();
+    private final List<String> projects = new ArrayList<>();
+    private final List<String> groups = new ArrayList<>();
 
     private boolean visibleToAll;
     private String user;
@@ -85,7 +85,7 @@ public interface Groups {
 
     public List<GroupInfo> get() throws RestApiException {
       Map<String, GroupInfo> map = getAsMap();
-      List<GroupInfo> result = new ArrayList<GroupInfo>(map.size());
+      List<GroupInfo> result = new ArrayList<>(map.size());
       for (Map.Entry<String, GroupInfo> e : map.entrySet()) {
         // ListGroups "helpfully" nulls out names when converting to a map.
         e.getValue().name = e.getKey();
@@ -167,7 +167,7 @@ public interface Groups {
       return this;
     }
 
-    public EnumSet<ListGroupsOption> getOptions() {
+    public Set<ListGroupsOption> getOptions() {
       return options;
     }
 
@@ -225,7 +225,7 @@ public interface Groups {
     private String query;
     private int limit;
     private int start;
-    private EnumSet<ListGroupsOption> options = EnumSet.noneOf(ListGroupsOption.class);
+    private Set<ListGroupsOption> options = EnumSet.noneOf(ListGroupsOption.class);
 
     /** Execute query and returns the matched groups as list. */
     public abstract List<GroupInfo> get() throws RestApiException;
@@ -254,17 +254,20 @@ public interface Groups {
       return this;
     }
 
+    /** Set an option on the request, appending to existing options. */
     public QueryRequest withOption(ListGroupsOption options) {
       this.options.add(options);
       return this;
     }
 
+    /** Set options on the request, appending to existing options. */
     public QueryRequest withOptions(ListGroupsOption... options) {
       this.options.addAll(Arrays.asList(options));
       return this;
     }
 
-    public QueryRequest withOptions(EnumSet<ListGroupsOption> options) {
+    /** Set options on the request, replacing existing options. */
+    public QueryRequest withOptions(Set<ListGroupsOption> options) {
       this.options = options;
       return this;
     }
@@ -281,7 +284,7 @@ public interface Groups {
       return start;
     }
 
-    public EnumSet<ListGroupsOption> getOptions() {
+    public Set<ListGroupsOption> getOptions() {
       return options;
     }
   }

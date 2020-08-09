@@ -19,8 +19,9 @@ import java.sql.Timestamp;
 import java.util.Map;
 
 public class RevisionInfo {
+  // ActionJson#copy(List, RevisionInfo) must be adapted if new fields are added that are not
+  // protected by any ListChangesOption.
   public transient boolean isCurrent;
-  public Boolean draft;
   public ChangeKind kind;
   public int _number;
   public Timestamp created;

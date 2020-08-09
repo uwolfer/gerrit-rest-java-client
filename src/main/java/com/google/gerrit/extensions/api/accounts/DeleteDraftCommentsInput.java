@@ -1,4 +1,4 @@
-// Copyright (C) 2013 The Android Open Source Project
+// Copyright (C) 2018 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.gerrit.extensions.api.projects;
+package com.google.gerrit.extensions.api.accounts;
 
-public class ThemeInfo {
-  public static final ThemeInfo INHERIT = new ThemeInfo(null, null, null);
+import com.google.gerrit.common.Nullable;
+import com.google.gerrit.extensions.restapi.DefaultInput;
 
-  public final String css;
-  public final String header;
-  public final String footer;
+public class DeleteDraftCommentsInput {
+  /**
+   * Delete comments only on changes that match this query.
+   *
+   * <p>If null or empty, delete comments on all changes.
+   */
+  @DefaultInput public String query;
 
-  public ThemeInfo(String css, String header, String footer) {
-    this.css = css;
-    this.header = header;
-    this.footer = footer;
+  public DeleteDraftCommentsInput() {
+    this(null);
+  }
+
+  public DeleteDraftCommentsInput(@Nullable String query) {
+    this.query = query;
   }
 }
