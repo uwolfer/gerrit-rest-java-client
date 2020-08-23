@@ -364,6 +364,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public Map<String, List<CommentInfo>> drafts() throws RestApiException {
+        String request = getRequestPath() + "/drafts";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return commentsParser.parseCommentInfos(jsonElement);
+    }
+
+    @Override
     public void index() throws RestApiException {
       String request = getRequestPath() + "/index";
       gerritRestClient.postRequest(request);
