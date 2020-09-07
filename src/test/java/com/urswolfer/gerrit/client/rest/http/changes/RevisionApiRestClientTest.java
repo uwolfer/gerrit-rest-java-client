@@ -66,6 +66,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/current/drafts/")
                         .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/submit_type")
                         .expectTestSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/test.submit_type")
+                        .expectDescriptionUrl("/changes/" + CHANGE_ID + "/revisions/current/description")
                         .expectGetCommitUrl("/changes/" + CHANGE_ID + "/revisions/current/commit")
                         .get(),
                 withRevision("3")
@@ -81,6 +82,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/3/drafts/")
                         .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/submit_type")
                         .expectTestSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/test.submit_type")
+                        .expectDescriptionUrl("/changes/" + CHANGE_ID + "/revisions/3/description")
                         .expectGetCommitUrl("/changes/" + CHANGE_ID + "/revisions/3/commit")
                         .get()
         ).iterator();
@@ -346,6 +348,18 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         EasyMock.verify(gerritRestClient);
     }
 
+    @Test(dataProvider = "TestCases")
+    public void testDescription(RevisionApiTestCase testCase) throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet(testCase.descriptionUrl, jsonElement)
+            .get();
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).description();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
     @Test
     public void testSubmitPreview() throws Exception {
         String previewContent = "binary data";
@@ -437,6 +451,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         private String getDraftsUrl;
         private String submitTypeUrl;
         private String testSubmitTypeUrl;
+        private String descriptionUrl;
         private String getCommitUrl;
 
         private RevisionApiTestCase(String revision) {
@@ -500,6 +515,11 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
         private RevisionApiTestCase expectTestSubmitTypeUrl(String testSubmitTypeUrl) {
             this.testSubmitTypeUrl = testSubmitTypeUrl;
+            return this;
+        }
+
+        private RevisionApiTestCase expectDescriptionUrl(String descriptionUrl) {
+            this.descriptionUrl = descriptionUrl;
             return this;
         }
 

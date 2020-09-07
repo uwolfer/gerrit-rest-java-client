@@ -245,6 +245,12 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         return gerritRestClient.getGson().fromJson(jsonElement, new TypeToken<SubmitType>() {}.getType());
     }
 
+    @Override
+    public String description() throws RestApiException {
+        String request = getRequestPath() + "/description";
+        return gerritRestClient.getRequest(request).getAsString();
+    }
+
     protected String getRequestPath() {
         return changeApiRestClient.getRequestPath() + "/revisions/" + revision;
     }
