@@ -23,10 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.SortedMap;
+import java.util.*;
 
 /**
  * @author Shawn Stafford
@@ -55,6 +52,11 @@ public class GroupsParser {
             return gson.fromJson(result, GROUP_LIST_TYPE);
         } else {
             SortedMap<String, GroupInfo> map = gson.fromJson(result, GROUP_MAP_TYPE);
+            if (map != null && !map.isEmpty()) {
+                for (Map.Entry<String, GroupInfo> groupInfoEntry : map.entrySet()) {
+                    groupInfoEntry.getValue().name = groupInfoEntry.getKey();
+                }
+            }
             return new ArrayList<GroupInfo>(map.values());
         }
     }

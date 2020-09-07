@@ -85,12 +85,12 @@ public interface Groups {
 
     public List<GroupInfo> get() throws RestApiException {
       Map<String, GroupInfo> map = getAsMap();
-      List<GroupInfo> result = new ArrayList<>(map.size());
-      for (Map.Entry<String, GroupInfo> e : map.entrySet()) {
-        // ListGroups "helpfully" nulls out names when converting to a map.
-        e.getValue().name = e.getKey();
-        result.add(e.getValue());
-      }
+      List<GroupInfo> result = new ArrayList<>(map.values());
+//      for (Map.Entry<String, GroupInfo> e : map.entrySet()) {
+//        // ListGroups "helpfully" nulls out names when converting to a map.
+//        e.getValue().name = e.getKey();
+//        result.add(e.getValue());
+//      }
       return Collections.unmodifiableList(result);
     }
 
