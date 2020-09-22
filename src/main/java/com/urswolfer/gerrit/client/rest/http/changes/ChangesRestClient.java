@@ -22,6 +22,7 @@ import com.google.gerrit.extensions.api.changes.Changes;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ChangeInput;
+import com.google.gerrit.extensions.common.MergeableInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
@@ -51,6 +52,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final CommitInfoParser commitInfoParser;
     private final HashtagsParser hashtagsParser;
     private final AccountsParser accountsParser;
+    private final MergeableInfoParser mergeableInfoParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
@@ -66,7 +68,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
                              ReviewResultParser reviewResultParser,
                              CommitInfoParser commitInfoParser,
                              HashtagsParser hashtagsParser,
-                             AccountsParser accountsParser) {
+                             AccountsParser accountsParser,
+                             MergeableInfoParser mergeableInfoParser) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
@@ -82,6 +85,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         this.commitInfoParser = commitInfoParser;
         this.hashtagsParser = hashtagsParser;
         this.accountsParser = accountsParser;
+        this.mergeableInfoParser = mergeableInfoParser;
     }
 
     @Override
@@ -138,7 +142,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
             messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser, addReviewerResultParser,
             reviewResultParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, commitInfoParser,
-            hashtagsParser, accountsParser, id);
+            hashtagsParser, accountsParser, mergeableInfoParser, id);
     }
 
     @Override

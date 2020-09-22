@@ -86,6 +86,8 @@ public class GerritAssert {
 
     public static void assertEquals(Set<String> actual, Set<String> expected) {assertXmlOutputEqual(actual, expected);}
 
+    public static void assertEquals(MergeableInfo actual, MergeableInfo expected) {assertXmlOutputEqual(actual, expected);}
+
     private static void assertXmlOutputEqual(Object actual, Object expected) {
         XStream xStream = new XStream();
         xStream.setMode(XStream.NO_REFERENCES);

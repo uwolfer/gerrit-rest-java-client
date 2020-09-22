@@ -1,0 +1,6 @@
+)]}'
+{
+    submit_type: "MERGE_IF_NECESSARY",
+    strategy: "recursive",
+    mergeable: true
+}

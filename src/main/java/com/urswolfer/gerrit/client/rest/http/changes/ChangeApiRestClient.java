@@ -63,6 +63,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final CommitInfoParser commitInfoParser;
     private final HashtagsParser hashtagsParser;
     private final AccountsParser accountsParser;
+    private final MergeableInfoParser mergeableInfoParser;
     private final String id;
     private final ServerRestClient serverRestClient;
 
@@ -82,6 +83,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                CommitInfoParser commitInfoParser,
                                HashtagsParser hashtagsParser,
                                AccountsParser accountsParser,
+                               MergeableInfoParser mergeableInfoParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
@@ -99,6 +101,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.commitInfoParser = commitInfoParser;
         this.hashtagsParser = hashtagsParser;
         this.accountsParser = accountsParser;
+        this.mergeableInfoParser = mergeableInfoParser;
         this.id = id;
         this.serverRestClient = new ServerRestClient(gerritRestClient);
     }
@@ -120,7 +123,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public RevisionApi revision(String id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, reviewResultParser, commitInfoParser, id);
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, reviewResultParser, commitInfoParser, mergeableInfoParser, id);
     }
 
     @Override
@@ -187,6 +190,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             commitInfoParser,
             hashtagsParser,
             accountsParser,
+            mergeableInfoParser,
             id);
     }
 

@@ -17,25 +17,24 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.reflect.TypeToken;
+import com.google.gerrit.extensions.common.MergeableInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import java.lang.reflect.Type;
-import java.util.Set;
 
 /**
  * @author EFregnan
  */
-public class HashtagsParser {
-    private static final Type TYPE = new TypeToken<Set<String>>() {}.getType();
+public class MergeableInfoParser {
+
+    private static final Type TYPE = new TypeToken<MergeableInfo>() {}.getType();
 
     private final Gson gson;
 
-    public HashtagsParser(Gson gson) {
-        this.gson = gson;
-    }
+    public MergeableInfoParser(Gson gson) { this.gson = gson; }
 
-    public Set<String> parseHashtags(JsonElement result) {
+    public MergeableInfo parseMergeableInfo(JsonElement result) {
         return gson.fromJson(result, TYPE);
     }
 

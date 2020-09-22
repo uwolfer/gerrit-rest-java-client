@@ -19,10 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.common.base.Strings;
 import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.client.SubmitType;
-import com.google.gerrit.extensions.common.CommentInfo;
-import com.google.gerrit.extensions.common.CommitInfo;
-import com.google.gerrit.extensions.common.FileInfo;
-import com.google.gerrit.extensions.common.TestSubmitRuleInput;
+import com.google.gerrit.extensions.common.*;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
@@ -49,6 +46,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     private final DiffInfoParser diffInfoParser;
     private final ReviewResultParser reviewResultParser;
     private final CommitInfoParser commitInfoParser;
+    private final MergeableInfoParser mergeableInfoParser;
     private final String revision;
 
     public RevisionApiRestClient(GerritRestClient gerritRestClient,
@@ -58,6 +56,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
                                  DiffInfoParser diffInfoParser,
                                  ReviewResultParser reviewResultParser,
                                  CommitInfoParser commitInfoParser,
+                                 MergeableInfoParser mergeableInfoParser,
                                  String revision) {
         this.gerritRestClient = gerritRestClient;
         this.changeApiRestClient = changeApiRestClient;
@@ -66,6 +65,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         this.diffInfoParser = diffInfoParser;
         this.reviewResultParser = reviewResultParser;
         this.commitInfoParser = commitInfoParser;
+        this.mergeableInfoParser = mergeableInfoParser;
         this.revision = revision;
     }
 
@@ -135,6 +135,13 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         } else {
             gerritRestClient.deleteRequest(url);
         }
+    }
+
+    @Override
+    public MergeableInfo mergeable() throws RestApiException {
+        String request = getRequestPath() + "/mergeable";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return mergeableInfoParser.parseMergeableInfo(jsonElement);
     }
 
     /**
