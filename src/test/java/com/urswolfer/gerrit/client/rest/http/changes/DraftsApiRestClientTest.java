@@ -47,8 +47,8 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, commentsParser, null,
             null, null, null, null, null, null,
             null, null, null, null, null,
-            "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
-        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, commentsParser, null, null, null, null, revisionId);
+            null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, commentsParser, null, null, null, null, null, revisionId);
 
         CommentInfo commentInfo = revisionApiRestClient.draft(draftId).get();
 
@@ -68,8 +68,8 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null, null, null, null,
             null, null, null, null, null, null,
-            "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
-        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null, null, null, revisionId);
+            null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null, null, null, null, revisionId);
         DraftApiRestClient draftApiRestClient = new DraftApiRestClient(gerritRestClient, changeApiRestClient,
             revisionApiRestClient, null, expectedCommentInfo);
 
@@ -93,8 +93,8 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null, null, null, null,
             null, null, null, null, null, null,
-            "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
-        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null, null, null, revisionId);
+            null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null, null, null, null, revisionId);
         DraftApiRestClient draftApiRestClient = new DraftApiRestClient(gerritRestClient, changeApiRestClient,
             revisionApiRestClient, commentsParser, "89233d9c_56013406");
 
@@ -115,8 +115,8 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null,null, null, null,
             null, null, null, null, null, null,
-            "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
-        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null, null, null, revisionId);
+            null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null, null, null, null, revisionId);
         DraftApiRestClient draftApiRestClient = new DraftApiRestClient(gerritRestClient, changeApiRestClient,
             revisionApiRestClient, null, "89233d9c_56013406");
 

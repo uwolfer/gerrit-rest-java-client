@@ -62,6 +62,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         .expectRebaseUrl("/changes/" + CHANGE_ID + "/revisions/current/rebase")
                         .expectGetFileUrl("/changes/" + CHANGE_ID + "/revisions/current/files")
                         .expectFileReviewedUrl("/changes/" + CHANGE_ID + "/revisions/current/files/" + FILE_PATH_ENCODED + "/reviewed")
+                        .expectMergeableUrl("/changes/" + CHANGE_ID + "/revisions/current/mergeable")
                         .expectGetCommentsUrl("/changes/" + CHANGE_ID + "/revisions/current/comments/")
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/current/drafts/")
                         .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/submit_type")
@@ -78,6 +79,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         .expectRebaseUrl("/changes/" + CHANGE_ID + "/revisions/3/rebase")
                         .expectGetFileUrl("/changes/" + CHANGE_ID + "/revisions/3/files")
                         .expectFileReviewedUrl("/changes/" + CHANGE_ID + "/revisions/3/files/" + FILE_PATH_ENCODED + "/reviewed")
+                        .expectMergeableUrl("/changes/" + CHANGE_ID + "/revisions/3/mergeable")
                         .expectGetCommentsUrl("/changes/" + CHANGE_ID + "/revisions/3/comments/")
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/3/drafts/")
                         .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/submit_type")
@@ -260,6 +262,24 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     }
 
     @Test(dataProvider = "TestCases")
+    public void testMergeable(RevisionApiTestCase testCase) throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet(testCase.mergeableUrl, jsonElement)
+            .get();
+
+        MergeableInfoParser mergeableInfoParser = EasyMock.createMock(MergeableInfoParser.class);
+        EasyMock.expect(mergeableInfoParser.parseMergeableInfo(jsonElement)).andReturn(null).once();
+        EasyMock.replay(mergeableInfoParser);
+
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, mergeableInfoParser);
+
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).mergeable();
+
+        EasyMock.verify(gerritRestClient, mergeableInfoParser);
+    }
+
+    @Test(dataProvider = "TestCases")
     public void testGetCommentsAndDrafts(RevisionApiTestCase testCase) throws Exception {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
@@ -409,9 +429,10 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         CommitInfoParser commitInfoParser = EasyMock.createMock(CommitInfoParser.class);
         HashtagsParser hashtagsParser = EasyMock.createMock(HashtagsParser.class);
         AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
+        MergeableInfoParser mergeableInfoParser = EasyMock.createMock(MergeableInfoParser.class);
         return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, messagesParser,
             includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser,
-            addReviewerResultParser, reviewResultParser, commitInfoParser, hashtagsParser, accountsParser);
+            addReviewerResultParser, reviewResultParser, commitInfoParser, hashtagsParser, accountsParser, mergeableInfoParser);
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
@@ -430,7 +451,28 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                 EasyMock.createMock(ReviewResultParser.class),
                 EasyMock.createMock(CommitInfoParser.class),
                 EasyMock.createMock(HashtagsParser.class),
-                EasyMock.createMock(AccountsParser.class));
+                EasyMock.createMock(AccountsParser.class),
+                EasyMock.createMock(MergeableInfoParser.class));
+    }
+
+    private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, MergeableInfoParser mergeableInfoParser) {
+        return new ChangesRestClient(
+            gerritRestClient,
+            EasyMock.createMock(ChangesParser.class),
+            EasyMock.createMock(CommentsParser.class),
+            EasyMock.createMock(MessagesParser.class),
+            EasyMock.createMock(IncludedInInfoParser.class),
+            EasyMock.createMock(FileInfoParser.class),
+            EasyMock.createMock(DiffInfoParser.class),
+            null,
+            EasyMock.createMock(ReviewerInfoParser.class),
+            EasyMock.createMock(EditInfoParser.class),
+            EasyMock.createMock(AddReviewerResultParser.class),
+            EasyMock.createMock(ReviewResultParser.class),
+            EasyMock.createMock(CommitInfoParser.class),
+            EasyMock.createMock(HashtagsParser.class),
+            EasyMock.createMock(AccountsParser.class),
+            mergeableInfoParser);
     }
 
     private static RevisionApiTestCase withRevision(String revision) {
@@ -447,6 +489,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         private String rebaseUrl;
         private String fileUrl;
         private String fileReviewedUrl;
+        private String mergeableUrl;
         private String getCommentsUrl;
         private String getDraftsUrl;
         private String submitTypeUrl;
@@ -495,6 +538,11 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
         private RevisionApiTestCase expectFileReviewedUrl(String setReviewedUrl) {
             this.fileReviewedUrl = setReviewedUrl;
+            return this;
+        }
+
+        private RevisionApiTestCase expectMergeableUrl(String mergeableUrl) {
+            this.mergeableUrl = mergeableUrl;
             return this;
         }
 
