@@ -21,7 +21,6 @@ import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.*;
 import com.google.gerrit.extensions.restapi.BinaryResult;
-import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
