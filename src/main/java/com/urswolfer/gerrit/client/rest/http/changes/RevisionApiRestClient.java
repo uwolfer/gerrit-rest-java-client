@@ -21,6 +21,7 @@ import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.*;
 import com.google.gerrit.extensions.restapi.BinaryResult;
+import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
@@ -161,6 +162,13 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         String request = getRequestPath() + '/' + type + '/';
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return commentsParser.parseCommentInfos(jsonElement);
+    }
+
+    @Override
+    public Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException {
+        String request = getRequestPath() + "/robotcomments/";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return commentsParser.parseRobotCommentInfos(jsonElement);
     }
 
     @Override

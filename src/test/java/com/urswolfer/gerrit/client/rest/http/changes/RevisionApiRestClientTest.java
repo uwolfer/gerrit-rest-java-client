@@ -64,6 +64,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         .expectFileReviewedUrl("/changes/" + CHANGE_ID + "/revisions/current/files/" + FILE_PATH_ENCODED + "/reviewed")
                         .expectMergeableUrl("/changes/" + CHANGE_ID + "/revisions/current/mergeable")
                         .expectGetCommentsUrl("/changes/" + CHANGE_ID + "/revisions/current/comments/")
+                        .expectGetRobotCommentsUrl("/changes/" + CHANGE_ID + "/revisions/current/robotcomments/")
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/current/drafts/")
                         .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/submit_type")
                         .expectTestSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/current/test.submit_type")
@@ -81,6 +82,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         .expectFileReviewedUrl("/changes/" + CHANGE_ID + "/revisions/3/files/" + FILE_PATH_ENCODED + "/reviewed")
                         .expectMergeableUrl("/changes/" + CHANGE_ID + "/revisions/3/mergeable")
                         .expectGetCommentsUrl("/changes/" + CHANGE_ID + "/revisions/3/comments/")
+                        .expectGetRobotCommentsUrl("/changes/" + CHANGE_ID + "/revisions/3/robotcomments/")
                         .expectGetDraftsUrl("/changes/" + CHANGE_ID + "/revisions/3/drafts/")
                         .expectSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/submit_type")
                         .expectTestSubmitTypeUrl("/changes/" + CHANGE_ID + "/revisions/3/test.submit_type")
@@ -299,6 +301,24 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         EasyMock.verify(gerritRestClient, commentsParser);
     }
 
+    @Test(dataProvider = "TestCases")
+    public void testGetRobotComments(RevisionApiTestCase testCase) throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet(testCase.robotCommentsUrl, jsonElement)
+            .get();
+
+        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+        EasyMock.expect(commentsParser.parseRobotCommentInfos(jsonElement)).andReturn(null).once();
+        EasyMock.replay(commentsParser);
+
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, commentsParser);
+
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).robotComments();
+
+        EasyMock.verify(gerritRestClient, commentsParser);
+    }
+
     @Test
     public void testPatch() throws Exception {
         String patchContent = "patch content";
@@ -491,6 +511,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         private String fileReviewedUrl;
         private String mergeableUrl;
         private String getCommentsUrl;
+        private String robotCommentsUrl;
         private String getDraftsUrl;
         private String submitTypeUrl;
         private String testSubmitTypeUrl;
@@ -548,6 +569,11 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
         private RevisionApiTestCase expectGetCommentsUrl(String getCommentsUrl) {
             this.getCommentsUrl = getCommentsUrl;
+            return this;
+        }
+
+        private RevisionApiTestCase expectGetRobotCommentsUrl(String robotCommentsUrl) {
+            this.robotCommentsUrl = robotCommentsUrl;
             return this;
         }
 
