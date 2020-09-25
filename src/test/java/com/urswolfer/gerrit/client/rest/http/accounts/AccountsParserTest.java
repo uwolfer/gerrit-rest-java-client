@@ -45,16 +45,13 @@ public class AccountsParserTest extends AbstractParserTest {
     @Test
     public void testParseUserInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("self/account.json");
-
         AccountInfo accountInfo = accountsParser.parseAccountInfo(jsonElement);
-
         GerritAssert.assertEquals(accountInfo, johnDoe);
     }
 
     @Test
     public void testParseUserInfoWithNullJsonElement() throws Exception {
         AccountInfo accountInfo = accountsParser.parseAccountInfo(null);
-
         Truth.assertThat(accountInfo).isNull();
     }
 

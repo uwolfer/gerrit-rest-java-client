@@ -102,5 +102,4 @@ public class GerritAssert {
     public static void assertRobotCommentsEquals(TreeMap<String, List<RobotCommentInfo>> actual, TreeMap<String, List<RobotCommentInfo>> expected) {
         assertXmlOutputEqual(actual, expected);
     }
-
 }

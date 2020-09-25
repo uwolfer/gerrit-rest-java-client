@@ -48,5 +48,4 @@ public class CommitInfoParser {
     public CommitInfo parseSingleCommentInfo(JsonObject result) {
         return gson.fromJson(result, CommitInfo.class);
     }
-
 }

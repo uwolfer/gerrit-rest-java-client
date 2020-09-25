@@ -17,14 +17,12 @@
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
 import com.google.common.truth.Truth;
-import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import org.testng.annotations.Test;
 
-import java.util.Collections;
 import java.util.List;
 
 /**

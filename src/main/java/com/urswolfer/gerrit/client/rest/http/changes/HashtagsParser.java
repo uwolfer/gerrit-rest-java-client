@@ -38,5 +38,4 @@ public class HashtagsParser {
     public Set<String> parseHashtags(JsonElement result) {
         return gson.fromJson(result, TYPE);
     }
-
 }

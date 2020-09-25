@@ -43,12 +43,7 @@ public class ChangesRestClientTest {
     private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
 
     private static final Function<ChangesQueryTestCase, ChangesQueryTestCase[]> WRAP_IN_ARRAY_FUNCTION =
-            new Function<ChangesQueryTestCase, ChangesQueryTestCase[]>() {
-                @Override
-                public ChangesQueryTestCase[] apply(ChangesQueryTestCase testCase) {
-                    return new ChangesQueryTestCase[]{testCase};
-                }
-            };
+        testCase -> new ChangesQueryTestCase[]{testCase};
 
     @DataProvider(name = "ChangesQueryTestCases")
     public Iterator<ChangesQueryTestCase[]> getChangesQueryTestCases() {

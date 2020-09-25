@@ -104,5 +104,4 @@ public class RobotCommentInfoBuilder extends AbstractBuilder {
         robotCommentInfo.fixSuggestions = fixSuggestions;
         return this;
     }
-
 }

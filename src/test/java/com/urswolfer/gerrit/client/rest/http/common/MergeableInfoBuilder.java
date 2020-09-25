@@ -43,5 +43,4 @@ public class MergeableInfoBuilder extends AbstractBuilder {
         mergeableInfo.mergeable = mergeable;
         return this;
     }
-
 }

@@ -86,16 +86,13 @@ public class FileApiRestClientTest {
     @Test
     public void testDiff() throws Exception {
         String requestUrl = getBaseRequestUrl() + "/diff";
-        testDiff(new Function<FileApiRestClient, Void>() {
-            @Override
-            public Void apply(FileApiRestClient fileApiRestClient) {
-                try {
-                    fileApiRestClient.diff();
-                } catch (RestApiException e) {
-                    throw new RuntimeException(e);
-                }
-                return null;
+        testDiff(fileApiRestClient -> {
+            try {
+                fileApiRestClient.diff();
+            } catch (RestApiException e) {
+                throw new RuntimeException(e);
             }
+            return null;
         }, requestUrl);
     }
 
@@ -103,16 +100,13 @@ public class FileApiRestClientTest {
     public void testDiffWithBase() throws Exception {
         final String base = "2";
         String requestUrl = getBaseRequestUrl() + "/diff?base=" + base;
-        testDiff(new Function<FileApiRestClient, Void>() {
-            @Override
-            public Void apply(FileApiRestClient fileApiRestClient) {
-                try {
-                    fileApiRestClient.diff(base);
-                } catch (RestApiException e) {
-                    throw new RuntimeException(e);
-                }
-                return null;
+        testDiff(fileApiRestClient -> {
+            try {
+                fileApiRestClient.diff(base);
+            } catch (RestApiException e) {
+                throw new RuntimeException(e);
             }
+            return null;
         }, requestUrl);
     }
 
@@ -120,54 +114,45 @@ public class FileApiRestClientTest {
     public void testDiffRequest() throws Exception {
         final Integer context = 10;
         String requestUrl = getBaseRequestUrl() + "/diff?context=" + context;
-        testDiff(new Function<FileApiRestClient, Void>() {
-            @Override
-            public Void apply(FileApiRestClient fileApiRestClient) {
-                try {
-                    fileApiRestClient.diffRequest()
-                        .withContext(context)
-                        .get();
-                } catch (RestApiException e) {
-                    throw new RuntimeException(e);
-                }
-                return null;
+        testDiff(fileApiRestClient -> {
+            try {
+                fileApiRestClient.diffRequest()
+                    .withContext(context)
+                    .get();
+            } catch (RestApiException e) {
+                throw new RuntimeException(e);
             }
+            return null;
         }, requestUrl);
 
         final boolean intraline = true;
-        requestUrl += "&intraline=" + Boolean.toString(intraline);
-        testDiff(new Function<FileApiRestClient, Void>() {
-            @Override
-            public Void apply(FileApiRestClient fileApiRestClient) {
-                  try {
-                      fileApiRestClient.diffRequest()
-                          .withContext(context)
-                          .withIntraline(intraline)
-                          .get();
-                  } catch (RestApiException e) {
-                      throw new RuntimeException(e);
-                  }
-                  return null;
+        requestUrl += "&intraline=" + intraline;
+        testDiff(fileApiRestClient -> {
+              try {
+                  fileApiRestClient.diffRequest()
+                      .withContext(context)
+                      .withIntraline(intraline)
+                      .get();
+              } catch (RestApiException e) {
+                  throw new RuntimeException(e);
               }
-        }, requestUrl);
+              return null;
+          }, requestUrl);
 
         final Whitespace whitespace = Whitespace.IGNORE_ALL;
         requestUrl += "&whitespace=" + whitespace.name();
-        testDiff(new Function<FileApiRestClient, Void>() {
-            @Override
-            public Void apply(FileApiRestClient fileApiRestClient) {
-                try {
-                    fileApiRestClient.diffRequest()
-                        .withContext(context)
-                        .withIntraline(intraline)
-                        .withWhitespace(whitespace)
-                        .get();
-                } catch (RestApiException e) {
-                    throw new RuntimeException(e);
-                }
-                return null;
+        testDiff(fileApiRestClient -> {
+            try {
+                fileApiRestClient.diffRequest()
+                    .withContext(context)
+                    .withIntraline(intraline)
+                    .withWhitespace(whitespace)
+                    .get();
+            } catch (RestApiException e) {
+                throw new RuntimeException(e);
             }
-      }, requestUrl);
+            return null;
+        }, requestUrl);
     }
 
     private void testDiff(Function<FileApiRestClient, Void> method, String expectedRequestUrl) throws Exception {

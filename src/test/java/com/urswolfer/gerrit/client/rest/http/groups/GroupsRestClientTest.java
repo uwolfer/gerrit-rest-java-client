@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.groups;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.gerrit.extensions.api.groups.Groups;
 import com.google.gerrit.extensions.api.groups.Groups.QueryRequest;
@@ -111,12 +110,7 @@ public class GroupsRestClientTest {
                     .withStart(10)
                     .withOwned(true)
             ).expectUrl("/groups/?n=15&S=10&owned&suggest=bar")
-        ), new Function<GroupListTestCase, GroupListTestCase[]>() {
-            @Override
-            public GroupListTestCase[] apply(GroupListTestCase testCase) {
-                return new GroupListTestCase[]{testCase};
-            }
-        }).iterator();
+        ), testCase -> new GroupListTestCase[]{testCase}).iterator();
     }
 
     private static GroupListTestCase listTestCase() {
@@ -263,12 +257,7 @@ public class GroupsRestClientTest {
                         .withQueryParameter(new TestQueryRequest().withQuery("inname:test")
                             .withLimit(25).withStart(50))
                         .expectUrl("/groups/?query2=inname:test&limit=25&start=50")),
-                new Function<GroupQueryTestCase, GroupQueryTestCase[]>() {
-                    @Override
-                    public GroupQueryTestCase[] apply(GroupQueryTestCase testCase) {
-                        return new GroupQueryTestCase[]{testCase};
-                    }
-                })
+                testCase -> new GroupQueryTestCase[]{testCase})
             .iterator();
     }
 
@@ -315,7 +304,7 @@ public class GroupsRestClientTest {
             return gerritRestClient;
         }
 
-        public GroupsParser setupGroupsParser() throws Exception {
+        public GroupsParser setupGroupsParser() {
             groupsParser = EasyMock.createMock(GroupsParser.class);
             EasyMock.expect(groupsParser.parseGroupInfos(mockJsonElement)).andReturn(new ArrayList<GroupInfo>()).once();
             EasyMock.replay(groupsParser);

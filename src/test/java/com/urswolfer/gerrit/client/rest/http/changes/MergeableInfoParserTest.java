@@ -45,5 +45,4 @@ public class MergeableInfoParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("mergeable.json");
         return mergeableInfoParser.parseMergeableInfo(jsonElement);
     }
-
 }
