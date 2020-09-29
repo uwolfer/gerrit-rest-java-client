@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-
 /**
  * @author Urs Wolfer
  */

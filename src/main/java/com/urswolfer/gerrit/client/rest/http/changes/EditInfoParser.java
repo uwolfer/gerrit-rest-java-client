@@ -43,5 +43,4 @@ public class EditInfoParser {
         }
         return gson.fromJson(result, TYPE);
     }
-
 }

@@ -30,7 +30,6 @@ import java.io.FileReader;
 import java.net.URL;
 import java.util.List;
 
-
 /**
  * This test are run against real Gerrit servers.
  *

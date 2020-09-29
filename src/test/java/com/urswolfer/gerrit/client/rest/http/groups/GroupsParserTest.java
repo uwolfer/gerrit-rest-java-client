@@ -51,16 +51,13 @@ public class GroupsParserTest extends AbstractParserTest {
     @Test
     public void testParseGroupInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("group.json");
-
         GroupInfo groupInfo = groupsParser.parseGroupInfo(jsonElement);
-
         GerritAssert.assertEquals(groupInfo, testGroup);
     }
 
     @Test
     public void testParseGroupInfoWithNullJsonElement() throws Exception {
         GroupInfo groupInfo = groupsParser.parseGroupInfo(null);
-
         Truth.assertThat(groupInfo).isNull();
     }
 

@@ -28,6 +28,7 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Urs Wolfer
@@ -40,7 +41,7 @@ public class AccountApiRestClientTest {
         String requestUrl = "/accounts/101/avatar?s=16";
         HttpResponse httpResponse = EasyMock.createMock(HttpResponse.class);
         HttpEntity httpEntity = EasyMock.createMock(HttpEntity.class);
-        EasyMock.expect(httpEntity.getContent()).andStubReturn(new ByteArrayInputStream(imageContent.getBytes("UTF-8")));
+        EasyMock.expect(httpEntity.getContent()).andStubReturn(new ByteArrayInputStream(imageContent.getBytes(StandardCharsets.UTF_8)));
         EasyMock.expect(httpResponse.getEntity()).andStubReturn(httpEntity);
         EasyMock.expect(httpResponse.getFirstHeader("X-FYI-Content-Encoding")).andStubReturn(null);
         EasyMock.expect(httpResponse.getFirstHeader("X-FYI-Content-Type")).andStubReturn(null);

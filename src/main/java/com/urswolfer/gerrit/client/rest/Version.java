@@ -53,5 +53,4 @@ public class Version {
     public static String get() {
         return VERSION;
     }
-
 }

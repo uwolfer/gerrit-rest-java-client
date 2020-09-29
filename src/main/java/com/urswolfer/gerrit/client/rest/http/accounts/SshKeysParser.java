@@ -26,7 +26,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by Phil Moore on 24/04/2020.
+ * @author Phil Moore
+ * created on 24/04/2020
  */
 public class SshKeysParser {
     private static final Type TYPE = new TypeToken<List<SshKeyInfo>>() {}.getType();
