@@ -164,6 +164,13 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     }
 
     @Override
+    public Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException {
+        String request = getRequestPath() + "/robotcomments/";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return commentsParser.parseRobotCommentInfos(jsonElement);
+    }
+
+    @Override
     public DraftApi createDraft(DraftInput in) throws RestApiException {
         String request = getRequestPath() + "/drafts";
         String json = gerritRestClient.getGson().toJson(in);
