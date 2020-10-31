@@ -47,6 +47,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     private final ReviewResultParser reviewResultParser;
     private final CommitInfoParser commitInfoParser;
     private final MergeableInfoParser mergeableInfoParser;
+    private final ActionInfoParser actionInfoParser;
     private final String revision;
 
     public RevisionApiRestClient(GerritRestClient gerritRestClient,
@@ -57,6 +58,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
                                  ReviewResultParser reviewResultParser,
                                  CommitInfoParser commitInfoParser,
                                  MergeableInfoParser mergeableInfoParser,
+                                 ActionInfoParser actionInfoParser,
                                  String revision) {
         this.gerritRestClient = gerritRestClient;
         this.changeApiRestClient = changeApiRestClient;
@@ -66,6 +68,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         this.reviewResultParser = reviewResultParser;
         this.commitInfoParser = commitInfoParser;
         this.mergeableInfoParser = mergeableInfoParser;
+        this.actionInfoParser = actionInfoParser;
         this.revision = revision;
     }
 
@@ -221,6 +224,13 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         } catch (IOException e) {
             throw RestApiException.wrap("Failed to get patch.", e);
         }
+    }
+
+    @Override
+    public Map<String, ActionInfo> actions() throws RestApiException {
+        String request = getRequestPath() + "/actions";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return actionInfoParser.parseActionInfos(jsonElement);
     }
 
     @Override

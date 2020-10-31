@@ -1,0 +1,16 @@
+)]}'
+{
+    "submit": {
+        "method": "POST",
+        "label": "Submit",
+        "title": "Submit patch set 1 into master",
+        "enabled": true
+    },
+    "cherrypick": {
+        "method": "POST",
+        "label": "Cherry Pick",
+        "title": "Cherry pick change",
+        "enabled": true
+    }
+}
+

@@ -64,6 +64,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final HashtagsParser hashtagsParser;
     private final AccountsParser accountsParser;
     private final MergeableInfoParser mergeableInfoParser;
+    private final ActionInfoParser actionInfoParser;
     private final String id;
     private final ServerRestClient serverRestClient;
 
@@ -84,6 +85,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                HashtagsParser hashtagsParser,
                                AccountsParser accountsParser,
                                MergeableInfoParser mergeableInfoParser,
+                               ActionInfoParser actionInfoParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
@@ -102,6 +104,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.hashtagsParser = hashtagsParser;
         this.accountsParser = accountsParser;
         this.mergeableInfoParser = mergeableInfoParser;
+        this.actionInfoParser = actionInfoParser;
         this.id = id;
         this.serverRestClient = new ServerRestClient(gerritRestClient);
     }
@@ -123,7 +126,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public RevisionApi revision(String id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser, reviewResultParser, commitInfoParser, mergeableInfoParser, id);
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser,
+            reviewResultParser, commitInfoParser, mergeableInfoParser, actionInfoParser, id);
     }
 
     @Override
@@ -191,6 +195,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             hashtagsParser,
             accountsParser,
             mergeableInfoParser,
+            actionInfoParser,
             id);
     }
 
