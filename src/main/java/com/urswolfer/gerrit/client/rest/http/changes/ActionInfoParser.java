@@ -25,7 +25,7 @@ import java.lang.reflect.Type;
 import java.util.TreeMap;
 
 /**
- * @aythor EFregnan
+ * @author EFregnan
  */
 public class ActionInfoParser {
 
