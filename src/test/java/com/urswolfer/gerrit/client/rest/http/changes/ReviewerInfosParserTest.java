@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Urs Wolfer
+ * Copyright 2013-2020 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,20 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.api.changes.AddReviewerResult;
 import com.google.gerrit.extensions.api.changes.ReviewerInfo;
+import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import org.testng.annotations.Test;
 
 import java.util.List;
 
-public class ReviewerInfoParserTest extends AbstractParserTest {
-    private final ReviewerInfoParser reviewerInfoParser = new ReviewerInfoParser(getGson());
+/**
+ * @author EFregnan
+ */
+public class ReviewerInfosParserTest extends AbstractParserTest {
+    private final ReviewerInfosParser reviewerInfoParser = new ReviewerInfosParser(getGson());
 
     @Test
     public void testParseReviewerInfo() throws Exception {
@@ -41,6 +46,29 @@ public class ReviewerInfoParserTest extends AbstractParserTest {
         List<ReviewerInfo> reviewerInfos = reviewerInfoParser.parseReviewerInfos(jsonElement);
         Truth.assertThat(reviewerInfos).hasSize(2);
         Truth.assertThat(reviewerInfos.get(1).approvals.get("My-Own-Label")).isEqualTo("-2");
+    }
+
+    @Test
+    public void testParseSuggestReviewerInfos() throws Exception {
+        JsonElement jsonElement = getJsonElement("suggestreviewer.json");
+        List<SuggestedReviewerInfo> suggestedReviewerInfos = reviewerInfoParser.parseSuggestReviewerInfos(jsonElement);
+        Truth.assertThat(suggestedReviewerInfos).hasSize(1);
+    }
+
+    @Test
+    public void testParseSuggestReviewersInfos() throws Exception {
+        JsonElement jsonElement = getJsonElement("suggestreviewers.json");
+        List<SuggestedReviewerInfo> suggestedReviewerInfos = reviewerInfoParser.parseSuggestReviewerInfos(jsonElement);
+        Truth.assertThat(suggestedReviewerInfos).hasSize(2);
+    }
+
+    @Test
+    public void testParseCommitInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("addreviewer.json");
+        AddReviewerResult addReviewerResult = reviewerInfoParser.parseAddReviewerResult(jsonElement);
+        Truth.assertThat(addReviewerResult.input).isEqualTo("john.doe@example.com");
+        Truth.assertThat(addReviewerResult.reviewers.size()).isEqualTo(1);
+        Truth.assertThat(addReviewerResult.reviewers.get(0)._accountId).isEqualTo(1000096);
     }
 
 }

@@ -55,10 +55,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
-    private final AddReviewerResultParser addReviewerResultParser;
     private final ReviewResultParser reviewResultParser;
-    private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
-    private final ReviewerInfoParser reviewerInfoParser;
+    private final ReviewerInfosParser reviewerInfosParser;
     private final EditInfoParser editInfoParser;
     private final CommitInfoParser commitInfoParser;
     private final HashtagsParser hashtagsParser;
@@ -76,10 +74,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                IncludedInInfoParser includedInInfoParser,
                                FileInfoParser fileInfoParser,
                                DiffInfoParser diffInfoParser,
-                               AddReviewerResultParser addReviewerResultParser,
                                ReviewResultParser reviewResultParser,
-                               SuggestedReviewerInfoParser suggestedReviewerInfoParser,
-                               ReviewerInfoParser reviewerInfoParser,
+                               ReviewerInfosParser reviewerInfosParser,
                                EditInfoParser editInfoParser,
                                CommitInfoParser commitInfoParser,
                                HashtagsParser hashtagsParser,
@@ -95,10 +91,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
-        this.addReviewerResultParser = addReviewerResultParser;
         this.reviewResultParser = reviewResultParser;
-        this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
-        this.reviewerInfoParser = reviewerInfoParser;
+        this.reviewerInfosParser = reviewerInfosParser;
         this.editInfoParser = editInfoParser;
         this.commitInfoParser = commitInfoParser;
         this.hashtagsParser = hashtagsParser;
@@ -186,10 +180,8 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             includedInInfoParser,
             fileInfoParser,
             diffInfoParser,
-            addReviewerResultParser,
             reviewResultParser,
-            suggestedReviewerInfoParser,
-            reviewerInfoParser,
+            reviewerInfosParser,
             editInfoParser,
             commitInfoParser,
             hashtagsParser,
@@ -242,7 +234,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     public List<ReviewerInfo> reviewers() throws RestApiException {
         String request = getRequestPath() + "/reviewers";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return reviewerInfoParser.parseReviewerInfos(jsonElement);
+        return reviewerInfosParser.parseReviewerInfos(jsonElement);
     }
 
     @Override
@@ -250,7 +242,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String request = getRequestPath() + "/reviewers";
         String json = gerritRestClient.getGson().toJson(in);
         JsonElement reviewerResult = gerritRestClient.postRequest(request, json);
-        return addReviewerResultParser.parseAddReviewerResult(reviewerResult);
+        return reviewerInfosParser.parseAddReviewerResult(reviewerResult);
     }
 
     @Override
@@ -283,7 +275,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private List<SuggestedReviewerInfo> getSuggestedReviewers(String queryPart) throws RestApiException {
         String request = getRequestPath() + String.format("/suggest_reviewers?%s", queryPart);
         JsonElement suggestedReviewers = gerritRestClient.getRequest(request);
-        return suggestedReviewerInfoParser.parseSuggestReviewerInfos(suggestedReviewers);
+        return reviewerInfosParser.parseSuggestReviewerInfos(suggestedReviewers);
     }
 
     @Override
