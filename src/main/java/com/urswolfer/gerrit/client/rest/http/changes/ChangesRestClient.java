@@ -43,10 +43,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
     private final DiffInfoParser diffInfoParser;
-    private final SuggestedReviewerInfoParser suggestedReviewerInfoParser;
-    private final ReviewerInfoParser reviewerInfoParser;
+    private final ReviewerInfosParser reviewerInfosParser;
     private final EditInfoParser editInfoParser;
-    private final AddReviewerResultParser addReviewerResultParser;
     private final ReviewResultParser reviewResultParser;
     private final CommitInfoParser commitInfoParser;
     private final HashtagsParser hashtagsParser;
@@ -61,10 +59,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
                              IncludedInInfoParser includedInInfoParser,
                              FileInfoParser fileInfoParser,
                              DiffInfoParser diffInfoParser,
-                             SuggestedReviewerInfoParser suggestedReviewerInfoParser,
-                             ReviewerInfoParser reviewerInfoParser,
+                             ReviewerInfosParser reviewerInfosParser,
                              EditInfoParser editInfoParser,
-                             AddReviewerResultParser addReviewerResultParser,
                              ReviewResultParser reviewResultParser,
                              CommitInfoParser commitInfoParser,
                              HashtagsParser hashtagsParser,
@@ -78,10 +74,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
         this.diffInfoParser = diffInfoParser;
-        this.suggestedReviewerInfoParser = suggestedReviewerInfoParser;
-        this.reviewerInfoParser = reviewerInfoParser;
+        this.reviewerInfosParser = reviewerInfosParser;
         this.editInfoParser = editInfoParser;
-        this.addReviewerResultParser = addReviewerResultParser;
         this.reviewResultParser = reviewResultParser;
         this.commitInfoParser = commitInfoParser;
         this.hashtagsParser = hashtagsParser;
@@ -142,8 +136,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     @Override
     public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
-            messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser, addReviewerResultParser,
-            reviewResultParser, suggestedReviewerInfoParser, reviewerInfoParser, editInfoParser, commitInfoParser,
+            messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser,
+            reviewResultParser, reviewerInfosParser, editInfoParser, commitInfoParser,
             hashtagsParser, accountsParser, mergeableInfoParser, actionInfoParser, id);
     }
 

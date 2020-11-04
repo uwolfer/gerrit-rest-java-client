@@ -462,9 +462,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         IncludedInInfoParser includedInInfoParser = EasyMock.createMock(IncludedInInfoParser.class);
         FileInfoParser fileInfoParser = EasyMock.createMock(FileInfoParser.class);
         DiffInfoParser diffInfoParser = EasyMock.createMock(DiffInfoParser.class);
-        ReviewerInfoParser reviewerInfoParser = EasyMock.createMock(ReviewerInfoParser.class);
+        ReviewerInfosParser reviewerInfosParser = EasyMock.createMock(ReviewerInfosParser.class);
         EditInfoParser editInfoParser = EasyMock.createMock(EditInfoParser.class);
-        AddReviewerResultParser addReviewerResultParser = EasyMock.createMock(AddReviewerResultParser.class);
         ReviewResultParser reviewResultParser = EasyMock.createMock(ReviewResultParser.class);
         CommitInfoParser commitInfoParser = EasyMock.createMock(CommitInfoParser.class);
         HashtagsParser hashtagsParser = EasyMock.createMock(HashtagsParser.class);
@@ -472,8 +471,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         MergeableInfoParser mergeableInfoParser = EasyMock.createMock(MergeableInfoParser.class);
         ActionInfoParser actionInfoParser = EasyMock.createMock(ActionInfoParser.class);
         return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, messagesParser,
-            includedInInfoParser, fileInfoParser, diffInfoParser, null, reviewerInfoParser, editInfoParser,
-            addReviewerResultParser, reviewResultParser, commitInfoParser, hashtagsParser, accountsParser, mergeableInfoParser, actionInfoParser);
+            includedInInfoParser, fileInfoParser, diffInfoParser, reviewerInfosParser, editInfoParser,
+            reviewResultParser, commitInfoParser, hashtagsParser, accountsParser, mergeableInfoParser, actionInfoParser);
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
@@ -485,10 +484,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                 EasyMock.createMock(IncludedInInfoParser.class),
                 EasyMock.createMock(FileInfoParser.class),
                 EasyMock.createMock(DiffInfoParser.class),
-                null,
-                EasyMock.createMock(ReviewerInfoParser.class),
+                EasyMock.createMock(ReviewerInfosParser.class),
                 EasyMock.createMock(EditInfoParser.class),
-                EasyMock.createMock(AddReviewerResultParser.class),
                 EasyMock.createMock(ReviewResultParser.class),
                 EasyMock.createMock(CommitInfoParser.class),
                 EasyMock.createMock(HashtagsParser.class),
@@ -506,10 +503,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
             EasyMock.createMock(IncludedInInfoParser.class),
             EasyMock.createMock(FileInfoParser.class),
             EasyMock.createMock(DiffInfoParser.class),
-            null,
-            EasyMock.createMock(ReviewerInfoParser.class),
+            EasyMock.createMock(ReviewerInfosParser.class),
             EasyMock.createMock(EditInfoParser.class),
-            EasyMock.createMock(AddReviewerResultParser.class),
             EasyMock.createMock(ReviewResultParser.class),
             EasyMock.createMock(CommitInfoParser.class),
             EasyMock.createMock(HashtagsParser.class),
@@ -527,10 +522,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
             EasyMock.createMock(IncludedInInfoParser.class),
             EasyMock.createMock(FileInfoParser.class),
             EasyMock.createMock(DiffInfoParser.class),
-            null,
-            EasyMock.createMock(ReviewerInfoParser.class),
+            EasyMock.createMock(ReviewerInfosParser.class),
             EasyMock.createMock(EditInfoParser.class),
-            EasyMock.createMock(AddReviewerResultParser.class),
             EasyMock.createMock(ReviewResultParser.class),
             EasyMock.createMock(CommitInfoParser.class),
             EasyMock.createMock(HashtagsParser.class),

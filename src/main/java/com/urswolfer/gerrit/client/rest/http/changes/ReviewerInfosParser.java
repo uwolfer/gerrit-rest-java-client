@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Urs Wolfer
+ * Copyright 2013-2020 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.reflect.TypeToken;
+import com.google.gerrit.extensions.api.changes.AddReviewerResult;
+import com.google.gerrit.extensions.api.changes.ReviewerInfo;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -26,22 +28,36 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Thomas Forrer
+ * Parser for all information related to reviewers.
+ *
+ * @author EFregnan
  */
-public class SuggestedReviewerInfoParser {
-    private static final Type TYPE = new TypeToken<List<SuggestedReviewerInfo>>() {}.getType();
+public class ReviewerInfosParser {
+
+    private static final Type REVIEWER_INFO = new TypeToken<List<ReviewerInfo>>() {}.getType();
+    private static final Type SUGGESTED_REVIEWER_INFO = new TypeToken<List<SuggestedReviewerInfo>>() {}.getType();
 
     private final Gson gson;
 
-    public SuggestedReviewerInfoParser(Gson gson) {
+    public ReviewerInfosParser(Gson gson) {
         this.gson = gson;
+    }
+
+    public List<ReviewerInfo> parseReviewerInfos(JsonElement result) {
+        if (!result.isJsonArray()) {
+            return Collections.singletonList(gson.fromJson(result,  ReviewerInfo.class));
+        }
+        return gson.fromJson(result, REVIEWER_INFO);
     }
 
     public List<SuggestedReviewerInfo> parseSuggestReviewerInfos(JsonElement result) {
         if (!result.isJsonArray()) {
             return Collections.singletonList(gson.fromJson(result, SuggestedReviewerInfo.class));
         }
-        return gson.fromJson(result, TYPE);
+        return gson.fromJson(result, SUGGESTED_REVIEWER_INFO);
     }
 
+    public AddReviewerResult parseAddReviewerResult(JsonElement result) {
+        return gson.fromJson(result, AddReviewerResult.class);
+    }
 }
