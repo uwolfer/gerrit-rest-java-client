@@ -72,7 +72,7 @@ public class GerritAssert {
         assertXmlOutputEqual(actual, expected);
     }
 
-    public static void assertEquals(List<ChangeMessageInfo> actual, List<ChangeMessageInfo> expected) {
+    public static <V> void assertEquals(List<V> actual, List<V> expected) {
         assertXmlOutputEqual(actual, expected);
     }
 
@@ -85,6 +85,7 @@ public class GerritAssert {
     }
 
     public static void assertEquals(Set<String> actual, Set<String> expected) {assertXmlOutputEqual(actual, expected);}
+
 
     public static void assertEquals(MergeableInfo actual, MergeableInfo expected) {assertXmlOutputEqual(actual, expected);}
 
