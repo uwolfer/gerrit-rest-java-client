@@ -51,6 +51,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final AccountsParser accountsParser;
     private final MergeableInfoParser mergeableInfoParser;
     private final ActionInfoParser actionInfoParser;
+    private final ReviewInfoParser reviewInfoParser;
+
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
@@ -66,7 +68,8 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
                              HashtagsParser hashtagsParser,
                              AccountsParser accountsParser,
                              MergeableInfoParser mergeableInfoParser,
-                             ActionInfoParser actionInfoParser) {
+                             ActionInfoParser actionInfoParser,
+                             ReviewInfoParser reviewInfoParser) {
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
@@ -82,6 +85,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         this.accountsParser = accountsParser;
         this.mergeableInfoParser = mergeableInfoParser;
         this.actionInfoParser = actionInfoParser;
+        this.reviewInfoParser = reviewInfoParser;
     }
 
     @Override
@@ -138,7 +142,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
             messagesParser, includedInInfoParser, fileInfoParser, diffInfoParser,
             reviewResultParser, reviewerInfosParser, editInfoParser, commitInfoParser,
-            hashtagsParser, accountsParser, mergeableInfoParser, actionInfoParser, id);
+            hashtagsParser, accountsParser, mergeableInfoParser, actionInfoParser, reviewInfoParser, id);
     }
 
     @Override

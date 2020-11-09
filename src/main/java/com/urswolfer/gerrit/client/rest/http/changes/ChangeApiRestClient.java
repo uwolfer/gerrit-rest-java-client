@@ -63,8 +63,10 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final AccountsParser accountsParser;
     private final MergeableInfoParser mergeableInfoParser;
     private final ActionInfoParser actionInfoParser;
+    private final ReviewInfoParser reviewInfoParser;
     private final String id;
     private final ServerRestClient serverRestClient;
+
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
@@ -82,6 +84,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                AccountsParser accountsParser,
                                MergeableInfoParser mergeableInfoParser,
                                ActionInfoParser actionInfoParser,
+                               ReviewInfoParser reviewInfoParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
@@ -99,6 +102,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.accountsParser = accountsParser;
         this.mergeableInfoParser = mergeableInfoParser;
         this.actionInfoParser = actionInfoParser;
+        this.reviewInfoParser = reviewInfoParser;
         this.id = id;
         this.serverRestClient = new ServerRestClient(gerritRestClient);
     }
@@ -121,7 +125,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     @Override
     public RevisionApi revision(String id) throws RestApiException {
         return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser,
-            reviewResultParser, commitInfoParser, mergeableInfoParser, actionInfoParser, id);
+            reviewResultParser, commitInfoParser, mergeableInfoParser, actionInfoParser, reviewInfoParser, id);
     }
 
     @Override
@@ -188,6 +192,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             accountsParser,
             mergeableInfoParser,
             actionInfoParser,
+            reviewInfoParser,
             id);
     }
 
