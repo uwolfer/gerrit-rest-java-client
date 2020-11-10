@@ -32,6 +32,7 @@ import org.apache.http.HttpResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -48,6 +49,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     private final CommitInfoParser commitInfoParser;
     private final MergeableInfoParser mergeableInfoParser;
     private final ActionInfoParser actionInfoParser;
+    private final ReviewInfoParser reviewInfoParser;
     private final String revision;
 
     public RevisionApiRestClient(GerritRestClient gerritRestClient,
@@ -59,6 +61,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
                                  CommitInfoParser commitInfoParser,
                                  MergeableInfoParser mergeableInfoParser,
                                  ActionInfoParser actionInfoParser,
+                                 ReviewInfoParser reviewInfoParser,
                                  String revision) {
         this.gerritRestClient = gerritRestClient;
         this.changeApiRestClient = changeApiRestClient;
@@ -69,6 +72,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         this.commitInfoParser = commitInfoParser;
         this.mergeableInfoParser = mergeableInfoParser;
         this.actionInfoParser = actionInfoParser;
+        this.reviewInfoParser = reviewInfoParser;
         this.revision = revision;
     }
 
@@ -158,6 +162,13 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public TreeMap<String, List<CommentInfo>> drafts() throws RestApiException {
         return comments("drafts");
+    }
+
+    @Override
+    public Set<String> reviewed() throws RestApiException {
+        String request = getRequestPath() + "/files?reviewed";
+        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        return reviewInfoParser.parseFileInfos(jsonElement);
     }
 
     private TreeMap<String, List<CommentInfo>> comments(String type) throws RestApiException {
