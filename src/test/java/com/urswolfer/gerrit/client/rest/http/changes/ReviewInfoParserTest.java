@@ -16,20 +16,15 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
 import com.google.common.collect.Sets;
-import com.google.gerrit.extensions.common.FileInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
-
-import junit.framework.TestCase;
 
 /**
  * @author Leonard Brünings

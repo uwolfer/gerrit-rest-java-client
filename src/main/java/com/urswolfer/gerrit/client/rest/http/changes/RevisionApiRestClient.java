@@ -30,7 +30,6 @@ import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -169,7 +168,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     public Set<String> reviewed() throws RestApiException {
         String request = getRequestPath() + "/files?reviewed";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return new HashSet<>(reviewInfoParser.parseFileInfos(jsonElement));
+        return reviewInfoParser.parseFileInfos(jsonElement);
     }
 
     private TreeMap<String, List<CommentInfo>> comments(String type) throws RestApiException {
