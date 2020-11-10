@@ -67,7 +67,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final String id;
     private final ServerRestClient serverRestClient;
 
-
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
                                ChangesParser changesParser,

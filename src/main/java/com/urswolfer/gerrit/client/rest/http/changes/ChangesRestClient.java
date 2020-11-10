@@ -53,7 +53,6 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final ActionInfoParser actionInfoParser;
     private final ReviewInfoParser reviewInfoParser;
 
-
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
                              CommentsParser commentsParser,
