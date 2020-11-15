@@ -63,7 +63,7 @@ public class CommitInfosParser {
         return gson.fromJson(result, COMMIT_INFO_TYPE);
     }
 
-    public CommitInfo parseSingleCommentInfo(JsonObject result) {
+    public CommitInfo parseSingleCommitInfo(JsonObject result) {
         return gson.fromJson(result, CommitInfo.class);
     }
 

@@ -217,7 +217,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     public CommitInfo commit(boolean addLinks) throws RestApiException {
         String request = getRequestPath() + "/commit" + (addLinks ? "?links" : "");
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return commitInfosParser.parseSingleCommentInfo(jsonElement.getAsJsonObject());
+        return commitInfosParser.parseSingleCommitInfo(jsonElement.getAsJsonObject());
     }
 
     @Override
