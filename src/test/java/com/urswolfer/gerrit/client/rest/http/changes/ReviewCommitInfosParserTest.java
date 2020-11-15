@@ -29,7 +29,7 @@ import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 /**
  * @author Leonard Brünings
  */
-public class ReviewInfoParserTest extends AbstractParserTest {
+public class ReviewCommitInfosParserTest extends AbstractParserTest {
     private static final Set<String> REVIEW_INFO = Sets.newLinkedHashSet(Lists.newArrayList(
             "/COMMIT_MSG",
             "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java"

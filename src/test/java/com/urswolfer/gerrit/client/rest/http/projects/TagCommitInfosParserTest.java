@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * @author Pavel Bely
  */
-public class TagInfoParserTest extends AbstractParserTest {
+public class TagCommitInfosParserTest extends AbstractParserTest {
     private static final List<TagInfo> TAG_INFO_LIST = Lists.newArrayList();
 
     static {

@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * @author Thomas Forrer
  */
-public class FileInfoParserTest extends AbstractParserTest {
+public class FileCommitInfosParserTest extends AbstractParserTest {
     private static final Map<String, FileInfo> FILE_INFO_MAP = Maps.newLinkedHashMap();
 
     static {

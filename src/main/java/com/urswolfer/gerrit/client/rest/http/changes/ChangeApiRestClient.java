@@ -54,15 +54,12 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final MessagesParser messagesParser;
     private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
-    private final DiffInfoParser diffInfoParser;
     private final ReviewResultParser reviewResultParser;
     private final ReviewerInfosParser reviewerInfosParser;
-    private final EditInfoParser editInfoParser;
-    private final CommitInfoParser commitInfoParser;
+    private final CommitInfosParser commitInfosParser;
     private final HashtagsParser hashtagsParser;
     private final AccountsParser accountsParser;
     private final MergeableInfoParser mergeableInfoParser;
-    private final ActionInfoParser actionInfoParser;
     private final ReviewInfoParser reviewInfoParser;
     private final String id;
     private final ServerRestClient serverRestClient;
@@ -74,15 +71,12 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                MessagesParser messagesParser,
                                IncludedInInfoParser includedInInfoParser,
                                FileInfoParser fileInfoParser,
-                               DiffInfoParser diffInfoParser,
                                ReviewResultParser reviewResultParser,
                                ReviewerInfosParser reviewerInfosParser,
-                               EditInfoParser editInfoParser,
-                               CommitInfoParser commitInfoParser,
+                               CommitInfosParser commitInfosParser,
                                HashtagsParser hashtagsParser,
                                AccountsParser accountsParser,
                                MergeableInfoParser mergeableInfoParser,
-                               ActionInfoParser actionInfoParser,
                                ReviewInfoParser reviewInfoParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
@@ -92,15 +86,12 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.messagesParser = messagesParser;
         this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
-        this.diffInfoParser = diffInfoParser;
         this.reviewResultParser = reviewResultParser;
         this.reviewerInfosParser = reviewerInfosParser;
-        this.editInfoParser = editInfoParser;
-        this.commitInfoParser = commitInfoParser;
+        this.commitInfosParser = commitInfosParser;
         this.hashtagsParser = hashtagsParser;
         this.accountsParser = accountsParser;
         this.mergeableInfoParser = mergeableInfoParser;
-        this.actionInfoParser = actionInfoParser;
         this.reviewInfoParser = reviewInfoParser;
         this.id = id;
         this.serverRestClient = new ServerRestClient(gerritRestClient);
@@ -123,8 +114,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public RevisionApi revision(String id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, diffInfoParser,
-            reviewResultParser, commitInfoParser, mergeableInfoParser, actionInfoParser, reviewInfoParser, id);
+        return new RevisionApiRestClient(gerritRestClient, this, commentsParser, fileInfoParser, reviewResultParser, commitInfosParser, mergeableInfoParser, reviewInfoParser, id);
     }
 
     @Override
@@ -182,15 +172,12 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             messagesParser,
             includedInInfoParser,
             fileInfoParser,
-            diffInfoParser,
             reviewResultParser,
             reviewerInfosParser,
-            editInfoParser,
-            commitInfoParser,
+            commitInfosParser,
             hashtagsParser,
             accountsParser,
             mergeableInfoParser,
-            actionInfoParser,
             reviewInfoParser,
             id);
     }
@@ -310,7 +297,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     public EditInfo getEdit() throws RestApiException {
         String request = getRequestPath() + "/edit";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return Iterables.getOnlyElement(editInfoParser.parseEditInfos(jsonElement));
+        return Iterables.getOnlyElement(commitInfosParser.parseEditInfos(jsonElement));
     }
 
     @Override

@@ -44,11 +44,9 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     private final ChangeApiRestClient changeApiRestClient;
     private final CommentsParser commentsParser;
     private final FileInfoParser fileInfoParser;
-    private final DiffInfoParser diffInfoParser;
     private final ReviewResultParser reviewResultParser;
-    private final CommitInfoParser commitInfoParser;
+    private final CommitInfosParser commitInfosParser;
     private final MergeableInfoParser mergeableInfoParser;
-    private final ActionInfoParser actionInfoParser;
     private final ReviewInfoParser reviewInfoParser;
     private final String revision;
 
@@ -56,22 +54,18 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
                                  ChangeApiRestClient changeApiRestClient,
                                  CommentsParser commentsParser,
                                  FileInfoParser fileInfoParser,
-                                 DiffInfoParser diffInfoParser,
                                  ReviewResultParser reviewResultParser,
-                                 CommitInfoParser commitInfoParser,
+                                 CommitInfosParser commitInfosParser,
                                  MergeableInfoParser mergeableInfoParser,
-                                 ActionInfoParser actionInfoParser,
                                  ReviewInfoParser reviewInfoParser,
                                  String revision) {
         this.gerritRestClient = gerritRestClient;
         this.changeApiRestClient = changeApiRestClient;
         this.commentsParser = commentsParser;
         this.fileInfoParser = fileInfoParser;
-        this.diffInfoParser = diffInfoParser;
         this.reviewResultParser = reviewResultParser;
-        this.commitInfoParser = commitInfoParser;
+        this.commitInfosParser = commitInfosParser;
         this.mergeableInfoParser = mergeableInfoParser;
-        this.actionInfoParser = actionInfoParser;
         this.reviewInfoParser = reviewInfoParser;
         this.revision = revision;
     }
@@ -216,14 +210,14 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
     @Override
     public FileApi file(String path) {
-        return new FileApiRestClient(gerritRestClient, this, diffInfoParser, path);
+        return new FileApiRestClient(gerritRestClient, this, commitInfosParser, path);
     }
 
     @Override
     public CommitInfo commit(boolean addLinks) throws RestApiException {
         String request = getRequestPath() + "/commit" + (addLinks ? "?links" : "");
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return commitInfoParser.parseSingleCommentInfo(jsonElement.getAsJsonObject());
+        return commitInfosParser.parseSingleCommentInfo(jsonElement.getAsJsonObject());
     }
 
     @Override
@@ -241,7 +235,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     public Map<String, ActionInfo> actions() throws RestApiException {
         String request = getRequestPath() + "/actions";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return actionInfoParser.parseActionInfos(jsonElement);
+        return commitInfosParser.parseActionInfos(jsonElement);
     }
 
     @Override
