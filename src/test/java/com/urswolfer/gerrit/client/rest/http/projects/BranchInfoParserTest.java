@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * @author Tim Coulson
  */
-public class BranchCommitInfosParserTest extends AbstractParserTest {
+public class BranchInfoParserTest extends AbstractParserTest {
     private static final List<BranchInfo> BRANCH_INFO_LIST = Lists.newArrayList();
 
     static {
