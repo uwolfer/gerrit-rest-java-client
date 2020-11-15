@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 /**
  * @author EFregnan
  */
-public class MergeableCommitInfosParserTest extends AbstractParserTest {
+public class MergeableInfoParserTest extends AbstractParserTest {
 
     private static final MergeableInfo MERGEABLE_INFO = new MergeableInfoBuilder()
         .withSubmitType(SubmitType.MERGE_IF_NECESSARY)

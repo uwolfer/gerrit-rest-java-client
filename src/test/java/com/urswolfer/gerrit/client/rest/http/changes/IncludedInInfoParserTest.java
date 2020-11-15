@@ -23,7 +23,7 @@ import com.google.gerrit.extensions.api.changes.IncludedInInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 
-public class IncludedInCommitInfosParserTest extends AbstractParserTest {
+public class IncludedInInfoParserTest extends AbstractParserTest {
     private final IncludedInInfoParser includedInInfoParser = new IncludedInInfoParser(getGson());
 
     @Test
