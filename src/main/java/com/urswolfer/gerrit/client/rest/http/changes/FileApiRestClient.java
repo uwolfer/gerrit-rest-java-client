@@ -40,7 +40,7 @@ public class FileApiRestClient extends FileApi.NotImplemented {
 
     private final GerritRestClient gerritRestClient;
     private final RevisionApiRestClient revisionApiRestClient;
-    private final DiffInfoParser diffInfoParser;
+    private final CommitInfosParser commitInfosParser;
     private final String path;
 
     private final Supplier<String> requestPath = Suppliers.memoize(new Supplier<String>() {
@@ -53,10 +53,10 @@ public class FileApiRestClient extends FileApi.NotImplemented {
 
     public FileApiRestClient(GerritRestClient gerritRestClient,
                              RevisionApiRestClient revisionApiRestClient,
-                             DiffInfoParser diffInfoParser, String path) {
+                             CommitInfosParser commitInfosParser, String path) {
         this.gerritRestClient = gerritRestClient;
         this.revisionApiRestClient = revisionApiRestClient;
-        this.diffInfoParser = diffInfoParser;
+        this.commitInfosParser = commitInfosParser;
         this.path = path;
     }
 
@@ -125,7 +125,7 @@ public class FileApiRestClient extends FileApi.NotImplemented {
         }
 
         JsonElement jsonElement = gerritRestClient.getRequest(url);
-        return diffInfoParser.parseDiffInfo(jsonElement);
+        return commitInfosParser.parseDiffInfo(jsonElement);
     }
 
     protected String getRequestPath() {

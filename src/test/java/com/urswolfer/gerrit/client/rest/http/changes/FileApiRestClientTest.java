@@ -159,17 +159,17 @@ public class FileApiRestClientTest {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         DiffInfo diffInfo = EasyMock.createMock(DiffInfo.class);
 
-        DiffInfoParser diffInfoParser = EasyMock.createMock(DiffInfoParser.class);
-        EasyMock.expect(diffInfoParser.parseDiffInfo(jsonElement)).andReturn(diffInfo).once();
-        EasyMock.replay(diffInfoParser);
+        CommitInfosParser commitInfosParser = EasyMock.createMock(CommitInfosParser.class);
+        EasyMock.expect(commitInfosParser.parseDiffInfo(jsonElement)).andReturn(diffInfo).once();
+        EasyMock.replay(commitInfosParser);
 
         setupServices();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectGet(expectedRequestUrl, jsonElement).get();
 
-        FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, revisionApiRestClient, diffInfoParser, FILE_PATH);
+        FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, revisionApiRestClient, commitInfosParser, FILE_PATH);
         method.apply(fileApiRestClient);
 
-        EasyMock.verify(gerritRestClient, diffInfoParser);
+        EasyMock.verify(gerritRestClient, commitInfosParser);
     }
 
     private String getBaseRequestUrl() {
