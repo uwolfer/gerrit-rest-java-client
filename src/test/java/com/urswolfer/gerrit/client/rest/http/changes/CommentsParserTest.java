@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2020 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.AccountInfo;
+import com.google.gerrit.extensions.common.ChangeMessageInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.*;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -114,9 +116,35 @@ public class CommentsParserTest extends AbstractParserTest {
         ));
     }
 
+    private static final List<ChangeMessageInfo> MESSAGES_INFOS = new ArrayList<ChangeMessageInfo>();
+
+    static {
+        AccountInfo accountInfo = new AccountInfoBuilder()
+            .withName("EFregnan")
+            .withEmail("abc@gmail.com")
+            .withUsername("efregnan")
+            .withAccountId(1000000)
+            .get();
+
+        MESSAGES_INFOS.add(new ChangeMessageInfoBuilder()
+            .withId("EAF")
+            .withMessage("Patch Set 1: This is the first message.")
+            .withDate("2019-11-28 22:28:50")
+            .withAuthor(accountInfo)
+            .withRevisionNumber(1)
+            .get()
+        );
+        MESSAGES_INFOS.add(new ChangeMessageInfoBuilder()
+            .withId("YH-egE")
+            .withMessage("i think so")
+            .withDate("2019-11-28 22:33:12")
+            .withAuthor(accountInfo)
+            .withRevisionNumber(2)
+            .get()
+        );
+    }
 
     private CommentsParser commentsParser = new CommentsParser(getGson());
-
 
     @Test
     public void testParseCommentsFileName() throws Exception {
@@ -167,6 +195,12 @@ public class CommentsParserTest extends AbstractParserTest {
         GerritAssert.assertRobotCommentsEquals(robotComments, ROBOT_COMMENT_INFOS);
     }
 
+    @Test
+    public void testParseMessageInfos() throws Exception {
+        List<ChangeMessageInfo> messages = parseMessages();
+        GerritAssert.assertEquals(messages, MESSAGES_INFOS);
+    }
+
     private TreeMap<String, List<CommentInfo>> parseComments() throws Exception {
         JsonElement jsonElement = getJsonElement("comments.json");
         return commentsParser.parseCommentInfos(jsonElement);
@@ -175,5 +209,10 @@ public class CommentsParserTest extends AbstractParserTest {
     private TreeMap<String, List<RobotCommentInfo>> parseRobotComments() throws Exception {
         JsonElement jsonElement = getJsonElement("robotcomments.json");
         return commentsParser.parseRobotCommentInfos(jsonElement);
+    }
+
+    private List<ChangeMessageInfo> parseMessages() throws Exception {
+        JsonElement jsonElement = getJsonElement("messages.json");
+        return commentsParser.parseChangeMessageInfos(jsonElement);
     }
 }

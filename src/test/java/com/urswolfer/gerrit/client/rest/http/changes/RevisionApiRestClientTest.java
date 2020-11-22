@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Urs Wolfer
+ * Copyright 2013-2020 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -458,7 +458,6 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {
         ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
-        MessagesParser messagesParser = EasyMock.createMock(MessagesParser.class);
         IncludedInInfoParser includedInInfoParser = EasyMock.createMock(IncludedInInfoParser.class);
         FileInfoParser fileInfoParser = EasyMock.createMock(FileInfoParser.class);
         ReviewerInfosParser reviewerInfosParser = EasyMock.createMock(ReviewerInfosParser.class);
@@ -468,7 +467,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
         MergeableInfoParser mergeableInfoParser = EasyMock.createMock(MergeableInfoParser.class);
         ReviewInfoParser reviewInfoParser = EasyMock.createMock(ReviewInfoParser.class);
-        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser, messagesParser,
+        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser,
             includedInInfoParser, fileInfoParser, reviewerInfosParser, reviewResultParser,
             commitInfosParser, hashtagsParser, accountsParser, mergeableInfoParser, reviewInfoParser);
     }
@@ -478,7 +477,6 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                 gerritRestClient,
                 EasyMock.createMock(ChangesParser.class),
                 commentsParser,
-                EasyMock.createMock(MessagesParser.class),
                 EasyMock.createMock(IncludedInInfoParser.class),
                 EasyMock.createMock(FileInfoParser.class),
                 EasyMock.createMock(ReviewerInfosParser.class),
@@ -495,7 +493,6 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
             gerritRestClient,
             EasyMock.createMock(ChangesParser.class),
             EasyMock.createMock(CommentsParser.class),
-            EasyMock.createMock(MessagesParser.class),
             EasyMock.createMock(IncludedInInfoParser.class),
             EasyMock.createMock(FileInfoParser.class),
             EasyMock.createMock(ReviewerInfosParser.class),
@@ -512,7 +509,6 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
             gerritRestClient,
             EasyMock.createMock(ChangesParser.class),
             EasyMock.createMock(CommentsParser.class),
-            EasyMock.createMock(MessagesParser.class),
             EasyMock.createMock(IncludedInInfoParser.class),
             EasyMock.createMock(FileInfoParser.class),
             EasyMock.createMock(ReviewerInfosParser.class),
