@@ -36,7 +36,7 @@ import java.util.TreeMap;
 public class CommentsParser {
     private static final Type COMMENT_TYPE = new TypeToken<TreeMap<String, List<CommentInfo>>>() {}.getType();
     private static final Type ROBOT_COMMENT_TYPE = new TypeToken<TreeMap<String, List<RobotCommentInfo>>>() {}.getType();
-    private static final Type TYPE = new TypeToken<List<ChangeMessageInfo>>() {}.getType();
+    private static final Type CHANGE_MESSAGE_TYPE = new TypeToken<List<ChangeMessageInfo>>() {}.getType();
 
     private final Gson gson;
 
@@ -61,7 +61,7 @@ public class CommentsParser {
     }
 
     public List<ChangeMessageInfo> parseChangeMessageInfos(JsonElement result) {
-        return gson.fromJson(result, TYPE);
+        return gson.fromJson(result, CHANGE_MESSAGE_TYPE);
     }
 
     public ChangeMessageInfo parseSingleChangeMessageInfo(JsonObject result) {
