@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2020 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final ChangesRestClient changesRestClient;
     private final ChangesParser changesParser;
     private final CommentsParser commentsParser;
-    private final MessagesParser messagesParser;
     private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
     private final ReviewResultParser reviewResultParser;
@@ -68,7 +67,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                ChangesRestClient changesRestClient,
                                ChangesParser changesParser,
                                CommentsParser commentsParser,
-                               MessagesParser messagesParser,
                                IncludedInInfoParser includedInInfoParser,
                                FileInfoParser fileInfoParser,
                                ReviewResultParser reviewResultParser,
@@ -83,7 +81,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.changesRestClient = changesRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
-        this.messagesParser = messagesParser;
         this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
         this.reviewResultParser = reviewResultParser;
@@ -169,7 +166,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             changesRestClient,
             changesParser,
             commentsParser,
-            messagesParser,
             includedInInfoParser,
             fileInfoParser,
             reviewResultParser,
@@ -379,7 +375,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     public List<ChangeMessageInfo> messages() throws RestApiException {
         String request = getRequestPath() + "/messages";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return messagesParser.parseChangeMessageInfos(jsonElement);
+        return commentsParser.parseChangeMessageInfos(jsonElement);
     }
 
     protected String getRequestPath() {

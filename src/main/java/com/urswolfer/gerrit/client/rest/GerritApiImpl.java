@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2020 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,6 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
                     gerritRestClient,
                     new ChangesParser(gerritRestClient.getGson()),
                     new CommentsParser(gerritRestClient.getGson()),
-                    new MessagesParser(gerritRestClient.getGson()),
                     new IncludedInInfoParser(gerritRestClient.getGson()),
                     new FileInfoParser(gerritRestClient.getGson()),
                     new ReviewerInfosParser(gerritRestClient.getGson()),

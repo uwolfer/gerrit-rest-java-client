@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2020 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final GerritRestClient gerritRestClient;
     private final ChangesParser changesParser;
     private final CommentsParser commentsParser;
-    private final MessagesParser messagesParser;
     private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
     private final ReviewerInfosParser reviewerInfosParser;
@@ -53,7 +52,6 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangesParser changesParser,
                              CommentsParser commentsParser,
-                             MessagesParser messagesParser,
                              IncludedInInfoParser includedInInfoParser,
                              FileInfoParser fileInfoParser,
                              ReviewerInfosParser reviewerInfosParser,
@@ -66,7 +64,6 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         this.gerritRestClient = gerritRestClient;
         this.changesParser = changesParser;
         this.commentsParser = commentsParser;
-        this.messagesParser = messagesParser;
         this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
         this.reviewerInfosParser = reviewerInfosParser;
@@ -130,7 +127,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     @Override
     public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
-            messagesParser, includedInInfoParser, fileInfoParser, reviewResultParser, reviewerInfosParser, commitInfosParser,
+            includedInInfoParser, fileInfoParser, reviewResultParser, reviewerInfosParser, commitInfosParser,
             hashtagsParser, accountsParser, mergeableInfoParser, reviewInfoParser, id);
     }
 

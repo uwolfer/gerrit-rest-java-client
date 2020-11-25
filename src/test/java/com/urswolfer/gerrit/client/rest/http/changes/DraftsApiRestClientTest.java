@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 Urs Wolfer
+ * Copyright 2013-2020 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, commentsParser, null,
             null, null, null, null, null, null,
-            null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+            null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, commentsParser, null, null, null,
             null, null, revisionId);
 
@@ -67,7 +67,7 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null, null, null, null,
-            null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+            null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null,
             null, null, null, revisionId);
         DraftApiRestClient draftApiRestClient = new DraftApiRestClient(gerritRestClient, changeApiRestClient,
@@ -92,7 +92,7 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null, null, null, null,
-            null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+            null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null,
             null, null, null, revisionId);
         DraftApiRestClient draftApiRestClient = new DraftApiRestClient(gerritRestClient, changeApiRestClient,
@@ -114,7 +114,7 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
             null, null,null, null, null,
-            null, null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+            null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(gerritRestClient, changeApiRestClient, null, null, null,
             null, null, null, revisionId);
         DraftApiRestClient draftApiRestClient = new DraftApiRestClient(gerritRestClient, changeApiRestClient,
