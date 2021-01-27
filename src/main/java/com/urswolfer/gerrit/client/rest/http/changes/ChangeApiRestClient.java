@@ -378,6 +378,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         return commentsParser.parseChangeMessageInfos(jsonElement);
     }
 
+    @Override
+    public void ignore(boolean ignore) throws RestApiException {
+        String path = ignore ? "/ignore" : "/unignore";
+        String request = getRequestPath() + path;
+        gerritRestClient.putRequest(request);
+    }
+
     protected String getRequestPath() {
         return "/changes/" + id;
     }
