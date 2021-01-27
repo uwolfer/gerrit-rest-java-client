@@ -688,6 +688,36 @@ public class ChangeApiRestClientTest {
         EasyMock.verify(gerritRestClient);
     }
 
+    @Test
+    public void testIgnore() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPut("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/ignore")
+            .get();
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
+            null, null, null, null, null,
+            null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        changeApiRestClient.ignore(true);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testUnignore() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPut("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/unignore")
+            .get();
+
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null, null, null,
+            null, null, null, null, null,
+            null, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        changeApiRestClient.ignore(false);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
     private GerritRestClient getGerritRestClient(String expectedRequest, String expectedJson) throws Exception {
         return new GerritRestClientBuilder()
                 .expectPost(expectedRequest, expectedJson)
