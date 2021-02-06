@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Urs Wolfer
+ * Copyright 2013-2021 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,14 +49,12 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     private final GerritRestClient gerritRestClient;
     private final ChangesRestClient changesRestClient;
-    private final ChangesParser changesParser;
+    private final ChangeInfosParser changeInfosParser;
     private final CommentsParser commentsParser;
-    private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
     private final ReviewResultParser reviewResultParser;
     private final ReviewerInfosParser reviewerInfosParser;
     private final CommitInfosParser commitInfosParser;
-    private final HashtagsParser hashtagsParser;
     private final AccountsParser accountsParser;
     private final MergeableInfoParser mergeableInfoParser;
     private final ReviewInfoParser reviewInfoParser;
@@ -65,28 +63,24 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     public ChangeApiRestClient(GerritRestClient gerritRestClient,
                                ChangesRestClient changesRestClient,
-                               ChangesParser changesParser,
+                               ChangeInfosParser changeInfosParser,
                                CommentsParser commentsParser,
-                               IncludedInInfoParser includedInInfoParser,
                                FileInfoParser fileInfoParser,
                                ReviewResultParser reviewResultParser,
                                ReviewerInfosParser reviewerInfosParser,
                                CommitInfosParser commitInfosParser,
-                               HashtagsParser hashtagsParser,
                                AccountsParser accountsParser,
                                MergeableInfoParser mergeableInfoParser,
                                ReviewInfoParser reviewInfoParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
-        this.changesParser = changesParser;
+        this.changeInfosParser = changeInfosParser;
         this.commentsParser = commentsParser;
-        this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
         this.reviewResultParser = reviewResultParser;
         this.reviewerInfosParser = reviewerInfosParser;
         this.commitInfosParser = commitInfosParser;
-        this.hashtagsParser = hashtagsParser;
         this.accountsParser = accountsParser;
         this.mergeableInfoParser = mergeableInfoParser;
         this.reviewInfoParser = reviewInfoParser;
@@ -164,14 +158,12 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         gerritRestClient.postRequest(request, json);
         return new ChangeApiRestClient(gerritRestClient,
             changesRestClient,
-            changesParser,
+                changeInfosParser,
             commentsParser,
-            includedInInfoParser,
             fileInfoParser,
             reviewResultParser,
             reviewerInfosParser,
             commitInfosParser,
-            hashtagsParser,
             accountsParser,
             mergeableInfoParser,
             reviewInfoParser,
@@ -208,7 +200,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     public IncludedInInfo includedIn() throws RestApiException {
         String request = getRequestPath() + "/in";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return includedInInfoParser.parseIncludedInInfos(jsonElement);
+        return changeInfosParser.parseIncludedInInfos(jsonElement);
     }
 
     @Deprecated
@@ -276,7 +268,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             url += '?' + query;
         }
         JsonElement jsonElement = gerritRestClient.getRequest(url);
-        return changesParser.parseSingleChangeInfo(jsonElement);
+        return changeInfosParser.parseSingleChangeInfo(jsonElement);
     }
 
     @Override
@@ -305,7 +297,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     public Set<String> getHashtags() throws RestApiException {
         String request = getRequestPath() + "/hashtags";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return hashtagsParser.parseHashtags(jsonElement);
+        return changeInfosParser.parseHashtags(jsonElement);
     }
 
     @Override
@@ -326,7 +318,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     public ChangeInfo check() throws RestApiException {
         String request = getRequestPath() + "/check";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return changesParser.parseSingleChangeInfo(jsonElement);
+        return changeInfosParser.parseSingleChangeInfo(jsonElement);
     }
 
     @Override
@@ -334,7 +326,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String request = getRequestPath() + "/check";
         String json = gerritRestClient.getGson().toJson(in);
         JsonElement jsonElement = gerritRestClient.postRequest(request, json);
-        return changesParser.parseSingleChangeInfo(jsonElement);
+        return changeInfosParser.parseSingleChangeInfo(jsonElement);
     }
 
     @Override
@@ -368,7 +360,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     public List<ChangeInfo> submittedTogether() throws RestApiException {
         String url = getRequestPath() + "/submitted_together";
         JsonElement jsonElement = gerritRestClient.getRequest(url);
-        return changesParser.parseChangeInfos(jsonElement);
+        return changeInfosParser.parseChangeInfos(jsonElement);
     }
 
     @Override

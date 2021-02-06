@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Urs Wolfer
+ * Copyright 2013-2021 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -456,33 +456,29 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {
-        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
-        IncludedInInfoParser includedInInfoParser = EasyMock.createMock(IncludedInInfoParser.class);
         FileInfoParser fileInfoParser = EasyMock.createMock(FileInfoParser.class);
         ReviewerInfosParser reviewerInfosParser = EasyMock.createMock(ReviewerInfosParser.class);
         ReviewResultParser reviewResultParser = EasyMock.createMock(ReviewResultParser.class);
         CommitInfosParser commitInfosParser = EasyMock.createMock(CommitInfosParser.class);
-        HashtagsParser hashtagsParser = EasyMock.createMock(HashtagsParser.class);
         AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
         MergeableInfoParser mergeableInfoParser = EasyMock.createMock(MergeableInfoParser.class);
         ReviewInfoParser reviewInfoParser = EasyMock.createMock(ReviewInfoParser.class);
-        return new ChangesRestClient(gerritRestClient, changesParser, commentsParser,
-            includedInInfoParser, fileInfoParser, reviewerInfosParser, reviewResultParser,
-            commitInfosParser, hashtagsParser, accountsParser, mergeableInfoParser, reviewInfoParser);
+        return new ChangesRestClient(gerritRestClient, changeInfosParser, commentsParser,
+            fileInfoParser, reviewerInfosParser, reviewResultParser,
+            commitInfosParser, accountsParser, mergeableInfoParser, reviewInfoParser);
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
         return new ChangesRestClient(
                 gerritRestClient,
-                EasyMock.createMock(ChangesParser.class),
+                EasyMock.createMock(ChangeInfosParser.class),
                 commentsParser,
-                EasyMock.createMock(IncludedInInfoParser.class),
                 EasyMock.createMock(FileInfoParser.class),
                 EasyMock.createMock(ReviewerInfosParser.class),
                 EasyMock.createMock(ReviewResultParser.class),
                 EasyMock.createMock(CommitInfosParser.class),
-                EasyMock.createMock(HashtagsParser.class),
                 EasyMock.createMock(AccountsParser.class),
                 EasyMock.createMock(MergeableInfoParser.class),
                 EasyMock.createMock(ReviewInfoParser.class));
@@ -491,14 +487,12 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, MergeableInfoParser mergeableInfoParser) {
         return new ChangesRestClient(
             gerritRestClient,
-            EasyMock.createMock(ChangesParser.class),
+            EasyMock.createMock(ChangeInfosParser.class),
             EasyMock.createMock(CommentsParser.class),
-            EasyMock.createMock(IncludedInInfoParser.class),
             EasyMock.createMock(FileInfoParser.class),
             EasyMock.createMock(ReviewerInfosParser.class),
             EasyMock.createMock(ReviewResultParser.class),
             EasyMock.createMock(CommitInfosParser.class),
-            EasyMock.createMock(HashtagsParser.class),
             EasyMock.createMock(AccountsParser.class),
             mergeableInfoParser,
             EasyMock.createMock(ReviewInfoParser.class));
@@ -507,14 +501,12 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommitInfosParser commitInfosParser) {
         return new ChangesRestClient(
             gerritRestClient,
-            EasyMock.createMock(ChangesParser.class),
+            EasyMock.createMock(ChangeInfosParser.class),
             EasyMock.createMock(CommentsParser.class),
-            EasyMock.createMock(IncludedInInfoParser.class),
             EasyMock.createMock(FileInfoParser.class),
             EasyMock.createMock(ReviewerInfosParser.class),
             EasyMock.createMock(ReviewResultParser.class),
             commitInfosParser,
-            EasyMock.createMock(HashtagsParser.class),
             EasyMock.createMock(AccountsParser.class),
             EasyMock.createMock(MergeableInfoParser.class),
             EasyMock.createMock(ReviewInfoParser.class));

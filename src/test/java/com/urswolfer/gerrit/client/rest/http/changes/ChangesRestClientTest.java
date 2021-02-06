@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2021 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,16 +84,16 @@ public class ChangesRestClientTest {
     @Test(dataProvider = "ChangesQueryTestCases")
     public void testQueryWithParameter(ChangesQueryTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
-        ChangesParser changesParser = setupChangesParser();
+        ChangeInfosParser changeInfosParser = setupChangesParser();
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null,
-            null, null, null, null,
-            null, null, null, null);
+        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changeInfosParser, null, null,
+            null, null, null,
+            null, null, null);
 
         Changes.QueryRequest queryRequest = changes.query();
         testCase.queryParameter.apply(queryRequest).get();
 
-        EasyMock.verify(gerritRestClient, changesParser);
+        EasyMock.verify(gerritRestClient, changeInfosParser);
     }
 
     @Test
@@ -101,11 +101,11 @@ public class ChangesRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectGet("/changes/?q=is:open", MOCK_JSON_ELEMENT)
                 .get();
-        ChangesParser changesParser = setupChangesParser();
+        ChangeInfosParser changeInfosParser = setupChangesParser();
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null,
-            null, null, null, null, null,
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changeInfosParser, commentsParser, null,
+            null, null, null,
             null, null, null);
         changesRestClient.query("is:open").get();
 
@@ -115,11 +115,11 @@ public class ChangesRestClientTest {
     @Test
     public void testIdAsInt() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
-        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null,
-            null, null, null, null, null,
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changeInfosParser, commentsParser, null,
+            null, null, null,
             null, null, null);
 
         ChangeApi changeApi = changesRestClient.id(123);
@@ -130,11 +130,11 @@ public class ChangesRestClientTest {
     @Test
     public void testIdAsProjectWithNr() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
-        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null,
-            null, null, null, null, null,
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changeInfosParser, commentsParser, null,
+            null, null, null,
             null, null, null);
 
         ChangeApi changeApi = changesRestClient.id("packages/test", 123);
@@ -145,12 +145,12 @@ public class ChangesRestClientTest {
     @Test
     public void testIdAsTriplet() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
-        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changesParser, commentsParser, null,
-            null,  null, null, null, null,
-            null, null, null);
+        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changeInfosParser, commentsParser, null,
+            null,  null, null, null,
+            null, null);
 
         ChangeApi changeApi = changesRestClient.id("packages/test", "master", "Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
 
@@ -161,15 +161,15 @@ public class ChangesRestClientTest {
     public void testQuery() throws Exception {
         ChangesQueryTestCase testCase = new ChangesQueryTestCase().expectUrl("/changes/");
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
-        ChangesParser changesParser = setupChangesParser();
+        ChangeInfosParser changeInfosParser = setupChangesParser();
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser,null, null,
-            null, null, null, null, null,
+        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changeInfosParser,null,
+            null, null, null, null,
             null, null, null);
 
         changes.query().get();
 
-        EasyMock.verify(gerritRestClient, changesParser);
+        EasyMock.verify(gerritRestClient, changeInfosParser);
     }
 
     @Test
@@ -181,17 +181,17 @@ public class ChangesRestClientTest {
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase, changeInputJsonString);
         ChangeInfo changeInfo = new ChangeInfo();
         changeInfo._number = 29;
-        ChangesParser changesParser = setupChangesParserForCreate(changeInput,
+        ChangeInfosParser changeInfosParser = setupChangesParserForCreate(changeInput,
             changeInputJsonString, changeInfo);
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changesParser, null, null,
-            null, null, null, null, null,
+        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changeInfosParser, null,
+            null, null, null, null,
             null, null, null);
 
         ChangeApi changeApi = changes.create(changeInput);
 
         Truth.assertThat(changeApi.id()).isEqualTo(Integer.toString(changeInfo._number));
-        EasyMock.verify(gerritRestClient, changesParser);
+        EasyMock.verify(gerritRestClient, changeInfosParser);
     }
 
     private GerritRestClient setupGerritRestClient(ChangesQueryTestCase testCase) throws Exception {
@@ -217,26 +217,26 @@ public class ChangesRestClientTest {
         return gerritRestClient;
     }
 
-    private ChangesParser setupChangesParser() throws Exception {
-        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
-        EasyMock.expect(changesParser.parseChangeInfos(MOCK_JSON_ELEMENT))
+    private ChangeInfosParser setupChangesParser() throws Exception {
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
+        EasyMock.expect(changeInfosParser.parseChangeInfos(MOCK_JSON_ELEMENT))
                 .andReturn(Lists.<ChangeInfo>newArrayList())
                 .once();
-        EasyMock.replay(changesParser);
-        return changesParser;
+        EasyMock.replay(changeInfosParser);
+        return changeInfosParser;
     }
 
-    private ChangesParser setupChangesParserForCreate(ChangeInput changeInput,
-        String changeInputJsonString, ChangeInfo changeInfo) throws Exception {
-        ChangesParser changesParser = EasyMock.createMock(ChangesParser.class);
-        EasyMock.expect(changesParser.generateChangeInput(changeInput))
+    private ChangeInfosParser setupChangesParserForCreate(ChangeInput changeInput,
+                                                          String changeInputJsonString, ChangeInfo changeInfo) throws Exception {
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
+        EasyMock.expect(changeInfosParser.generateChangeInput(changeInput))
             .andReturn(changeInputJsonString)
             .once();
-        EasyMock.expect(changesParser.parseSingleChangeInfo(MOCK_JSON_ELEMENT))
+        EasyMock.expect(changeInfosParser.parseSingleChangeInfo(MOCK_JSON_ELEMENT))
             .andReturn(changeInfo)
             .once();
-        EasyMock.replay(changesParser);
-        return changesParser;
+        EasyMock.replay(changeInfosParser);
+        return changeInfosParser;
     }
 
     private static ChangesQueryTestCase queryParameter(TestQueryRequest parameter) {

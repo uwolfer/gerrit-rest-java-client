@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Urs Wolfer
+ * Copyright 2013-2021 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,39 +37,33 @@ import java.util.List;
 public class ChangesRestClient extends Changes.NotImplemented implements Changes {
 
     private final GerritRestClient gerritRestClient;
-    private final ChangesParser changesParser;
+    private final ChangeInfosParser changeInfosParser;
     private final CommentsParser commentsParser;
-    private final IncludedInInfoParser includedInInfoParser;
     private final FileInfoParser fileInfoParser;
     private final ReviewerInfosParser reviewerInfosParser;
     private final ReviewResultParser reviewResultParser;
     private final CommitInfosParser commitInfosParser;
-    private final HashtagsParser hashtagsParser;
     private final AccountsParser accountsParser;
     private final MergeableInfoParser mergeableInfoParser;
     private final ReviewInfoParser reviewInfoParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
-                             ChangesParser changesParser,
+                             ChangeInfosParser changeInfosParser,
                              CommentsParser commentsParser,
-                             IncludedInInfoParser includedInInfoParser,
                              FileInfoParser fileInfoParser,
                              ReviewerInfosParser reviewerInfosParser,
                              ReviewResultParser reviewResultParser,
                              CommitInfosParser commitInfosParser,
-                             HashtagsParser hashtagsParser,
                              AccountsParser accountsParser,
                              MergeableInfoParser mergeableInfoParser,
                              ReviewInfoParser reviewInfoParser) {
         this.gerritRestClient = gerritRestClient;
-        this.changesParser = changesParser;
+        this.changeInfosParser = changeInfosParser;
         this.commentsParser = commentsParser;
-        this.includedInInfoParser = includedInInfoParser;
         this.fileInfoParser = fileInfoParser;
         this.reviewerInfosParser = reviewerInfosParser;
         this.reviewResultParser = reviewResultParser;
         this.commitInfosParser = commitInfosParser;
-        this.hashtagsParser = hashtagsParser;
         this.accountsParser = accountsParser;
         this.mergeableInfoParser = mergeableInfoParser;
         this.reviewInfoParser = reviewInfoParser;
@@ -116,7 +110,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         }
 
         JsonElement jsonElement = gerritRestClient.getRequest(url);
-        return changesParser.parseChangeInfos(jsonElement);
+        return changeInfosParser.parseChangeInfos(jsonElement);
     }
 
     @Override
@@ -126,9 +120,9 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(String id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, changesParser, commentsParser,
-            includedInInfoParser, fileInfoParser, reviewResultParser, reviewerInfosParser, commitInfosParser,
-            hashtagsParser, accountsParser, mergeableInfoParser, reviewInfoParser, id);
+        return new ChangeApiRestClient(gerritRestClient, this, changeInfosParser, commentsParser,
+            fileInfoParser, reviewResultParser, reviewerInfosParser, commitInfosParser,
+            accountsParser, mergeableInfoParser, reviewInfoParser, id);
     }
 
     @Override
@@ -148,9 +142,9 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         }
 
         String url = "/changes/";
-        String changeInput = changesParser.generateChangeInput(in);
+        String changeInput = changeInfosParser.generateChangeInput(in);
         JsonElement result = gerritRestClient.postRequest(url, changeInput);
-        ChangeInfo info = changesParser.parseSingleChangeInfo(result);
+        ChangeInfo info = changeInfosParser.parseSingleChangeInfo(result);
         return id(info._number);
     }
 }
