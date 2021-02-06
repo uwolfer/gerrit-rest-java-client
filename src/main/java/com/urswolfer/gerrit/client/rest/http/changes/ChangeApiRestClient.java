@@ -158,7 +158,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         gerritRestClient.postRequest(request, json);
         return new ChangeApiRestClient(gerritRestClient,
             changesRestClient,
-                changeInfosParser,
+            changeInfosParser,
             commentsParser,
             fileInfoParser,
             reviewResultParser,

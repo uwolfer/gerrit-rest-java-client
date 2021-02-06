@@ -226,8 +226,7 @@ public class ChangesRestClientTest {
         return changeInfosParser;
     }
 
-    private ChangeInfosParser setupChangesParserForCreate(ChangeInput changeInput,
-                                                          String changeInputJsonString, ChangeInfo changeInfo) throws Exception {
+    private ChangeInfosParser setupChangesParserForCreate(ChangeInput changeInput, String changeInputJsonString, ChangeInfo changeInfo) throws Exception {
         ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
         EasyMock.expect(changeInfosParser.generateChangeInput(changeInput))
             .andReturn(changeInputJsonString)
