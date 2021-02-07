@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2021 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.api.changes.IncludedInInfo;
 import com.google.gerrit.extensions.client.ChangeStatus;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
@@ -27,12 +28,14 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.*;
 import org.testng.annotations.Test;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- * @author Thomas Forrer
+ * @author Thomas Forrer - EFregnan
  */
-public class ChangesParserTest extends AbstractParserTest {
+public class ChangeInfosParserTest extends AbstractParserTest {
     private static final List<ChangeInfo> CHANGE_INFOS = Lists.newArrayList();
 
     static {
@@ -84,13 +87,21 @@ public class ChangesParserTest extends AbstractParserTest {
                 .get());
     }
 
-    private final ChangesParser changesParser = new ChangesParser(getGson());
+    private static final Set<String> HASHTAGS = new LinkedHashSet<>();
+
+    static {
+        HASHTAGS.add("first");
+        HASHTAGS.add("last");
+    }
+
+    private final ChangeInfosParser changeInfosParser = new ChangeInfosParser(getGson());
+
 
     @Test
     public void testParseChangeInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("changes.json");
 
-        List<ChangeInfo> changeInfos = changesParser.parseChangeInfos(jsonElement);
+        List<ChangeInfo> changeInfos = changeInfosParser.parseChangeInfos(jsonElement);
         Truth.assertThat(changeInfos.size()).isEqualTo(3);
 
         for (int i = 0; i < changeInfos.size(); i++) {
@@ -104,7 +115,7 @@ public class ChangesParserTest extends AbstractParserTest {
     public void testParseSingleChangeInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("change.json");
 
-        List<ChangeInfo> changeInfos = changesParser.parseChangeInfos(jsonElement);
+        List<ChangeInfo> changeInfos = changeInfosParser.parseChangeInfos(jsonElement);
 
         Truth.assertThat(changeInfos.size()).isEqualTo(1);
 
@@ -115,7 +126,7 @@ public class ChangesParserTest extends AbstractParserTest {
     public void testParseSingleChangeInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("change.json");
 
-        ChangeInfo changeInfo = changesParser.parseSingleChangeInfo(jsonElement);
+        ChangeInfo changeInfo = changeInfosParser.parseSingleChangeInfo(jsonElement);
 
         GerritAssert.assertEquals(changeInfo, CHANGE_INFOS.get(0));
     }
@@ -129,12 +140,33 @@ public class ChangesParserTest extends AbstractParserTest {
         changeInput.topic = "create-change-in-browser";
         changeInput.status = ChangeStatus.DRAFT;
 
-        String outputForTesting = changesParser.generateChangeInput(changeInput);
+        String outputForTesting = changeInfosParser.generateChangeInput(changeInput);
 
         ChangeInput parsedJson = new Gson().fromJson(outputForTesting, ChangeInput.class);
         Truth.assertThat(parsedJson.project).isEqualTo(changeInput.project);
         Truth.assertThat(parsedJson.subject).isEqualTo(changeInput.subject);
         Truth.assertThat(parsedJson.topic).isEqualTo(changeInput.topic);
         Truth.assertThat(parsedJson.status).isEqualTo(changeInput.status);
+    }
+
+    @Test
+    public void testParseHashtags() throws Exception {
+        Set<String> hashtags = parseHashtags();
+        GerritAssert.assertEquals(hashtags, HASHTAGS);
+    }
+
+    private Set<String> parseHashtags() throws Exception {
+        JsonElement jsonElement = getJsonElement("hashtags.json");
+        return changeInfosParser.parseHashtags(jsonElement);
+    }
+
+    @Test
+    public void testParseEditInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("includedin.json");
+        IncludedInInfo includedInInfo = changeInfosParser.parseIncludedInInfos(jsonElement);
+        Truth.assertThat(includedInInfo.branches).hasSize(4);
+        Truth.assertThat(includedInInfo.tags).hasSize(3);
+        Truth.assertThat(includedInInfo.branches).containsAllOf("integration/master", "integration/releases/2.12", "master", "releases/2.12");
+        Truth.assertThat(includedInInfo.tags).containsAllOf("2017-12_v2.12", "2017-12_v2.13", "v2.13.1_xyz");
     }
 }
