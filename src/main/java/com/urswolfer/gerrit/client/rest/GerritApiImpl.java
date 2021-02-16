@@ -31,6 +31,7 @@ import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsRestClient;
 import com.urswolfer.gerrit.client.rest.http.accounts.SshKeysParser;
 import com.urswolfer.gerrit.client.rest.http.changes.*;
+import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
 import com.urswolfer.gerrit.client.rest.http.config.ConfigRestClient;
 import com.urswolfer.gerrit.client.rest.http.groups.GroupsParser;
 import com.urswolfer.gerrit.client.rest.http.groups.GroupsRestClient;

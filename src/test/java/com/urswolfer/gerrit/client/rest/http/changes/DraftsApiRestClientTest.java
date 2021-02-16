@@ -22,6 +22,7 @@ import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.changes.parsers.CommentsParser;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;

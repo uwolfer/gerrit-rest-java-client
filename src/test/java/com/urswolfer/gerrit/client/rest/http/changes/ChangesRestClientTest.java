@@ -27,6 +27,8 @@ import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.changes.parsers.ChangeInfosParser;
+import com.urswolfer.gerrit.client.rest.http.changes.parsers.CommentsParser;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.DataProvider;

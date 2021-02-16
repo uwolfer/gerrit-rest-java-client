@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Urs Wolfer
+ * Copyright 2013-2021 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.changes;
+package com.urswolfer.gerrit.client.rest.http.changes.parsers;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gerrit.extensions.common.FileInfo;
+import com.google.gerrit.extensions.api.changes.ReviewResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
-import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
- * @author Thomas Forrer
+ * @author Urs Wolfer
  */
-public class FileInfoParser {
-    private static final Type TYPE = new TypeToken<LinkedHashMap<String, FileInfo>>() {}.getType();
+public class ReviewResultParser {
 
     private final Gson gson;
 
-    public FileInfoParser(Gson gson) {
+    public ReviewResultParser(Gson gson) {
         this.gson = gson;
     }
 
-    public Map<String, FileInfo> parseFileInfos(JsonElement jsonElement) {
-        return gson.fromJson(jsonElement, TYPE);
+    public ReviewResult parseReviewResult(JsonElement result) {
+        return gson.fromJson(result, ReviewResult.class);
     }
 }

@@ -27,6 +27,7 @@ import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
+import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.apache.commons.codec.binary.Base64;
