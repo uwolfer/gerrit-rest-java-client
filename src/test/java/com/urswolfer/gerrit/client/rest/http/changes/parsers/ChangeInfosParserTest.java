@@ -99,7 +99,7 @@ public class ChangeInfosParserTest extends AbstractParserTest {
 
     @Test
     public void testParseChangeInfos() throws Exception {
-        JsonElement jsonElement = getJsonElement("changes.json");
+        JsonElement jsonElement = getJsonElement("../changes.json");
 
         List<ChangeInfo> changeInfos = changeInfosParser.parseChangeInfos(jsonElement);
         Truth.assertThat(changeInfos.size()).isEqualTo(3);
