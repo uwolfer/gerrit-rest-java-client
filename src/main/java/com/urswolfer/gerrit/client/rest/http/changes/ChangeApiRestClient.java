@@ -37,6 +37,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
+import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
 import com.urswolfer.gerrit.client.rest.http.config.ServerRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 

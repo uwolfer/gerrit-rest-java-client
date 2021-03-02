@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.changes;
+package com.urswolfer.gerrit.client.rest.http.changes.parsers;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.api.changes.IncludedInInfo;

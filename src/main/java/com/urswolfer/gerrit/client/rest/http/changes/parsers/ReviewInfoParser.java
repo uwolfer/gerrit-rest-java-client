@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 Urs Wolfer
+ * Copyright 2013-2021 Urs Wolfer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.changes;
+package com.urswolfer.gerrit.client.rest.http.changes.parsers;
 
 import java.lang.reflect.Type;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import com.google.common.reflect.TypeToken;
