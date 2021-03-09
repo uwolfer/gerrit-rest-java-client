@@ -235,7 +235,7 @@ public class GroupsRestClientTest {
 
     @Test
     public void testQueryGroupsWithQueryParam() throws Exception {
-        GroupQueryTestCase testCase = queryTestCase().expectUrl("/groups/?query2=Q");
+        GroupQueryTestCase testCase = queryTestCase().expectUrl("/groups/?query=Q");
         GroupsRestClient groupsRestClient = testCase.getGroupsRestClient();
         groupsRestClient.query("Q").get();
         testCase.verify();
@@ -252,11 +252,11 @@ public class GroupsRestClientTest {
             .transform(
                 Arrays.asList(queryTestCase().withQueryParameter(new TestQueryRequest()).expectUrl("/groups/"),
                     queryTestCase().withQueryParameter(new TestQueryRequest().withQuery("inname:test"))
-                        .expectUrl("/groups/?query2=inname:test"),
+                        .expectUrl("/groups/?query=inname:test"),
                     queryTestCase()
                         .withQueryParameter(new TestQueryRequest().withQuery("inname:test")
                             .withLimit(25).withStart(50))
-                        .expectUrl("/groups/?query2=inname:test&limit=25&start=50")),
+                        .expectUrl("/groups/?query=inname:test&limit=25&start=50")),
                 testCase -> new GroupQueryTestCase[]{testCase})
             .iterator();
     }
