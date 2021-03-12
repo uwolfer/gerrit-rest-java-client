@@ -144,12 +144,6 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
         };
     }
 
-    /**
-     * this method may does not support Gerrit versions lower than 3.2.0
-     * @param queryRequest {@link QueryRequest}
-     * @return {@link List<GroupInfo>}
-     * @throws {@link RestApiException}
-     */
     protected List<GroupInfo> query(QueryRequest queryRequest) throws RestApiException {
         String query = "";
         if (!Strings.isNullOrEmpty(queryRequest.getQuery())) {
