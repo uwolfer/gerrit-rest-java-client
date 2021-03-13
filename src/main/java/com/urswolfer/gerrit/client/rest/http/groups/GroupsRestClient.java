@@ -144,11 +144,13 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
         };
     }
 
+    /**
+     * this method may does not support Gerrit versions lower than 3.2.0
+     */
     protected List<GroupInfo> query(QueryRequest queryRequest) throws RestApiException {
         String query = "";
         if (!Strings.isNullOrEmpty(queryRequest.getQuery())) {
-            // param is "query2", not "query".
-            query = UrlUtils.appendToUrlQuery(query, "query2=" + queryRequest.getQuery());
+            query = UrlUtils.appendToUrlQuery(query, "query=" + queryRequest.getQuery());
         }
         if (queryRequest.getLimit() > 0) {
             query = UrlUtils.appendToUrlQuery(query, "limit=" + queryRequest.getLimit());
