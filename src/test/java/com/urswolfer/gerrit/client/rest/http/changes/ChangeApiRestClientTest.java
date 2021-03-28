@@ -497,6 +497,32 @@ public class ChangeApiRestClientTest {
     }
 
     @Test
+    public void testSetMessage() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+            "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/message",
+            "{\"message\":\"New Commit message \\n\\nChange-Id: I10394472cbd17dd12454f229e4f6de00b143a444\\n\"}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        CommitMessageInput commitMessageInput = new CommitMessageInput();
+        commitMessageInput.message = "New Commit message \n\nChange-Id: I10394472cbd17dd12454f229e4f6de00b143a444\n";
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").setMessage(commitMessageInput);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testSetHashtags() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+            "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/hashtags",
+            "{\"add\":[\"hashtag3\"],\"remove\":[\"hashtag2\"]}");
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        HashtagsInput hashtagsInput = new HashtagsInput(new HashSet<>(Arrays.asList("hashtag3")), new HashSet<>(Arrays.asList("hashtag2")));
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").setHashtags(hashtagsInput);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
     public void testGetAssignee() throws Exception {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
