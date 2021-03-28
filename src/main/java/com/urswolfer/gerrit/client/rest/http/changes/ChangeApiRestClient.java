@@ -18,18 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-import com.google.gerrit.extensions.api.changes.AbandonInput;
-import com.google.gerrit.extensions.api.changes.AddReviewerInput;
-import com.google.gerrit.extensions.api.changes.AddReviewerResult;
-import com.google.gerrit.extensions.api.changes.ChangeApi;
-import com.google.gerrit.extensions.api.changes.ChangeEditApi;
-import com.google.gerrit.extensions.api.changes.FixInput;
-import com.google.gerrit.extensions.api.changes.IncludedInInfo;
-import com.google.gerrit.extensions.api.changes.MoveInput;
-import com.google.gerrit.extensions.api.changes.RestoreInput;
-import com.google.gerrit.extensions.api.changes.RevertInput;
-import com.google.gerrit.extensions.api.changes.ReviewerInfo;
-import com.google.gerrit.extensions.api.changes.RevisionApi;
+import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.*;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -292,6 +281,27 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     @Override
     public ChangeEditApi edit() throws RestApiException {
         return new ChangeEditApiRestClient(gerritRestClient, id);
+    }
+
+    @Override
+    public void setMessage(String message) throws RestApiException {
+        CommitMessageInput commitMessageInput = new CommitMessageInput();
+        commitMessageInput.message = message;
+        setMessage(commitMessageInput);
+    }
+
+    @Override
+    public void setMessage(CommitMessageInput in) throws RestApiException {
+        String request = getRequestPath() + "/message";
+        String json = gerritRestClient.getGson().toJson(in);
+        gerritRestClient.postRequest(request, json);
+    }
+
+    @Override
+    public void setHashtags(HashtagsInput input) throws RestApiException {
+        String request = getRequestPath() + "/hashtags";
+        String json = gerritRestClient.getGson().toJson(input);
+        gerritRestClient.postRequest(request, json);
     }
 
     @Override
