@@ -161,6 +161,21 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public RevertSubmissionInfo revertSubmission() throws RestApiException {
+        return revertSubmission(new RevertInput());
+    }
+
+    @Override
+    public RevertSubmissionInfo revertSubmission(RevertInput in) throws RestApiException{
+        String request = getRequestPath() + "/revert_submission";
+        String json = gerritRestClient.getGson().toJson(in);
+        JsonElement revertedChanges = gerritRestClient.postRequest(request, json);
+        RevertSubmissionInfo revertSubmissionInfo = new RevertSubmissionInfo();
+        revertSubmissionInfo.revertChanges = changeInfosParser.parseChangeInfos(revertedChanges);
+        return revertSubmissionInfo;
+    }
+
+    @Override
     public void publish() throws RestApiException {
         String request = getRequestPath() + "/publish";
         gerritRestClient.postRequest(request);
