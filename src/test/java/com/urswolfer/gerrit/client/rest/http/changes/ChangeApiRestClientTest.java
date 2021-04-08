@@ -246,6 +246,32 @@ public class ChangeApiRestClientTest {
     }
 
     @Test
+    public void testRevertSubmission() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+            "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revert_submission",
+            "{\"notify\":\"ALL\"}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").revertSubmission();
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testRevertSubmissionWithMessage() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+            "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revert_submission",
+            "{\"message\":\"Submission need revert.\",\"notify\":\"ALL\"}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        RevertInput revertInput = new RevertInput();
+        revertInput.message = "Submission need revert.";
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").revertSubmission(revertInput);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
     public void testSuggestReviewers() throws Exception {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
