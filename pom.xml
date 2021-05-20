@@ -71,7 +71,7 @@
     <dependency>
       <groupId>com.google.truth</groupId>
       <artifactId>truth</artifactId>
-      <version>0.37</version><!-- do not update - this is the last release with Java 6 support -->
+      <version>0.44</version>
       <scope>test</scope>
     </dependency>
     <dependency>
