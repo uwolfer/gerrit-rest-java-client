@@ -36,5 +36,5 @@ cache:
 
 after_success:
   if [ "$TRAVIS_JDK_VERSION" == "openjdk11" ]; then
-    mvn clean cobertura:cobertura coveralls:report jacoco:prepare-agent test jacoco:report sonar:sonar;
+    mvn clean test jacoco:report coveralls:report jacoco:prepare-agent sonar:sonar;
   fi
