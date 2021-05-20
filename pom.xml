@@ -39,7 +39,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jdk.min.version>8</jdk.min.version>
-    <jetty.version>8.1.22.v20160922</jetty.version> <!-- we need jetty 8 because of java 1.6 compatibility -->
+    <jetty.version>8.2.0.v20160908</jetty.version>
   </properties>
 
   <dependencies>
