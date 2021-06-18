@@ -93,4 +93,11 @@ public class GroupsParserTest extends AbstractParserTest {
         List<AccountInfo> accountInfos = groupsParser.parseGroupMembers(jsonElement);
         Truth.assertThat(accountInfos).hasSize(2);
     }
+
+    @Test
+    public void testParseGroupName() throws Exception {
+        JsonElement jsonElement = getJsonElement("groups.json");
+        List<GroupInfo> groupInfos = groupsParser.parseGroupInfos(jsonElement);
+        Truth.assertThat(groupInfos.get(0).name).isEqualTo("Administrators");
+    }
 }
