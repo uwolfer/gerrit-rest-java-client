@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.Map;
 
 /**
  * @author Shawn Stafford
@@ -55,6 +56,9 @@ public class GroupsParser {
             return gson.fromJson(result, GROUP_LIST_TYPE);
         } else {
             SortedMap<String, GroupInfo> map = gson.fromJson(result, GROUP_MAP_TYPE);
+            for(Map.Entry<String,GroupInfo> entry : map.entrySet()){
+                entry.getValue().name = entry.getKey();
+            }
             return new ArrayList<GroupInfo>(map.values());
         }
     }
