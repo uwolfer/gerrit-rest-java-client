@@ -463,7 +463,7 @@ public class ChangeApiRestClientTest {
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/messages", jsonElement)
             .get();
 
-        List<ChangeMessageInfo> expectedMessageInfos = new ArrayList<ChangeMessageInfo>();
+        List<ChangeMessageInfo> expectedMessageInfos = new ArrayList<>();
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
         EasyMock.expect(commentsParser.parseChangeMessageInfos(jsonElement)).andReturn(expectedMessageInfos).once();
         EasyMock.replay(commentsParser);
@@ -577,7 +577,7 @@ public class ChangeApiRestClientTest {
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/past_assignees", jsonElement)
             .get();
 
-        List<AccountInfo> expectedPastAssignees = new ArrayList<AccountInfo>();
+        List<AccountInfo> expectedPastAssignees = new ArrayList<>();
         AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
         EasyMock.expect(accountsParser.parseAccountInfos(jsonElement)).andReturn(expectedPastAssignees).once();
         EasyMock.replay(accountsParser);
@@ -659,7 +659,7 @@ public class ChangeApiRestClientTest {
     public void testChangeGetShouldUseAllOptionsOnLatestGerrit() throws Exception {
         String expectedChangeId = "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940";
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
-        List<String> allOptions = new ArrayList<String>();
+        List<String> allOptions = new ArrayList<>();
         for(Iterator<ListChangesOption> optionIterator = EnumSet.allOf(ListChangesOption.class).iterator(); optionIterator.hasNext(); ) {
             ListChangesOption option = optionIterator.next();
             if(option != ListChangesOption.CHECK) {

@@ -91,7 +91,7 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
 
         JsonElement result = gerritRestClient.getRequest(url);
         if (result == null) {
-            return new TreeMap<String, ProjectInfo>();
+            return new TreeMap<>();
         }
         return projectsParser.parseProjectInfos(result);
     }

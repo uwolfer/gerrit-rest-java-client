@@ -70,7 +70,7 @@ public class ProjectApiRestClientTest {
     @Test
     public void testGetBranchesForProject() throws Exception {
         String projectName = "sandbox";
-        ArrayList<BranchInfo> mockBranches = new ArrayList<BranchInfo>();
+        ArrayList<BranchInfo> mockBranches = new ArrayList<>();
         mockBranches.add(MOCK_BRANCH_INFO);
         mockBranches.add(MOCK_BRANCH_INFO);
         mockBranches.add(MOCK_BRANCH_INFO);
@@ -185,9 +185,9 @@ public class ProjectApiRestClientTest {
         ProjectAccessInput projectAccessInput = new ProjectAccessInput();
         AccessSectionInfo accessSectionInfo = new AccessSectionInfo();
         PermissionInfo permissionInfo = new PermissionInfo("", false);
-        projectAccessInput.add = new HashMap<String, AccessSectionInfo>();
-        permissionInfo.rules = new HashMap<String, PermissionRuleInfo>();
-        accessSectionInfo.permissions = new HashMap<String, PermissionInfo>();
+        projectAccessInput.add = new HashMap<>();
+        permissionInfo.rules = new HashMap<>();
+        accessSectionInfo.permissions = new HashMap<>();
         permissionInfo.rules.put("d064e6028af64945c9512108a9a4f5bde6baaebf", new PermissionRuleInfo(Action.ALLOW, false));
         accessSectionInfo.permissions.put("read", permissionInfo);
         projectAccessInput.add.put("refs/*", accessSectionInfo);

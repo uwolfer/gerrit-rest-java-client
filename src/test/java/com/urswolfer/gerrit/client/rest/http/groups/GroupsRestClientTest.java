@@ -164,7 +164,7 @@ public class GroupsRestClientTest {
         public GroupsParser setupGroupsParser() throws Exception {
             groupsParser = EasyMock.createMock(GroupsParser.class);
             EasyMock.expect(groupsParser.parseGroupInfos(mockJsonElement))
-                .andReturn(new ArrayList<GroupInfo>())
+                .andReturn(new ArrayList<>())
                 .once();
             EasyMock.replay(groupsParser);
             return groupsParser;
@@ -179,8 +179,8 @@ public class GroupsRestClientTest {
     private final static class TestListRequest {
         private EnumSet<ListGroupsOption> options =
             EnumSet.noneOf(ListGroupsOption.class);
-        private List<String> projects = new ArrayList<String>();
-        private List<String> groups = new ArrayList<String>();
+        private List<String> projects = new ArrayList<>();
+        private List<String> groups = new ArrayList<>();
 
         private Boolean visibleToAll;
         private String user;
@@ -306,7 +306,7 @@ public class GroupsRestClientTest {
 
         public GroupsParser setupGroupsParser() {
             groupsParser = EasyMock.createMock(GroupsParser.class);
-            EasyMock.expect(groupsParser.parseGroupInfos(mockJsonElement)).andReturn(new ArrayList<GroupInfo>()).once();
+            EasyMock.expect(groupsParser.parseGroupInfos(mockJsonElement)).andReturn(new ArrayList<>()).once();
             EasyMock.replay(groupsParser);
             return groupsParser;
         }
@@ -319,8 +319,8 @@ public class GroupsRestClientTest {
 
     private final static class TestQueryRequest {
         private EnumSet<ListGroupsOption> options = EnumSet.noneOf(ListGroupsOption.class);
-        private List<String> projects = new ArrayList<String>();
-        private List<String> groups = new ArrayList<String>();
+        private List<String> projects = new ArrayList<>();
+        private List<String> groups = new ArrayList<>();
         private Integer limit;
         private Integer start;
         private String query;

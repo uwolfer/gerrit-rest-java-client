@@ -72,7 +72,7 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
         return new ListRequest() {
             @Override
             public SortedMap<String, GroupInfo> getAsMap() throws RestApiException {
-                SortedMap<String, GroupInfo> map = new TreeMap<String, GroupInfo>();
+                SortedMap<String, GroupInfo> map = new TreeMap<>();
                 List<GroupInfo> list = GroupsRestClient.this.list(this);
                 if (list != null) {
                     for (GroupInfo group : list) {

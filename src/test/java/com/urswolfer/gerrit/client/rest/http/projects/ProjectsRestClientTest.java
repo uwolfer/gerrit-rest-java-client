@@ -145,7 +145,7 @@ public class ProjectsRestClientTest {
         public ProjectsParser setupProjectsParser() throws Exception {
             projectsParser = EasyMock.createMock(ProjectsParser.class);
             EasyMock.expect(projectsParser.parseProjectInfos(mockJsonElement))
-                    .andReturn(new TreeMap<String, ProjectInfo>())
+                    .andReturn(new TreeMap<>())
                     .once();
             EasyMock.replay(projectsParser);
             return projectsParser;

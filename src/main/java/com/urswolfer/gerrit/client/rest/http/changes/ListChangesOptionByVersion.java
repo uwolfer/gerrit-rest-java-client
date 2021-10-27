@@ -26,7 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class ListChangesOptionByVersion {
-    static final Map<String, ListChangesOption> MAX_CHANGE_OPTION_BY_VERSION = new HashMap<String, ListChangesOption>();
+    static final Map<String, ListChangesOption> MAX_CHANGE_OPTION_BY_VERSION = new HashMap<>();
     static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\..*");
 
     static {

@@ -59,7 +59,7 @@ public class GroupsParser {
             for(Map.Entry<String,GroupInfo> entry : map.entrySet()){
                 entry.getValue().name = entry.getKey();
             }
-            return new ArrayList<GroupInfo>(map.values());
+            return new ArrayList<>(map.values());
         }
     }
 

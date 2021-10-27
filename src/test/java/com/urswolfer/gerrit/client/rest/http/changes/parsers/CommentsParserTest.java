@@ -116,7 +116,7 @@ public class CommentsParserTest extends AbstractParserTest {
         ));
     }
 
-    private static final List<ChangeMessageInfo> MESSAGES_INFOS = new ArrayList<ChangeMessageInfo>();
+    private static final List<ChangeMessageInfo> MESSAGES_INFOS = new ArrayList<>();
 
     static {
         AccountInfo accountInfo = new AccountInfoBuilder()

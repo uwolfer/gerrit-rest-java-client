@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ServerRestClient extends Server.NotImplemented implements Server {
     private final GerritRestClient gerritRestClient;
-    private final AtomicReference<String> version = new AtomicReference<String>();
+    private final AtomicReference<String> version = new AtomicReference<>();
 
     public ServerRestClient(GerritRestClient gerritRestClient) {
         this.gerritRestClient = gerritRestClient;
