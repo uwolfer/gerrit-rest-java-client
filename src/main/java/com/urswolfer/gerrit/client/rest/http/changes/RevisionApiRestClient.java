@@ -262,8 +262,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
         try {
             HttpResponse response = gerritRestClient.request(request, null, GET);
-            BinaryResult result = BinaryResultUtils.createBinaryResult(response);
-            return result;
+            return BinaryResultUtils.createBinaryResult(response);
         } catch (IOException e) {
             throw RestApiException.wrap("Request failed.", e);
         }
