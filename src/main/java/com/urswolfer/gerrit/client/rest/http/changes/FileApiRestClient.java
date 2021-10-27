@@ -17,7 +17,6 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.base.Strings;
-import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.gerrit.extensions.api.changes.FileApi;
 import com.google.gerrit.extensions.common.DiffInfo;
@@ -33,6 +32,7 @@ import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 
@@ -46,7 +46,7 @@ public class FileApiRestClient extends FileApi.NotImplemented {
     private final CommitInfosParser commitInfosParser;
     private final String path;
 
-    private final Supplier<String> requestPath = Suppliers.memoize(new Supplier<String>() {
+    private final Supplier<String> requestPath = Suppliers.memoize(new com.google.common.base.Supplier<String>() {
         @Override
         public String get() {
             String encodedPath = Url.encode(path);

@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest;
 
-import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.gerrit.extensions.api.GerritApi;
 import com.google.gerrit.extensions.api.changes.Changes;
@@ -42,20 +41,22 @@ import com.urswolfer.gerrit.client.rest.http.projects.TagInfoParser;
 import com.urswolfer.gerrit.client.rest.http.tools.ToolsRestClient;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
 
+import java.util.function.Supplier;
+
 /**
  * @author Urs Wolfer
  */
 public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRestApi {
     private final GerritRestClient gerritRestClient;
 
-    private final Supplier<GroupsRestClient> groupsRestClient = Suppliers.memoize(new Supplier<GroupsRestClient>() {
+    private final Supplier<GroupsRestClient> groupsRestClient = Suppliers.memoize(new com.google.common.base.Supplier<GroupsRestClient>() {
         @Override
         public GroupsRestClient get() {
             return new GroupsRestClient(gerritRestClient, new GroupsParser(gerritRestClient.getGson()));
         }
     });
 
-    private final Supplier<AccountsRestClient> accountsRestClient = Suppliers.memoize(new Supplier<AccountsRestClient>() {
+    private final Supplier<AccountsRestClient> accountsRestClient = Suppliers.memoize(new com.google.common.base.Supplier<AccountsRestClient>() {
         @Override
         public AccountsRestClient get() {
             return new AccountsRestClient(gerritRestClient, new AccountsParser(gerritRestClient.getGson()),
@@ -63,7 +64,7 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
         }
     });
 
-    private final Supplier<ChangesRestClient> changesRestClient = Suppliers.memoize(new Supplier<ChangesRestClient>() {
+    private final Supplier<ChangesRestClient> changesRestClient = Suppliers.memoize(new com.google.common.base.Supplier<ChangesRestClient>() {
         @Override
         public ChangesRestClient get() {
             return new ChangesRestClient(
@@ -80,14 +81,14 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
         }
     });
 
-    private final Supplier<ConfigRestClient> configRestClient = Suppliers.memoize(new Supplier<ConfigRestClient>() {
+    private final Supplier<ConfigRestClient> configRestClient = Suppliers.memoize(new com.google.common.base.Supplier<ConfigRestClient>() {
         @Override
         public ConfigRestClient get() {
             return new ConfigRestClient(gerritRestClient);
         }
     });
 
-    private final Supplier<ProjectsRestClient> projectsRestClient = Suppliers.memoize(new Supplier<ProjectsRestClient>() {
+    private final Supplier<ProjectsRestClient> projectsRestClient = Suppliers.memoize(new com.google.common.base.Supplier<ProjectsRestClient>() {
         @Override
         public ProjectsRestClient get() {
             return new ProjectsRestClient(
@@ -98,7 +99,7 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
         }
     });
 
-    private final Supplier<ToolsRestClient> toolsRestClient = Suppliers.memoize(new Supplier<ToolsRestClient>() {
+    private final Supplier<ToolsRestClient> toolsRestClient = Suppliers.memoize(new com.google.common.base.Supplier<ToolsRestClient>() {
         @Override
         public ToolsRestClient get() {
             return new ToolsRestClient(gerritRestClient);
