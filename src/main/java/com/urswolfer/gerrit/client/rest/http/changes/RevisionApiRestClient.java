@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+
 /**
  * @author Urs Wolfer
  */
@@ -225,7 +227,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     public BinaryResult patch() throws RestApiException {
         String request = getRequestPath() + "/patch";
         try {
-            HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
+            HttpResponse response = gerritRestClient.request(request, null, GET);
             return BinaryResultUtils.createBinaryResult(response);
         } catch (IOException e) {
             throw RestApiException.wrap("Failed to get patch.", e);
@@ -259,7 +261,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         }
 
         try {
-            HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
+            HttpResponse response = gerritRestClient.request(request, null, GET);
             BinaryResult result = BinaryResultUtils.createBinaryResult(response);
             return result;
         } catch (IOException e) {

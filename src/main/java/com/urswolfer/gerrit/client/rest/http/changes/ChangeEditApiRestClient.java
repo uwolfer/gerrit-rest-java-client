@@ -29,6 +29,8 @@ import java.util.Optional;
 
 import org.apache.http.HttpResponse;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+
 /**
  * @author Jun Qiu
  */
@@ -46,7 +48,7 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
     public Optional<BinaryResult> getFile(String filePath) throws RestApiException {
         String request = getRequestPath() + "/" + filePath;
         try {
-            HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
+            HttpResponse response = gerritRestClient.request(request, null, GET);
             return Optional.of(BinaryResultUtils.createBinaryResult(response));
         } catch (IOException e) {
             throw RestApiException.wrap("Failed to get file content.", e);

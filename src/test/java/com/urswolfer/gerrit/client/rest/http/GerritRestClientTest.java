@@ -55,6 +55,9 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.List;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.HEAD;
+
 /**
  * @author Urs Wolfer
  */
@@ -206,7 +209,7 @@ public class GerritRestClientTest {
     public void testUnsupportedHttpMethod() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(jettyUrl), new HttpRequestExecutor());
-        gerritRestClient.requestRest("/invalid/", null, GerritRestClient.HttpVerb.HEAD);
+        gerritRestClient.requestRest("/invalid/", null, HEAD);
     }
 
     /**
@@ -298,8 +301,8 @@ public class GerritRestClientTest {
         LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
 
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
-        gerritRestClient.requestRest("/changes/", null, GerritRestClient.HttpVerb.GET);
-        gerritRestClient.requestRest("/changes/?n=5", null, GerritRestClient.HttpVerb.GET);
+        gerritRestClient.requestRest("/changes/", null, GET);
+        gerritRestClient.requestRest("/changes/?n=5", null, GET);
         Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isTrue();
         Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
 
@@ -307,7 +310,7 @@ public class GerritRestClientTest {
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
 
         // ensure that even with invalidated cache request is possible and cached filled again
-        gerritRestClient.requestRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+        gerritRestClient.requestRest("/changes/", null, GET);
         Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
     }
 
@@ -355,7 +358,7 @@ public class GerritRestClientTest {
 
     private void requestChanges(GerritRestClient gerritRestClient) throws IOException, HttpStatusException {
         try {
-            gerritRestClient.requestRest("/changes/", null, GerritRestClient.HttpVerb.GET);
+            gerritRestClient.requestRest("/changes/", null, GET);
         } catch (HttpStatusException e) {
             if (e.getStatusCode() != 404) { // 404 is expected since path /a/changes is not mapped
                 throw e;

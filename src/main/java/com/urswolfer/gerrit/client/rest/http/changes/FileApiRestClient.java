@@ -34,6 +34,8 @@ import org.apache.http.HttpResponse;
 
 import java.io.IOException;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+
 /**
  * @author Thomas Forrer
  */
@@ -65,7 +67,7 @@ public class FileApiRestClient extends FileApi.NotImplemented {
     public BinaryResult content() throws RestApiException {
         String request = getRequestPath() + "/content";
         try {
-            HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
+            HttpResponse response = gerritRestClient.request(request, null, GET);
             return BinaryResultUtils.createBinaryResult(response);
         } catch (IOException e) {
             throw RestApiException.wrap("Failed to get file content.", e);

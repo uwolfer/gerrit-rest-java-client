@@ -30,6 +30,8 @@ import org.apache.http.HttpResponse;
 
 import java.io.IOException;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+
 /**
  * @author Ingo Rissmann
  */
@@ -72,7 +74,7 @@ public class BranchApiRestClient extends BranchApi.NotImplemented implements Bra
         String encodedPath = Url.encode(path);
         String request = branchUrl() + "/files/" + encodedPath + "/content";
         try {
-            HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
+            HttpResponse response = gerritRestClient.request(request, null, GET);
             return BinaryResultUtils.createBinaryResult(response);
         } catch (IOException e) {
             throw RestApiException.wrap("Failed to get file content.", e);

@@ -30,6 +30,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+
 /**
  * @author Urs Wolfer
  */
@@ -50,7 +52,7 @@ public class AccountApiRestClientTest {
         EasyMock.replay(httpEntity, httpResponse);
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectRequest(requestUrl, null, GerritRestClient.HttpVerb.GET, httpResponse)
+            .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
 
         AccountsRestClient accountsRestClient = getAccountsRestClient(gerritRestClient);

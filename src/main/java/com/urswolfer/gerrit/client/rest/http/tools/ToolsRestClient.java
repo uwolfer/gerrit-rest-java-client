@@ -24,6 +24,8 @@ import org.apache.http.HttpResponse;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+
 /**
  * @author Urs Wolfer
  */
@@ -38,7 +40,7 @@ public class ToolsRestClient implements Tools {
     @Override
     public InputStream getCommitMessageHook() throws RestApiException {
         try {
-            HttpResponse response = gerritRestClient.request("/tools/hooks/commit-msg", null, GerritRestClient.HttpVerb.GET);
+            HttpResponse response = gerritRestClient.request("/tools/hooks/commit-msg", null, GET);
             return response.getEntity().getContent();
         } catch (IOException e) {
             throw RestApiException.wrap("Failed to get commit message hook.", e);

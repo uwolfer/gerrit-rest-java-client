@@ -35,6 +35,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+
 /**
  * @author Urs Wolfer
  */
@@ -103,7 +105,7 @@ public class BranchApiRestClientTest {
         setupServices();
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectRequest(requestUrl, null, GerritRestClient.HttpVerb.GET, httpResponse)
+            .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
 
         BranchApiRestClient branchApiRestClient = new BranchApiRestClient(gerritRestClient, null, projectApiRestClient, "master");

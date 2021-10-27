@@ -37,6 +37,8 @@ import org.testng.annotations.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+
 /**
  * @author Thomas Forrer
  */
@@ -64,7 +66,7 @@ public class FileApiRestClientTest {
         setupServices();
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectRequest(requestUrl, null, GerritRestClient.HttpVerb.GET, httpResponse)
+            .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
 
         FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, revisionApiRestClient, null, FILE_PATH);

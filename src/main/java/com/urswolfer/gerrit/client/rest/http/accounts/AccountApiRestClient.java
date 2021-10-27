@@ -31,6 +31,8 @@ import org.apache.http.HttpResponse;
 import java.io.IOException;
 import java.util.List;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+
 /**
  * @author Urs Wolfer
  */
@@ -79,7 +81,7 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
     public BinaryResult downloadAvatar(int size) throws RestApiException {
         String request = getRequestPath() + "/avatar?s=" + size;
         try {
-            HttpResponse response = gerritRestClient.request(request, null, GerritRestClient.HttpVerb.GET);
+            HttpResponse response = gerritRestClient.request(request, null, GET);
             return BinaryResultUtils.createBinaryResult(response);
         } catch (IOException e) {
             throw RestApiException.wrap("Failed to get avatar.", e);

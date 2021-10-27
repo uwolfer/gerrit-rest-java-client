@@ -42,6 +42,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+
 /**
  * @author Thomas Forrer
  */
@@ -338,7 +340,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         EasyMock.replay(httpEntity, httpResponse);
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectRequest(requestUrl, null, GerritRestClient.HttpVerb.GET, httpResponse)
+            .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
 
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
@@ -436,7 +438,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         EasyMock.replay(httpEntity, httpResponse);
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectRequest(requestUrl, null, GerritRestClient.HttpVerb.GET, httpResponse)
+            .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
 
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
