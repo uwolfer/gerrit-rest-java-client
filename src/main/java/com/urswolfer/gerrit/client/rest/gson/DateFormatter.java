@@ -29,12 +29,9 @@ import java.util.TimeZone;
 public abstract class DateFormatter {
     private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
-    protected static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected SimpleDateFormat initialValue() {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
-            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            return dateFormat;
-        }
-    };
+    protected static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = ThreadLocal.withInitial(() -> {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat;
+    });
 }
