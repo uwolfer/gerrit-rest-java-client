@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 
@@ -152,12 +152,12 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
      * Support starting from Gerrit 2.7.
      */
     @Override
-    public TreeMap<String, List<CommentInfo>> comments() throws RestApiException {
+    public SortedMap<String, List<CommentInfo>> comments() throws RestApiException {
         return comments("comments");
     }
 
     @Override
-    public TreeMap<String, List<CommentInfo>> drafts() throws RestApiException {
+    public SortedMap<String, List<CommentInfo>> drafts() throws RestApiException {
         return comments("drafts");
     }
 
@@ -168,7 +168,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         return reviewInfoParser.parseFileInfos(jsonElement);
     }
 
-    private TreeMap<String, List<CommentInfo>> comments(String type) throws RestApiException {
+    private SortedMap<String, List<CommentInfo>> comments(String type) throws RestApiException {
         String request = getRequestPath() + '/' + type + '/';
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return commentsParser.parseCommentInfos(jsonElement);

@@ -28,6 +28,7 @@ import com.google.gson.JsonObject;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
@@ -48,7 +49,7 @@ public class CommitInfosParser {
         this.gson = gson;
     }
 
-    public TreeMap<String, ActionInfo> parseActionInfos(JsonElement result) {
+    public SortedMap<String, ActionInfo> parseActionInfos(JsonElement result) {
         return gson.fromJson(result, ACTION_TYPE);
     }
 

@@ -25,7 +25,7 @@ import com.thoughtworks.xstream.XStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 /**
  * @author Thomas Forrer
@@ -64,7 +64,7 @@ public class GerritAssert {
         assertXmlOutputEqual(actual, expected);
     }
 
-    public static <V> void assertEquals(TreeMap<String, V> actual, TreeMap<String, V> expected) {
+    public static <V> void assertEquals(SortedMap<String, V> actual, SortedMap<String, V> expected) {
         assertXmlOutputEqual(actual, expected);
     }
 
@@ -99,7 +99,7 @@ public class GerritAssert {
         Truth.assertThat(actualXml).isEqualTo(expectedXml);
     }
 
-    public static void assertRobotCommentsEquals(TreeMap<String, List<RobotCommentInfo>> actual, TreeMap<String, List<RobotCommentInfo>> expected) {
+    public static void assertRobotCommentsEquals(SortedMap<String, List<RobotCommentInfo>> actual, SortedMap<String, List<RobotCommentInfo>> expected) {
         assertXmlOutputEqual(actual, expected);
     }
 }

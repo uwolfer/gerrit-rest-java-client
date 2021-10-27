@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
@@ -44,7 +45,7 @@ public class CommentsParser {
         this.gson = gson;
     }
 
-    public TreeMap<String, List<CommentInfo>> parseCommentInfos(JsonElement result) {
+    public SortedMap<String, List<CommentInfo>> parseCommentInfos(JsonElement result) {
         return gson.fromJson(result, COMMENT_TYPE);
     }
 
@@ -52,7 +53,7 @@ public class CommentsParser {
         return gson.fromJson(result, CommentInfo.class);
     }
 
-    public TreeMap<String, List<RobotCommentInfo>> parseRobotCommentInfos(JsonElement result) {
+    public SortedMap<String, List<RobotCommentInfo>> parseRobotCommentInfos(JsonElement result) {
         return gson.fromJson(result, ROBOT_COMMENT_TYPE);
     }
 

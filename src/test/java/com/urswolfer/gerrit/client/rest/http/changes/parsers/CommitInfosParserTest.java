@@ -24,6 +24,7 @@ import com.urswolfer.gerrit.client.rest.http.common.*;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
@@ -104,11 +105,11 @@ public class CommitInfosParserTest extends AbstractParserTest{
 
     @Test
     public void testParseActionInfos() throws Exception {
-        TreeMap<String, ActionInfo> actions = parseActions();
+        SortedMap<String, ActionInfo> actions = parseActions();
         GerritAssert.assertEquals(actions, ACTION_INFOS);
     }
 
-    private TreeMap<String, ActionInfo> parseActions() throws Exception {
+    private SortedMap<String, ActionInfo> parseActions() throws Exception {
         JsonElement jsonElement = getJsonElement("actions.json");
         return commitInfosParser.parseActionInfos(jsonElement);
     }

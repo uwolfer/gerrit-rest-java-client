@@ -148,13 +148,13 @@ public class CommentsParserTest extends AbstractParserTest {
 
     @Test
     public void testParseCommentsFileName() throws Exception {
-        TreeMap<String, List<CommentInfo>> comments = parseComments();
+        SortedMap<String, List<CommentInfo>> comments = parseComments();
         Truth.assertThat(comments.keySet()).isEqualTo(COMMENT_INFOS.keySet());
     }
 
     @Test
     public void testParseCommentInfosForFile() throws Exception {
-        TreeMap<String, List<CommentInfo>> comments = parseComments();
+        SortedMap<String, List<CommentInfo>> comments = parseComments();
         Function<List<CommentInfo>, Integer> listSizeFunction = new Function<List<CommentInfo>, Integer>() {
             @Override
             public Integer apply(List<CommentInfo> commentInfos) {
@@ -169,19 +169,19 @@ public class CommentsParserTest extends AbstractParserTest {
 
     @Test
     public void testParseCommentInfos() throws Exception {
-        TreeMap<String, List<CommentInfo>> comments = parseComments();
+        SortedMap<String, List<CommentInfo>> comments = parseComments();
         GerritAssert.assertEquals(comments, COMMENT_INFOS);
     }
 
     @Test
     public void testParseRobotCommentsFileName() throws Exception {
-        TreeMap<String, List<RobotCommentInfo>> robotComments = parseRobotComments();
+        SortedMap<String, List<RobotCommentInfo>> robotComments = parseRobotComments();
         Truth.assertThat(robotComments.keySet()).isEqualTo(ROBOT_COMMENT_INFOS.keySet());
     }
 
     @Test
     public void testParseRobotCommentInfosForFile() throws Exception {
-        TreeMap<String, List<RobotCommentInfo>> robotComments = parseRobotComments();
+        SortedMap<String, List<RobotCommentInfo>> robotComments = parseRobotComments();
         Function<List<RobotCommentInfo>, Integer> listSizeFunction = robotCommentInfos -> robotCommentInfos.size();
         SortedMap<String, Integer> commentsPerFile = Maps.transformValues(robotComments, listSizeFunction);
         SortedMap<String, Integer> expectedCommentsPerFile = Maps.transformValues(ROBOT_COMMENT_INFOS, listSizeFunction);
@@ -191,7 +191,7 @@ public class CommentsParserTest extends AbstractParserTest {
 
     @Test
     public void testParseRobotCommentInfos() throws Exception {
-        TreeMap<String, List<RobotCommentInfo>> robotComments = parseRobotComments();
+        SortedMap<String, List<RobotCommentInfo>> robotComments = parseRobotComments();
         GerritAssert.assertRobotCommentsEquals(robotComments, ROBOT_COMMENT_INFOS);
     }
 
@@ -201,12 +201,12 @@ public class CommentsParserTest extends AbstractParserTest {
         GerritAssert.assertEquals(messages, MESSAGES_INFOS);
     }
 
-    private TreeMap<String, List<CommentInfo>> parseComments() throws Exception {
+    private SortedMap<String, List<CommentInfo>> parseComments() throws Exception {
         JsonElement jsonElement = getJsonElement("comments.json");
         return commentsParser.parseCommentInfos(jsonElement);
     }
 
-    private TreeMap<String, List<RobotCommentInfo>> parseRobotComments() throws Exception {
+    private SortedMap<String, List<RobotCommentInfo>> parseRobotComments() throws Exception {
         JsonElement jsonElement = getJsonElement("robotcomments.json");
         return commentsParser.parseRobotCommentInfos(jsonElement);
     }
