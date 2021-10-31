@@ -81,7 +81,10 @@ public class ProjectsRestClientTest {
                                 .withLimit(15)
                                 .withStart(10)
                                 .withPrefix("master")
-                ).expectUrl("/projects/?d&p=master&n=15&S=10")
+                ).expectUrl("/projects/?d&p=master&n=15&S=10"),
+                listTestCase().withListParameter(
+                    new TestListRequest().withType(Projects.ListRequest.FilterType.CODE)
+                ).expectUrl("/projects/?type=CODE")
         ), new Function<ProjectListTestCase, ProjectListTestCase[]>() {
             @Override
             public ProjectListTestCase[] apply(ProjectListTestCase testCase) {
@@ -181,6 +184,7 @@ public class ProjectsRestClientTest {
         private String prefix = null;
         private Integer limit = null;
         private Integer start = null;
+        private Projects.ListRequest.FilterType type = null;
 
         public TestListRequest withDescription(boolean description) {
             this.description = description;
@@ -207,6 +211,11 @@ public class ProjectsRestClientTest {
             return this;
         }
 
+        public TestListRequest withType(Projects.ListRequest.FilterType filterType) {
+            this.type = filterType;
+            return this;
+        }
+
         public Projects.ListRequest apply(Projects.ListRequest target) {
             if (description != null) {
                 target.withDescription(description);
@@ -222,6 +231,9 @@ public class ProjectsRestClientTest {
             }
             if (start != null) {
                 target.withStart(start);
+            }
+            if (type != null) {
+                target.withType(type);
             }
             return target;
         }

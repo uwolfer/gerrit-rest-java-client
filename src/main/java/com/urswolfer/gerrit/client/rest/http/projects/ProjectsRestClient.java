@@ -83,6 +83,9 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
         if (listParameter.getStart() > 0) {
             query = UrlUtils.appendToUrlQuery(query, "S=" + listParameter.getStart());
         }
+        if (listParameter.getFilterType() != ListRequest.FilterType.ALL) {
+            query = UrlUtils.appendToUrlQuery(query, "type=" + listParameter.getFilterType());
+        }
 
         String url = "/projects/";
         if (!Strings.isNullOrEmpty(query)) {
