@@ -21,6 +21,7 @@ import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.access.ProjectAccessInput;
 import com.google.gerrit.extensions.api.projects.BranchApi;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
+import com.google.gerrit.extensions.api.projects.LabelApi;
 import com.google.gerrit.extensions.api.projects.ProjectApi;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.api.projects.TagApi;
@@ -32,7 +33,6 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
-
 import java.util.List;
 
 /**
@@ -135,6 +135,11 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         String params = projectsParser.generateProjectAccessInput(p);
         JsonElement result = gerritRestClient.postRequest(request, params);
         return projectsParser.parseProjectAccessInfo(result);
+    }
+
+    @Override
+    public LabelApi label(String labelName) throws RestApiException {
+        return new LabelApiRestClient(gerritRestClient, this, labelName);
     }
 
     protected String projectsUrl() {
