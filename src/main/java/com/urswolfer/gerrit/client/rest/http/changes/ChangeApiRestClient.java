@@ -282,6 +282,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public ChangeInfo getDetail() throws RestApiException {
+        String url = getRequestPath() + "/detail";
+        JsonElement jsonElement = gerritRestClient.getRequest(url);
+        return changeInfosParser.parseSingleChangeInfo(jsonElement);
+    }
+
+    @Override
     public ChangeInfo info() throws RestApiException {
         return get(EnumSet.noneOf(ListChangesOption.class));
     }

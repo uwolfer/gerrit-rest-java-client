@@ -262,6 +262,8 @@ public interface ChangeApi {
     return get(EnumSet.noneOf(ListChangesOption.class));
   }
 
+  ChangeInfo getDetail() throws RestApiException;
+
   /**
    * Retrieve change edit when exists.
    *
@@ -565,6 +567,11 @@ public interface ChangeApi {
     public ChangeInfo get(
         EnumSet<ListChangesOption> options, ImmutableListMultimap<String, String> pluginOptions)
         throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ChangeInfo getDetail() throws RestApiException {
       throw new NotImplementedException();
     }
 
