@@ -221,28 +221,64 @@ public class ChangeApiRestClientTest {
 
     @Test
     public void testRevertChange() throws Exception {
-        GerritRestClient gerritRestClient = getGerritRestClient(
-            "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revert",
-            "{\"notify\":\"ALL\"}"
-        );
-        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
-        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").revert();
+        JsonElement revertingChangeJsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPost("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revert", "{\"notify\":\"ALL\"}", revertingChangeJsonElement)
+            .expectGetGson()
+            .get();
 
-        EasyMock.verify(gerritRestClient);
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
+        ChangeInfo expectedChangeInfo = new ChangeInfo();
+        expectedChangeInfo.id = "foo";
+        EasyMock.expect(changeInfosParser.parseSingleChangeInfo(revertingChangeJsonElement)).andReturn(expectedChangeInfo).once();
+        EasyMock.replay(changeInfosParser);
+
+        ChangesRestClient changesRestClient = new ChangesRestClient(
+            gerritRestClient,
+            changeInfosParser,
+            EasyMock.createMock(CommentsParser.class),
+            EasyMock.createMock(FileInfoParser.class),
+            EasyMock.createMock(ReviewerInfosParser.class),
+            EasyMock.createMock(ReviewResultParser.class),
+            EasyMock.createMock(CommitInfosParser.class),
+            EasyMock.createMock(AccountsParser.class),
+            EasyMock.createMock(MergeableInfoParser.class),
+            EasyMock.createMock(ReviewInfoParser.class));
+
+        String revertingChangeId = changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").revert().id();
+
+        Truth.assertThat(revertingChangeId).isEqualTo("foo");
+        EasyMock.verify(gerritRestClient, changeInfosParser);
     }
 
     @Test
     public void testRevertChangeWithMessage() throws Exception {
-        GerritRestClient gerritRestClient = getGerritRestClient(
-            "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revert",
-            "{\"message\":\"Change need revert.\",\"notify\":\"ALL\"}"
-        );
-        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        JsonElement revertingChangeJsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPost("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revert", "{\"message\":\"Change need revert.\",\"notify\":\"ALL\"}", revertingChangeJsonElement)
+            .expectGetGson()
+            .get();
+
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
+        EasyMock.expect(changeInfosParser.parseSingleChangeInfo(revertingChangeJsonElement)).andReturn(new ChangeInfo()).once();
+        EasyMock.replay(changeInfosParser);
+
+        ChangesRestClient changesRestClient = new ChangesRestClient(
+            gerritRestClient,
+            changeInfosParser,
+            EasyMock.createMock(CommentsParser.class),
+            EasyMock.createMock(FileInfoParser.class),
+            EasyMock.createMock(ReviewerInfosParser.class),
+            EasyMock.createMock(ReviewResultParser.class),
+            EasyMock.createMock(CommitInfosParser.class),
+            EasyMock.createMock(AccountsParser.class),
+            EasyMock.createMock(MergeableInfoParser.class),
+            EasyMock.createMock(ReviewInfoParser.class));
         RevertInput revertInput = new RevertInput();
         revertInput.message = "Change need revert.";
         changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").revert(revertInput);
 
-        EasyMock.verify(gerritRestClient);
+        EasyMock.verify(gerritRestClient, changeInfosParser);
     }
 
     @Test
