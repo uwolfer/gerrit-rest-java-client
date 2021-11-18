@@ -89,6 +89,7 @@ public class GerritRestClient implements RestClient {
     private static final Pattern GERRIT_AUTH_PATTERN = Pattern.compile(".*?xGerritAuth=\"(.+?)\"");
     private static final int CONNECTION_TIMEOUT_MS = 300000;
     private static final Gson GSON = GsonFactory.create();
+    private static final RequestConfig REQUEST_CONFIG = RequestConfig.custom().setNormalizeUri(false).build();
 
     private final GerritAuthData authData;
     private final HttpRequestExecutor httpRequestExecutor;
@@ -241,6 +242,7 @@ public class GerritRestClient implements RestClient {
             method.addHeader(header);
         }
 
+        method.setConfig(REQUEST_CONFIG);
         HttpResponse response = httpRequestExecutor.execute(client, method, httpContext);
 
         if (!isRetry && response.getStatusLine().getStatusCode() == SC_FORBIDDEN && loginCache.getGerritAuthOptional().isPresent()) {
