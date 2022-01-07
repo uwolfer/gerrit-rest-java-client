@@ -364,7 +364,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
-    public  Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException {
+    public Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException {
         String request = getRequestPath() + "/robotcomments";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return commentsParser.parseRobotCommentInfos(jsonElement);
@@ -402,6 +402,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String path = ignore ? "/ignore" : "/unignore";
         String request = getRequestPath() + path;
         gerritRestClient.putRequest(request);
+    }
+    
+    @Override
+    public void rebase(RebaseInput in) throws RestApiException {
+        String url = getRequestPath() + "/rebase";
+        String json = gerritRestClient.getGson().toJson(in);
+        gerritRestClient.postRequest(url, json);
     }
 
     protected String getRequestPath() {
