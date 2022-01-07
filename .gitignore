@@ -16,3 +16,6 @@ target/
 
 # OS X
 .DS_Store
+
+#TestNG
+test-output/
