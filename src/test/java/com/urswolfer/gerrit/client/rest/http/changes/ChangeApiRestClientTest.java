@@ -807,6 +807,20 @@ public class ChangeApiRestClientTest {
         EasyMock.verify(gerritRestClient);
     }
 
+    @Test
+    public void testRebaseChange() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+                "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/rebase",
+                "{\"base\":\"1234\"}"
+        );
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+        RebaseInput rebaseInput = new RebaseInput();
+        rebaseInput.base = "1234";
+        changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").rebase(rebaseInput);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
     private GerritRestClient getGerritRestClient(String expectedRequest, String expectedJson) throws Exception {
         return new GerritRestClientBuilder()
                 .expectPost(expectedRequest, expectedJson)
