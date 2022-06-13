@@ -4,8 +4,8 @@ gerrit-rest-java-client
 [![Linux Build](https://app.travis-ci.com/uwolfer/gerrit-rest-java-client.svg?branch=master)](https://app.travis-ci.com/uwolfer/gerrit-rest-java-client)
 [![Windows Build](https://ci.appveyor.com/api/projects/status/ctm64o74lxdri26s/branch/master?svg=true)](https://ci.appveyor.com/project/uwolfer/gerrit-rest-java-client/branch/master)
 [![Coverage Status](https://img.shields.io/coveralls/uwolfer/gerrit-rest-java-client.svg)](https://coveralls.io/r/uwolfer/gerrit-rest-java-client)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.urswolfer.gerrit.client.rest%3Agerrit-rest-java-client&metric=alert_status)](https://sonarcloud.io/dashboard/index/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=com.urswolfer.gerrit.client.rest%3Agerrit-rest-java-client&metric=sqale_rating)](https://sonarcloud.io/dashboard/index/com.urswolfer.gerrit.client.rest:gerrit-rest-java-client)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.urswolfer.gerrit.client.rest%3Agerrit-rest-java-client&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=com.urswolfer.gerrit.client.rest%3Agerrit-rest-java-client)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=com.urswolfer.gerrit.client.rest%3Agerrit-rest-java-client&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=com.urswolfer.gerrit.client.rest%3Agerrit-rest-java-client)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.urswolfer.gerrit.client.rest/gerrit-rest-java-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.urswolfer.gerrit.client.rest/gerrit-rest-java-client)
 
 Introduction
