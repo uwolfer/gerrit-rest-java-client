@@ -512,15 +512,16 @@ public class GerritRestClient implements RestClient {
         if (entity != null) {
             body = EntityUtils.toString(entity).trim();
         }
-        String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content: %s.",
+        String message = String.format("Request not successful. Message: %s. Status-Code: %s. Content:%n%s.",
                 statusLine.getReasonPhrase(), statusLine.getStatusCode(), body);
         throw new HttpStatusException(statusLine.getStatusCode(), statusLine.getReasonPhrase(), message);
     }
 
-    private void checkContentType(HttpEntity entity) throws RestApiException {
+    private void checkContentType(HttpEntity entity) throws RestApiException, IOException {
         Header contentType = entity.getContentType();
         if (contentType != null && !contentType.getValue().contains(JSON_MIME_TYPE)) {
-            throw RestApiException.wrap(String.format("Expected JSON but got '%s'.", contentType.getValue()), null);
+            throw RestApiException.wrap(String.format("Expected JSON but got '%s'. Content:%n%s",
+                contentType.getValue(), EntityUtils.toString(entity).trim()), null);
         }
     }
 }
