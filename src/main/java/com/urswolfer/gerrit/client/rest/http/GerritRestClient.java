@@ -248,6 +248,7 @@ public class GerritRestClient implements RestClient {
         if (!isRetry && response.getStatusLine().getStatusCode() == SC_FORBIDDEN && loginCache.getGerritAuthOptional().isPresent()) {
             // handle expired sessions: try again with a fresh login
             loginCache.invalidate();
+            EntityUtils.consumeQuietly(response.getEntity());
             response = requestRest(path, requestBody, verb, true);
         }
 
