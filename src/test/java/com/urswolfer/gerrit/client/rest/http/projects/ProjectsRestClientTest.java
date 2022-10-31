@@ -32,8 +32,10 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 
 /**
@@ -75,6 +77,9 @@ public class ProjectsRestClientTest {
                 listTestCase().withListParameter(
                         new TestListRequest().withStart(5)
                 ).expectUrl("/projects/?S=5"),
+                listTestCase().withListParameter(
+                    new TestListRequest().addShowBranches("toto").addShowBranches("titi")
+                ).expectUrl("/projects/?b=toto&b=titi"),
                 listTestCase().withListParameter(
                         new TestListRequest()
                                 .withDescription(true)
@@ -184,6 +189,8 @@ public class ProjectsRestClientTest {
         private String prefix = null;
         private Integer limit = null;
         private Integer start = null;
+
+        private List<String> branches = new ArrayList<>();
         private Projects.ListRequest.FilterType type = null;
 
         public TestListRequest withDescription(boolean description) {
@@ -198,6 +205,11 @@ public class ProjectsRestClientTest {
 
         public TestListRequest withPrefix(String prefix) {
             this.prefix = prefix;
+            return this;
+        }
+
+        public TestListRequest addShowBranches(String branch){
+            this.branches.add(branch);
             return this;
         }
 
@@ -231,6 +243,9 @@ public class ProjectsRestClientTest {
             }
             if (start != null) {
                 target.withStart(start);
+            }
+            for(final String branch: branches){
+                target.addShowBranch(branch);
             }
             if (type != null) {
                 target.withType(type);
