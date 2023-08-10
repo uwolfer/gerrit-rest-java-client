@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.gerrit.extensions.api.changes.IncludedInInfo;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.api.projects.Projects;
@@ -26,6 +27,7 @@ import com.google.gerrit.extensions.api.projects.TagInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import org.easymock.EasyMock;
 import org.easymock.LogicalOperator;
 import org.testng.annotations.DataProvider;
@@ -110,6 +112,7 @@ public class ProjectsRestClientTest {
         private ProjectsParser projectsParser;
         private BranchInfoParser branchInfoParser;
         private TagInfoParser tagInfoParser;
+        private ProjectCommitInfoParser projectCommitInforParser;
 
         public ProjectListTestCase withListParameter(TestListRequest listParameter) {
             this.listParameter = listParameter;
@@ -137,7 +140,8 @@ public class ProjectsRestClientTest {
                     setupGerritRestClient(),
                     setupProjectsParser(),
                     setupBranchInfoParser(),
-                    setupTagInfoParser()
+                    setupTagInfoParser(),
+                    setupProjectCommitInfoParser()
             );
         }
 
@@ -175,6 +179,15 @@ public class ProjectsRestClientTest {
                     .once();
             EasyMock.replay(tagInfoParser);
             return tagInfoParser;
+        }
+
+        public ProjectCommitInfoParser setupProjectCommitInfoParser() throws Exception {
+            projectCommitInforParser = EasyMock.createMock(ProjectCommitInfoParser.class);
+            EasyMock.expect(projectCommitInforParser.parseIncludedInInfo(mockJsonElement))
+                .andReturn(EasyMock.createMock(IncludedInInfo.class))
+                .once();
+            EasyMock.replay(projectCommitInforParser);
+            return projectCommitInforParser;
         }
 
         @Override
@@ -271,6 +284,7 @@ public class ProjectsRestClientTest {
         private ProjectsParser projectsParser;
         private BranchInfoParser branchInfoParser;
         private TagInfoParser tagInfoParser;
+        private ProjectCommitInfoParser projectCommitInfoParser;
         private String mockJsonString = "{\"name\":\"whatever\"}";
         private ProjectInput mockProjectInput;
         private ProjectInfo mockProjectInfo = EasyMock.createMock(ProjectInfo.class);
@@ -301,7 +315,8 @@ public class ProjectsRestClientTest {
                     setupGerritRestClient(),
                     setupProjectsParser(),
                     setupBranchInfoParser(),
-                    setupTagInfoParser()
+                    setupTagInfoParser(),
+                    setupProjectCommitInfoParser()
             );
         }
 
@@ -337,6 +352,11 @@ public class ProjectsRestClientTest {
         public TagInfoParser setupTagInfoParser() throws Exception {
             tagInfoParser = EasyMock.createMock(TagInfoParser.class);
             return tagInfoParser;
+        }
+
+        public ProjectCommitInfoParser setupProjectCommitInfoParser() throws Exception {
+            projectCommitInfoParser = EasyMock.createMock(ProjectCommitInfoParser.class);
+            return projectCommitInfoParser;
         }
     }
     private static class SameName implements Comparator<ProjectInput> {

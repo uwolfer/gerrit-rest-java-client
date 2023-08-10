@@ -23,6 +23,7 @@ import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
+import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
@@ -57,7 +58,8 @@ public class TagApiRestClientTest {
         TagInfoParser tagInfoParser = new TagInfoParserBuilder()
                 .expectParseTagInfos(MOCK_JSON_ELEMENT, mockTags)
                 .get();
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectName);
+        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser, projectName);
 
         List<TagInfo> tags = projectApiRestClient.tags()
                 .withLimit(3)
@@ -83,7 +85,9 @@ public class TagApiRestClientTest {
         TagInfoParser tagInfoParser = new TagInfoParserBuilder()
                 .expectParseTagInfos(MOCK_JSON_ELEMENT, mockTags)
                 .get();
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectName);
+        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
+
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser, projectName);
 
         TagInfo tags = projectApiRestClient.tag("v0.0.1")
                 .get();

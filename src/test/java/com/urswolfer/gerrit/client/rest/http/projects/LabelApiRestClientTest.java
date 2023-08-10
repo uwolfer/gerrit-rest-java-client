@@ -81,6 +81,6 @@ public class LabelApiRestClientTest {
     private ProjectApiRestClient createProjectApiRestClient(GerritRestClient gerritRestClient, String projectName) {
         return new ProjectApiRestClient(gerritRestClient, new ProjectsParserBuilder()
             .get(), new BranchInfoParserBuilder()
-            .get(), new TagInfoParserBuilder().get(), projectName);
+            .get(), new TagInfoParserBuilder().get(), new ProjectCommitInfoParserBuilder().get(), projectName );
     }
 }
