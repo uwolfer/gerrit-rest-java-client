@@ -51,11 +51,11 @@ public class CommitApiRestClient extends CommitApi.NotImplemented implements Com
 
     @Override
     public IncludedInInfo includedIn() throws RestApiException {
-        JsonElement jsonElement = gerritRestClient.getRequest(commitURL()+"/in");
+        JsonElement jsonElement = gerritRestClient.getRequest(commitURL() + "/in");
         return projectCommitInfoParser.parseIncludedInInfo(jsonElement);
     }
 
     protected String commitURL() {
-        return projectApiRestClient.projectsUrl() + "/commits/"+ Url.encode(commit);
+        return projectApiRestClient.projectsUrl() + "/commits/" + Url.encode(commit);
     }
 }

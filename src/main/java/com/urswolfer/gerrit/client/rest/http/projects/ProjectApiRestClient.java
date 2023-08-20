@@ -35,6 +35,7 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
+
 import java.util.List;
 
 /**
@@ -148,8 +149,8 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
     }
 
     @Override
-    public CommitApi commit(String commit){
-        return new CommitApiRestClient(gerritRestClient,this, projectCommitInfoParser, commit);
+    public CommitApi commit(String commit) {
+        return new CommitApiRestClient(gerritRestClient, this, projectCommitInfoParser, commit);
     }
 
     protected String projectsUrl() {

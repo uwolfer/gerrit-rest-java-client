@@ -42,8 +42,8 @@ public class CommitApiRestClientTest {
             .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
         ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder()
-            .expectParseCommitInfo(MOCK_JSON_ELEMENT,MOCK_COMMIT_INFO).get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, null, null,projectCommitInfoParser);
+            .expectParseCommitInfo(MOCK_JSON_ELEMENT, MOCK_COMMIT_INFO).get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, null, null, projectCommitInfoParser);
 
         CommitInfo commitInfo = projectsRestClient.name(projectName).commit(commitSha).get();
 
@@ -60,8 +60,8 @@ public class CommitApiRestClientTest {
             .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
         ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder()
-            .expectParseIncludedIn(MOCK_JSON_ELEMENT,MOCK_INCLUDED_IN_INFO).get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, null, null,projectCommitInfoParser);
+            .expectParseIncludedIn(MOCK_JSON_ELEMENT, MOCK_INCLUDED_IN_INFO).get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, null, null, projectCommitInfoParser);
 
         IncludedInInfo includedInInfo = projectsRestClient.name(projectName).commit(commitSha).includedIn();
 

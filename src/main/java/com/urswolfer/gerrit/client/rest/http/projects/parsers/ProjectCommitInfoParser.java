@@ -23,7 +23,6 @@ import com.google.gson.JsonElement;
 
 /**
  * Parser for commit information from project/projectname/commit
- *
  */
 public class ProjectCommitInfoParser {
 

@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 
 public class ProjectCommitInfoParserTest extends AbstractParserTest {
 
-    String[] includedInBranches = {"master","branch1"};
+    String[] includedInBranches = {"master", "branch1"};
     String[] includedInTags = {"tag1"};
 
     @Test

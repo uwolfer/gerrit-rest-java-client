@@ -48,23 +48,23 @@ public class TagApiRestClientTest {
         mockTags.add(MOCK_TAG_INFO);
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectGet("/projects/sandbox/tags?n=3&s=1", MOCK_JSON_ELEMENT)
-                .get();
+            .expectGet("/projects/sandbox/tags?n=3&s=1", MOCK_JSON_ELEMENT)
+            .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder()
-                .expectParseSingleProjectInfo(MOCK_JSON_ELEMENT, MOCK_PROJECT_INFO)
-                .get();
+            .expectParseSingleProjectInfo(MOCK_JSON_ELEMENT, MOCK_PROJECT_INFO)
+            .get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder()
-                .get();
+            .get();
         TagInfoParser tagInfoParser = new TagInfoParserBuilder()
-                .expectParseTagInfos(MOCK_JSON_ELEMENT, mockTags)
-                .get();
+            .expectParseTagInfos(MOCK_JSON_ELEMENT, mockTags)
+            .get();
         ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
         ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser, projectName);
 
         List<TagInfo> tags = projectApiRestClient.tags()
-                .withLimit(3)
-                .withStart(1)
-                .get();
+            .withLimit(3)
+            .withStart(1)
+            .get();
         Truth.assertThat(tags).isEqualTo(mockTags);
     }
 
@@ -75,22 +75,22 @@ public class TagApiRestClientTest {
         mockTags.add(MOCK_TAG_INFO);
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectGet("/projects/sandbox/tags/v0.0.1", MOCK_JSON_ELEMENT)
-                .get();
+            .expectGet("/projects/sandbox/tags/v0.0.1", MOCK_JSON_ELEMENT)
+            .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder()
-                .expectParseSingleProjectInfo(MOCK_JSON_ELEMENT, MOCK_PROJECT_INFO)
-                .get();
+            .expectParseSingleProjectInfo(MOCK_JSON_ELEMENT, MOCK_PROJECT_INFO)
+            .get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder()
-                .get();
+            .get();
         TagInfoParser tagInfoParser = new TagInfoParserBuilder()
-                .expectParseTagInfos(MOCK_JSON_ELEMENT, mockTags)
-                .get();
+            .expectParseTagInfos(MOCK_JSON_ELEMENT, mockTags)
+            .get();
         ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
 
         ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser, projectName);
 
         TagInfo tags = projectApiRestClient.tag("v0.0.1")
-                .get();
+            .get();
         Truth.assertThat(tags).isEqualTo(MOCK_TAG_INFO);
     }
 }
