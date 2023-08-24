@@ -25,6 +25,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.SortedMap;
@@ -39,15 +40,18 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
     private final ProjectsParser projectsParser;
     private final BranchInfoParser branchInfoParser;
     private final TagInfoParser tagInfoParser;
+    private final ProjectCommitInfoParser projectCommitInfoParser;
 
     public ProjectsRestClient(GerritRestClient gerritRestClient,
                               ProjectsParser projectsParser,
                               BranchInfoParser branchInfoParser,
-                              TagInfoParser tagInfoParser) {
+                              TagInfoParser tagInfoParser,
+                              ProjectCommitInfoParser projectCommitInfoParser) {
         this.gerritRestClient = gerritRestClient;
         this.projectsParser = projectsParser;
         this.branchInfoParser = branchInfoParser;
         this.tagInfoParser = tagInfoParser;
+        this.projectCommitInfoParser = projectCommitInfoParser;
     }
 
     @Override
@@ -62,7 +66,7 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
 
     @Override
     public ProjectApi name(String name) throws RestApiException {
-        return new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, name);
+        return new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser, name);
     }
 
     private SortedMap<String, ProjectInfo> list(ListRequest listParameter) throws RestApiException {
@@ -83,7 +87,7 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
         if (listParameter.getStart() > 0) {
             query = UrlUtils.appendToUrlQuery(query, "S=" + listParameter.getStart());
         }
-        for (final String branch : listParameter.getBranches()){
+        for (final String branch : listParameter.getBranches()) {
             query = UrlUtils.appendToUrlQuery(query, "b=" + branch);
         }
         ListRequest.FilterType filterType = listParameter.getFilterType();
@@ -120,6 +124,6 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
         String projectInput = projectsParser.generateProjectInput(in);
         JsonElement result = gerritRestClient.putRequest(url, projectInput);
         ProjectInfo info = projectsParser.parseSingleProjectInfo(result);
-        return new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, info.name);
+        return new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser, info.name);
     }
 }

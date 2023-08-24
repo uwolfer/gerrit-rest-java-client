@@ -21,6 +21,7 @@ import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.access.ProjectAccessInput;
 import com.google.gerrit.extensions.api.projects.BranchApi;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
+import com.google.gerrit.extensions.api.projects.CommitApi;
 import com.google.gerrit.extensions.api.projects.LabelApi;
 import com.google.gerrit.extensions.api.projects.ProjectApi;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
@@ -32,7 +33,9 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
+
 import java.util.List;
 
 /**
@@ -43,17 +46,20 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
     private final ProjectsParser projectsParser;
     private final BranchInfoParser branchInfoParser;
     private final TagInfoParser tagInfoParser;
+    private final ProjectCommitInfoParser projectCommitInfoParser;
     private final String name;
 
     public ProjectApiRestClient(GerritRestClient gerritRestClient,
                                 ProjectsParser projectsParser,
                                 BranchInfoParser branchInfoParser,
                                 TagInfoParser tagInfoParser,
+                                ProjectCommitInfoParser projectCommitInfoParser,
                                 String name) {
         this.gerritRestClient = gerritRestClient;
         this.projectsParser = projectsParser;
         this.branchInfoParser = branchInfoParser;
         this.tagInfoParser = tagInfoParser;
+        this.projectCommitInfoParser = projectCommitInfoParser;
         this.name = name;
     }
 
@@ -140,6 +146,11 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
     @Override
     public LabelApi label(String labelName) throws RestApiException {
         return new LabelApiRestClient(gerritRestClient, this, labelName);
+    }
+
+    @Override
+    public CommitApi commit(String commit) {
+        return new CommitApiRestClient(gerritRestClient, this, projectCommitInfoParser, commit);
     }
 
     protected String projectsUrl() {

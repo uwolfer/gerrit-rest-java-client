@@ -1,0 +1,9 @@
+{
+    "branches": [
+        "master",
+        "branch1"
+    ],
+    "tags": [
+        "tag1"
+    ]
+}

@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.gerrit.extensions.api.changes.IncludedInInfo;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.api.projects.Projects;
@@ -26,6 +27,7 @@ import com.google.gerrit.extensions.api.projects.TagInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import org.easymock.EasyMock;
 import org.easymock.LogicalOperator;
 import org.testng.annotations.DataProvider;
@@ -56,40 +58,40 @@ public class ProjectsRestClientTest {
     @DataProvider(name = "ListProjectTestCases")
     public Iterator<ProjectListTestCase[]> listProjectTestCases() throws Exception {
         return Iterables.transform(Arrays.asList(
-                listTestCase().withListParameter(
-                        new TestListRequest().withDescription(true)
-                ).expectUrl("/projects/?d"),
-                listTestCase().withListParameter(
-                        new TestListRequest().withDescription(false)
-                ).expectUrl("/projects/"),
-                listTestCase().withListParameter(
-                        new TestListRequest().withTree(true)
-                ).expectUrl("/projects/?t"),
-                listTestCase().withListParameter(
-                        new TestListRequest().withTree(false)
-                ).expectUrl("/projects/"),
-                listTestCase().withListParameter(
-                        new TestListRequest().withLimit(10)
-                ).expectUrl("/projects/?n=10"),
-                listTestCase().withListParameter(
-                        new TestListRequest().withPrefix("test")
-                ).expectUrl("/projects/?p=test"),
-                listTestCase().withListParameter(
-                        new TestListRequest().withStart(5)
-                ).expectUrl("/projects/?S=5"),
-                listTestCase().withListParameter(
-                    new TestListRequest().addShowBranches("toto").addShowBranches("titi")
-                ).expectUrl("/projects/?b=toto&b=titi"),
-                listTestCase().withListParameter(
-                        new TestListRequest()
-                                .withDescription(true)
-                                .withLimit(15)
-                                .withStart(10)
-                                .withPrefix("master")
-                ).expectUrl("/projects/?d&p=master&n=15&S=10"),
-                listTestCase().withListParameter(
-                    new TestListRequest().withType(Projects.ListRequest.FilterType.CODE)
-                ).expectUrl("/projects/?type=CODE")
+            listTestCase().withListParameter(
+                new TestListRequest().withDescription(true)
+            ).expectUrl("/projects/?d"),
+            listTestCase().withListParameter(
+                new TestListRequest().withDescription(false)
+            ).expectUrl("/projects/"),
+            listTestCase().withListParameter(
+                new TestListRequest().withTree(true)
+            ).expectUrl("/projects/?t"),
+            listTestCase().withListParameter(
+                new TestListRequest().withTree(false)
+            ).expectUrl("/projects/"),
+            listTestCase().withListParameter(
+                new TestListRequest().withLimit(10)
+            ).expectUrl("/projects/?n=10"),
+            listTestCase().withListParameter(
+                new TestListRequest().withPrefix("test")
+            ).expectUrl("/projects/?p=test"),
+            listTestCase().withListParameter(
+                new TestListRequest().withStart(5)
+            ).expectUrl("/projects/?S=5"),
+            listTestCase().withListParameter(
+                new TestListRequest().addShowBranches("toto").addShowBranches("titi")
+            ).expectUrl("/projects/?b=toto&b=titi"),
+            listTestCase().withListParameter(
+                new TestListRequest()
+                    .withDescription(true)
+                    .withLimit(15)
+                    .withStart(10)
+                    .withPrefix("master")
+            ).expectUrl("/projects/?d&p=master&n=15&S=10"),
+            listTestCase().withListParameter(
+                new TestListRequest().withType(Projects.ListRequest.FilterType.CODE)
+            ).expectUrl("/projects/?type=CODE")
         ), new Function<ProjectListTestCase, ProjectListTestCase[]>() {
             @Override
             public ProjectListTestCase[] apply(ProjectListTestCase testCase) {
@@ -110,6 +112,7 @@ public class ProjectsRestClientTest {
         private ProjectsParser projectsParser;
         private BranchInfoParser branchInfoParser;
         private TagInfoParser tagInfoParser;
+        private ProjectCommitInfoParser projectCommitInforParser;
 
         public ProjectListTestCase withListParameter(TestListRequest listParameter) {
             this.listParameter = listParameter;
@@ -134,18 +137,19 @@ public class ProjectsRestClientTest {
 
         public ProjectsRestClient getProjectsRestClient() throws Exception {
             return new ProjectsRestClient(
-                    setupGerritRestClient(),
-                    setupProjectsParser(),
-                    setupBranchInfoParser(),
-                    setupTagInfoParser()
+                setupGerritRestClient(),
+                setupProjectsParser(),
+                setupBranchInfoParser(),
+                setupTagInfoParser(),
+                setupProjectCommitInfoParser()
             );
         }
 
         public GerritRestClient setupGerritRestClient() throws Exception {
             gerritRestClient = EasyMock.createMock(GerritRestClient.class);
             EasyMock.expect(gerritRestClient.getRequest(expectedUrl))
-                    .andReturn(mockJsonElement)
-                    .once();
+                .andReturn(mockJsonElement)
+                .once();
             EasyMock.replay(gerritRestClient);
             return gerritRestClient;
         }
@@ -153,8 +157,8 @@ public class ProjectsRestClientTest {
         public ProjectsParser setupProjectsParser() throws Exception {
             projectsParser = EasyMock.createMock(ProjectsParser.class);
             EasyMock.expect(projectsParser.parseProjectInfos(mockJsonElement))
-                    .andReturn(new TreeMap<>())
-                    .once();
+                .andReturn(new TreeMap<>())
+                .once();
             EasyMock.replay(projectsParser);
             return projectsParser;
         }
@@ -162,8 +166,8 @@ public class ProjectsRestClientTest {
         public BranchInfoParser setupBranchInfoParser() throws Exception {
             branchInfoParser = EasyMock.createMock(BranchInfoParser.class);
             EasyMock.expect(branchInfoParser.parseBranchInfos(mockJsonElement))
-                    .andReturn(Lists.<BranchInfo>newArrayList())
-                    .once();
+                .andReturn(Lists.<BranchInfo>newArrayList())
+                .once();
             EasyMock.replay(branchInfoParser);
             return branchInfoParser;
         }
@@ -171,10 +175,19 @@ public class ProjectsRestClientTest {
         public TagInfoParser setupTagInfoParser() throws Exception {
             tagInfoParser = EasyMock.createMock(TagInfoParser.class);
             EasyMock.expect(tagInfoParser.parseTagInfos(mockJsonElement))
-                    .andReturn(Lists.<TagInfo>newArrayList())
-                    .once();
+                .andReturn(Lists.<TagInfo>newArrayList())
+                .once();
             EasyMock.replay(tagInfoParser);
             return tagInfoParser;
+        }
+
+        public ProjectCommitInfoParser setupProjectCommitInfoParser() throws Exception {
+            projectCommitInforParser = EasyMock.createMock(ProjectCommitInfoParser.class);
+            EasyMock.expect(projectCommitInforParser.parseIncludedInInfo(mockJsonElement))
+                .andReturn(EasyMock.createMock(IncludedInInfo.class))
+                .once();
+            EasyMock.replay(projectCommitInforParser);
+            return projectCommitInforParser;
         }
 
         @Override
@@ -208,7 +221,7 @@ public class ProjectsRestClientTest {
             return this;
         }
 
-        public TestListRequest addShowBranches(String branch){
+        public TestListRequest addShowBranches(String branch) {
             this.branches.add(branch);
             return this;
         }
@@ -244,7 +257,7 @@ public class ProjectsRestClientTest {
             if (start != null) {
                 target.withStart(start);
             }
-            for(final String branch: branches){
+            for (final String branch : branches) {
                 target.addShowBranch(branch);
             }
             if (type != null) {
@@ -259,6 +272,7 @@ public class ProjectsRestClientTest {
         final String name = "MyProject";
         createTestCase(name).expectUrl("/projects/" + name).execute().verify();
     }
+
     private static ProjectCreateTestCase createTestCase(String name) {
         return new ProjectCreateTestCase(name);
     }
@@ -271,6 +285,7 @@ public class ProjectsRestClientTest {
         private ProjectsParser projectsParser;
         private BranchInfoParser branchInfoParser;
         private TagInfoParser tagInfoParser;
+        private ProjectCommitInfoParser projectCommitInfoParser;
         private String mockJsonString = "{\"name\":\"whatever\"}";
         private ProjectInput mockProjectInput;
         private ProjectInfo mockProjectInfo = EasyMock.createMock(ProjectInfo.class);
@@ -298,18 +313,19 @@ public class ProjectsRestClientTest {
 
         public ProjectsRestClient getProjectsRestClient() throws Exception {
             return new ProjectsRestClient(
-                    setupGerritRestClient(),
-                    setupProjectsParser(),
-                    setupBranchInfoParser(),
-                    setupTagInfoParser()
+                setupGerritRestClient(),
+                setupProjectsParser(),
+                setupBranchInfoParser(),
+                setupTagInfoParser(),
+                setupProjectCommitInfoParser()
             );
         }
 
         public GerritRestClient setupGerritRestClient() throws Exception {
             gerritRestClient = EasyMock.createMock(GerritRestClient.class);
             EasyMock.expect(gerritRestClient.putRequest(expectedUrl, mockJsonString))
-                    .andReturn(mockJsonElement)
-                    .once();
+                .andReturn(mockJsonElement)
+                .once();
             EasyMock.replay(gerritRestClient);
             return gerritRestClient;
         }
@@ -318,13 +334,13 @@ public class ProjectsRestClientTest {
             projectsParser = EasyMock.createMock(ProjectsParser.class);
             EasyMock.expect(projectsParser.generateProjectInput(
                     EasyMock.cmp(mockProjectInput,
-                            new SameName(),
-                            LogicalOperator.EQUAL)))
-                    .andReturn(mockJsonString)
-                    .once();
+                        new SameName(),
+                        LogicalOperator.EQUAL)))
+                .andReturn(mockJsonString)
+                .once();
             EasyMock.expect(projectsParser.parseSingleProjectInfo(mockJsonElement))
-                    .andReturn(mockProjectInfo)
-                    .once();
+                .andReturn(mockProjectInfo)
+                .once();
             EasyMock.replay(projectsParser);
             return projectsParser;
         }
@@ -338,7 +354,13 @@ public class ProjectsRestClientTest {
             tagInfoParser = EasyMock.createMock(TagInfoParser.class);
             return tagInfoParser;
         }
+
+        public ProjectCommitInfoParser setupProjectCommitInfoParser() throws Exception {
+            projectCommitInfoParser = EasyMock.createMock(ProjectCommitInfoParser.class);
+            return projectCommitInfoParser;
+        }
     }
+
     private static class SameName implements Comparator<ProjectInput> {
         @Override
         public int compare(ProjectInput o1, ProjectInput o2) {

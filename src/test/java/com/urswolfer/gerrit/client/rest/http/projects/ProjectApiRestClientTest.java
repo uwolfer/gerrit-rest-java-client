@@ -31,6 +31,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
+import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
@@ -52,14 +53,15 @@ public class ProjectApiRestClientTest {
     public void testGetProjectInfoForName() throws Exception {
         String projectName = "sandbox";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectGet("/projects/sandbox", MOCK_JSON_ELEMENT)
-                .get();
+            .expectGet("/projects/sandbox", MOCK_JSON_ELEMENT)
+            .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder()
-                .expectParseSingleProjectInfo(MOCK_JSON_ELEMENT, MOCK_PROJECT_INFO)
-                .get();
+            .expectParseSingleProjectInfo(MOCK_JSON_ELEMENT, MOCK_PROJECT_INFO)
+            .get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
         TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser);
+        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser);
 
         ProjectInfo projectInfo = projectsRestClient.name(projectName).get();
 
@@ -76,16 +78,17 @@ public class ProjectApiRestClientTest {
         mockBranches.add(MOCK_BRANCH_INFO);
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectGet("/projects/sandbox/branches?n=5&s=1&m=s&r=.", MOCK_JSON_ELEMENT)
-                .get();
+            .expectGet("/projects/sandbox/branches?n=5&s=1&m=s&r=.", MOCK_JSON_ELEMENT)
+            .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder()
-                .expectParseSingleProjectInfo(MOCK_JSON_ELEMENT, MOCK_PROJECT_INFO)
-                .get();
+            .expectParseSingleProjectInfo(MOCK_JSON_ELEMENT, MOCK_PROJECT_INFO)
+            .get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder()
-                .expectParseBranchInfos(MOCK_JSON_ELEMENT, mockBranches)
-                .get();
+            .expectParseBranchInfos(MOCK_JSON_ELEMENT, mockBranches)
+            .get();
         TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectName);
+        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser, projectName);
 
         List<BranchInfo> branches = projectApiRestClient.branches()
             .withLimit(5).withStart(1).withRegex(".").withSubstring("s")
@@ -97,12 +100,13 @@ public class ProjectApiRestClientTest {
     public void testGetProjectInfoServerException() throws Exception {
         String projectName = "sandbox";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectGet("/projects/sandbox", RestApiException.wrap(null, null))
-                .get();
+            .expectGet("/projects/sandbox", RestApiException.wrap(null, null))
+            .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
         TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser);
+        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser);
 
         projectsRestClient.name(projectName).get();
         projectsRestClient.name(projectName).branches().get();
@@ -112,12 +116,14 @@ public class ProjectApiRestClientTest {
     public void testCreateProject() throws Exception {
         String projectName = "sandbox";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectPut("/projects/sandbox", MOCK_JSON_ELEMENT)
-                .get();
+            .expectPut("/projects/sandbox", MOCK_JSON_ELEMENT)
+            .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
         TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser);
+        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
+
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser);
 
         projectsRestClient.name(projectName).create();
 
@@ -134,20 +140,22 @@ public class ProjectApiRestClientTest {
         projectInput.branches = Lists.newArrayList("master", "releases");
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectPut(
-                        "/projects/sandbox",
-                        "{\"parent\":\"playingfield\"," +
-                                "\"description\":\"Feel free to play in the sandbox!\"," +
-                                "\"permissions_only\":false," +
-                                "\"create_empty_commit\":false," +
-                                "\"branches\":[\"master\",\"releases\"]}",
-                        MOCK_JSON_ELEMENT)
-                .expectGetGson()
-                .get();
+            .expectPut(
+                "/projects/sandbox",
+                "{\"parent\":\"playingfield\"," +
+                    "\"description\":\"Feel free to play in the sandbox!\"," +
+                    "\"permissions_only\":false," +
+                    "\"create_empty_commit\":false," +
+                    "\"branches\":[\"master\",\"releases\"]}",
+                MOCK_JSON_ELEMENT)
+            .expectGetGson()
+            .get();
         ProjectsParser projectsParser = new ProjectsParserBuilder().get();
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder().get();
         TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser);
+        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
+
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser);
 
         projectsRestClient.name(projectName).create(projectInput);
 
@@ -166,7 +174,9 @@ public class ProjectApiRestClientTest {
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder()
             .get();
         TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectName);
+        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
+
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser, projectName);
 
         ProjectAccessInfo accessInfo = projectApiRestClient.access();
 
@@ -203,7 +213,10 @@ public class ProjectApiRestClientTest {
         BranchInfoParser branchInfoParser = new BranchInfoParserBuilder()
             .get();
         TagInfoParser tagInfoParser = new TagInfoParserBuilder().get();
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectName);
+        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder().get();
+
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, projectsParser, branchInfoParser, tagInfoParser, projectCommitInfoParser
+            , projectName);
 
         ProjectAccessInfo accessInfo = projectApiRestClient.access(projectAccessInput);
 

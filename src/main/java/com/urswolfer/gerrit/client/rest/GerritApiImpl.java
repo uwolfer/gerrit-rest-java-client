@@ -38,6 +38,7 @@ import com.urswolfer.gerrit.client.rest.http.projects.BranchInfoParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsRestClient;
 import com.urswolfer.gerrit.client.rest.http.projects.TagInfoParser;
+import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import com.urswolfer.gerrit.client.rest.http.tools.ToolsRestClient;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
 
@@ -68,16 +69,16 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
         @Override
         public ChangesRestClient get() {
             return new ChangesRestClient(
-                    gerritRestClient,
-                    new ChangeInfosParser(gerritRestClient.getGson()),
-                    new CommentsParser(gerritRestClient.getGson()),
-                    new FileInfoParser(gerritRestClient.getGson()),
-                    new ReviewerInfosParser(gerritRestClient.getGson()),
-                    new ReviewResultParser(gerritRestClient.getGson()),
-                    new CommitInfosParser(gerritRestClient.getGson()),
-                    new AccountsParser(gerritRestClient.getGson()),
-                    new MergeableInfoParser(gerritRestClient.getGson()),
-                    new ReviewInfoParser(gerritRestClient.getGson()));
+                gerritRestClient,
+                new ChangeInfosParser(gerritRestClient.getGson()),
+                new CommentsParser(gerritRestClient.getGson()),
+                new FileInfoParser(gerritRestClient.getGson()),
+                new ReviewerInfosParser(gerritRestClient.getGson()),
+                new ReviewResultParser(gerritRestClient.getGson()),
+                new CommitInfosParser(gerritRestClient.getGson()),
+                new AccountsParser(gerritRestClient.getGson()),
+                new MergeableInfoParser(gerritRestClient.getGson()),
+                new ReviewInfoParser(gerritRestClient.getGson()));
         }
     });
 
@@ -92,10 +93,11 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
         @Override
         public ProjectsRestClient get() {
             return new ProjectsRestClient(
-                    gerritRestClient,
-                    new ProjectsParser(gerritRestClient.getGson()),
-                    new BranchInfoParser(gerritRestClient.getGson()),
-                    new TagInfoParser(gerritRestClient.getGson()));
+                gerritRestClient,
+                new ProjectsParser(gerritRestClient.getGson()),
+                new BranchInfoParser(gerritRestClient.getGson()),
+                new TagInfoParser(gerritRestClient.getGson()),
+                new ProjectCommitInfoParser(gerritRestClient.getGson()));
         }
     });
 

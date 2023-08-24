@@ -20,11 +20,12 @@ import com.google.gerrit.extensions.common.LabelDefinitionInput;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
+import org.easymock.EasyMock;
+import org.testng.annotations.Test;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import org.easymock.EasyMock;
-import org.testng.annotations.Test;
 
 /**
  * @author Réda Housni Alaoui
@@ -81,6 +82,6 @@ public class LabelApiRestClientTest {
     private ProjectApiRestClient createProjectApiRestClient(GerritRestClient gerritRestClient, String projectName) {
         return new ProjectApiRestClient(gerritRestClient, new ProjectsParserBuilder()
             .get(), new BranchInfoParserBuilder()
-            .get(), new TagInfoParserBuilder().get(), projectName);
+            .get(), new TagInfoParserBuilder().get(), new ProjectCommitInfoParserBuilder().get(), projectName);
     }
 }
