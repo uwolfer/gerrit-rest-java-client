@@ -16,6 +16,7 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
+import com.google.gerrit.extensions.api.accounts.AccountInput;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
@@ -76,6 +77,22 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
     @Override
     public SuggestAccountsRequest suggestAccounts(String query) throws RestApiException {
         return suggestAccounts().withQuery(query);
+    }
+
+    @Override
+    public AccountApi create(String username) throws RestApiException {
+        AccountInput userInput = new AccountInput();
+        userInput.username = username;
+        return create(userInput);
+    }
+
+    @Override
+    public AccountApi create(AccountInput input) throws RestApiException {
+        String requestPath = String.format("/accounts/%s", Url.encode(input.username));
+        String body = gerritRestClient.getGson().toJson(input);
+        JsonElement result = gerritRestClient.putRequest(requestPath,body);
+        AccountInfo info = accountsParser.parseAccountInfo(result);
+        return new AccountApiRestClient(gerritRestClient,accountsParser,sshKeysParser,info.username);
     }
 
     private List<AccountInfo> suggestAccounts(SuggestAccountsRequest r) throws RestApiException {

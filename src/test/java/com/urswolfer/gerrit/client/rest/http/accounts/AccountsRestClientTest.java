@@ -20,6 +20,7 @@ import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
@@ -94,6 +95,22 @@ public class AccountsRestClientTest {
         accountsRestClient.suggestAccounts("jdoe").withLimit(5).get();
 
         EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testCreate() throws Exception {
+        String username = "foo";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGetGson()
+            .expectPut("/accounts/" + username, "{\"username\":\"foo\"}", MOCK_JSON_ELEMENT)
+            .get();
+        AccountsParser accountsParser = new AccountsParserBuilder()
+            .expectParseAccountInfo(MOCK_JSON_ELEMENT, MOCK_ACCOUNT_INFO)
+            .get();
+        SshKeysParser sshParser = EasyMock.createMock(SshKeysParser.class);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser,sshParser);
+        accountsRestClient.create(username);
+        EasyMock.verify(gerritRestClient, accountsParser);
     }
 
     private GerritRestClient gerritRestClientExpectGet(String expectedUrl) throws Exception {
