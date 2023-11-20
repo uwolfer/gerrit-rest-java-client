@@ -328,6 +328,14 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public AccountInfo setAssignee(AssigneeInput input) throws RestApiException {
+        String request = getRequestPath() + "/assignee";
+        String json = gerritRestClient.getGson().toJson(input);
+        JsonElement jsonElement= gerritRestClient.putRequest(request, json);
+        return accountsParser.parseAccountInfo(jsonElement);
+    }
+
+    @Override
     public AccountInfo getAssignee() throws RestApiException {
         String request = getRequestPath() + "/assignee";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
@@ -340,6 +348,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         JsonElement jsonElement = gerritRestClient.getRequest(request);
         return accountsParser.parseAccountInfos(jsonElement);
     }
+
+    public AccountInfo deleteAssignee() throws RestApiException {
+        String request = getRequestPath() + "/assignee";
+        JsonElement jsonElement= gerritRestClient.deleteRequest(request);
+        return accountsParser.parseAccountInfo(jsonElement);
+    }
+
 
     @Override
     public ChangeInfo check() throws RestApiException {
@@ -403,7 +418,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String request = getRequestPath() + path;
         gerritRestClient.putRequest(request);
     }
-    
+
     @Override
     public void rebase(RebaseInput in) throws RestApiException {
         String url = getRequestPath() + "/rebase";

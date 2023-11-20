@@ -26,6 +26,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
+import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParserBuilder;
 import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
@@ -585,6 +586,31 @@ public class ChangeApiRestClientTest {
     }
 
     @Test
+    public void testSetAssignee() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPut("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/assignee",
+                "{\"assignee\":\"foo\"}",jsonElement)
+            .expectGetGson()
+            .get();
+        AccountInfo info = EasyMock.createMock(AccountInfo.class);
+        info.username= "foo";
+        AccountsParser accountsParser = new AccountsParserBuilder()
+            .expectParseAccountInfo(jsonElement, info)
+            .get();
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null,
+            null, null, null, null, null,
+            accountsParser, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        AssigneeInput assigneeInput = new AssigneeInput();
+        assigneeInput.assignee = "foo";
+        AccountInfo assigneeInfo =
+            changeApiRestClient.setAssignee(assigneeInput);
+        Truth.assertThat(assigneeInfo).isSameAs(info);
+        EasyMock.verify(gerritRestClient, accountsParser);
+    }
+
+    @Test
     public void testGetAssignee() throws Exception {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
@@ -625,6 +651,28 @@ public class ChangeApiRestClientTest {
         List<AccountInfo> pastAssigneesInfo = changeApiRestClient.getPastAssignees();
 
         Truth.assertThat(pastAssigneesInfo).isSameAs(expectedPastAssignees);
+        EasyMock.verify(gerritRestClient, accountsParser);
+    }
+
+    @Test
+    public void testDeleteAssignee() throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectDelete("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/assignee",jsonElement)
+            .get();
+        AccountInfo info = EasyMock.createMock(AccountInfo.class);
+        info.username= "foo";
+        AccountsParser accountsParser = new AccountsParserBuilder()
+            .expectParseAccountInfo(jsonElement, info)
+            .get();
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null,
+            null, null, null, null, null,
+            accountsParser, null, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        AssigneeInput assigneeInput = new AssigneeInput();
+        assigneeInput.assignee = "foo";
+        AccountInfo assigneeInfo =
+            changeApiRestClient.deleteAssignee();
+        Truth.assertThat(assigneeInfo).isSameAs(info);
         EasyMock.verify(gerritRestClient, accountsParser);
     }
 
