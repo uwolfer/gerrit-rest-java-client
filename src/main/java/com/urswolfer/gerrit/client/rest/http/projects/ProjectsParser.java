@@ -16,13 +16,16 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.access.ProjectAccessInput;
+import com.google.gerrit.extensions.api.projects.ConfigInfo;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 
 import java.lang.reflect.Type;
 import java.util.SortedMap;
@@ -57,5 +60,12 @@ public class ProjectsParser {
 
     public String generateProjectAccessInput(ProjectAccessInput input) {
         return gson.toJson(input);
+    }
+
+    public ConfigInfo parseConfigInfo(JsonElement result) {
+        Gson gson = GsonFactory.getBuilder()
+        .registerTypeAdapter(ImmutableMap.class, new GsonFactory.ImmutableMapStringListAdaptor())
+        .create();
+        return gson.fromJson(result, ConfigInfo.class);
     }
 }

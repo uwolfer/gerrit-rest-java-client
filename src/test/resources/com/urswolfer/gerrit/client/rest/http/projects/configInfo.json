@@ -1,0 +1,64 @@
+)]}'
+{
+    "description": "Access inherited by all other projects.",
+    "use_contributor_agreements": {
+        "configured_value": "FALSE"
+    },
+    "use_content_merge": {
+        "configured_value":"TRUE"
+    },
+    "use_signed_off_by": {
+        "configured_value": "FALSE"
+    },
+    "create_new_change_for_all_not_in_target": {
+        "configured_value": "INHERIT"
+    },
+    "require_change_id": {
+        "configured_value": "TRUE"
+    },
+    "reject_implicit_merges": {
+        "configured_value": "INHERIT"
+    },
+    "private_by_default": {
+        "configured_value":"INHERIT"
+    },
+    "work_in_progress_by_default": {
+        "configured_value": "INHERIT"
+    },
+    "enable_reviewer_by_email": {
+        "configured_value": "INHERIT"
+    },
+    "match_author_to_committer_date": {
+        "configured_value": "INHERIT"
+    },
+    "reject_empty_commit": {
+        "configured_value": "INHERIT"
+    },
+    "max_object_size_limit": {
+            "value": "10m"
+        },
+    "submit_type": "MERGE_IF_NECESSARY",
+    "default_submit_type": {
+        "value": "MERGE_IF_NECESSARY",
+        "configured_value": "MERGE_IF_NECESSARY",
+        "inherited_value": "MERGE_IF_NECESSARY"
+    },
+    "actions": {
+        "delete-project~delete": {
+            "method": "POST",
+            "label": "Delete Project",
+            "title": "Not allowed to delete All-Projects"
+        },
+        "gc": {
+            "method": "POST",
+            "label": "Run GC",
+            "title": "Triggers the Git Garbage Collection for this project.",
+            "enabled": true
+            }
+        },
+    "commentlinks": {},
+    "extension_panel_names":{
+           "lfs": ["sadasd","asdsada"]
+    }
+}
+
