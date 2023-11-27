@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.TagInfo;
+import com.google.gerrit.extensions.api.projects.TagInput;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -38,6 +39,18 @@ public class TagApiRestClientTest {
     public static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
     public static final ProjectInfo MOCK_PROJECT_INFO = EasyMock.createMock(ProjectInfo.class);
     public static final TagInfo MOCK_TAG_INFO = EasyMock.createMock(TagInfo.class);
+
+    @Test
+    public void testCreateTag() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPut("/projects/sandbox/tags/some-tag", "{}", MOCK_JSON_ELEMENT)
+            .expectGetGson()
+            .get();
+        ProjectsRestClient projectsRestClient =
+            new ProjectsRestClient(gerritRestClient, null, null, null, null);
+
+        projectsRestClient.name("sandbox").tag("some-tag").create(new TagInput());
+    }
 
     @Test
     public void testGetTagsForProject() throws Exception {
@@ -92,5 +105,16 @@ public class TagApiRestClientTest {
         TagInfo tags = projectApiRestClient.tag("v0.0.1")
             .get();
         Truth.assertThat(tags).isEqualTo(MOCK_TAG_INFO);
+    }
+
+    @Test
+    public void testDeleteTag() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectDelete("/projects/sandbox/tags/some-tag")
+            .get();
+        ProjectsRestClient projectsRestClient =
+            new ProjectsRestClient(gerritRestClient, null, null, null, null);
+
+        projectsRestClient.name("sandbox").tag("some-tag").delete();
     }
 }
