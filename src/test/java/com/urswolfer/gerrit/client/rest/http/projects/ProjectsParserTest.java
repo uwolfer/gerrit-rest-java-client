@@ -16,10 +16,15 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.api.projects.ConfigInfo;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
+import com.google.gerrit.extensions.client.InheritableBoolean;
 import com.google.gerrit.extensions.client.ProjectState;
+import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -30,6 +35,7 @@ import org.testng.annotations.Test;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.SortedMap;
 
 /**
@@ -95,5 +101,23 @@ public class ProjectsParserTest extends AbstractParserTest {
         Truth.assertThat(parsedJson.name).isEqualTo(projectInput.name);
         Truth.assertThat(parsedJson.description).isEqualTo(projectInput.description);
         Truth.assertThat(parsedJson.owners).isEqualTo(projectInput.owners);
+    }
+
+    @Test
+    public void testParseProjectConfigInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("configInfo.json");
+
+        ConfigInfo configInfo = projectsParser.parseConfigInfo(jsonElement);
+
+
+        Truth.assertThat(configInfo.maxObjectSizeLimit.value).isEqualTo("10m");
+        Truth.assertThat(configInfo.useContentMerge.configuredValue).isEqualTo(InheritableBoolean.TRUE);
+        Truth.assertThat(configInfo.useContributorAgreements.configuredValue).isEqualTo(InheritableBoolean.FALSE);
+        Truth.assertThat(configInfo.defaultSubmitType.value).isEqualTo(SubmitType.MERGE_IF_NECESSARY);
+        ImmutableMap<String, ImmutableList<String>> extensionPanel = configInfo.extensionPanelNames;
+        Truth.assertThat(extensionPanel.size() ).isEqualTo(1);
+        Truth.assertThat(extensionPanel.containsKey("lfs")).isTrue();
+        Truth.assertThat(Objects.requireNonNull(extensionPanel.get("lfs")).size()).isEqualTo(2);
+
     }
 }

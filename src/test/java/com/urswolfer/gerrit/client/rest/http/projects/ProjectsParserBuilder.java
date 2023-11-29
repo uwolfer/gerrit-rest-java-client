@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.access.ProjectAccessInput;
+import com.google.gerrit.extensions.api.projects.ConfigInfo;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonElement;
 import org.easymock.EasyMock;
@@ -48,6 +49,12 @@ public final class ProjectsParserBuilder {
     public ProjectsParserBuilder expectParseProjectAccessInput(String json, ProjectAccessInput input) {
         EasyMock.expect(projectsParser.generateProjectAccessInput(input))
                 .andReturn(json).once();
+        return this;
+    }
+
+    public ProjectsParserBuilder expectParseProjectConfigInfo(JsonElement jsonElement, ConfigInfo result) {
+        EasyMock.expect(projectsParser.parseConfigInfo(jsonElement))
+            .andReturn(result).once();
         return this;
     }
 }

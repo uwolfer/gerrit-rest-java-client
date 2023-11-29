@@ -25,6 +25,8 @@ import com.google.gerrit.extensions.api.access.PermissionRuleInfo.Action;
 import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.access.ProjectAccessInput;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
+import com.google.gerrit.extensions.api.projects.ConfigInfo;
+import com.google.gerrit.extensions.api.projects.ConfigInput;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -94,6 +96,46 @@ public class ProjectApiRestClientTest {
             .withLimit(5).withStart(1).withRegex(".").withSubstring("s")
             .get();
         Truth.assertThat(branches).isEqualTo(mockBranches);
+    }
+
+    @Test
+    public void testGetProjectConfig() throws Exception {
+        String projectName = "sandbox";
+        ConfigInfo mockConfigInfo = EasyMock.createMock(ConfigInfo.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/projects/sandbox/config", MOCK_JSON_ELEMENT)
+            .get();
+        ProjectsParser projectsParser = new ProjectsParserBuilder()
+            .expectParseProjectConfigInfo(MOCK_JSON_ELEMENT, mockConfigInfo)
+            .get();
+        ProjectApiRestClient projectApiRestClient =
+            new ProjectApiRestClient(gerritRestClient, projectsParser, null, null, null, projectName);
+        ConfigInfo configInfo = projectApiRestClient.config();
+
+        EasyMock.verify(gerritRestClient, projectsParser);
+        Truth.assertThat(configInfo).isEqualTo(mockConfigInfo);
+    }
+
+    @Test
+    public void testSetProjectConfig() throws Exception {
+        String projectName = "sandbox";
+        ConfigInfo mockConfigInfo = EasyMock.createMock(ConfigInfo.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPut("/projects/sandbox/config", "{\"description\":\"foo\"}", MOCK_JSON_ELEMENT)
+            .expectGetGson()
+            .get();
+        mockConfigInfo.description= "foo";
+        ProjectsParser projectsParser = new ProjectsParserBuilder()
+            .expectParseProjectConfigInfo(MOCK_JSON_ELEMENT, mockConfigInfo)
+            .get();
+        ProjectApiRestClient projectApiRestClient =
+            new ProjectApiRestClient(gerritRestClient, projectsParser, null, null, null, projectName);
+        ConfigInput input = new ConfigInput();
+        input.description = "foo";
+        ConfigInfo configInfo = projectApiRestClient.config(input);
+
+        EasyMock.verify(gerritRestClient, projectsParser);
+        Truth.assertThat(configInfo).isEqualTo(mockConfigInfo);
     }
 
     @Test(expectedExceptions = RuntimeException.class)

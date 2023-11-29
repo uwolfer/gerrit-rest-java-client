@@ -22,6 +22,8 @@ import com.google.gerrit.extensions.api.access.ProjectAccessInput;
 import com.google.gerrit.extensions.api.projects.BranchApi;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.CommitApi;
+import com.google.gerrit.extensions.api.projects.ConfigInfo;
+import com.google.gerrit.extensions.api.projects.ConfigInput;
 import com.google.gerrit.extensions.api.projects.LabelApi;
 import com.google.gerrit.extensions.api.projects.ProjectApi;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
@@ -99,6 +101,21 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
     @Override
     public BranchApi branch(String ref) throws RestApiException {
         return new BranchApiRestClient(gerritRestClient, branchInfoParser, this, ref);
+    }
+
+    @Override
+    public ConfigInfo config() throws RestApiException {
+        String request = projectsUrl() + "/config";
+        JsonElement result = gerritRestClient.getRequest(request);
+        return projectsParser.parseConfigInfo(result);
+    }
+
+    @Override
+    public ConfigInfo config(ConfigInput in) throws RestApiException {
+        String request = projectsUrl() + "/config";
+        String body = gerritRestClient.getGson().toJson(in);
+        JsonElement result = gerritRestClient.putRequest(request, body);
+        return projectsParser.parseConfigInfo(result);
     }
 
     private List<BranchInfo> getBranches(ListRefsRequest<BranchInfo> lbr) throws RestApiException {
