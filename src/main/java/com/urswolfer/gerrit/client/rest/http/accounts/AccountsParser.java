@@ -17,19 +17,33 @@
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
 import com.google.common.reflect.TypeToken;
+import com.google.gerrit.extensions.api.accounts.DeletedDraftCommentInfo;
+import com.google.gerrit.extensions.client.DiffPreferencesInfo;
+import com.google.gerrit.extensions.client.EditPreferencesInfo;
+import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
+import com.google.gerrit.extensions.client.ProjectWatchInfo;
+import com.google.gerrit.extensions.common.AccountDetailInfo;
+import com.google.gerrit.extensions.common.AccountExternalIdInfo;
 import com.google.gerrit.extensions.common.AccountInfo;
+import com.google.gerrit.extensions.common.EmailInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * @author Thomas Forrer
  */
 public class AccountsParser {
     private static final Type TYPE = new TypeToken<List<AccountInfo>>() {}.getType();
+    private static final Type EMAIL_TYPE = new TypeToken<List<EmailInfo>>() {}.getType();
+    private static final Type EXTERNAL_ID_TYPE = new TypeToken<List<AccountExternalIdInfo>>() {}.getType();
+    private static final Type DELETE_DRAFT_TYPE = new TypeToken<List<DeletedDraftCommentInfo>>() {}.getType();
+    private static final Type PROJECT_WATCH_TYPE = new TypeToken<List<ProjectWatchInfo>>() {}.getType();
+    private static final Type STAR_TYPE = new TypeToken<SortedSet<String>>() {}.getType();
 
     private final Gson gson;
 
@@ -46,5 +60,45 @@ public class AccountsParser {
             return Collections.singletonList(parseAccountInfo(result));
         }
         return gson.fromJson(result, TYPE);
+    }
+
+    public AccountDetailInfo parseAccountDetailInfo(JsonElement result) {
+        return gson.fromJson(result, AccountDetailInfo.class);
+    }
+
+    public GeneralPreferencesInfo parseGeneralPreferences(JsonElement result) {
+        return gson.fromJson(result, GeneralPreferencesInfo.class);
+    }
+
+    public DiffPreferencesInfo parseDiffPreferences(JsonElement result) {
+        return gson.fromJson(result, DiffPreferencesInfo.class);
+    }
+
+    public EditPreferencesInfo parseEditPreferences(JsonElement result) {
+        return gson.fromJson(result, EditPreferencesInfo.class);
+    }
+
+    public List<ProjectWatchInfo> parseProjectWatchInfos(JsonElement result){
+        return gson.fromJson(result,PROJECT_WATCH_TYPE);
+    }
+
+    public SortedSet<String> parseStarLabels(JsonElement result) {
+        return gson.fromJson(result,STAR_TYPE);
+    }
+
+    public List<EmailInfo> parseEmailInfos(JsonElement result){
+        return gson.fromJson(result, EMAIL_TYPE);
+    }
+
+    public EmailInfo parseSingleEmailInfo(JsonElement result) {
+        return gson.fromJson(result, EmailInfo.class);
+    }
+
+    public List<AccountExternalIdInfo> parseAccountExternalIdInfos(JsonElement result){
+        return gson.fromJson(result, EXTERNAL_ID_TYPE);
+    }
+
+    public List<DeletedDraftCommentInfo> parseDeleteDraftCommentInfos(JsonElement result){
+        return gson.fromJson(result, DELETE_DRAFT_TYPE);
     }
 }

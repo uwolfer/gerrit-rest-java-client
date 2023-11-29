@@ -17,7 +17,14 @@
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.client.DiffPreferencesInfo;
+import com.google.gerrit.extensions.client.EditPreferencesInfo;
+import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
+import com.google.gerrit.extensions.client.ProjectWatchInfo;
+import com.google.gerrit.extensions.common.AccountDetailInfo;
+import com.google.gerrit.extensions.common.AccountExternalIdInfo;
 import com.google.gerrit.extensions.common.AccountInfo;
+import com.google.gerrit.extensions.common.EmailInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
@@ -25,6 +32,7 @@ import org.testng.annotations.Test;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Thomas Forrer
@@ -50,6 +58,15 @@ public class AccountsParserTest extends AbstractParserTest {
     }
 
     @Test
+    public void testParseAccountDetailInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/accountDetail.json");
+        AccountDetailInfo accountDetailInfo = accountsParser.parseAccountDetailInfo(jsonElement);
+        Truth.assertThat(accountDetailInfo.registeredOn).isNotNull();
+        Truth.assertThat(accountDetailInfo.inactive).isTrue();
+        Truth.assertThat(accountDetailInfo).isEqualTo(johnDoe);
+    }
+
+    @Test
     public void testParseUserInfoWithNullJsonElement() throws Exception {
         AccountInfo accountInfo = accountsParser.parseAccountInfo(null);
         Truth.assertThat(accountInfo).isNull();
@@ -67,5 +84,71 @@ public class AccountsParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("self/account.json");
         List<AccountInfo> accountInfos = accountsParser.parseAccountInfos(jsonElement);
         Truth.assertThat(accountInfos).hasSize(1);
+    }
+
+    @Test
+    public void testParseGeneralPreferences() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/generalPreferences.json");
+        GeneralPreferencesInfo preferencesInfo = accountsParser.parseGeneralPreferences(jsonElement);
+        Truth.assertThat(preferencesInfo.changesPerPage).isEqualTo(25);
+        Truth.assertThat(preferencesInfo.workInProgressByDefault).isTrue();
+    }
+
+    @Test
+    public void testParseDiffPreferences() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/diffPreferences.json");
+        DiffPreferencesInfo diffPreferencesInfo = accountsParser.parseDiffPreferences(jsonElement);
+        Truth.assertThat(diffPreferencesInfo.ignoreWhitespace).isEqualTo(DiffPreferencesInfo.Whitespace.IGNORE_NONE);
+    }
+
+    @Test
+    public void testParseEditPreferences() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/editPreferences.json");
+        EditPreferencesInfo editPreferencesInfo = accountsParser.parseEditPreferences(jsonElement);
+        Truth.assertThat(editPreferencesInfo.lineLength).isEqualTo(100);
+        Truth.assertThat(editPreferencesInfo.showTabs).isEqualTo(true);
+    }
+
+    @Test
+    public void testParseProjectWatchInfos() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/watchedProjects.json");
+        List<ProjectWatchInfo> watchInfoList = accountsParser.parseProjectWatchInfos(jsonElement);
+        Truth.assertThat(watchInfoList).hasSize(2);
+    }
+
+    @Test
+    public void testParseStarLabels() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/stars.json");
+        Set<String> starLabels = accountsParser.parseStarLabels(jsonElement);
+        Truth.assertThat(starLabels).hasSize(3);
+        Truth.assertThat(starLabels).containsExactly("blue", "green", "red");
+    }
+
+    @Test
+    public void testParseEmailInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/email.json");
+        List<EmailInfo> accountInfo = accountsParser.parseEmailInfos(jsonElement);
+        Truth.assertThat(accountInfo).hasSize(1);
+    }
+
+    @Test
+    public void testParseEmailInfos() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/emails.json");
+        List<EmailInfo> accountInfo = accountsParser.parseEmailInfos(jsonElement);
+        Truth.assertThat(accountInfo).hasSize(2);
+    }
+
+    @Test
+    public void parseAccountExternalIdInfos() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/externalIds.json");
+        List<AccountExternalIdInfo> accountInfo = accountsParser.parseAccountExternalIdInfos(jsonElement);
+        Truth.assertThat(accountInfo).hasSize(3);
+    }
+
+    @Test
+    public void parseDeleteDraftCommentInfos() throws Exception {
+        JsonElement jsonElement = getJsonElement("self/deletedDraftComments.json");
+        List<AccountExternalIdInfo> accountInfo = accountsParser.parseAccountExternalIdInfos(jsonElement);
+        Truth.assertThat(accountInfo).hasSize(1);
     }
 }

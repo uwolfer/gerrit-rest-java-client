@@ -20,6 +20,7 @@ import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.changes.parsers.ChangeInfosParser;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
@@ -37,7 +38,8 @@ public class AccountsRestClientTest {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet("/accounts/jdoe");
         AccountsParser accountsParser = getAccountsParser();
         SshKeysParser sshKeysParser = getSshKeysParser();
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser, sshKeysParser);
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser, sshKeysParser, changeInfosParser);
         accountsRestClient.id("jdoe").get();
 
         EasyMock.verify(gerritRestClient, accountsParser);
@@ -48,39 +50,11 @@ public class AccountsRestClientTest {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet("/accounts/self");
         AccountsParser accountsParser = getAccountsParser();
         SshKeysParser sshKeysParser = getSshKeysParser();
-
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser, sshKeysParser);
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser, sshKeysParser, changeInfosParser);
         accountsRestClient.self().get();
 
         EasyMock.verify(gerritRestClient, accountsParser);
-    }
-
-    @Test
-    public void testStarChange() throws Exception {
-        GerritRestClient gerritRestClient = gerritRestClientExpectPut(
-                "/accounts/jdoe/starred.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9");
-        AccountsRestClient accountsRestClient = new AccountsRestClient(
-                gerritRestClient,
-                EasyMock.createMock(AccountsParser.class),
-                EasyMock.createMock(SshKeysParser.class));
-
-        accountsRestClient.id("jdoe").starChange("Iccf90a8284f8371a211db9a2824d0617e95a79f9");
-
-        EasyMock.verify(gerritRestClient);
-    }
-
-    @Test
-    public void testUnStarChange() throws Exception {
-        GerritRestClient gerritRestClient = gerritRestClientExpectDelete(
-                "/accounts/jdoe/starred.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9");
-        AccountsRestClient accountsRestClient = new AccountsRestClient(
-                gerritRestClient,
-                EasyMock.createMock(AccountsParser.class),
-                EasyMock.createMock(SshKeysParser.class));
-
-        accountsRestClient.id("jdoe").unstarChange("Iccf90a8284f8371a211db9a2824d0617e95a79f9");
-
-        EasyMock.verify(gerritRestClient);
     }
 
     @Test
@@ -90,7 +64,8 @@ public class AccountsRestClientTest {
         AccountsRestClient accountsRestClient = new AccountsRestClient(
                 gerritRestClient,
                 EasyMock.createMock(AccountsParser.class),
-                EasyMock.createMock(SshKeysParser.class));
+                EasyMock.createMock(SshKeysParser.class),
+                EasyMock.createMock(ChangeInfosParser.class));
 
         accountsRestClient.suggestAccounts("jdoe").withLimit(5).get();
 
@@ -108,7 +83,8 @@ public class AccountsRestClientTest {
             .expectParseAccountInfo(MOCK_JSON_ELEMENT, MOCK_ACCOUNT_INFO)
             .get();
         SshKeysParser sshParser = EasyMock.createMock(SshKeysParser.class);
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser,sshParser);
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser, sshParser, changeInfosParser);
         accountsRestClient.create(username);
         EasyMock.verify(gerritRestClient, accountsParser);
     }
@@ -146,10 +122,10 @@ public class AccountsRestClientTest {
     }
 
     private SshKeysParser getSshKeysParser() throws Exception {
-        SshKeysParser accountsParser = EasyMock.createMock(SshKeysParser.class);
-        EasyMock.expect(accountsParser.parseSshKeyInfo(MOCK_JSON_ELEMENT))
+        SshKeysParser sshKeysParser = EasyMock.createMock(SshKeysParser.class);
+        EasyMock.expect(sshKeysParser.parseSshKeyInfo(MOCK_JSON_ELEMENT))
             .andReturn(MOCK_SSHKEY_INFO).once();
-        EasyMock.replay(accountsParser);
-        return accountsParser;
+        EasyMock.replay(sshKeysParser);
+        return sshKeysParser;
     }
 }

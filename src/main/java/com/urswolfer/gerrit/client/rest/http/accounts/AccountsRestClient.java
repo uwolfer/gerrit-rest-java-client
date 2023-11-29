@@ -24,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.accounts.AccountApi;
 import com.urswolfer.gerrit.client.rest.accounts.Accounts;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.changes.parsers.ChangeInfosParser;
 
 import java.util.List;
 
@@ -35,17 +36,19 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
     private final GerritRestClient gerritRestClient;
     private final AccountsParser accountsParser;
     private final SshKeysParser sshKeysParser;
+    private final ChangeInfosParser changeInfosParser;
 
     public AccountsRestClient(GerritRestClient gerritRestClient, AccountsParser accountsParser,
-                              SshKeysParser sshKeysParser) {
+                              SshKeysParser sshKeysParser, ChangeInfosParser changeInfosParser) {
         this.gerritRestClient = gerritRestClient;
         this.accountsParser = accountsParser;
         this.sshKeysParser = sshKeysParser;
+        this.changeInfosParser = changeInfosParser;
     }
 
     @Override
     public AccountApi id(String id) throws RestApiException {
-        return new AccountApiRestClient(gerritRestClient, accountsParser, sshKeysParser, id);
+        return new AccountApiRestClient(gerritRestClient, accountsParser, sshKeysParser, changeInfosParser, id);
     }
 
     @Override
@@ -92,7 +95,7 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
         String body = gerritRestClient.getGson().toJson(input);
         JsonElement result = gerritRestClient.putRequest(requestPath,body);
         AccountInfo info = accountsParser.parseAccountInfo(result);
-        return new AccountApiRestClient(gerritRestClient,accountsParser,sshKeysParser,info.username);
+        return new AccountApiRestClient(gerritRestClient, accountsParser, sshKeysParser, changeInfosParser, info.username);
     }
 
     private List<AccountInfo> suggestAccounts(SuggestAccountsRequest r) throws RestApiException {
