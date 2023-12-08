@@ -1,0 +1,30 @@
+)]}'
+[
+{
+"change": {
+"id": "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940",
+"project": "myProject",
+"branch": "master",
+"change_id": "I8473b95934b5732ac55d26311a706c9c2bde9940",
+"subject": "Implementing Feature X",
+"status": "ABANDONED",
+"created": "2013-02-01 09:59:32.126000000",
+"updated": "2013-02-21 11:16:36.775000000",
+"insertions": 34,
+"deletions": 101,
+"_number": 3965,
+"owner": {
+"name": "John Doe"
+}
+},
+"deleted": [
+{
+"id": "TvcXrmjM",
+"path": "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java",
+"line": 23,
+"message": "[nit] trailing whitespace",
+"updated": "2013-02-26 15:40:43.986000000"
+}
+]
+}
+]

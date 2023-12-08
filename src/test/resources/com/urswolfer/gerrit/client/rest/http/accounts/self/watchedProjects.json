@@ -1,0 +1,19 @@
+)]}'
+[
+{
+"project": "All-Projects",
+"notify_new_changes": true,
+"notify_new_patch_sets": true,
+"notify_all_comments": true,
+"notify_submitted_changes": true,
+"notify_abandoned_changes": true
+},
+{
+"project": "All-Users",
+"notify_new_changes": true,
+"notify_new_patch_sets": true,
+"notify_all_comments": true,
+"notify_submitted_changes": true,
+"notify_abandoned_changes": true
+}
+]

@@ -60,8 +60,10 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
     private final Supplier<AccountsRestClient> accountsRestClient = Suppliers.memoize(new com.google.common.base.Supplier<AccountsRestClient>() {
         @Override
         public AccountsRestClient get() {
-            return new AccountsRestClient(gerritRestClient, new AccountsParser(gerritRestClient.getGson()),
-                new SshKeysParser(gerritRestClient.getGson()));
+            return new AccountsRestClient(gerritRestClient,
+                new AccountsParser(gerritRestClient.getGson()),
+                new SshKeysParser(gerritRestClient.getGson()),
+                new ChangeInfosParser(gerritRestClient.getGson()));
         }
     });
 

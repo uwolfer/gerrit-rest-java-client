@@ -1,0 +1,19 @@
+)]}'
+[
+{
+"identity": "mailto:admin@example.com",
+"email_address": "admin@example.com",
+"trusted": true,
+"can_delete": true
+},
+{
+"identity": "mailto:admin2@example.com",
+"email_address": "admin2@example.com",
+"trusted": true,
+"can_delete": true
+},
+{
+"identity": "username:admin",
+"trusted": true
+}
+]

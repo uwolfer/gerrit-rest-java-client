@@ -1,0 +1,10 @@
+)]}'
+[
+{
+"email": "admin2@example.com"
+},
+{
+"email": "admin@example.com",
+"preferred": true
+}
+]

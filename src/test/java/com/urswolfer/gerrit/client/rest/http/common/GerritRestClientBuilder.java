@@ -88,6 +88,12 @@ public final class GerritRestClientBuilder {
         return this;
     }
 
+    public GerritRestClientBuilder expectJsonRequest(String path, String requestBody, GerritRestClient.HttpVerb verb,
+                                                 JsonElement result) throws Exception {
+        EasyMock.expect(gerritRestClient.requestJson(path, requestBody, verb)).andReturn(result).once();
+        return this;
+    }
+
     public GerritRestClientBuilder expectGetGson() {
         EasyMock.expect(gerritRestClient.getGson()).andReturn(AbstractParserTest.getGson()).once();
         return this;
