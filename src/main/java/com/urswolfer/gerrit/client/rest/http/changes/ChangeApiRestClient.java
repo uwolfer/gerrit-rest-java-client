@@ -28,6 +28,7 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
 import com.urswolfer.gerrit.client.rest.http.config.ServerRestClient;
+import com.urswolfer.gerrit.client.rest.http.config.parsers.ServerConfigParser;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.*;
@@ -48,6 +49,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     private final AccountsParser accountsParser;
     private final MergeableInfoParser mergeableInfoParser;
     private final ReviewInfoParser reviewInfoParser;
+    private final ServerConfigParser serverConfigParser;
     private final String id;
     private final ServerRestClient serverRestClient;
 
@@ -62,6 +64,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                AccountsParser accountsParser,
                                MergeableInfoParser mergeableInfoParser,
                                ReviewInfoParser reviewInfoParser,
+                               ServerConfigParser serverConfigParser,
                                String id) {
         this.gerritRestClient = gerritRestClient;
         this.changesRestClient = changesRestClient;
@@ -74,8 +77,9 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         this.accountsParser = accountsParser;
         this.mergeableInfoParser = mergeableInfoParser;
         this.reviewInfoParser = reviewInfoParser;
+        this.serverConfigParser = serverConfigParser;
         this.id = id;
-        this.serverRestClient = new ServerRestClient(gerritRestClient);
+        this.serverRestClient = new ServerRestClient(gerritRestClient,serverConfigParser);
     }
 
     @Override
@@ -158,6 +162,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
             accountsParser,
             mergeableInfoParser,
             reviewInfoParser,
+            serverConfigParser,
             newChangeInfo.id);
     }
 

@@ -17,9 +17,6 @@
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
 import com.google.common.truth.Truth;
-import com.google.gerrit.extensions.client.DiffPreferencesInfo;
-import com.google.gerrit.extensions.client.EditPreferencesInfo;
-import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
 import com.google.gerrit.extensions.client.ProjectWatchInfo;
 import com.google.gerrit.extensions.common.AccountDetailInfo;
 import com.google.gerrit.extensions.common.AccountExternalIdInfo;
@@ -84,29 +81,6 @@ public class AccountsParserTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("self/account.json");
         List<AccountInfo> accountInfos = accountsParser.parseAccountInfos(jsonElement);
         Truth.assertThat(accountInfos).hasSize(1);
-    }
-
-    @Test
-    public void testParseGeneralPreferences() throws Exception {
-        JsonElement jsonElement = getJsonElement("self/generalPreferences.json");
-        GeneralPreferencesInfo preferencesInfo = accountsParser.parseGeneralPreferences(jsonElement);
-        Truth.assertThat(preferencesInfo.changesPerPage).isEqualTo(25);
-        Truth.assertThat(preferencesInfo.workInProgressByDefault).isTrue();
-    }
-
-    @Test
-    public void testParseDiffPreferences() throws Exception {
-        JsonElement jsonElement = getJsonElement("self/diffPreferences.json");
-        DiffPreferencesInfo diffPreferencesInfo = accountsParser.parseDiffPreferences(jsonElement);
-        Truth.assertThat(diffPreferencesInfo.ignoreWhitespace).isEqualTo(DiffPreferencesInfo.Whitespace.IGNORE_NONE);
-    }
-
-    @Test
-    public void testParseEditPreferences() throws Exception {
-        JsonElement jsonElement = getJsonElement("self/editPreferences.json");
-        EditPreferencesInfo editPreferencesInfo = accountsParser.parseEditPreferences(jsonElement);
-        Truth.assertThat(editPreferencesInfo.lineLength).isEqualTo(100);
-        Truth.assertThat(editPreferencesInfo.showTabs).isEqualTo(true);
     }
 
     @Test
