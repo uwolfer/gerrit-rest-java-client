@@ -25,12 +25,17 @@ import com.google.gerrit.extensions.api.access.PermissionRuleInfo.Action;
 import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.access.ProjectAccessInput;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
+import com.google.gerrit.extensions.api.projects.ChildProjectApi;
 import com.google.gerrit.extensions.api.projects.ConfigInfo;
 import com.google.gerrit.extensions.api.projects.ConfigInput;
+import com.google.gerrit.extensions.api.projects.DescriptionInput;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
+import com.google.gerrit.extensions.common.BatchLabelInput;
+import com.google.gerrit.extensions.common.LabelDefinitionInput;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
@@ -38,6 +43,7 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -264,5 +270,208 @@ public class ProjectApiRestClientTest {
 
         Truth.assertThat(accessInfo).isEqualTo(MOCK_PROJECT_ACCESS_INFO);
         EasyMock.verify(gerritRestClient, projectsParser);
+    }
+
+    @Test
+    public void testGetDescription() throws Exception {
+        String description = "foo";
+        JsonPrimitive jsonObject = new JsonPrimitive(description);
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/projects/sandbox/description", jsonObject)
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null,
+            null, null);
+
+        String response = projectsRestClient.name(projectName).description();
+
+        EasyMock.verify(gerritRestClient);
+        Truth.assertThat(response).isEqualTo(description);
+    }
+
+    @Test
+    public void testSetDescription() throws Exception {
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPut("/projects/sandbox/description", "{\"description\":\"Some Description\"}", MOCK_JSON_ELEMENT)
+            .expectGetGson()
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null,
+            null, null);
+
+        DescriptionInput input = new DescriptionInput();
+        input.description = "Some Description";
+        projectsRestClient.name(projectName).description(input);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testGetChildren() throws Exception {
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/projects/sandbox/children", MOCK_JSON_ELEMENT)
+            .get();
+        ProjectsParser projectsParser = EasyMock.createMock(ProjectsParser.class);
+        List<ProjectInfo> expected = new ArrayList<>(Collections.emptyList());
+        expected.add(EasyMock.createMock(ProjectInfo.class));
+        expected.add(EasyMock.createMock(ProjectInfo.class));
+        expected.add(EasyMock.createMock(ProjectInfo.class));
+        EasyMock.expect(projectsParser.parseProjectInfosList(MOCK_JSON_ELEMENT))
+            .andReturn(expected)
+            .once();
+        EasyMock.replay(projectsParser);;
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, null,
+            null, null);
+        List<ProjectInfo> result = projectsRestClient.name(projectName).children();
+        Truth.assertThat(result).isEqualTo(expected);
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testGetChildrenRecursive() throws Exception {
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/projects/sandbox/children?recursive", MOCK_JSON_ELEMENT)
+            .get();
+        ProjectsParser projectsParser = EasyMock.createMock(ProjectsParser.class);
+        List<ProjectInfo> expected = new ArrayList<>(Collections.emptyList());
+        expected.add(EasyMock.createMock(ProjectInfo.class));
+        expected.add(EasyMock.createMock(ProjectInfo.class));
+        expected.add(EasyMock.createMock(ProjectInfo.class));
+        EasyMock.expect(projectsParser.parseProjectInfosList(MOCK_JSON_ELEMENT))
+            .andReturn(expected)
+            .once();
+        EasyMock.replay(projectsParser);;
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, null,
+            null, null);
+        List<ProjectInfo> result = projectsRestClient.name(projectName).children(true);
+        Truth.assertThat(result).isEqualTo(expected);
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testChild() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/projects/sandbox/children/child1", MOCK_JSON_ELEMENT)
+            .get();
+        ProjectsParser projectsParser = EasyMock.createMock(ProjectsParser.class);
+        EasyMock.expect(projectsParser.parseSingleProjectInfo(MOCK_JSON_ELEMENT))
+            .andReturn(MOCK_PROJECT_INFO)
+            .once();
+        EasyMock.replay(projectsParser);
+        ChildProjectApi client =  new ProjectsRestClient(gerritRestClient, projectsParser, null,
+            null, null).name("sandbox").child("child1");
+        ProjectInfo returned = client.get();
+        Truth.assertThat(returned).isEqualTo(MOCK_PROJECT_INFO);
+        EasyMock.verify(gerritRestClient,projectsParser);
+    }
+
+    @Test
+    public void testGetHead() throws Exception {
+        String head = "refs/heads/master";
+        JsonPrimitive jsonObject = new JsonPrimitive(head);
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/projects/sandbox/HEAD", jsonObject)
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null,
+            null, null);
+
+        String response = projectsRestClient.name(projectName).head();
+
+        EasyMock.verify(gerritRestClient);
+        Truth.assertThat(response).isEqualTo(head);
+    }
+
+    @Test
+    public void testSetHead() throws Exception {
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPut("/projects/sandbox/HEAD", "{\"ref\":\"refs/heads/new\"}", MOCK_JSON_ELEMENT)
+            .expectGetGson()
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null,
+            null, null);
+        projectsRestClient.name(projectName).head("refs/heads/new");
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testGetParent() throws Exception {
+        String parent = "All-Projects";
+        JsonPrimitive jsonObject = new JsonPrimitive(parent);
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/projects/sandbox/parent", jsonObject)
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null,
+            null, null);
+
+        String response = projectsRestClient.name(projectName).parent();
+
+        EasyMock.verify(gerritRestClient);
+        Truth.assertThat(response).isEqualTo(parent);
+    }
+
+    @Test
+    public void testSetParent() throws Exception {
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPut("/projects/sandbox/parent", "{\"parent\":\"Parent-project\"}", MOCK_JSON_ELEMENT)
+            .expectGetGson()
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null,
+            null, null);
+        projectsRestClient.name(projectName).parent("Parent-project");
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testIndex() throws Exception {
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPost("/projects/sandbox/index", "{\"index_children\":true}", MOCK_JSON_ELEMENT)
+            .expectGetGson()
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null,
+            null, null);
+        projectsRestClient.name(projectName).index(true);
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testIndexChanges() throws Exception {
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPost("/projects/sandbox/index.changes")
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null,
+            null, null);
+        projectsRestClient.name(projectName).indexChanges();
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
+    public void testLabels() throws Exception {
+        String projectName = "sandbox";
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectPost("/projects/sandbox/labels",
+                "{\"commit_message\":\"some commit\",\"create\":[{\"name\":\"reviews\",\"branches\":[\"master\"]}]}")
+            .expectGetGson()
+            .get();
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null,
+            null, null);
+
+        BatchLabelInput input = new BatchLabelInput();
+        input.commitMessage = "some commit";
+        LabelDefinitionInput labelDefinitionInput = new LabelDefinitionInput();
+        labelDefinitionInput.name = "reviews";
+        labelDefinitionInput.branches = Collections.singletonList("master");
+        input.create = Collections.singletonList(labelDefinitionInput);
+        projectsRestClient.name(projectName).labels(input);
+        EasyMock.verify(gerritRestClient);
     }
 }

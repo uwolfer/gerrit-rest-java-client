@@ -1,0 +1,34 @@
+)]}'
+{
+    "revision": "8c43bd9e565d306fe3beb329f51d3d2164338db2",
+    "inherits_from": {
+        "id": "All-Projects",
+        "name": "All-Projects",
+        "description": "Access inherited by all other projects.",
+        "state": "ACTIVE",
+        "web_links": [
+            {
+                "name": "browse",
+                "url": "/plugins/gitiles/All-Projects",
+                "target": "_blank"
+            }
+        ]
+    },
+    "local": {},
+    "is_owner": true,
+    "owner_of": [
+        "refs/*"
+    ],
+    "can_upload": true,
+    "can_add": true,
+    "can_add_tags": true,
+    "config_visible": true,
+    "groups": {},
+    "config_web_links": [
+        {
+            "name": "browse",
+            "url": "/plugins/gitiles/confirmation/+log/8c43bd9e565d306fe3beb329f51d3d2164338db2/project.config",
+            "target": "_blank"
+        }
+    ]
+}

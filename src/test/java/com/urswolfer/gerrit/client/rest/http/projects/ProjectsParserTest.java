@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
+import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.projects.ConfigInfo;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.client.InheritableBoolean;
@@ -74,6 +75,21 @@ public class ProjectsParserTest extends AbstractParserTest {
     }
 
     @Test
+    public void testParseProjectInfosList() throws Exception {
+        JsonElement jsonElement = getJsonElement("projects.json");
+
+        List<ProjectInfo> projectInfos = projectsParser.parseProjectInfosList(jsonElement);
+
+        Truth.assertThat(projectInfos.size()).isEqualTo(3);
+        int i = 0;
+        for (ProjectInfo projectInfo : projectInfos) {
+            ProjectInfo expected = PROJECT_INFO_LIST.get(i);
+            GerritAssert.assertEquals(projectInfo, expected);
+            i++;
+        }
+    }
+
+    @Test
     public void testParseSingleProjectInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("project.json");
 
@@ -120,4 +136,18 @@ public class ProjectsParserTest extends AbstractParserTest {
         Truth.assertThat(Objects.requireNonNull(extensionPanel.get("lfs")).size()).isEqualTo(2);
 
     }
+
+    @Test
+    public void testParseAccessCheckInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("projectAccessInfo.json");
+
+        ProjectAccessInfo accessInfo = projectsParser.parseProjectAccessInfo(jsonElement);
+
+        Truth.assertThat(accessInfo.canAdd).isTrue();
+        Truth.assertThat(accessInfo.canAddTags).isTrue();
+        Truth.assertThat(accessInfo.canUpload).isTrue();
+        Truth.assertThat(accessInfo.revision).isEqualTo("8c43bd9e565d306fe3beb329f51d3d2164338db2");
+        Truth.assertThat(accessInfo.inheritsFrom.name).isEqualTo("All-Projects");
+    }
+
 }
