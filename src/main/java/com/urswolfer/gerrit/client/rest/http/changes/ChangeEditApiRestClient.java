@@ -19,15 +19,19 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.gerrit.extensions.api.changes.ChangeEditApi;
 import com.google.gerrit.extensions.api.changes.FileContentInput;
 import com.google.gerrit.extensions.api.changes.PublishChangeEditInput;
+import com.google.gerrit.extensions.common.EditInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.google.gerrit.extensions.restapi.Url;
+import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.changes.parsers.CommitInfosParser;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
+import org.apache.http.HttpResponse;
+
 import java.io.IOException;
 import java.util.Optional;
-
-import org.apache.http.HttpResponse;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 
@@ -39,9 +43,44 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
     private final GerritRestClient gerritRestClient;
     private final String id;
 
-    public ChangeEditApiRestClient(GerritRestClient gerritRestClient, String id) {
+    private final CommitInfosParser commitInfosParser;
+
+    public ChangeEditApiRestClient(GerritRestClient gerritRestClient, CommitInfosParser commitInfosParser, String id) {
         this.gerritRestClient = gerritRestClient;
         this.id = id;
+        this.commitInfosParser = commitInfosParser;
+    }
+
+    @Override
+    public Optional<EditInfo> get() throws RestApiException {
+        JsonElement result = gerritRestClient.getRequest(getRequestPath());
+        if(result.isJsonNull()){
+            return Optional.empty();
+        }
+        return Optional.of(commitInfosParser.parseEditInfo(result));
+    }
+
+    @Override
+    public void delete() throws RestApiException {
+        gerritRestClient.deleteRequest(getRequestPath());
+    }
+
+    @Override
+    public void rebase() throws RestApiException {
+        String request = getRequestPath() + ":rebase";
+        gerritRestClient.postRequest(request);
+    }
+
+    @Override
+    public void publish() throws RestApiException{
+        publish(new PublishChangeEditInput());
+    }
+
+    @Override
+    public void publish(PublishChangeEditInput input) throws RestApiException {
+        String request = getRequestPath() + ":publish";
+        String json = gerritRestClient.getGson().toJson(input);
+        gerritRestClient.postRequest(request,json);
     }
 
     @Override
@@ -56,8 +95,29 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
     }
 
     @Override
+    public void renameFile(String oldFilePath, String newFilePath) throws RestApiException {
+        ChangeEditInput input = new ChangeEditInput();
+        input.old_path = oldFilePath;
+        input.new_path = newFilePath;
+        changeFile(input);
+    }
+
+    @Override
+    public void restoreFile(String filePath) throws RestApiException {
+        ChangeEditInput input = new ChangeEditInput();
+        input.restore_path = filePath;
+        changeFile(input);
+    }
+
+    private void changeFile(ChangeEditInput input) throws RestApiException {
+        String json = gerritRestClient.getGson().toJson(input);
+        gerritRestClient.postRequest(getRequestPath(),json);
+    }
+
+    @Override
     public void modifyFile(String filePath, FileContentInput input) throws RestApiException {
-        String request = getRequestPath() + "/" + filePath;
+        String encodedPath = Url.encode(filePath);
+        String request = getRequestPath() + "/" + encodedPath;
         try {
             gerritRestClient.request(request, input.binary_content, HttpVerb.PUT_TEXT_PLAIN);
         } catch (IOException e) {
@@ -66,11 +126,41 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
     }
 
     @Override
-    public void publish(PublishChangeEditInput input) throws RestApiException {
-	String request = getRequestPath() + ":publish";
+    public void deleteFile(String filePath) throws RestApiException {
+        String encodedPath = Url.encode(filePath);
+        String request = getRequestPath() + "/" + encodedPath;
+        gerritRestClient.deleteRequest(request);
+    }
+
+    @Override
+    public String getCommitMessage() throws RestApiException{
+        String request = getRequestPath() + ":message";
+        JsonElement result = gerritRestClient.getRequest(request);
+        return result.getAsString();
+    }
+
+    @Override
+    public void modifyCommitMessage(String newCommitMessage) throws RestApiException {
+        ChangeEditMessageInput input = new ChangeEditMessageInput();
+        input.message = newCommitMessage;
+        modifyCommitMessage(input);
+    }
+
+    public void modifyCommitMessage(ChangeEditMessageInput input) throws RestApiException {
+        String request = getRequestPath() + ":message";
         String json = gerritRestClient.getGson().toJson(input);
-        gerritRestClient.postRequest(request,json);
+        gerritRestClient.putRequest(request,json);
     }
 
     protected String getRequestPath() { return "/changes/" + id + "/edit"; }
+
+    protected static class ChangeEditInput {
+        public String restore_path;
+        public String old_path;
+        public String new_path;
+    }
+
+    public static class ChangeEditMessageInput {
+        public String message;
+    }
 }

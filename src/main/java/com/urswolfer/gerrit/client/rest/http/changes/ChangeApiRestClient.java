@@ -296,7 +296,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public ChangeEditApi edit() throws RestApiException {
-        return new ChangeEditApiRestClient(gerritRestClient, id);
+        return new ChangeEditApiRestClient(gerritRestClient, commitInfosParser, id);
     }
 
     @Override

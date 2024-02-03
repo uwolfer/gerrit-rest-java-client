@@ -74,4 +74,8 @@ public class CommitInfosParser {
         }
         return gson.fromJson(result, EDIT_INFO_TYPE);
     }
+
+    public EditInfo parseEditInfo(JsonElement jsonElement){
+        return gson.fromJson(jsonElement, EditInfo.class);
+    }
 }

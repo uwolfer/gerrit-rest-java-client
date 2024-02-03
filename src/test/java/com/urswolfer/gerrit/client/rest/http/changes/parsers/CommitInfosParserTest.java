@@ -131,12 +131,22 @@ public class CommitInfosParserTest extends AbstractParserTest{
     }
 
     @Test
-    public void testParseEditInfo() throws Exception {
+    public void testParseEditInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("edit.json");
         List<EditInfo> editInfos = commitInfosParser.parseEditInfos(jsonElement);
         Truth.assertThat(editInfos).hasSize(1);
         Truth.assertThat(editInfos.get(0).baseRevision).isEqualTo("184ebe53805e102605d11f6b143486d15c23a09c");
         Truth.assertThat(editInfos.get(0).fetch.get("git").url).isEqualTo("git://localhost/gerrit");
         Truth.assertThat(editInfos.get(0).files.size()).isEqualTo(2);
+    }
+
+    @Test
+    public void testParseEditInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("changeEditInfo.json");
+        EditInfo request = commitInfosParser.parseEditInfo(jsonElement);
+        Truth.assertThat(request.baseRevision).isEqualTo("c35558e0925e6985c91f3a16921537d5e572b7a3");
+        Truth.assertThat(request.commit.subject).isEqualTo("Use an EventBus to manage star icons");
+        Truth.assertThat(request.commit.message).isEqualTo("Use an EventBus to manage star icons\n\nImage widgets that need to ...");
+        Truth.assertThat(request.ref).isEqualTo("refs/users/01/1000001/edit-76482/1");
     }
 }

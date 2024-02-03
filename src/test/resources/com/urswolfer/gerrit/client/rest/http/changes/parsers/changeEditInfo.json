@@ -1,0 +1,23 @@
+)]}'
+{
+"commit": {
+"parents": [{"commit": "1eee2c9d8f352483781e772f35dc586a69ff5646"}],
+"author": {
+"name": "Shawn O. Pearce",
+"email": "sop@google.com",
+"date": "2012-04-24 18:08:08.000000000",
+"tz": -420
+},
+"committer": {
+"name": "Shawn O. Pearce",
+"email": "sop@google.com",
+"date": "2012-04-24 18:08:08.000000000",
+"tz": -420
+},
+"subject": "Use an EventBus to manage star icons",
+"message": "Use an EventBus to manage star icons\n\nImage widgets that need to ..."
+},
+"base_patch_set_number": 1,
+"base_revision": "c35558e0925e6985c91f3a16921537d5e572b7a3",
+"ref": "refs/users/01/1000001/edit-76482/1"
+}
