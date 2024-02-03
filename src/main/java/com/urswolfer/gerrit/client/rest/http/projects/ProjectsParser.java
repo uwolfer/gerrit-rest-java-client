@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.access.ProjectAccessInput;
+import com.google.gerrit.extensions.api.config.AccessCheckInfo;
 import com.google.gerrit.extensions.api.projects.ConfigInfo;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.common.ProjectInfo;
@@ -28,6 +29,8 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedMap;
 
 /**
@@ -46,6 +49,10 @@ public class ProjectsParser {
         return gson.fromJson(result, TYPE);
     }
 
+    public List<ProjectInfo> parseProjectInfosList(JsonElement result) {
+        return new ArrayList<>(parseProjectInfos(result).values());
+    }
+
     public ProjectInfo parseSingleProjectInfo(JsonElement result) {
         return gson.fromJson(result, ProjectInfo.class);
     }
@@ -60,6 +67,10 @@ public class ProjectsParser {
 
     public String generateProjectAccessInput(ProjectAccessInput input) {
         return gson.toJson(input);
+    }
+
+    public AccessCheckInfo parseAccessCheckInfo(JsonElement result) {
+        return gson.fromJson(result, AccessCheckInfo.class);
     }
 
     public ConfigInfo parseConfigInfo(JsonElement result) {
