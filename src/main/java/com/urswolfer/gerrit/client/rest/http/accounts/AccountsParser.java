@@ -18,9 +18,6 @@ package com.urswolfer.gerrit.client.rest.http.accounts;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.api.accounts.DeletedDraftCommentInfo;
-import com.google.gerrit.extensions.client.DiffPreferencesInfo;
-import com.google.gerrit.extensions.client.EditPreferencesInfo;
-import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
 import com.google.gerrit.extensions.client.ProjectWatchInfo;
 import com.google.gerrit.extensions.common.AccountDetailInfo;
 import com.google.gerrit.extensions.common.AccountExternalIdInfo;
@@ -28,6 +25,7 @@ import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.EmailInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.http.config.parsers.PreferencesParser;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -37,7 +35,7 @@ import java.util.SortedSet;
 /**
  * @author Thomas Forrer
  */
-public class AccountsParser {
+public class AccountsParser extends PreferencesParser {
     private static final Type TYPE = new TypeToken<List<AccountInfo>>() {}.getType();
     private static final Type EMAIL_TYPE = new TypeToken<List<EmailInfo>>() {}.getType();
     private static final Type EXTERNAL_ID_TYPE = new TypeToken<List<AccountExternalIdInfo>>() {}.getType();
@@ -45,10 +43,8 @@ public class AccountsParser {
     private static final Type PROJECT_WATCH_TYPE = new TypeToken<List<ProjectWatchInfo>>() {}.getType();
     private static final Type STAR_TYPE = new TypeToken<SortedSet<String>>() {}.getType();
 
-    private final Gson gson;
-
     public AccountsParser(Gson gson) {
-        this.gson = gson;
+        super(gson);
     }
 
     public AccountInfo parseAccountInfo(JsonElement result) {
@@ -64,18 +60,6 @@ public class AccountsParser {
 
     public AccountDetailInfo parseAccountDetailInfo(JsonElement result) {
         return gson.fromJson(result, AccountDetailInfo.class);
-    }
-
-    public GeneralPreferencesInfo parseGeneralPreferences(JsonElement result) {
-        return gson.fromJson(result, GeneralPreferencesInfo.class);
-    }
-
-    public DiffPreferencesInfo parseDiffPreferences(JsonElement result) {
-        return gson.fromJson(result, DiffPreferencesInfo.class);
-    }
-
-    public EditPreferencesInfo parseEditPreferences(JsonElement result) {
-        return gson.fromJson(result, EditPreferencesInfo.class);
     }
 
     public List<ProjectWatchInfo> parseProjectWatchInfos(JsonElement result){

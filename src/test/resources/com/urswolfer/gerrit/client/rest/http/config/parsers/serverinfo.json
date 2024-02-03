@@ -1,0 +1,82 @@
+)]}'
+{
+    "accounts": {
+        "visibility": "ALL",
+        "default_display_name": "FULL_NAME"
+    },
+    "auth": {
+        "auth_type": "LDAP",
+        "editable_account_fields": [
+            "USER_NAME",
+            "FULL_NAME"
+        ],
+        "git_basic_auth_policy": "HTTP"
+    },
+    "change": {
+        "allow_blame": true,
+        "update_delay": 300,
+        "mergeability_computation_behavior": "NEVER",
+        "enable_attention_set": true,
+        "conflicts_predicate_enabled": true
+    },
+    "download": {
+        "schemes": {
+            "anonymous http": {
+                "url": "http://test.gerrit.server/${project}",
+                "commands": {},
+                "clone_commands": {
+                    "Clone with commit-msg hook": "git clone \"http://test.gerrit.server/${project}\" \u0026\u0026 (cd \"${project-base-name}\" \u0026\u0026 mkdir -p `git rev-parse --git-dir`/hooks/ \u0026\u0026 curl -Lo `git rev-parse --git-dir`/hooks/commit-msg http://test.gerrit.server/tools/hooks/commit-msg \u0026\u0026 chmod +x `git rev-parse --git-dir`/hooks/commit-msg)",
+                    "Clone": "git clone \"http://test.gerrit.server/${project}\""
+                }
+            },
+            "ssh": {
+                "url": "ssh://admin@gerritms-daily-static-0.qauk.wandisco.com:29418/${project}",
+                "is_auth_required": true,
+                "is_auth_supported": true,
+                "commands": {},
+                "clone_commands": {
+                    "Clone with commit-msg hook": "git clone \"ssh://admin@gerritms-daily-static-0.qauk.wandisco.com:29418/${project}\" \u0026\u0026 (cd \"${project-base-name}\" \u0026\u0026 mkdir -p `git rev-parse --git-dir`/hooks/ \u0026\u0026 curl -Lo `git rev-parse --git-dir`/hooks/commit-msg http://test.gerrit.server/tools/hooks/commit-msg \u0026\u0026 chmod +x `git rev-parse --git-dir`/hooks/commit-msg)",
+                    "Clone": "git clone \"ssh://admin@gerritms-daily-static-0.qauk.wandisco.com:29418/${project}\""
+                }
+            },
+            "http": {
+                "url": "http://admin@test.gerrit.server/a/${project}",
+                "is_auth_required": true,
+                "is_auth_supported": true,
+                "commands": {},
+                "clone_commands": {
+                    "Clone with commit-msg hook": "git clone \"http://admin@test.gerrit.server/a/${project}\" \u0026\u0026 (cd \"${project-base-name}\" \u0026\u0026 mkdir -p `git rev-parse --git-dir`/hooks/ \u0026\u0026 curl -Lo `git rev-parse --git-dir`/hooks/commit-msg http://test.gerrit.server/tools/hooks/commit-msg \u0026\u0026 chmod +x `git rev-parse --git-dir`/hooks/commit-msg)",
+                    "Clone": "git clone \"http://admin@test.gerrit.server/a/${project}\""
+                }
+            }
+        },
+        "archives": [
+            "tgz",
+            "tar",
+            "tbz2",
+            "txz"
+        ]
+    },
+    "gerrit": {
+        "all_projects": "All-Projects",
+        "all_users": "All-Users",
+        "doc_search": true
+    },
+    "note_db_enabled": true,
+    "plugin": {
+        "js_resource_paths": [
+            "plugins/codemirror-editor/static/codemirror_editor.js"
+        ]
+    },
+    "sshd": {},
+    "suggest": {
+        "from": 0
+    },
+    "user": {
+        "anonymous_coward_name": "Name of user not set"
+    },
+    "receive": {
+        "enable_signed_push": false
+    },
+    "submit_requirement_dashboard_columns": []
+}

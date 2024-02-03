@@ -90,7 +90,7 @@ public class ChangesRestClientTest {
 
         ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changeInfosParser, null, null,
             null, null, null,
-            null, null, null);
+            null, null, null, null);
 
         Changes.QueryRequest queryRequest = changes.query();
         testCase.queryParameter.apply(queryRequest).get();
@@ -108,7 +108,7 @@ public class ChangesRestClientTest {
 
         ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changeInfosParser, commentsParser, null,
             null, null, null,
-            null, null, null);
+            null, null, null, null);
         changesRestClient.query("is:open").get();
 
         EasyMock.verify(gerritRestClient);
@@ -122,7 +122,7 @@ public class ChangesRestClientTest {
 
         ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changeInfosParser, commentsParser, null,
             null, null, null,
-            null, null, null);
+            null, null, null, null);
 
         ChangeApi changeApi = changesRestClient.id(123);
 
@@ -137,7 +137,7 @@ public class ChangesRestClientTest {
 
         ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changeInfosParser, commentsParser, null,
             null, null, null,
-            null, null, null);
+            null, null, null, null);
 
         ChangeApi changeApi = changesRestClient.id("packages/test", 123);
 
@@ -152,7 +152,7 @@ public class ChangesRestClientTest {
 
         ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, changeInfosParser, commentsParser, null,
             null,  null, null, null,
-            null, null);
+            null, null, null);
 
         ChangeApi changeApi = changesRestClient.id("packages/test", "master", "Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
 
@@ -167,7 +167,7 @@ public class ChangesRestClientTest {
 
         ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changeInfosParser,null,
             null, null, null, null,
-            null, null, null);
+            null, null, null, null);
 
         changes.query().get();
 
@@ -188,7 +188,7 @@ public class ChangesRestClientTest {
 
         ChangesRestClient changes = new ChangesRestClient(gerritRestClient, changeInfosParser, null,
             null, null, null, null,
-            null, null, null);
+            null, null, null, null);
 
         ChangeApi changeApi = changes.create(changeInput);
 

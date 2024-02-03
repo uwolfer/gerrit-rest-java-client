@@ -28,6 +28,7 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
+import com.urswolfer.gerrit.client.rest.http.config.parsers.ServerConfigParser;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     private final AccountsParser accountsParser;
     private final MergeableInfoParser mergeableInfoParser;
     private final ReviewInfoParser reviewInfoParser;
+    private final ServerConfigParser serverConfigParser;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
                              ChangeInfosParser changeInfosParser,
@@ -57,7 +59,9 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
                              CommitInfosParser commitInfosParser,
                              AccountsParser accountsParser,
                              MergeableInfoParser mergeableInfoParser,
-                             ReviewInfoParser reviewInfoParser) {
+                             ReviewInfoParser reviewInfoParser,
+                             ServerConfigParser serverConfigParser
+                             ) {
         this.gerritRestClient = gerritRestClient;
         this.changeInfosParser = changeInfosParser;
         this.commentsParser = commentsParser;
@@ -68,6 +72,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         this.accountsParser = accountsParser;
         this.mergeableInfoParser = mergeableInfoParser;
         this.reviewInfoParser = reviewInfoParser;
+        this.serverConfigParser = serverConfigParser;
     }
 
     @Override
@@ -123,7 +128,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     public ChangeApi id(String id) throws RestApiException {
         return new ChangeApiRestClient(gerritRestClient, this, changeInfosParser, commentsParser,
             fileInfoParser, reviewResultParser, reviewerInfosParser, commitInfosParser,
-            accountsParser, mergeableInfoParser, reviewInfoParser, id);
+            accountsParser, mergeableInfoParser, reviewInfoParser, serverConfigParser, id);
     }
 
     @Override

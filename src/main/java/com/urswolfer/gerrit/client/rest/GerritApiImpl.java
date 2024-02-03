@@ -32,6 +32,7 @@ import com.urswolfer.gerrit.client.rest.http.accounts.SshKeysParser;
 import com.urswolfer.gerrit.client.rest.http.changes.*;
 import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
 import com.urswolfer.gerrit.client.rest.http.config.ConfigRestClient;
+import com.urswolfer.gerrit.client.rest.http.config.parsers.ServerConfigParser;
 import com.urswolfer.gerrit.client.rest.http.groups.GroupsParser;
 import com.urswolfer.gerrit.client.rest.http.groups.GroupsRestClient;
 import com.urswolfer.gerrit.client.rest.http.projects.BranchInfoParser;
@@ -80,14 +81,15 @@ public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRes
                 new CommitInfosParser(gerritRestClient.getGson()),
                 new AccountsParser(gerritRestClient.getGson()),
                 new MergeableInfoParser(gerritRestClient.getGson()),
-                new ReviewInfoParser(gerritRestClient.getGson()));
+                new ReviewInfoParser(gerritRestClient.getGson()),
+                new ServerConfigParser(gerritRestClient.getGson()));
         }
     });
 
     private final Supplier<ConfigRestClient> configRestClient = Suppliers.memoize(new com.google.common.base.Supplier<ConfigRestClient>() {
         @Override
         public ConfigRestClient get() {
-            return new ConfigRestClient(gerritRestClient);
+            return new ConfigRestClient(gerritRestClient,new ServerConfigParser(gerritRestClient.getGson()));
         }
     });
 
