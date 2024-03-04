@@ -22,6 +22,8 @@ import com.google.gerrit.extensions.api.changes.CherryPickInput;
 import com.google.gerrit.extensions.api.changes.ReviewInput;
 import com.google.gerrit.extensions.api.changes.SubmitInput;
 import com.google.gerrit.extensions.client.SubmitType;
+import com.google.gerrit.extensions.common.CommentInfo;
+import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gerrit.extensions.common.TestSubmitRuleInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gson.JsonElement;
@@ -308,6 +310,21 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     }
 
     @Test(dataProvider = "TestCases")
+    public void testGetComment(RevisionApiTestCase testCase) throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet(testCase.getCommentsUrl + "TvcXrmjM", jsonElement)
+            .get();
+        CommentInfo commentInfo = EasyMock.createMock(CommentInfo.class);
+        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+        EasyMock.expect(commentsParser.parseSingleCommentInfo(jsonElement)).andReturn(commentInfo).once();
+        EasyMock.replay(commentsParser);
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, commentsParser);
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).comment("TvcXrmjM").get();
+        EasyMock.verify(gerritRestClient, commentsParser);
+    }
+
+    @Test(dataProvider = "TestCases")
     public void testGetRobotComments(RevisionApiTestCase testCase) throws Exception {
         JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
@@ -322,6 +339,21 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).robotComments();
 
+        EasyMock.verify(gerritRestClient, commentsParser);
+    }
+
+    @Test(dataProvider = "TestCases")
+    public void testGetRobotComment(RevisionApiTestCase testCase) throws Exception {
+        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet(testCase.robotCommentsUrl + "TvcXrmjM", jsonElement)
+            .get();
+        RobotCommentInfo robotCommentInfo = EasyMock.createMock(RobotCommentInfo.class);
+        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
+        EasyMock.expect(commentsParser.parseSingleRobotCommentInfo(jsonElement)).andReturn(robotCommentInfo).once();
+        EasyMock.replay(commentsParser);
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, commentsParser);
+        changesRestClient.id(CHANGE_ID).revision(testCase.revision).robotComment("TvcXrmjM").get();
         EasyMock.verify(gerritRestClient, commentsParser);
     }
 

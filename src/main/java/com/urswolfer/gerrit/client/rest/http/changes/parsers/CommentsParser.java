@@ -22,7 +22,6 @@ import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -49,7 +48,7 @@ public class CommentsParser {
         return gson.fromJson(result, COMMENT_TYPE);
     }
 
-    public CommentInfo parseSingleCommentInfo(JsonObject result) {
+    public CommentInfo parseSingleCommentInfo(JsonElement result) {
         return gson.fromJson(result, CommentInfo.class);
     }
 
@@ -57,7 +56,7 @@ public class CommentsParser {
         return gson.fromJson(result, ROBOT_COMMENT_TYPE);
     }
 
-    public RobotCommentInfo parseSingleRobotCommentInfo(JsonObject result) {
+    public RobotCommentInfo parseSingleRobotCommentInfo(JsonElement result) {
         return gson.fromJson(result, RobotCommentInfo.class);
     }
 
@@ -65,7 +64,7 @@ public class CommentsParser {
         return gson.fromJson(result, CHANGE_MESSAGE_TYPE);
     }
 
-    public ChangeMessageInfo parseSingleChangeMessageInfo(JsonObject result) {
+    public ChangeMessageInfo parseSingleChangeMessageInfo(JsonElement result) {
         return gson.fromJson(result, ChangeMessageInfo.class);
     }
 }
