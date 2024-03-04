@@ -1,0 +1,13 @@
+)]}'
+{
+"id": "TvcXrmjM",
+"path": "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java",
+"line": 23,
+"message": "Comment removed by: Administrator; Reason: contains confidential information",
+"updated": "2013-02-26 15:40:43.986000000",
+"author": {
+"_account_id": 1000096,
+"name": "John Doe",
+"email": "john.doe@example.com"
+}
+}

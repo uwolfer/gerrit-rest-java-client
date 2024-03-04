@@ -195,6 +195,16 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         return new DraftApiRestClient(gerritRestClient, changeApiRestClient, this, commentsParser, id);
     }
 
+    @Override
+    public CommentApi comment(String id) throws RestApiException {
+        return new CommentApiRestClient(gerritRestClient, this, commentsParser, id);
+    }
+
+    @Override
+    public RobotCommentApi robotComment(String id) throws RestApiException {
+        return new RobotCommentApiRestClient(gerritRestClient, this, commentsParser, id);
+    }
+
 
     @Override
     public Map<String, FileInfo> files() throws RestApiException {

@@ -25,7 +25,12 @@ import com.google.gerrit.extensions.common.ChangeMessageInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.*;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AccountInfoBuilder;
+import com.urswolfer.gerrit.client.rest.http.common.ChangeMessageInfoBuilder;
+import com.urswolfer.gerrit.client.rest.http.common.CommentInfoBuilder;
+import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
+import com.urswolfer.gerrit.client.rest.http.common.RobotCommentInfoBuilder;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -199,6 +204,27 @@ public class CommentsParserTest extends AbstractParserTest {
     public void testParseMessageInfos() throws Exception {
         List<ChangeMessageInfo> messages = parseMessages();
         GerritAssert.assertEquals(messages, MESSAGES_INFOS);
+    }
+
+    @Test
+    public void testParseSingleCommentInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("comment.json");
+        CommentInfo result = commentsParser.parseSingleCommentInfo(jsonElement);
+        Truth.assertThat(result.id).isEqualTo("TvcXrmjM");
+        Truth.assertThat(result.path).isEqualTo(
+            "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java");
+        Truth.assertThat(result.line).isEqualTo(23);
+        Truth.assertThat(result.author._accountId).isEqualTo(1000096);
+    }
+
+    @Test
+    public void testParseSingleRobotCommentInfo() throws Exception {
+        JsonElement jsonElement = getJsonElement("robotcomment.json");
+        RobotCommentInfo result = commentsParser.parseSingleRobotCommentInfo(jsonElement);
+        Truth.assertThat(result.id).isEqualTo("TvcXrmjM");
+        Truth.assertThat(result.line).isEqualTo(23);
+        Truth.assertThat(result.robotId).isEqualTo("importChecker");
+        Truth.assertThat(result.robotRunId).isEqualTo("76b1375aa8626ea7149792831fe2ed85e80d9e04");
     }
 
     private SortedMap<String, List<CommentInfo>> parseComments() throws Exception {
