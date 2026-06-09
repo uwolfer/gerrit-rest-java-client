@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Grab('com.urswolfer.gerrit.client.rest:gerrit-rest-java-client:0.8.8')
+@Grab('com.urswolfer.gerrit.client.rest:gerrit-rest-java-client:0.9.8')
 
 import com.google.gerrit.extensions.api.GerritApi
 import com.google.gerrit.extensions.common.ChangeInfo
