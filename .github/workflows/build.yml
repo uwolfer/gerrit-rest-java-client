@@ -28,17 +28,17 @@ jobs:
     - name: Build with Maven
       run: mvn -B package
     - name: Generate JaCoCo coverage report
-      if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+      if: github.event.pull_request.user.login != 'dependabot[bot]' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
       run: mvn -B jacoco:report
     - name: Publish coverage report to Coveralls
-      if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+      if: github.event.pull_request.user.login != 'dependabot[bot]' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
       uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         file: target/site/jacoco/jacoco.xml
         format: jacoco
     - name: Publish analysis to SonarCloud
-      if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+      if: github.event.pull_request.user.login != 'dependabot[bot]' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
