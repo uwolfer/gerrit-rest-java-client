@@ -242,9 +242,18 @@ public interface ChangeApi {
 
   IncludedInInfo includedIn() throws RestApiException;
 
+  /**
+   * Upstream changed this convenience method's return type from {@link AddReviewerResult} to
+   * {@link ReviewerResult} (both delegate to a differently-typed {@code addReviewer} overload).
+   * Java doesn't allow two methods with the same name/parameter types but different return types,
+   * so keeping both isn't possible; this keeps the original return type (and the original
+   * delegation to the deprecated {@link #addReviewer(AddReviewerInput)}) for source/binary
+   * compatibility with existing callers of {@code addReviewer(String)}. Use {@link
+   * #addReviewer(ReviewerInput)} directly for the new upstream behavior.
+   */
   @CanIgnoreReturnValue
-  default ReviewerResult addReviewer(String reviewer) throws RestApiException {
-    ReviewerInput in = new ReviewerInput();
+  default AddReviewerResult addReviewer(String reviewer) throws RestApiException {
+    AddReviewerInput in = new AddReviewerInput();
     in.reviewer = reviewer;
     return addReviewer(in);
   }
@@ -692,6 +701,10 @@ public interface ChangeApi {
   @Deprecated
   List<AccountInfo> getPastAssignees() throws RestApiException;
 
+  /** @deprecated removed upstream along with the "assignee" feature (superseded by attention set). */
+  @Deprecated
+  AccountInfo deleteAssignee() throws RestApiException;
+
   /** @deprecated removed upstream from this interface; the underlying REST resource may still exist. */
   @Deprecated
   Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException;
@@ -699,6 +712,14 @@ public interface ChangeApi {
   /** @deprecated removed upstream from this interface; the underlying REST resource may still exist. */
   @Deprecated
   void ignore(boolean ignore) throws RestApiException;
+
+  /** @deprecated removed upstream from this interface; the underlying REST resource may still exist. */
+  @Deprecated
+  boolean ignored() throws RestApiException;
+
+  /** @deprecated removed upstream from this interface; the underlying REST resource may still exist. */
+  @Deprecated
+  void markAsReviewed(boolean reviewed) throws RestApiException;
 
   /**
    * A default implementation which allows source compatibility when adding new methods to the
@@ -1004,12 +1025,27 @@ public interface ChangeApi {
     }
 
     @Override
+    public AccountInfo deleteAssignee() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
     public void ignore(boolean ignore) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public boolean ignored() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void markAsReviewed(boolean reviewed) throws RestApiException {
       throw new NotImplementedException();
     }
   }

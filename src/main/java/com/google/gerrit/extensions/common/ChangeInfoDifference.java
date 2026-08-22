@@ -14,6 +14,10 @@
 
 package com.google.gerrit.extensions.common;
 
+import static java.util.Objects.requireNonNull;
+
+import java.util.Objects;
+
 /** The difference between two {@link ChangeInfo}s returned by {@code ChangeInfoDiffer}. */
 public final class ChangeInfoDifference {
 
@@ -44,6 +48,40 @@ public final class ChangeInfoDifference {
 
   public ChangeInfo removed() {
     return removed;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ChangeInfoDifference)) {
+      return false;
+    }
+    ChangeInfoDifference that = (ChangeInfoDifference) o;
+    return Objects.equals(oldChangeInfo, that.oldChangeInfo)
+        && Objects.equals(newChangeInfo, that.newChangeInfo)
+        && Objects.equals(added, that.added)
+        && Objects.equals(removed, that.removed);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(oldChangeInfo, newChangeInfo, added, removed);
+  }
+
+  @Override
+  public String toString() {
+    return "ChangeInfoDifference{"
+        + "oldChangeInfo="
+        + oldChangeInfo
+        + ", newChangeInfo="
+        + newChangeInfo
+        + ", added="
+        + added
+        + ", removed="
+        + removed
+        + "}";
   }
 
   public static Builder builder() {
@@ -79,7 +117,11 @@ public final class ChangeInfoDifference {
     }
 
     public ChangeInfoDifference build() {
-      return new ChangeInfoDifference(oldChangeInfo, newChangeInfo, added, removed);
+      return new ChangeInfoDifference(
+          requireNonNull(oldChangeInfo, "oldChangeInfo"),
+          requireNonNull(newChangeInfo, "newChangeInfo"),
+          requireNonNull(added, "added"),
+          requireNonNull(removed, "removed"));
     }
   }
 }

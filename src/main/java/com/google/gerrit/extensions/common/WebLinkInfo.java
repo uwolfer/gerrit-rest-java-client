@@ -47,12 +47,13 @@ public class WebLinkInfo {
     return Objects.equals(name, i.name)
         && Objects.equals(tooltip, i.tooltip)
         && Objects.equals(imageUrl, i.imageUrl)
-        && Objects.equals(url, i.url);
+        && Objects.equals(url, i.url)
+        && Objects.equals(target, i.target);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, tooltip, imageUrl, url);
+    return Objects.hash(name, tooltip, imageUrl, url, target);
   }
 
   @Override

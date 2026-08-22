@@ -233,6 +233,14 @@ public interface RevisionApi {
   @Deprecated
   BinaryResult submitPreview(String format) throws RestApiException;
 
+  /** @deprecated removed upstream from this interface; the underlying REST resource may still exist. */
+  @Deprecated
+  List<RobotCommentInfo> robotCommentsAsList() throws RestApiException;
+
+  /** @deprecated removed upstream from this interface; the underlying REST resource may still exist. */
+  @Deprecated
+  String etag() throws RestApiException;
+
   /**
    * A default implementation which allows source compatibility when adding new methods to the
    * interface.
@@ -480,6 +488,16 @@ public interface RevisionApi {
 
     @Override
     public BinaryResult submitPreview(String format) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<RobotCommentInfo> robotCommentsAsList() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public String etag() throws RestApiException {
       throw new NotImplementedException();
     }
   }

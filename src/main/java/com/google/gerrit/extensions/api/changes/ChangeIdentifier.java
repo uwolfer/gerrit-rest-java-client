@@ -16,6 +16,7 @@ package com.google.gerrit.extensions.api.changes;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.gerrit.extensions.restapi.Url;
 import java.util.Objects;
 
 /**
@@ -67,7 +68,7 @@ public final class ChangeIdentifier {
    */
   public static ChangeIdentifier byProjectAndNumericChangeId(
       String projectName, int numericChangeId) {
-    return new ChangeIdentifier(projectName + "~" + numericChangeId);
+    return new ChangeIdentifier(Url.encode(projectName) + "~" + numericChangeId);
   }
 
   /**
@@ -82,7 +83,8 @@ public final class ChangeIdentifier {
    */
   public static ChangeIdentifier byTriplet(String projectName, String branchName, String changeId) {
     checkState(changeId.startsWith("I"), "expected changeId to be the I-hash");
-    return new ChangeIdentifier(projectName + "~" + branchName + "~" + changeId);
+    return new ChangeIdentifier(
+        Url.encode(projectName) + "~" + Url.encode(branchName) + "~" + changeId);
   }
 
   /**
