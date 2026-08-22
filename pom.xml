@@ -40,6 +40,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jdk.min.version>8</jdk.min.version>
     <jetty.version>8.2.0.v20160908</jetty.version>
+    <sonar.organization>uwolfer-github</sonar.organization>
+    <sonar.projectKey>com.urswolfer.gerrit.client.rest:gerrit-rest-java-client</sonar.projectKey>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
   </properties>
 
   <dependencies>
