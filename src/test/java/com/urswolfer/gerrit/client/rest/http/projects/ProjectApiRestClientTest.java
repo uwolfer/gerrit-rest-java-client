@@ -194,7 +194,8 @@ public class ProjectApiRestClientTest {
                     "\"description\":\"Feel free to play in the sandbox!\"," +
                     "\"permissions_only\":false," +
                     "\"create_empty_commit\":false," +
-                    "\"branches\":[\"master\",\"releases\"]}",
+                    "\"branches\":[\"master\",\"releases\"]," +
+                    "\"init_only\":false}",
                 MOCK_JSON_ELEMENT)
             .expectGetGson()
             .get();

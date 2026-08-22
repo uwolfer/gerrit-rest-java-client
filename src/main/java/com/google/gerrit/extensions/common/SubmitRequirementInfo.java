@@ -1,4 +1,4 @@
-// Copyright (C) 2018 The Android Open Source Project
+// Copyright (C) 2022 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,45 +14,67 @@
 
 package com.google.gerrit.extensions.common;
 
-import com.google.common.base.MoreObjects;
-import java.util.Objects;
-
 public class SubmitRequirementInfo {
-  public final String status;
-  public final String fallbackText;
-  public final String type;
+  /**
+   * @deprecated removed upstream; this class was repurposed for submit requirement definitions (see
+   *     {@link #name}, {@link #description}, ...). Use {@link SubmitRequirementResultInfo} for the
+   *     result of evaluating a submit requirement on a change instead. Kept here for source/binary
+   *     compatibility with existing callers.
+   */
+  @Deprecated public final String status;
 
+  /** @deprecated see {@link #status}. */
+  @Deprecated public final String fallbackText;
+
+  /** @deprecated see {@link #status}. */
+  @Deprecated public final String type;
+
+  public SubmitRequirementInfo() {
+    status = null;
+    fallbackText = null;
+    type = null;
+  }
+
+  /** @deprecated see {@link #status}; kept for source/binary compatibility with existing callers. */
+  @Deprecated
   public SubmitRequirementInfo(String status, String fallbackText, String type) {
     this.status = status;
     this.fallbackText = fallbackText;
     this.type = type;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof SubmitRequirementInfo)) {
-      return false;
-    }
-    SubmitRequirementInfo that = (SubmitRequirementInfo) o;
-    return Objects.equals(status, that.status)
-        && Objects.equals(fallbackText, that.fallbackText)
-        && Objects.equals(type, that.type);
-  }
+  /** Name of the submit requirement. */
+  public String name;
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(status, fallbackText, type);
-  }
+  /** Description of the submit requirement. */
+  public String description;
 
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this)
-        .add("status", status)
-        .add("fallbackText", fallbackText)
-        .add("type", type)
-        .toString();
-  }
+  /**
+   * The name of the project that defines this submit requirement.
+   *
+   * <p>{@code null} if the it's a global submit requirement.
+   */
+  public String projectName;
+
+  /**
+   * Expression string to be evaluated on a change. Decides if this submit requirement is applicable
+   * on the given change.
+   */
+  public String applicabilityExpression;
+
+  /**
+   * Expression string to be evaluated on a change. When evaluated to true, this submit requirement
+   * becomes fulfilled for this change.
+   */
+  public String submittabilityExpression;
+
+  /**
+   * Expression string to be evaluated on a change. When evaluated to true, this submit requirement
+   * becomes fulfilled for this change regardless of the evaluation of the {@link
+   * #submittabilityExpression}.
+   */
+  public String overrideExpression;
+
+  /** Boolean indicating if this submit requirement can be overridden in child projects. */
+  public boolean allowOverrideInChildProjects;
 }

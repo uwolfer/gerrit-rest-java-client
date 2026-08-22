@@ -15,6 +15,7 @@
 package com.google.gerrit.extensions.common;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 public class GroupInfo extends GroupBaseInfo {
@@ -26,10 +27,28 @@ public class GroupInfo extends GroupBaseInfo {
   public Integer groupId;
   public String owner;
   public String ownerId;
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
   public Timestamp createdOn;
+
   public Boolean _moreGroups;
 
   // These fields are only supplied for internal groups, and only if requested.
   public List<AccountInfo> members;
   public List<GroupInfo> includes;
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
+  @SuppressWarnings("JdkObsolete")
+  public Instant getCreatedOn() {
+    return createdOn.toInstant();
+  }
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
+  @SuppressWarnings("JdkObsolete")
+  public void setCreatedOn(Instant when) {
+    createdOn = Timestamp.from(when);
+  }
 }

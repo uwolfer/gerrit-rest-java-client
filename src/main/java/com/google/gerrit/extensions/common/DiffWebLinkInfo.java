@@ -18,29 +18,53 @@ public class DiffWebLinkInfo extends WebLinkInfo {
   public Boolean showOnSideBySideDiffView;
   public Boolean showOnUnifiedDiffView;
 
-  public static DiffWebLinkInfo forSideBySideDiffView(
-      String name, String imageUrl, String url, String target) {
-    return new DiffWebLinkInfo(name, imageUrl, url, target, true, false);
+  public static DiffWebLinkInfo forSideBySideDiffView(String name, String imageUrl, String url) {
+    return new DiffWebLinkInfo(name, imageUrl, url, true, false);
   }
 
+  /** @deprecated removed upstream; kept for source/binary compatibility with existing callers. */
+  @Deprecated
+  public static DiffWebLinkInfo forSideBySideDiffView(
+      String name, String imageUrl, String url, String target) {
+    DiffWebLinkInfo info = forSideBySideDiffView(name, imageUrl, url);
+    info.target = target;
+    return info;
+  }
+
+  public static DiffWebLinkInfo forUnifiedDiffView(String name, String imageUrl, String url) {
+    return new DiffWebLinkInfo(name, imageUrl, url, false, true);
+  }
+
+  /** @deprecated removed upstream; kept for source/binary compatibility with existing callers. */
+  @Deprecated
   public static DiffWebLinkInfo forUnifiedDiffView(
       String name, String imageUrl, String url, String target) {
-    return new DiffWebLinkInfo(name, imageUrl, url, target, false, true);
+    DiffWebLinkInfo info = forUnifiedDiffView(name, imageUrl, url);
+    info.target = target;
+    return info;
   }
 
   public static DiffWebLinkInfo forSideBySideAndUnifiedDiffView(
+      String name, String imageUrl, String url) {
+    return new DiffWebLinkInfo(name, imageUrl, url, true, true);
+  }
+
+  /** @deprecated removed upstream; kept for source/binary compatibility with existing callers. */
+  @Deprecated
+  public static DiffWebLinkInfo forSideBySideAndUnifiedDiffView(
       String name, String imageUrl, String url, String target) {
-    return new DiffWebLinkInfo(name, imageUrl, url, target, true, true);
+    DiffWebLinkInfo info = forSideBySideAndUnifiedDiffView(name, imageUrl, url);
+    info.target = target;
+    return info;
   }
 
   private DiffWebLinkInfo(
       String name,
       String imageUrl,
       String url,
-      String target,
       boolean showOnSideBySideDiffView,
       boolean showOnUnifiedDiffView) {
-    super(name, imageUrl, url, target);
+    super(name, imageUrl, url);
     this.showOnSideBySideDiffView = showOnSideBySideDiffView ? true : null;
     this.showOnUnifiedDiffView = showOnUnifiedDiffView ? true : null;
   }

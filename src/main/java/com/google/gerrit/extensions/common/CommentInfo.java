@@ -15,6 +15,7 @@
 package com.google.gerrit.extensions.common;
 
 import com.google.gerrit.extensions.client.Comment;
+import java.util.List;
 import java.util.Objects;
 
 public class CommentInfo extends Comment {
@@ -22,17 +23,29 @@ public class CommentInfo extends Comment {
   public String tag;
   public String changeMessageId;
 
+  /**
+   * A list of {@link ContextLineInfo}, that is, a list of pairs of {line_num, line_text} of the
+   * actual source file content surrounding and including the lines where the comment was written.
+   */
+  public List<ContextLineInfo> contextLines;
+
+  /** Mime type of the underlying source file. Only available if context lines are requested. */
+  public String sourceContentType;
+
   @Override
   public boolean equals(Object o) {
     if (super.equals(o)) {
       CommentInfo ci = (CommentInfo) o;
-      return Objects.equals(author, ci.author) && Objects.equals(tag, ci.tag);
+      return Objects.equals(author, ci.author)
+          && Objects.equals(tag, ci.tag)
+          && Objects.equals(unresolved, ci.unresolved)
+          && Objects.equals(fixSuggestions, ci.fixSuggestions);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), author, tag);
+    return Objects.hash(super.hashCode(), author, tag, unresolved, fixSuggestions);
   }
 }

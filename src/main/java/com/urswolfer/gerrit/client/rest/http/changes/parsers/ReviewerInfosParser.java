@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.changes.parsers;
 import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.api.changes.AddReviewerResult;
 import com.google.gerrit.extensions.api.changes.ReviewerInfo;
+import com.google.gerrit.extensions.api.changes.ReviewerResult;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -59,5 +60,9 @@ public class ReviewerInfosParser {
 
     public AddReviewerResult parseAddReviewerResult(JsonElement result) {
         return gson.fromJson(result, AddReviewerResult.class);
+    }
+
+    public ReviewerResult parseReviewerResult(JsonElement result) {
+        return gson.fromJson(result, ReviewerResult.class);
     }
 }

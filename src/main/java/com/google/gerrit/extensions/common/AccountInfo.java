@@ -27,6 +27,15 @@ import java.util.Objects;
  * are defined in {@link AccountDetailInfo}.
  */
 public class AccountInfo {
+  /**
+   * Tags are additional properties of an account. These are just tags known to Gerrit core. Plugins
+   * may define their own.
+   */
+  public static final class Tags {
+    /** Tag indicating that this account is a service user. */
+    public static final String SERVICE_USER = "SERVICE_USER";
+  }
+
   /** The numeric ID of the account. */
   public Integer _accountId;
 
@@ -67,6 +76,12 @@ public class AccountInfo {
   /** Whether the account is inactive. */
   public Boolean inactive;
 
+  /** Whether the account is deleted. */
+  public Boolean deleted;
+
+  /** Tags, such as whether this account is a service user. */
+  public List<String> tags;
+
   public AccountInfo(Integer id) {
     this._accountId = id;
   }
@@ -75,6 +90,22 @@ public class AccountInfo {
   public AccountInfo(String name, String email) {
     this.name = name;
     this.email = email;
+  }
+
+  /** Copies properties of this AccountInfo to another instance. */
+  public void copyTo(AccountInfo other) {
+    other._accountId = _accountId;
+    other.name = name;
+    other.displayName = displayName;
+    other.email = email;
+    other.secondaryEmails = secondaryEmails;
+    other.username = username;
+    other.avatars = avatars;
+    other._moreAccounts = _moreAccounts;
+    other.status = status;
+    other.inactive = inactive;
+    other.deleted = deleted;
+    other.tags = tags;
   }
 
   @Override
@@ -89,7 +120,10 @@ public class AccountInfo {
           && Objects.equals(username, accountInfo.username)
           && Objects.equals(avatars, accountInfo.avatars)
           && Objects.equals(_moreAccounts, accountInfo._moreAccounts)
-          && Objects.equals(status, accountInfo.status);
+          && Objects.equals(status, accountInfo.status)
+          && Objects.equals(inactive, accountInfo.inactive)
+          && Objects.equals(deleted, accountInfo.deleted)
+          && Objects.equals(tags, accountInfo.tags);
     }
     return false;
   }
@@ -102,6 +136,8 @@ public class AccountInfo {
         .add("displayname", displayName)
         .add("email", email)
         .add("username", username)
+        .add("inactive", inactive)
+        .add("tags", tags)
         .toString();
   }
 
@@ -116,7 +152,10 @@ public class AccountInfo {
         username,
         avatars,
         _moreAccounts,
-        status);
+        status,
+        inactive,
+        deleted,
+        tags);
   }
 
   protected AccountInfo() {}

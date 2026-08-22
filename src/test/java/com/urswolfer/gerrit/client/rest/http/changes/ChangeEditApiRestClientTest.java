@@ -122,7 +122,7 @@ public class ChangeEditApiRestClientTest {
                 "some text goes here", RestClient.HttpVerb.PUT_TEXT_PLAIN, response)
             .get();
         FileContentInput input = new FileContentInput();
-        input.binary_content = "some text goes here";
+        input.binaryContent = "some text goes here";
         getEditApiClient(gerritRestClient,null,"1").modifyFile("dir/file1",input);
         EasyMock.verify(gerritRestClient);
     }

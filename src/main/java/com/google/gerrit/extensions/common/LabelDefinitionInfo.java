@@ -19,20 +19,43 @@ import java.util.Map;
 
 public class LabelDefinitionInfo {
   public String name;
+  public String description;
   public String projectName;
   public String function;
   public Map<String, String> values;
   public short defaultValue;
   public List<String> branches;
   public Boolean canOverride;
-  public Boolean copyAnyScore;
-  public Boolean copyMinScore;
-  public Boolean copyMaxScore;
-  public Boolean copyAllScoresIfNoChange;
-  public Boolean copyAllScoresIfNoCodeChange;
-  public Boolean copyAllScoresOnTrivialRebase;
-  public Boolean copyAllScoresOnMergeFirstParentUpdate;
-  public List<Short> copyValues;
+
+  // The individual copy-rule flags below were replaced upstream by the single copyCondition
+  // expression further down. They are kept here, deprecated, for source/binary compatibility with
+  // existing callers.
+
+  /** @deprecated removed upstream in favor of {@link #copyCondition}. */
+  @Deprecated public Boolean copyAnyScore;
+
+  /** @deprecated removed upstream in favor of {@link #copyCondition}. */
+  @Deprecated public Boolean copyMinScore;
+
+  /** @deprecated removed upstream in favor of {@link #copyCondition}. */
+  @Deprecated public Boolean copyMaxScore;
+
+  /** @deprecated removed upstream in favor of {@link #copyCondition}. */
+  @Deprecated public Boolean copyAllScoresIfNoChange;
+
+  /** @deprecated removed upstream in favor of {@link #copyCondition}. */
+  @Deprecated public Boolean copyAllScoresIfNoCodeChange;
+
+  /** @deprecated removed upstream in favor of {@link #copyCondition}. */
+  @Deprecated public Boolean copyAllScoresOnTrivialRebase;
+
+  /** @deprecated removed upstream in favor of {@link #copyCondition}. */
+  @Deprecated public Boolean copyAllScoresOnMergeFirstParentUpdate;
+
+  /** @deprecated removed upstream in favor of {@link #copyCondition}. */
+  @Deprecated public List<Short> copyValues;
+
+  public String copyCondition;
   public Boolean allowPostSubmit;
   public Boolean ignoreSelfApproval;
 }

@@ -52,7 +52,7 @@ public class BranchApiRestClientTest {
     @Test
     public void testCreateBranch() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/projects/sandbox/branches/some-feature", "{}", MOCK_JSON_ELEMENT)
+            .expectPut("/projects/sandbox/branches/some-feature", "{\"create_empty_commit\":false}", MOCK_JSON_ELEMENT)
             .expectGetGson()
             .get();
         ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null, null, null);

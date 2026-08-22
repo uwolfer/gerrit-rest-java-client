@@ -16,10 +16,52 @@ package com.google.gerrit.extensions.common;
 
 import com.google.gerrit.extensions.client.ReviewerState;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Objects;
 
 public class ReviewerUpdateInfo {
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
   public Timestamp updated;
+
   public AccountInfo updatedBy;
+  public AccountInfo realUpdatedBy;
   public AccountInfo reviewer;
   public ReviewerState state;
+
+  public ReviewerUpdateInfo() {}
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
+  @SuppressWarnings("JdkObsolete")
+  public ReviewerUpdateInfo(
+      Instant updated,
+      AccountInfo updatedBy,
+      AccountInfo realUpdatedBy,
+      AccountInfo reviewer,
+      ReviewerState state) {
+    this.updated = Timestamp.from(updated);
+    this.updatedBy = updatedBy;
+    this.realUpdatedBy = realUpdatedBy;
+    this.reviewer = reviewer;
+    this.state = state;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof ReviewerUpdateInfo) {
+      ReviewerUpdateInfo reviewerUpdateInfo = (ReviewerUpdateInfo) o;
+      return Objects.equals(updated, reviewerUpdateInfo.updated)
+          && Objects.equals(updatedBy, reviewerUpdateInfo.updatedBy)
+          && Objects.equals(realUpdatedBy, reviewerUpdateInfo.realUpdatedBy)
+          && Objects.equals(reviewer, reviewerUpdateInfo.reviewer)
+          && Objects.equals(state, reviewerUpdateInfo.state);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(updated, updatedBy, realUpdatedBy, reviewer, state);
+  }
 }

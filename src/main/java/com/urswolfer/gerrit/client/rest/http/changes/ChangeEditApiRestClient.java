@@ -119,7 +119,7 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
         String encodedPath = Url.encode(filePath);
         String request = getRequestPath() + "/" + encodedPath;
         try {
-            gerritRestClient.request(request, input.binary_content, HttpVerb.PUT_TEXT_PLAIN);
+            gerritRestClient.request(request, input.binaryContent, HttpVerb.PUT_TEXT_PLAIN);
         } catch (IOException e) {
             throw RestApiException.wrap("Failed to modify file.", e);
         }

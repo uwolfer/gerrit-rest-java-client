@@ -91,6 +91,14 @@ public interface ChangeEditApi {
   void rebase() throws RestApiException;
 
   /**
+   * Rebases the change edit on top of the latest patch set of this change.
+   *
+   * @param input params for rebasing the change edit
+   * @throws RestApiException if the change edit couldn't be rebased or a change edit wasn't present
+   */
+  EditInfo rebase(RebaseChangeEditInput input) throws RestApiException;
+
+  /**
    * Publishes the change edit using default settings. See {@link #publish(PublishChangeEditInput)}
    * for more details.
    *
@@ -196,6 +204,18 @@ public interface ChangeEditApi {
   void modifyCommitMessage(String newCommitMessage) throws RestApiException;
 
   /**
+   * Updates the author/committer of the change edit. If the change edit doesn't exist, it will be
+   * created based on the current patch set of the change.
+   *
+   * @param name the name of the author/committer
+   * @param email the email of the author/committer
+   * @param type the type of the identity being edited
+   * @throws RestApiException if the author/committer identity couldn't be updated
+   */
+  void modifyIdentity(String name, String email, ChangeEditIdentityType type)
+      throws RestApiException;
+
+  /**
    * A default implementation which allows source compatibility when adding new methods to the
    * interface.
    */
@@ -222,6 +242,11 @@ public interface ChangeEditApi {
 
     @Override
     public void rebase() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public EditInfo rebase(RebaseChangeEditInput input) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -267,6 +292,11 @@ public interface ChangeEditApi {
 
     @Override
     public void modifyCommitMessage(String newCommitMessage) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void modifyIdentity(String name, String email, ChangeEditIdentityType type) throws RestApiException {
       throw new NotImplementedException();
     }
   }

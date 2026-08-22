@@ -15,6 +15,7 @@
 package com.google.gerrit.extensions.common;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 /**
  * Representation of a (detailed) account in the REST API.
@@ -27,9 +28,18 @@ import java.sql.Timestamp;
  */
 public class AccountDetailInfo extends AccountInfo {
   /** The timestamp of when the account was registered. */
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
   public Timestamp registeredOn;
 
   public AccountDetailInfo(Integer id) {
     super(id);
+  }
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
+  @SuppressWarnings("JdkObsolete")
+  public void setRegisteredOn(Instant registeredOn) {
+    this.registeredOn = Timestamp.from(registeredOn);
   }
 }

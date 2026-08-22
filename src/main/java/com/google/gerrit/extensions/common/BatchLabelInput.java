@@ -14,13 +14,5 @@
 
 package com.google.gerrit.extensions.common;
 
-import java.util.List;
-import java.util.Map;
-
 /** Input for the REST API that describes additions, updates and deletions of label definitions. */
-public class BatchLabelInput {
-  public String commitMessage;
-  public List<String> delete;
-  public List<LabelDefinitionInput> create;
-  public Map<String, LabelDefinitionInput> update;
-}
+public class BatchLabelInput extends AbstractBatchInput<LabelDefinitionInput> {}

@@ -16,6 +16,8 @@ package com.google.gerrit.extensions.common;
 
 import com.google.gerrit.common.Nullable;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Objects;
 
 /**
  * Representation of an approval in the REST API.
@@ -42,6 +44,8 @@ public class ApprovalInfo extends AccountInfo {
   public Integer value;
 
   /** The time and date describing when the approval was made. */
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
   public Timestamp date;
 
   /** Whether this vote was made after the change was submitted. */
@@ -61,14 +65,60 @@ public class ApprovalInfo extends AccountInfo {
 
   public ApprovalInfo(
       Integer id,
-      Integer value,
+      @Nullable Integer value,
       @Nullable VotingRangeInfo permittedVotingRange,
       @Nullable String tag,
-      Timestamp date) {
+      @Nullable Timestamp date) {
     super(id);
     this.value = value;
     this.permittedVotingRange = permittedVotingRange;
     this.date = date;
     this.tag = tag;
+  }
+
+  public ApprovalInfo(
+      Integer id,
+      @Nullable Integer value,
+      @Nullable VotingRangeInfo permittedVotingRange,
+      @Nullable String tag,
+      @Nullable Instant date) {
+    super(id);
+    this.value = value;
+    this.permittedVotingRange = permittedVotingRange;
+    this.tag = tag;
+    if (date != null) {
+      setDate(date);
+    }
+  }
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
+  @SuppressWarnings("JdkObsolete")
+  public void setDate(Instant date) {
+    this.date = Timestamp.from(date);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof ApprovalInfo) {
+      ApprovalInfo approvalInfo = (ApprovalInfo) o;
+      return super.equals(o)
+          && Objects.equals(tag, approvalInfo.tag)
+          && Objects.equals(value, approvalInfo.value)
+          && Objects.equals(date, approvalInfo.date)
+          && Objects.equals(postSubmit, approvalInfo.postSubmit)
+          && Objects.equals(permittedVotingRange, approvalInfo.permittedVotingRange);
+    }
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return super.toString() + ", value=" + this.value;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), tag, value, date, postSubmit, permittedVotingRange);
   }
 }

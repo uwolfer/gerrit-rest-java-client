@@ -14,6 +14,7 @@
 
 package com.google.gerrit.extensions.api.plugins;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.gerrit.extensions.common.PluginInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
@@ -29,9 +30,11 @@ public interface Plugins {
   PluginApi name(String name) throws RestApiException;
 
   @Deprecated
+  @CanIgnoreReturnValue
   PluginApi install(String name, com.google.gerrit.extensions.common.InstallPluginInput input)
       throws RestApiException;
 
+  @CanIgnoreReturnValue
   PluginApi install(String name, InstallPluginInput input) throws RestApiException;
 
   abstract class ListRequest {
@@ -114,25 +117,22 @@ public interface Plugins {
    */
   class NotImplemented implements Plugins {
     @Override
-    public ListRequest list() {
+    public ListRequest list() throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public PluginApi name(String name) {
+    public PluginApi name(String name) throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    @Deprecated
-    public PluginApi install(
-        String name, com.google.gerrit.extensions.common.InstallPluginInput input)
-        throws RestApiException {
+    public PluginApi install(String name, com.google.gerrit.extensions.common.InstallPluginInput input) throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public PluginApi install(String name, InstallPluginInput input) {
+    public PluginApi install(String name, InstallPluginInput input) throws RestApiException {
       throw new NotImplementedException();
     }
   }

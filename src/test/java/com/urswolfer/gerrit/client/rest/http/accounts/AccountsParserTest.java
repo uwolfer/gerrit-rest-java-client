@@ -60,7 +60,10 @@ public class AccountsParserTest extends AbstractParserTest {
         AccountDetailInfo accountDetailInfo = accountsParser.parseAccountDetailInfo(jsonElement);
         Truth.assertThat(accountDetailInfo.registeredOn).isNotNull();
         Truth.assertThat(accountDetailInfo.inactive).isTrue();
-        Truth.assertThat(accountDetailInfo).isEqualTo(johnDoe);
+        AccountInfo expectedJohnDoe = new AccountInfo(1000003);
+        johnDoe.copyTo(expectedJohnDoe);
+        expectedJohnDoe.inactive = true;
+        Truth.assertThat(accountDetailInfo).isEqualTo(expectedJohnDoe);
     }
 
     @Test

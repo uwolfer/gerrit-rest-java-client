@@ -29,10 +29,18 @@ public interface FileApi {
   /** Diff against the revision's parent version of the file. */
   DiffInfo diff() throws RestApiException;
 
-  /** @param base revision id of the revision to be used as the diff base */
+  /**
+   * Diff against the specified base
+   *
+   * @param base revision id of the revision to be used as the diff base
+   */
   DiffInfo diff(String base) throws RestApiException;
 
-  /** @param parent 1-based parent number to diff against */
+  /**
+   * Diff against the specified parent
+   *
+   * @param parent 1-based parent number to diff against
+   */
   DiffInfo diff(int parent) throws RestApiException;
 
   /**
@@ -52,7 +60,9 @@ public interface FileApi {
 
   abstract class DiffRequest {
     private String base;
-    private Integer context;
+    // Removed upstream. Kept here, deprecated, for source/binary compatibility with existing
+    // callers.
+    @Deprecated private Integer context;
     private Boolean intraline;
     private Whitespace whitespace;
     private OptionalInt parent = OptionalInt.empty();
@@ -64,6 +74,8 @@ public interface FileApi {
       return this;
     }
 
+    /** @deprecated removed upstream; kept for source/binary compatibility with existing callers. */
+    @Deprecated
     public DiffRequest withContext(int context) {
       this.context = context;
       return this;
@@ -88,6 +100,8 @@ public interface FileApi {
       return base;
     }
 
+    /** @deprecated removed upstream; kept for source/binary compatibility with existing callers. */
+    @Deprecated
     public Integer getContext() {
       return context;
     }

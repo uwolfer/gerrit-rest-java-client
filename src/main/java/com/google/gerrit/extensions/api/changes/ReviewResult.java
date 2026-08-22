@@ -15,6 +15,7 @@
 package com.google.gerrit.extensions.api.changes;
 
 import com.google.gerrit.common.Nullable;
+import com.google.gerrit.extensions.common.ChangeInfo;
 import java.util.Map;
 
 /** Result object representing the outcome of a review request. */
@@ -29,7 +30,7 @@ public class ReviewResult {
    * Map of account or group identifier to outcome of adding as a reviewer. Null if no reviewer
    * additions were requested.
    */
-  @Nullable public Map<String, AddReviewerResult> reviewers;
+  @Nullable public Map<String, ReviewerResult> reviewers;
 
   /**
    * Boolean indicating whether the change was moved out of WIP by this review. Either true or null.
@@ -38,4 +39,7 @@ public class ReviewResult {
 
   /** Error message for non-200 responses. */
   @Nullable public String error;
+
+  /** Change after applying the update. */
+  @Nullable public ChangeInfo changeInfo;
 }

@@ -14,17 +14,26 @@
 
 package com.google.gerrit.extensions.api.projects;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.access.ProjectAccessInput;
 import com.google.gerrit.extensions.api.config.AccessCheckInfo;
 import com.google.gerrit.extensions.api.config.AccessCheckInput;
 import com.google.gerrit.extensions.common.BatchLabelInput;
+import com.google.gerrit.extensions.common.BatchSubmitRequirementInput;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.DiffInfo;
+import com.google.gerrit.extensions.common.FileInfo;
 import com.google.gerrit.extensions.common.LabelDefinitionInfo;
+import com.google.gerrit.extensions.common.ListTagSortOption;
 import com.google.gerrit.extensions.common.ProjectInfo;
+import com.google.gerrit.extensions.common.SubmitRequirementInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface ProjectApi {
   ProjectApi create() throws RestApiException;
@@ -39,8 +48,10 @@ public interface ProjectApi {
 
   ProjectAccessInfo access() throws RestApiException;
 
+  @CanIgnoreReturnValue
   ProjectAccessInfo access(ProjectAccessInput p) throws RestApiException;
 
+  @CanIgnoreReturnValue
   ChangeInfo accessChange(ProjectAccessInput p) throws RestApiException;
 
   AccessCheckInfo checkAccess(AccessCheckInput in) throws RestApiException;
@@ -49,7 +60,37 @@ public interface ProjectApi {
 
   ConfigInfo config() throws RestApiException;
 
+  @CanIgnoreReturnValue
   ConfigInfo config(ConfigInput in) throws RestApiException;
+
+  @CanIgnoreReturnValue
+  ChangeInfo configReview(ConfigInput in) throws RestApiException;
+
+  Map<String, Set<String>> commitsIn(Collection<String> commits, Collection<String> refs)
+      throws RestApiException;
+
+  /**
+   * Lists files that differ between two commits.
+   *
+   * @param oldCommit the old commit SHA1 (40 characters)
+   * @param newCommit the new commit SHA1 (40 characters)
+   * @param nameOnly whether to return only the list of files without diff info
+   * @return map of file paths to FileInfo
+   * @throws RestApiException if commits are not in ancestor/descendant relationship or not visible
+   */
+  Map<String, FileInfo> diffFiles(String oldCommit, String newCommit, boolean nameOnly)
+      throws RestApiException;
+
+  /**
+   * Gets the diff for a specific file between two commits.
+   *
+   * @param oldCommit the old commit SHA1 (40 characters)
+   * @param newCommit the new commit SHA1 (40 characters)
+   * @param path the file path
+   * @return DiffInfo for the file
+   * @throws RestApiException if commits are not in ancestor/descendant relationship or not visible
+   */
+  DiffInfo diffFile(String oldCommit, String newCommit, String path) throws RestApiException;
 
   ListRefsRequest<BranchInfo> branches();
 
@@ -57,13 +98,19 @@ public interface ProjectApi {
 
   void deleteBranches(DeleteBranchesInput in) throws RestApiException;
 
+  Map<DeleteChangesResult, Collection<String>> deleteChanges(DeleteChangesInput in)
+      throws RestApiException;
+
   void deleteTags(DeleteTagsInput in) throws RestApiException;
 
   abstract class ListRefsRequest<T extends RefInfo> {
     protected int limit;
     protected int start;
+    protected boolean descendingOrder;
     protected String substring;
     protected String regex;
+    protected String nextPageToken;
+    protected ListTagSortOption sortBy = ListTagSortOption.REF;
 
     public abstract List<T> get() throws RestApiException;
 
@@ -74,6 +121,21 @@ public interface ProjectApi {
 
     public ListRefsRequest<T> withStart(int start) {
       this.start = start;
+      return this;
+    }
+
+    public ListRefsRequest<T> withDescendingOrder(boolean descendingOrder) {
+      this.descendingOrder = descendingOrder;
+      return this;
+    }
+
+    public ListRefsRequest<T> withSortBy(ListTagSortOption sortBy) {
+      this.sortBy = sortBy;
+      return this;
+    }
+
+    public ListRefsRequest<T> withNextPageToken(String token) {
+      this.nextPageToken = token;
       return this;
     }
 
@@ -93,6 +155,18 @@ public interface ProjectApi {
 
     public int getStart() {
       return start;
+    }
+
+    public boolean getDescendingOrder() {
+      return descendingOrder;
+    }
+
+    public ListTagSortOption getSortBy() {
+      return sortBy;
+    }
+
+    public String getNextPageToken() {
+      return nextPageToken;
     }
 
     public String getSubstring() {
@@ -211,15 +285,37 @@ public interface ProjectApi {
   abstract class ListLabelsRequest {
     protected boolean inherited;
 
+    protected String voteableOnRef;
+
     public abstract List<LabelDefinitionInfo> get() throws RestApiException;
 
     public ListLabelsRequest withInherited(boolean inherited) {
       this.inherited = inherited;
       return this;
     }
+
+    public ListLabelsRequest withVoteableOnRef(String voteableOnRef) {
+      this.voteableOnRef = voteableOnRef;
+      return this;
+    }
   }
 
   LabelApi label(String labelName) throws RestApiException;
+
+  ListSubmitRequirementsRequest submitRequirements() throws RestApiException;
+
+  abstract class ListSubmitRequirementsRequest {
+    protected boolean inherited;
+
+    public abstract List<SubmitRequirementInfo> get() throws RestApiException;
+
+    public ListSubmitRequirementsRequest withInherited(boolean inherited) {
+      this.inherited = inherited;
+      return this;
+    }
+  }
+
+  SubmitRequirementApi submitRequirement(String name) throws RestApiException;
 
   /**
    * Adds, updates and deletes label definitions in a batch.
@@ -227,6 +323,25 @@ public interface ProjectApi {
    * @param input input that describes additions, updates and deletions of label definitions
    */
   void labels(BatchLabelInput input) throws RestApiException;
+
+  /** Same as {@link #labels(BatchLabelInput)}, but creates a change with required updates. */
+  @CanIgnoreReturnValue
+  ChangeInfo labelsReview(BatchLabelInput input) throws RestApiException;
+
+  /**
+   * Adds, updates and deletes submit requirements definitions in a batch.
+   *
+   * @param input input that describes additions, updates and deletions of submit requirements
+   */
+  void submitRequirements(BatchSubmitRequirementInput input) throws RestApiException;
+
+  /**
+   * Creates a change with required submit requirements updates.
+   *
+   * <p>See {@link #submitRequirements(BatchSubmitRequirementInput)} for details
+   */
+  @CanIgnoreReturnValue
+  ChangeInfo submitRequirementsReview(BatchSubmitRequirementInput input) throws RestApiException;
 
   /**
    * A default implementation which allows source compatibility when adding new methods to the
@@ -254,6 +369,11 @@ public interface ProjectApi {
     }
 
     @Override
+    public void description(DescriptionInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public ProjectAccessInfo access() throws RestApiException {
       throw new NotImplementedException();
     }
@@ -264,7 +384,7 @@ public interface ProjectApi {
     }
 
     @Override
-    public ChangeInfo accessChange(ProjectAccessInput input) throws RestApiException {
+    public ChangeInfo accessChange(ProjectAccessInput p) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -289,7 +409,22 @@ public interface ProjectApi {
     }
 
     @Override
-    public void description(DescriptionInput in) throws RestApiException {
+    public ChangeInfo configReview(ConfigInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public Map<String, Set<String>> commitsIn(Collection<String> commits, Collection<String> refs) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public Map<String, FileInfo> diffFiles(String oldCommit, String newCommit, boolean nameOnly) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public DiffInfo diffFile(String oldCommit, String newCommit, String path) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -300,6 +435,21 @@ public interface ProjectApi {
 
     @Override
     public ListRefsRequest<TagInfo> tags() {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void deleteBranches(DeleteBranchesInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public Map<DeleteChangesResult, Collection<String>> deleteChanges(DeleteChangesInput in) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void deleteTags(DeleteTagsInput in) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -334,16 +484,6 @@ public interface ProjectApi {
     }
 
     @Override
-    public void deleteBranches(DeleteBranchesInput in) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public void deleteTags(DeleteTagsInput in) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
     public CommitApi commit(String commit) throws RestApiException {
       throw new NotImplementedException();
     }
@@ -359,17 +499,17 @@ public interface ProjectApi {
     }
 
     @Override
-    public ListDashboardsRequest dashboards() throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
     public void defaultDashboard(String name) throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
     public void removeDefaultDashboard() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ListDashboardsRequest dashboards() throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -414,7 +554,32 @@ public interface ProjectApi {
     }
 
     @Override
+    public ListSubmitRequirementsRequest submitRequirements() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public SubmitRequirementApi submitRequirement(String name) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public void labels(BatchLabelInput input) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ChangeInfo labelsReview(BatchLabelInput input) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void submitRequirements(BatchSubmitRequirementInput input) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ChangeInfo submitRequirementsReview(BatchSubmitRequirementInput input) throws RestApiException {
       throw new NotImplementedException();
     }
   }

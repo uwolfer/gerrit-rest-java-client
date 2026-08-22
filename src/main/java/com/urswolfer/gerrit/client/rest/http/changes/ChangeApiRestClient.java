@@ -236,10 +236,11 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
-    public AddReviewerResult addReviewer(String in) throws RestApiException {
-        AddReviewerInput input = new AddReviewerInput();
-        input.reviewer = in;
-        return addReviewer(input);
+    public ReviewerResult addReviewer(ReviewerInput in) throws RestApiException {
+        String request = getRequestPath() + "/reviewers";
+        String json = gerritRestClient.getGson().toJson(in);
+        JsonElement reviewerResult = gerritRestClient.postRequest(request, json);
+        return reviewerInfosParser.parseReviewerResult(reviewerResult);
     }
 
     @Override

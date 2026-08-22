@@ -14,18 +14,25 @@
 
 package com.google.gerrit.extensions.client;
 
+import static com.google.gerrit.extensions.client.NullableBooleanPreferencesFieldComparator.equalBooleanPreferencesFields;
+
+import com.google.common.base.MoreObjects;
+import com.google.gerrit.common.ConvertibleToProto;
 import java.util.List;
+import java.util.Objects;
 
 /** Preferences about a single user. */
+@ConvertibleToProto
 public class GeneralPreferencesInfo {
 
   /** Default number of items to display per page. */
   public static final int DEFAULT_PAGESIZE = 25;
 
-  /** Valid choices for the page size. */
-  public static final int[] PAGESIZE_CHOICES = {10, 25, 50, 100};
+  /** @deprecated removed upstream. Valid choices for the page size. */
+  @Deprecated public static final int[] PAGESIZE_CHOICES = {10, 25, 50, 100};
 
-  /** Preferred method to download a change. */
+  /** @deprecated removed upstream. Preferred method to download a change. */
+  @Deprecated
   public enum DownloadCommand {
     REPO_DOWNLOAD,
     PULL,
@@ -75,6 +82,7 @@ public class GeneralPreferencesInfo {
   public enum EmailStrategy {
     ENABLED,
     CC_ON_OWN_COMMENTS,
+    ATTENTION_SET_ONLY,
     DISABLED
   }
 
@@ -103,6 +111,7 @@ public class GeneralPreferencesInfo {
   }
 
   public enum Theme {
+    AUTO,
     DARK,
     LIGHT
   }
@@ -127,6 +136,7 @@ public class GeneralPreferencesInfo {
 
   /** Number of changes to show in a screen. */
   public Integer changesPerPage;
+
   /** Type of download URL the user prefers to use. */
   public String downloadScheme;
 
@@ -134,7 +144,6 @@ public class GeneralPreferencesInfo {
   public DateFormat dateFormat;
   public TimeFormat timeFormat;
   public Boolean expandInlineDiffs;
-  public Boolean highlightAssigneeInChangeTable;
   public Boolean relativeDateInChangeTable;
   public DiffView diffView;
   public Boolean sizeBarInChangeTable;
@@ -145,9 +154,27 @@ public class GeneralPreferencesInfo {
   public EmailFormat emailFormat;
   public DefaultBase defaultBaseForMerges;
   public Boolean publishCommentsOnPush;
+  public Boolean disableKeyboardShortcuts;
+  public Boolean disableTokenHighlighting;
   public Boolean workInProgressByDefault;
   public List<MenuItem> my;
   public List<String> changeTable;
+  public Boolean allowBrowserNotifications;
+  public Boolean allowSuggestCodeWhileCommenting;
+  public Boolean allowAutocompletingComments;
+  public String aiChatSelectedModel;
+  public String labelFilter;
+
+  /** @deprecated removed upstream along with the "assignee" feature (superseded by attention set). */
+  @Deprecated public Boolean highlightAssigneeInChangeTable;
+
+  /**
+   * The sidebar section that the user prefers to have open on the diff page, or "NONE" if all
+   * sidebars should be closed.
+   *
+   * <p>Sidebars supplied by plugins are prefixed with "plugin-".
+   */
+  public String diffPageSidebar;
 
   public DateFormat getDateFormat() {
     if (dateFormat == null) {
@@ -184,15 +211,121 @@ public class GeneralPreferencesInfo {
     return emailFormat;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof GeneralPreferencesInfo)) {
+      return false;
+    }
+    GeneralPreferencesInfo other = (GeneralPreferencesInfo) obj;
+    return Objects.equals(this.changesPerPage, other.changesPerPage)
+        && Objects.equals(this.downloadScheme, other.downloadScheme)
+        && Objects.equals(this.theme, other.theme)
+        && Objects.equals(this.dateFormat, other.dateFormat)
+        && Objects.equals(this.timeFormat, other.timeFormat)
+        && equalBooleanPreferencesFields(this.expandInlineDiffs, other.expandInlineDiffs)
+        && equalBooleanPreferencesFields(
+            this.relativeDateInChangeTable, other.relativeDateInChangeTable)
+        && Objects.equals(this.diffView, other.diffView)
+        && equalBooleanPreferencesFields(this.sizeBarInChangeTable, other.sizeBarInChangeTable)
+        && equalBooleanPreferencesFields(this.legacycidInChangeTable, other.legacycidInChangeTable)
+        && equalBooleanPreferencesFields(this.muteCommonPathPrefixes, other.muteCommonPathPrefixes)
+        && equalBooleanPreferencesFields(this.signedOffBy, other.signedOffBy)
+        && Objects.equals(this.emailStrategy, other.emailStrategy)
+        && Objects.equals(this.emailFormat, other.emailFormat)
+        && Objects.equals(this.defaultBaseForMerges, other.defaultBaseForMerges)
+        && equalBooleanPreferencesFields(this.publishCommentsOnPush, other.publishCommentsOnPush)
+        && equalBooleanPreferencesFields(
+            this.disableKeyboardShortcuts, other.disableKeyboardShortcuts)
+        && equalBooleanPreferencesFields(
+            this.disableTokenHighlighting, other.disableTokenHighlighting)
+        && equalBooleanPreferencesFields(
+            this.workInProgressByDefault, other.workInProgressByDefault)
+        && Objects.equals(this.my, other.my)
+        && Objects.equals(this.changeTable, other.changeTable)
+        && equalBooleanPreferencesFields(
+            this.allowBrowserNotifications, other.allowBrowserNotifications)
+        && equalBooleanPreferencesFields(
+            this.allowSuggestCodeWhileCommenting, other.allowSuggestCodeWhileCommenting)
+        && equalBooleanPreferencesFields(
+            this.allowAutocompletingComments, other.allowAutocompletingComments)
+        && Objects.equals(this.diffPageSidebar, other.diffPageSidebar)
+        && Objects.equals(this.aiChatSelectedModel, other.aiChatSelectedModel)
+        && Objects.equals(this.labelFilter, other.labelFilter);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        changesPerPage,
+        downloadScheme,
+        theme,
+        dateFormat,
+        timeFormat,
+        expandInlineDiffs,
+        relativeDateInChangeTable,
+        diffView,
+        sizeBarInChangeTable,
+        legacycidInChangeTable,
+        muteCommonPathPrefixes,
+        signedOffBy,
+        emailStrategy,
+        emailFormat,
+        defaultBaseForMerges,
+        publishCommentsOnPush,
+        disableKeyboardShortcuts,
+        disableTokenHighlighting,
+        workInProgressByDefault,
+        my,
+        changeTable,
+        allowBrowserNotifications,
+        allowSuggestCodeWhileCommenting,
+        allowAutocompletingComments,
+        diffPageSidebar,
+        aiChatSelectedModel,
+        labelFilter);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper("GeneralPreferencesInfo")
+        .add("changesPerPage", changesPerPage)
+        .add("downloadScheme", downloadScheme)
+        .add("theme", theme)
+        .add("dateFormat", dateFormat)
+        .add("timeFormat", timeFormat)
+        .add("expandInlineDiffs", expandInlineDiffs)
+        .add("relativeDateInChangeTable", relativeDateInChangeTable)
+        .add("diffView", diffView)
+        .add("sizeBarInChangeTable", sizeBarInChangeTable)
+        .add("legacycidInChangeTable", legacycidInChangeTable)
+        .add("muteCommonPathPrefixes", muteCommonPathPrefixes)
+        .add("signedOffBy", signedOffBy)
+        .add("emailStrategy", emailStrategy)
+        .add("emailFormat", emailFormat)
+        .add("defaultBaseForMerges", defaultBaseForMerges)
+        .add("publishCommentsOnPush", publishCommentsOnPush)
+        .add("disableKeyboardShortcuts", disableKeyboardShortcuts)
+        .add("disableTokenHighlighting", disableTokenHighlighting)
+        .add("workInProgressByDefault", workInProgressByDefault)
+        .add("my", my)
+        .add("changeTable", changeTable)
+        .add("allowBrowserNotifications", allowBrowserNotifications)
+        .add("allowSuggestCodeWhileCommenting", allowSuggestCodeWhileCommenting)
+        .add("allowAutocompletingComments", allowAutocompletingComments)
+        .add("diffPageSidebar", diffPageSidebar)
+        .add("aiChatSelectedModel", aiChatSelectedModel)
+        .add("labelFilter", labelFilter)
+        .toString();
+  }
+
   public static GeneralPreferencesInfo defaults() {
     GeneralPreferencesInfo p = new GeneralPreferencesInfo();
     p.changesPerPage = DEFAULT_PAGESIZE;
     p.downloadScheme = null;
-    p.theme = Theme.LIGHT;
+    p.theme = Theme.AUTO;
     p.dateFormat = DateFormat.STD;
     p.timeFormat = TimeFormat.HHMM_12;
     p.expandInlineDiffs = false;
-    p.highlightAssigneeInChangeTable = true;
     p.relativeDateInChangeTable = false;
     p.diffView = DiffView.SIDE_BY_SIDE;
     p.sizeBarInChangeTable = true;
@@ -203,7 +336,15 @@ public class GeneralPreferencesInfo {
     p.emailFormat = EmailFormat.HTML_PLAINTEXT;
     p.defaultBaseForMerges = DefaultBase.FIRST_PARENT;
     p.publishCommentsOnPush = false;
+    p.disableKeyboardShortcuts = false;
+    p.disableTokenHighlighting = false;
     p.workInProgressByDefault = false;
+    p.allowBrowserNotifications = true;
+    p.allowSuggestCodeWhileCommenting = true;
+    p.allowAutocompletingComments = true;
+    p.diffPageSidebar = "NONE";
+    p.aiChatSelectedModel = null;
+    p.labelFilter = null;
     return p;
   }
 }

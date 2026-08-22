@@ -14,6 +14,7 @@
 
 package com.google.gerrit.extensions.api.accounts;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.gerrit.extensions.client.ListAccountsOption;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
@@ -38,7 +39,11 @@ public interface Accounts {
    */
   AccountApi id(String id) throws RestApiException;
 
-  /** @see #id(String) */
+  /**
+   * Look up an account by ID. #id(String)
+   *
+   * <p>See #id(String)
+   */
   AccountApi id(int id) throws RestApiException;
 
   /**
@@ -49,9 +54,11 @@ public interface Accounts {
   AccountApi self() throws RestApiException;
 
   /** Create a new account with the given username and default options. */
+  @CanIgnoreReturnValue
   AccountApi create(String username) throws RestApiException;
 
   /** Create a new account. */
+  @CanIgnoreReturnValue
   AccountApi create(AccountInput input) throws RestApiException;
 
   /**
