@@ -150,7 +150,7 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
 
     @Override
     public void addGroups(String... groups) throws RestApiException {
-        String restPath = getRequestPath() + "/groups";
+        String restPath = getRequestPath() + BASE_URL;
 
         // Create an object which can be used to create the json for:
         // { groups: [ "group1", "group2 ] }
