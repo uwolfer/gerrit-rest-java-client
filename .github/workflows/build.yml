@@ -7,6 +7,9 @@ on:
       - master
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build:
 
@@ -24,16 +27,16 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package
+    - name: Generate JaCoCo coverage report
+      if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+      run: mvn -B jacoco:report
     - name: Publish coverage report to Coveralls
       if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        CI_NAME: github
-        CI_BUILD_NUMBER: ${{ github.run_id }}
-        CI_BUILD_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        CI_BRANCH: ${{ github.head_ref || github.ref_name }}
-        CI_PULL_REQUEST: ${{ github.event.pull_request.number }}
-      run: mvn -B jacoco:report coveralls:report -DrepoToken=$COVERALLS_REPO_TOKEN
+      uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/site/jacoco/jacoco.xml
+        format: jacoco
     - name: Publish analysis to SonarCloud
       if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
       env:
