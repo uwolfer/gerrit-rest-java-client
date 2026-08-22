@@ -93,6 +93,7 @@ public class SubmitRequirementExpressionInfo {
     SubmitRequirementExpressionInfo that = (SubmitRequirementExpressionInfo) o;
     return fulfilled == that.fulfilled
         && Objects.equals(expression, that.expression)
+        && status == that.status
         && Objects.equals(passingAtoms, that.passingAtoms)
         && Objects.equals(failingAtoms, that.failingAtoms)
         && Objects.equals(atomExplanations, that.atomExplanations)
@@ -102,6 +103,6 @@ public class SubmitRequirementExpressionInfo {
   @Override
   public int hashCode() {
     return Objects.hash(
-        expression, fulfilled, passingAtoms, failingAtoms, atomExplanations, errorMessage);
+        expression, fulfilled, status, passingAtoms, failingAtoms, atomExplanations, errorMessage);
   }
 }

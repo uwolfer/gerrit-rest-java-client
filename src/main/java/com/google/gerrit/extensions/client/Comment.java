@@ -40,6 +40,11 @@ public abstract class Comment {
   public Range range;
   public String inReplyTo;
 
+  // Removed upstream from this shared base class (moved into individual subclasses instead). Kept
+  // here for source/binary compatibility with existing callers that reference it via a Comment-typed
+  // value; CommentInfo/DraftInput/ReviewInput.CommentInput inherit it rather than re-declaring it.
+  public Boolean unresolved;
+
   // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
   // Instant
   public Timestamp updated;
@@ -156,6 +161,7 @@ public abstract class Comment {
           && Objects.equals(line, c.line)
           && Objects.equals(range, c.range)
           && Objects.equals(inReplyTo, c.inReplyTo)
+          && Objects.equals(unresolved, c.unresolved)
           && Objects.equals(updated, c.updated)
           && Objects.equals(message, c.message)
           && Objects.equals(commitId, c.commitId)
@@ -176,6 +182,7 @@ public abstract class Comment {
         line,
         range,
         inReplyTo,
+        unresolved,
         updated,
         message,
         fixSuggestions,

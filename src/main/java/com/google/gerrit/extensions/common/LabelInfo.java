@@ -43,6 +43,7 @@ public class LabelInfo {
           && Objects.equals(disliked, labelInfo.disliked)
           && Objects.equals(all, labelInfo.all)
           && Objects.equals(values, labelInfo.values)
+          && Objects.equals(description, labelInfo.description)
           && Objects.equals(value, labelInfo.value)
           && Objects.equals(defaultValue, labelInfo.defaultValue)
           && Objects.equals(optional, labelInfo.optional)
@@ -60,6 +61,7 @@ public class LabelInfo {
         disliked,
         all,
         values,
+        description,
         value,
         defaultValue,
         optional,

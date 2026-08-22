@@ -56,6 +56,15 @@ public class AttentionSetInfo {
     this.reasonAccount = reasonAccount;
   }
 
+  /**
+   * @deprecated removed upstream in favor of {@link #AttentionSetInfo(AccountInfo, Timestamp,
+   *     String, AccountInfo)}; kept for source/binary compatibility with existing callers.
+   */
+  @Deprecated
+  public AttentionSetInfo(AccountInfo account, Timestamp lastUpdate, String reason) {
+    this(account, lastUpdate, reason, null);
+  }
+
   // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
   // Instant
   @SuppressWarnings("JdkObsolete")

@@ -112,9 +112,7 @@ public class ReviewInput {
     PUBLISH_ALL_REVISIONS
   }
 
-  public static class CommentInput extends Comment {
-    public Boolean unresolved;
-  }
+  public static class CommentInput extends Comment {}
 
   /** @deprecated removed upstream; the underlying REST resource may still exist. */
   @Deprecated

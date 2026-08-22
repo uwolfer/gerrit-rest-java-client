@@ -70,7 +70,28 @@ public class ChangeMessageInfo {
   @Override
   public int hashCode() {
     return Objects.hash(
-        id, tag, author, realAuthor, date, message, accountsInMessage, _revisionNumber);
+        id,
+        tag,
+        author,
+        realAuthor,
+        date,
+        message,
+        accountsInMessageHashCode(),
+        _revisionNumber);
+  }
+
+  // accountsInMessage is compared via Iterables.elementsEqual (order-sensitive, but agnostic to
+  // the concrete Collection implementation), so its hash must be derived the same way instead of
+  // delegating to the collection's own hashCode(), which is implementation-dependent.
+  private int accountsInMessageHashCode() {
+    if (accountsInMessage == null) {
+      return 0;
+    }
+    int hash = 1;
+    for (AccountInfo accountInfo : accountsInMessage) {
+      hash = 31 * hash + Objects.hashCode(accountInfo);
+    }
+    return hash;
   }
 
   @Override

@@ -67,16 +67,16 @@ public class EditPreferencesInfo {
         lineLength,
         indentUnit,
         cursorBlinkRate,
-        hideTopMenu,
-        showTabs,
-        showWhitespaceErrors,
-        syntaxHighlighting,
-        hideLineNumbers,
-        matchBrackets,
-        lineWrapping,
-        indentWithTabs,
-        autoCloseBrackets,
-        showBase);
+        Objects.requireNonNullElse(hideTopMenu, false),
+        Objects.requireNonNullElse(showTabs, false),
+        Objects.requireNonNullElse(showWhitespaceErrors, false),
+        Objects.requireNonNullElse(syntaxHighlighting, false),
+        Objects.requireNonNullElse(hideLineNumbers, false),
+        Objects.requireNonNullElse(matchBrackets, false),
+        Objects.requireNonNullElse(lineWrapping, false),
+        Objects.requireNonNullElse(indentWithTabs, false),
+        Objects.requireNonNullElse(autoCloseBrackets, false),
+        Objects.requireNonNullElse(showBase, false));
   }
 
   @Override

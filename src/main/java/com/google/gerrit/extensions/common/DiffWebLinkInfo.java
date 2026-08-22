@@ -22,13 +22,40 @@ public class DiffWebLinkInfo extends WebLinkInfo {
     return new DiffWebLinkInfo(name, imageUrl, url, true, false);
   }
 
+  /** @deprecated removed upstream; kept for source/binary compatibility with existing callers. */
+  @Deprecated
+  public static DiffWebLinkInfo forSideBySideDiffView(
+      String name, String imageUrl, String url, String target) {
+    DiffWebLinkInfo info = forSideBySideDiffView(name, imageUrl, url);
+    info.target = target;
+    return info;
+  }
+
   public static DiffWebLinkInfo forUnifiedDiffView(String name, String imageUrl, String url) {
     return new DiffWebLinkInfo(name, imageUrl, url, false, true);
+  }
+
+  /** @deprecated removed upstream; kept for source/binary compatibility with existing callers. */
+  @Deprecated
+  public static DiffWebLinkInfo forUnifiedDiffView(
+      String name, String imageUrl, String url, String target) {
+    DiffWebLinkInfo info = forUnifiedDiffView(name, imageUrl, url);
+    info.target = target;
+    return info;
   }
 
   public static DiffWebLinkInfo forSideBySideAndUnifiedDiffView(
       String name, String imageUrl, String url) {
     return new DiffWebLinkInfo(name, imageUrl, url, true, true);
+  }
+
+  /** @deprecated removed upstream; kept for source/binary compatibility with existing callers. */
+  @Deprecated
+  public static DiffWebLinkInfo forSideBySideAndUnifiedDiffView(
+      String name, String imageUrl, String url, String target) {
+    DiffWebLinkInfo info = forSideBySideAndUnifiedDiffView(name, imageUrl, url);
+    info.target = target;
+    return info;
   }
 
   private DiffWebLinkInfo(

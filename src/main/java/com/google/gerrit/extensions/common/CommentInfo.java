@@ -22,7 +22,6 @@ public class CommentInfo extends Comment {
   public AccountInfo author;
   public String tag;
   public String changeMessageId;
-  public Boolean unresolved;
 
   /**
    * A list of {@link ContextLineInfo}, that is, a list of pairs of {line_num, line_text} of the

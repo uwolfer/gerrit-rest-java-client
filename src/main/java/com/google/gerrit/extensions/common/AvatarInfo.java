@@ -38,6 +38,9 @@ public class AvatarInfo {
   /** The height of the avatar image in pixels. */
   public Integer height;
 
+  /** @deprecated removed upstream. */
+  @Deprecated public Integer width;
+
   @Override
   public boolean equals(Object o) {
     if (o instanceof AvatarInfo) {
