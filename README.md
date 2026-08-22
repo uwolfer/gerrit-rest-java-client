@@ -6,7 +6,7 @@ gerrit-rest-java-client
 [![Coverage Status](https://coveralls.io/repos/github/uwolfer/gerrit-rest-java-client/badge.svg?branch=master)](https://coveralls.io/github/uwolfer/gerrit-rest-java-client?branch=master)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.urswolfer.gerrit.client.rest%3Agerrit-rest-java-client&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=com.urswolfer.gerrit.client.rest%3Agerrit-rest-java-client)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=com.urswolfer.gerrit.client.rest%3Agerrit-rest-java-client&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=com.urswolfer.gerrit.client.rest%3Agerrit-rest-java-client)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.urswolfer.gerrit.client.rest/gerrit-rest-java-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.urswolfer.gerrit.client.rest/gerrit-rest-java-client)
+[![Maven Central](https://img.shields.io/maven-central/v/com.urswolfer.gerrit.client.rest/gerrit-rest-java-client.svg)](https://search.maven.org/artifact/com.urswolfer.gerrit.client.rest/gerrit-rest-java-client)
 
 Introduction
 -----------
