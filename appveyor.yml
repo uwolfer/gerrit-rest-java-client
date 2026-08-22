@@ -1,15 +1,8 @@
 install:
-  - ps: |
-      $jdk = Get-ChildItem 'C:\Program Files\Java' -Directory |
-        Where-Object { $_.Name -match '^jdk-?(\d+)' -and [int]$Matches[1] -ge 11 } |
-        Sort-Object { [int]([regex]::Match($_.Name, '\d+').Value) } |
-        Select-Object -First 1
-      if (-not $jdk) {
-          throw "No JDK 11+ found under 'C:\Program Files\Java'"
-      }
-      Write-Host "Using $($jdk.FullName) as JAVA_HOME"
-      $env:JAVA_HOME = $jdk.FullName
-      $env:PATH = "$($jdk.FullName)\bin;$env:PATH"
+  - choco install temurin11 --no-progress -y
+  - cmd: |
+      FOR /D %%F IN ("C:\Program Files\Eclipse Adoptium\jdk-11*") DO SET JAVA_HOME=%%F
+      SET PATH=%JAVA_HOME%\bin;%PATH%
   - java -version
 
 cache:
