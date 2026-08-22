@@ -22,3 +22,13 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package
+    - name: Publish coverage report to Coveralls
+      if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        CI_NAME: github
+        CI_BUILD_NUMBER: ${{ github.run_id }}
+        CI_BUILD_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        CI_BRANCH: ${{ github.head_ref || github.ref_name }}
+        CI_PULL_REQUEST: ${{ github.event.pull_request.number }}
+      run: mvn -B jacoco:report coveralls:report -DrepoToken=$COVERALLS_REPO_TOKEN
