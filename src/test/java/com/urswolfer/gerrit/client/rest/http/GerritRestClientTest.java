@@ -33,10 +33,12 @@ import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -84,8 +86,19 @@ public class GerritRestClientTest {
         resourceHandler.setBaseResource(new FileResource(url));
         resourceHandler.setWelcomeFiles(new String[] {"changes.json", "projects.json", "account.json"});
 
+        // wrap in a context so welcome-file resolution for a directory path requested
+        // without a trailing slash (e.g. "/accounts/self") isn't rejected as an alias;
+        // safe here since this only ever serves this test's own static fixture files
+        ContextHandler resourceContextHandler = new ContextHandler("/");
+        resourceContextHandler.addAliasCheck(new ContextHandler.ApproveAliases());
+        resourceContextHandler.setHandler(resourceHandler);
+
         ServletContextHandler servletContextHandler = new ServletContextHandler();
         servletContextHandler.addServlet(loginServletClass, "/login/");
+        // let requests for paths other than the login servlet fall through to the
+        // resourceHandler/basicAuthContextHandler siblings instead of being answered
+        // with a 404 by Jetty's own auto-registered default servlet
+        servletContextHandler.getServletHandler().setEnsureDefaultServlet(false);
 
         ServletContextHandler basicAuthContextHandler = new ServletContextHandler(ServletContextHandler.SECURITY);
         basicAuthContextHandler.setSecurityHandler(basicAuth("foo", "bar", "Gerrit Auth"));
@@ -94,22 +107,25 @@ public class GerritRestClientTest {
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] {
             servletContextHandler,
-            resourceHandler,
+            resourceContextHandler,
             basicAuthContextHandler
         });
         server.setHandler(handlers);
 
         server.start();
 
-        Connector connector = server.getConnectors()[0];
+        NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
         String host = "localhost";
         int port = connector.getLocalPort();
         return String.format("http://%s:%s", host, port);
     }
 
     private static SecurityHandler basicAuth(String username, String password, String realm) {
+        UserStore userStore = new UserStore();
+        userStore.addUser(username, Credential.getCredential(password), new String[]{"user"});
+
         HashLoginService loginService = new HashLoginService();
-        loginService.putUser(username, Credential.getCredential(password), new String[]{"user"});
+        loginService.setUserStore(userStore);
         loginService.setName(realm);
 
         Constraint constraint = new Constraint();
