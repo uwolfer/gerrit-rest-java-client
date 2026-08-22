@@ -166,7 +166,7 @@ public class ChangeInfosParserTest extends AbstractParserTest {
         IncludedInInfo includedInInfo = changeInfosParser.parseIncludedInInfos(jsonElement);
         Truth.assertThat(includedInInfo.branches).hasSize(4);
         Truth.assertThat(includedInInfo.tags).hasSize(3);
-        Truth.assertThat(includedInInfo.branches).containsAllOf("integration/master", "integration/releases/2.12", "master", "releases/2.12");
-        Truth.assertThat(includedInInfo.tags).containsAllOf("2017-12_v2.12", "2017-12_v2.13", "v2.13.1_xyz");
+        Truth.assertThat(includedInInfo.branches).containsAtLeast("integration/master", "integration/releases/2.12", "master", "releases/2.12");
+        Truth.assertThat(includedInInfo.tags).containsAtLeast("2017-12_v2.12", "2017-12_v2.13", "v2.13.1_xyz");
     }
 }
