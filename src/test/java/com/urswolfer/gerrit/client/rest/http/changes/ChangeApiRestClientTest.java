@@ -96,6 +96,24 @@ public class ChangeApiRestClientTest {
     }
 
     @Test
+    public void testAddReviewerWithReviewerInput() throws Exception {
+        GerritRestClient gerritRestClient = getGerritRestClient(
+                "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/reviewers",
+                "{\"reviewer\":\"jdoe\",\"confirmed\":true}");
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
+        ChangeApi changeApi = changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+
+        ReviewerInput input = new ReviewerInput();
+        input.reviewer = "jdoe";
+        input.confirmed = true;
+
+        changeApi.addReviewer(input);
+
+        EasyMock.verify(gerritRestClient);
+    }
+
+    @Test
     public void testPublish() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectPost("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/publish")
