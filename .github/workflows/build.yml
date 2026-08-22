@@ -22,10 +22,6 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package
-    - name: Debug Coveralls secret presence
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-      run: echo "COVERALLS_REPO_TOKEN length is ${#COVERALLS_REPO_TOKEN}"
     - name: Publish coverage report to Coveralls
       if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
       env:
@@ -35,4 +31,4 @@ jobs:
         CI_BUILD_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         CI_BRANCH: ${{ github.head_ref || github.ref_name }}
         CI_PULL_REQUEST: ${{ github.event.pull_request.number }}
-      run: mvn -B jacoco:report coveralls:report
+      run: mvn -B jacoco:report coveralls:report -DrepoToken=$COVERALLS_REPO_TOKEN
