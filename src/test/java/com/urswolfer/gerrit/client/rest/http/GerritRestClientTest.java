@@ -54,6 +54,8 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.HEAD;
@@ -354,6 +356,25 @@ public class GerritRestClientTest {
         Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isFalse();
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
         Truth.assertThat(loginCache.isGithubOAuthDetected()).isTrue();
+    }
+
+    /**
+     * Verifies that the GerritAuth-extraction pattern correctly extracts the token value
+     * from the HTML snippet Gerrit embeds in its start page (see login/index.html), and
+     * that it does not match when the attribute is absent.
+     */
+    @Test
+    public void testGerritAuthPatternExtractsToken() throws Exception {
+        Field patternField = GerritRestClient.class.getDeclaredField("GERRIT_AUTH_PATTERN");
+        patternField.setAccessible(true);
+        Pattern gerritAuthPattern = (Pattern) patternField.get(null);
+
+        String html = "gerrit_hostpagedata.xGerritAuth=\"AGaX_CruyH1_pMhQTiv2U-Rr4HXo5VQxe3sAVAnsOrhrcbK7Wxzjdgqr\";";
+        Matcher matcher = gerritAuthPattern.matcher(html);
+        Truth.assertThat(matcher.find()).isTrue();
+        Truth.assertThat(matcher.group(1)).isEqualTo("AGaX_CruyH1_pMhQTiv2U-Rr4HXo5VQxe3sAVAnsOrhrcbK7Wxzjdgqr");
+
+        Truth.assertThat(gerritAuthPattern.matcher("no auth token here").find()).isFalse();
     }
 
     private void requestChanges(GerritRestClient gerritRestClient) throws IOException, HttpStatusException {
