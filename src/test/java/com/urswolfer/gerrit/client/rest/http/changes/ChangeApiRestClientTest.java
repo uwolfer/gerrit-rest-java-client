@@ -59,7 +59,7 @@ public class ChangeApiRestClientTest {
 
         List<ReviewerInfo> listReviewers = changeApiRestClient.listReviewers();
 
-        Truth.assertThat(listReviewers).isSameAs(expectedListReviewers);
+        Truth.assertThat(listReviewers).isSameInstanceAs(expectedListReviewers);
         EasyMock.verify(gerritRestClient, reviewerInfoParser);
     }
 
@@ -333,7 +333,7 @@ public class ChangeApiRestClientTest {
 
         List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J").get();
 
-        Truth.assertThat(suggestedReviewerInfos).isSameAs(expectedSuggestedReviewerInfos);
+        Truth.assertThat(suggestedReviewerInfos).isSameInstanceAs(expectedSuggestedReviewerInfos);
         EasyMock.verify(gerritRestClient, reviewerInfosParser);
     }
 
@@ -357,7 +357,7 @@ public class ChangeApiRestClientTest {
 
         List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J").withLimit(5).get();
 
-        Truth.assertThat(suggestedReviewerInfos).isSameAs(expectedSuggestedReviewerInfos);
+        Truth.assertThat(suggestedReviewerInfos).isSameInstanceAs(expectedSuggestedReviewerInfos);
         EasyMock.verify(gerritRestClient, reviewerInfosParser);
     }
 
@@ -379,7 +379,7 @@ public class ChangeApiRestClientTest {
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         ChangeInfo changeInfo = changeApiRestClient.check();
-        Truth.assertThat(changeInfo).isSameAs(expectedChangeInfo);
+        Truth.assertThat(changeInfo).isSameInstanceAs(expectedChangeInfo);
 
         EasyMock.verify(gerritRestClient);
     }
@@ -402,7 +402,7 @@ public class ChangeApiRestClientTest {
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         IncludedInInfo includedInInfo = changeApiRestClient.includedIn();
-        Truth.assertThat(includedInInfo).isSameAs(expectedIncludedInInfo);
+        Truth.assertThat(includedInInfo).isSameInstanceAs(expectedIncludedInInfo);
 
         EasyMock.verify(gerritRestClient);
     }
@@ -432,7 +432,7 @@ public class ChangeApiRestClientTest {
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         ChangeInfo changeInfo = changeApiRestClient.check(fixInput);
-        Truth.assertThat(changeInfo).isSameAs(expectedChangeInfo);
+        Truth.assertThat(changeInfo).isSameInstanceAs(expectedChangeInfo);
 
         EasyMock.verify(gerritRestClient);
     }
@@ -456,7 +456,7 @@ public class ChangeApiRestClientTest {
 
         Map<String, List<CommentInfo>> commentInfos = changeApiRestClient.comments();
 
-        Truth.assertThat(commentInfos).isSameAs(expectedCommentInfos);
+        Truth.assertThat(commentInfos).isSameInstanceAs(expectedCommentInfos);
         EasyMock.verify(gerritRestClient, commentsParser);
     }
 
@@ -479,7 +479,7 @@ public class ChangeApiRestClientTest {
 
         Map<String, List<RobotCommentInfo>> robotCommentInfos = changeApiRestClient.robotComments();
 
-        Truth.assertThat(robotCommentInfos).isSameAs(expectedRobotCommentInfos);
+        Truth.assertThat(robotCommentInfos).isSameInstanceAs(expectedRobotCommentInfos);
         EasyMock.verify(gerritRestClient, commentsParser);
     }
 
@@ -502,7 +502,7 @@ public class ChangeApiRestClientTest {
 
         Map<String, List<CommentInfo>> draftInfos = changeApiRestClient.drafts();
 
-        Truth.assertThat(draftInfos).isSameAs(expectedDraftInfos);
+        Truth.assertThat(draftInfos).isSameInstanceAs(expectedDraftInfos);
         EasyMock.verify(gerritRestClient, commentsParser);
     }
 
@@ -525,7 +525,7 @@ public class ChangeApiRestClientTest {
 
         List<ChangeMessageInfo> messageInfos = changeApiRestClient.messages();
 
-        Truth.assertThat(messageInfos).isSameAs(expectedMessageInfos);
+        Truth.assertThat(messageInfos).isSameInstanceAs(expectedMessageInfos);
         EasyMock.verify(gerritRestClient, commentsParser);
     }
 
@@ -548,7 +548,7 @@ public class ChangeApiRestClientTest {
 
         Set<String> hashtags = changeApiRestClient.getHashtags();
 
-        Truth.assertThat(hashtags).isSameAs(expectedHashtags);
+        Truth.assertThat(hashtags).isSameInstanceAs(expectedHashtags);
         EasyMock.verify(gerritRestClient, changeInfosParser);
     }
 
@@ -570,7 +570,7 @@ public class ChangeApiRestClientTest {
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         EditInfo editInfo = changeApiRestClient.getEdit();
-        Truth.assertThat(editInfo).isSameAs(expectedEditInfo);
+        Truth.assertThat(editInfo).isSameInstanceAs(expectedEditInfo);
 
         EasyMock.verify(gerritRestClient);
     }
@@ -623,7 +623,7 @@ public class ChangeApiRestClientTest {
         assigneeInput.assignee = "foo";
         AccountInfo assigneeInfo =
             changeApiRestClient.setAssignee(assigneeInput);
-        Truth.assertThat(assigneeInfo).isSameAs(info);
+        Truth.assertThat(assigneeInfo).isSameInstanceAs(info);
         EasyMock.verify(gerritRestClient, accountsParser);
     }
 
@@ -646,7 +646,7 @@ public class ChangeApiRestClientTest {
 
         AccountInfo assigneeInfo = changeApiRestClient.getAssignee();
 
-        Truth.assertThat(assigneeInfo).isSameAs(expectedAssignee);
+        Truth.assertThat(assigneeInfo).isSameInstanceAs(expectedAssignee);
         EasyMock.verify(gerritRestClient, accountsParser);
     }
 
@@ -669,7 +669,7 @@ public class ChangeApiRestClientTest {
 
         List<AccountInfo> pastAssigneesInfo = changeApiRestClient.getPastAssignees();
 
-        Truth.assertThat(pastAssigneesInfo).isSameAs(expectedPastAssignees);
+        Truth.assertThat(pastAssigneesInfo).isSameInstanceAs(expectedPastAssignees);
         EasyMock.verify(gerritRestClient, accountsParser);
     }
 
@@ -692,7 +692,7 @@ public class ChangeApiRestClientTest {
         assigneeInput.assignee = "foo";
         AccountInfo assigneeInfo =
             changeApiRestClient.deleteAssignee();
-        Truth.assertThat(assigneeInfo).isSameAs(info);
+        Truth.assertThat(assigneeInfo).isSameInstanceAs(info);
         EasyMock.verify(gerritRestClient, accountsParser);
     }
 
@@ -714,7 +714,7 @@ public class ChangeApiRestClientTest {
         EnumSet<ListChangesOption> options = EnumSet.of(ListChangesOption.LABELS, ListChangesOption.DETAILED_LABELS);
         ChangeInfo result = changeApiRestClient.get(options);
 
-        Truth.assertThat(result).isSameAs(expectedChangeInfo);
+        Truth.assertThat(result).isSameInstanceAs(expectedChangeInfo);
         EasyMock.verify(gerritRestClient, changeInfosParser);
     }
 
@@ -756,7 +756,7 @@ public class ChangeApiRestClientTest {
             null, null, null, null, expectedChangeId);
         ChangeInfo result = changeApiRestClient.get();
 
-        Truth.assertThat(result).isSameAs(expectedChangeInfo);
+        Truth.assertThat(result).isSameInstanceAs(expectedChangeInfo);
         EasyMock.verify(gerritRestClient, changeInfosParser);
     }
 
@@ -787,7 +787,7 @@ public class ChangeApiRestClientTest {
             null, null, null, null, expectedChangeId);
         ChangeInfo result = changeApiRestClient.get();
 
-        Truth.assertThat(result).isSameAs(expectedChangeInfo);
+        Truth.assertThat(result).isSameInstanceAs(expectedChangeInfo);
         EasyMock.verify(gerritRestClient, changeInfosParser);
     }
 
@@ -808,7 +808,7 @@ public class ChangeApiRestClientTest {
             "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         ChangeInfo result = changeApiRestClient.info();
 
-        Truth.assertThat(result).isSameAs(expectedChangeInfo);
+        Truth.assertThat(result).isSameInstanceAs(expectedChangeInfo);
         EasyMock.verify(gerritRestClient, changeInfosParser);
     }
 
@@ -843,7 +843,7 @@ public class ChangeApiRestClientTest {
 "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<ChangeInfo> changeInfos = changeApiRestClient.submittedTogether();
-        Truth.assertThat(changeInfos).isSameAs(expectedChangeInfos);
+        Truth.assertThat(changeInfos).isSameInstanceAs(expectedChangeInfos);
 
         EasyMock.verify(gerritRestClient);
     }

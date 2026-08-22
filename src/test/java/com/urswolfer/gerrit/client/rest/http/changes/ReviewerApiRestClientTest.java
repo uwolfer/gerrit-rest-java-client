@@ -47,7 +47,7 @@ public class ReviewerApiRestClientTest extends AbstractParserTest {
         ReviewerApiRestClient reviewerApiRestClient = new ReviewerApiRestClient(gerritRestClient, changeApiRestClient, ACCOUNT_ID);
         Map<String, Short> votes = reviewerApiRestClient.votes();
 
-        Truth.assertThat(votes.get("Work-In-Progress")).isSameAs((short) 2);
+        Truth.assertThat(votes.get("Work-In-Progress")).isSameInstanceAs((short) 2);
         EasyMock.verify(gerritRestClient);
     }
 

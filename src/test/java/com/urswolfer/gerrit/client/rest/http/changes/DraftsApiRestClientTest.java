@@ -76,7 +76,7 @@ public class DraftsApiRestClientTest extends AbstractParserTest {
 
         CommentInfo commentInfo = draftApiRestClient.get();
 
-        Truth.assertThat(commentInfo).isSameAs(expectedCommentInfo);
+        Truth.assertThat(commentInfo).isSameInstanceAs(expectedCommentInfo);
         EasyMock.verify(gerritRestClient);
     }
 
