@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.changes.parsers;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.AddReviewerResult;
 import com.google.gerrit.extensions.api.changes.ReviewerInfo;
+import com.google.gerrit.extensions.api.changes.ReviewerResult;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
@@ -69,6 +70,15 @@ public class ReviewerInfosParserTest extends AbstractParserTest {
         Truth.assertThat(addReviewerResult.input).isEqualTo("john.doe@example.com");
         Truth.assertThat(addReviewerResult.reviewers.size()).isEqualTo(1);
         Truth.assertThat(addReviewerResult.reviewers.get(0)._accountId).isEqualTo(1000096);
+    }
+
+    @Test
+    public void testParseReviewerResult() throws Exception {
+        JsonElement jsonElement = getJsonElement("addreviewer.json");
+        ReviewerResult reviewerResult = reviewerInfoParser.parseReviewerResult(jsonElement);
+        Truth.assertThat(reviewerResult.input).isEqualTo("john.doe@example.com");
+        Truth.assertThat(reviewerResult.reviewers.size()).isEqualTo(1);
+        Truth.assertThat(reviewerResult.reviewers.get(0)._accountId).isEqualTo(1000096);
     }
 
 }
