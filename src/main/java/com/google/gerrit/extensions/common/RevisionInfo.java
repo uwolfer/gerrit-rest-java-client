@@ -95,7 +95,8 @@ public class RevisionInfo {
           && Objects.equals(actions, revisionInfo.actions)
           && Objects.equals(commitWithFooters, revisionInfo.commitWithFooters)
           && Objects.equals(pushCertificate, revisionInfo.pushCertificate)
-          && Objects.equals(description, revisionInfo.description);
+          && Objects.equals(description, revisionInfo.description)
+          && Objects.equals(conflicts, revisionInfo.conflicts);
     }
     return false;
   }
@@ -118,7 +119,8 @@ public class RevisionInfo {
         actions,
         commitWithFooters,
         pushCertificate,
-        description);
+        description,
+        conflicts);
   }
 
   public static class ParentInfo {

@@ -76,11 +76,11 @@ public class FileInfo {
         + ", oldMode="
         + oldMode
         + ", newMode="
-        + oldMode
+        + newMode
         + ", oldSha="
         + oldSha
         + ", newSha="
-        + oldSha
+        + newSha
         + ", binary="
         + binary
         + ", oldPath="

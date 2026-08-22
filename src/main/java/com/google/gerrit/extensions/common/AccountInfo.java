@@ -104,6 +104,7 @@ public class AccountInfo {
     other._moreAccounts = _moreAccounts;
     other.status = status;
     other.inactive = inactive;
+    other.deleted = deleted;
     other.tags = tags;
   }
 
@@ -121,6 +122,7 @@ public class AccountInfo {
           && Objects.equals(_moreAccounts, accountInfo._moreAccounts)
           && Objects.equals(status, accountInfo.status)
           && Objects.equals(inactive, accountInfo.inactive)
+          && Objects.equals(deleted, accountInfo.deleted)
           && Objects.equals(tags, accountInfo.tags);
     }
     return false;
@@ -152,6 +154,7 @@ public class AccountInfo {
         _moreAccounts,
         status,
         inactive,
+        deleted,
         tags);
   }
 
