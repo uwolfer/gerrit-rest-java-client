@@ -14,8 +14,11 @@
 
 package com.google.gerrit.extensions.client;
 
+import com.google.gerrit.extensions.common.FixSuggestionInfo;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class Comment {
@@ -30,20 +33,42 @@ public abstract class Comment {
   public String path;
   public Side side;
   public Integer parent;
+
   /** Value 0 or null indicates a file comment, normal lines start at 1. */
   public Integer line;
 
   public Range range;
   public String inReplyTo;
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
   public Timestamp updated;
+
   public String message;
-  public Boolean unresolved;
 
   /**
    * Hex commit SHA1 (as 40 characters hex string) of the commit of the patchset to which this
    * comment applies.
    */
   public String commitId;
+
+  public List<FixSuggestionInfo> fixSuggestions;
+
+  public Boolean isAi;
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
+  @SuppressWarnings("JdkObsolete")
+  public Instant getUpdated() {
+    return updated.toInstant();
+  }
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
+  @SuppressWarnings("JdkObsolete")
+  public void setUpdated(Instant when) {
+    updated = Timestamp.from(when);
+  }
 
   public static class Range implements Comparable<Range> {
     private static final Comparator<Range> RANGE_COMPARATOR =
@@ -71,10 +96,10 @@ public abstract class Comment {
     public boolean equals(Object o) {
       if (o instanceof Range) {
         Range r = (Range) o;
-        return Objects.equals(startLine, r.startLine)
-            && Objects.equals(startCharacter, r.startCharacter)
-            && Objects.equals(endLine, r.endLine)
-            && Objects.equals(endCharacter, r.endCharacter);
+        return startLine == r.startLine
+            && startCharacter == r.startCharacter
+            && endLine == r.endLine
+            && endCharacter == r.endCharacter;
       }
       return false;
     }
@@ -111,6 +136,11 @@ public abstract class Comment {
     return 1;
   }
 
+  // This is a value class that allows adding attributes by subclassing.
+  // Doing this is discouraged and using composition rather than inheritance to add fields to value
+  // types is preferred. However this class is part of the extension API, hence we cannot change it
+  // without breaking the API. Hence suppress the EqualsGetClass warning here.
+  @SuppressWarnings("EqualsGetClass")
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -128,14 +158,27 @@ public abstract class Comment {
           && Objects.equals(inReplyTo, c.inReplyTo)
           && Objects.equals(updated, c.updated)
           && Objects.equals(message, c.message)
-          && Objects.equals(unresolved, c.unresolved)
-          && Objects.equals(commitId, c.commitId);
+          && Objects.equals(commitId, c.commitId)
+          && Objects.equals(fixSuggestions, c.fixSuggestions)
+          && Objects.equals(isAi, c.isAi);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(patchSet, id, path, side, parent, line, range, inReplyTo, updated, message);
+    return Objects.hash(
+        patchSet,
+        id,
+        path,
+        side,
+        parent,
+        line,
+        range,
+        inReplyTo,
+        updated,
+        message,
+        fixSuggestions,
+        isAi);
   }
 }

@@ -92,15 +92,16 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     }
 
     @Override
-    public void submit() throws RestApiException {
-        submit(new SubmitInput());
+    public ChangeInfo submit() throws RestApiException {
+        return submit(new SubmitInput());
     }
 
     @Override
-    public void submit(SubmitInput submitInput) throws RestApiException {
+    public ChangeInfo submit(SubmitInput submitInput) throws RestApiException {
         String request = changeApiRestClient.getRequestPath() + "/submit";
         String json = gerritRestClient.getGson().toJson(submitInput);
-        gerritRestClient.postRequest(request, json);
+        JsonElement result = gerritRestClient.postRequest(request, json);
+        return gerritRestClient.getGson().fromJson(result, ChangeInfo.class);
     }
 
     @Override

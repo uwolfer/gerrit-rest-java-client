@@ -85,7 +85,22 @@ public enum ListChangesOption implements ListOption {
    * Skip diffstat computation that compute the insertions field (number of lines inserted) and
    * deletions field (number of lines deleted)
    */
-  SKIP_DIFFSTAT(23);
+  SKIP_DIFFSTAT(23),
+
+  /** Include the evaluated submit requirements for the caller. */
+  SUBMIT_REQUIREMENTS(24),
+
+  /** Include custom keyed values. */
+  CUSTOM_KEYED_VALUES(25),
+
+  /** Include the 'starred' field, that is if the change is starred by the current user . */
+  STAR(26),
+
+  /**
+   * Include the `parents_data` field in each revision, e.g. if it's merged in the target branch and
+   * whether it points to a patch-set of another change.
+   */
+  PARENTS(27);
 
   private final int value;
 

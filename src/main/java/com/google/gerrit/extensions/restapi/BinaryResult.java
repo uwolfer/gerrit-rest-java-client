@@ -16,6 +16,7 @@ package com.google.gerrit.extensions.restapi;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
@@ -63,7 +64,7 @@ public abstract class BinaryResult implements Closeable {
   private boolean base64;
   private String attachmentName;
 
-  /** @return the MIME type of the result, for HTTP clients. */
+  /** Returns the MIME type of the result, for HTTP clients. */
   public String getContentType() {
     Charset enc = getCharacterEncoding();
     if (enc != null) {
@@ -73,6 +74,7 @@ public abstract class BinaryResult implements Closeable {
   }
 
   /** Set the MIME type of the result, and return {@code this}. */
+  @CanIgnoreReturnValue
   public BinaryResult setContentType(String contentType) {
     this.contentType = contentType != null ? contentType : OCTET_STREAM;
     return this;
@@ -84,6 +86,7 @@ public abstract class BinaryResult implements Closeable {
   }
 
   /** Set the character set used to encode text data and return {@code this}. */
+  @CanIgnoreReturnValue
   public BinaryResult setCharacterEncoding(Charset encoding) {
     characterEncoding = encoding;
     return this;
@@ -95,39 +98,43 @@ public abstract class BinaryResult implements Closeable {
   }
 
   /** Set the attachment file name and return {@code this}. */
+  @CanIgnoreReturnValue
   public BinaryResult setAttachmentName(String attachmentName) {
     this.attachmentName = attachmentName;
     return this;
   }
 
-  /** @return length in bytes of the result; -1 if not known. */
+  /** Returns length in bytes of the result; -1 if not known. */
   public long getContentLength() {
     return contentLength;
   }
 
   /** Set the content length of the result; -1 if not known. */
+  @CanIgnoreReturnValue
   public BinaryResult setContentLength(long len) {
     this.contentLength = len;
     return this;
   }
 
-  /** @return true if this result can be gzip compressed to clients. */
+  /** Returns true if this result can be gzip compressed to clients. */
   public boolean canGzip() {
     return gzip;
   }
 
   /** Disable gzip compression for already compressed responses. */
+  @CanIgnoreReturnValue
   public BinaryResult disableGzip() {
     this.gzip = false;
     return this;
   }
 
-  /** @return true if the result must be base64 encoded. */
+  /** Returns true if the result must be base64 encoded. */
   public boolean isBase64() {
     return base64;
   }
 
   /** Wrap the binary data in base64 encoding. */
+  @CanIgnoreReturnValue
   public BinaryResult base64() {
     base64 = true;
     return this;

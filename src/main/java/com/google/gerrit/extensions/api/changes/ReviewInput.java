@@ -14,16 +14,21 @@
 
 package com.google.gerrit.extensions.api.changes;
 
+import static com.google.gerrit.extensions.client.ReviewerState.CC;
 import static com.google.gerrit.extensions.client.ReviewerState.REVIEWER;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.gerrit.common.Nullable;
 import com.google.gerrit.extensions.client.Comment;
+import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.client.ReviewerState;
-import com.google.gerrit.extensions.common.FixSuggestionInfo;
 import com.google.gerrit.extensions.restapi.DefaultInput;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /** Input passed to {@code POST /changes/[id]/revisions/[id]/review}. */
 public class ReviewInput {
@@ -33,7 +38,9 @@ public class ReviewInput {
 
   public Map<String, Short> labels;
   public Map<String, List<CommentInput>> comments;
-  public Map<String, List<RobotCommentInput>> robotComments;
+
+  /** @deprecated removed upstream from this interface; the underlying REST resource may still exist. */
+  @Deprecated public Map<String, List<RobotCommentInput>> robotComments;
 
   /**
    * How to process draft comments already in the database that were not also described in this
@@ -43,6 +50,9 @@ public class ReviewInput {
    * no other value besides {@code KEEP} is allowed.
    */
   public DraftHandling drafts;
+
+  /** A list of draft IDs that should be published. */
+  public List<String> draftIdsToPublish;
 
   /** Who to send email notifications to after review is stored. */
   public NotifyHandling notify;
@@ -60,8 +70,8 @@ public class ReviewInput {
    */
   public String onBehalfOf;
 
-  /** Reviewers that should be added to this change. */
-  public List<AddReviewerInput> reviewers;
+  /** Reviewers that should be added to this change or removed from it. */
+  public List<ReviewerInput> reviewers;
 
   /**
    * If true mark the change as work in progress. It is an error for both {@link #workInProgress}
@@ -89,6 +99,8 @@ public class ReviewInput {
    */
   public boolean ignoreAutomaticAttentionSetRules;
 
+  @Nullable public List<ListChangesOption> responseFormatOptions;
+
   public enum DraftHandling {
     /** Leave pending drafts alone. */
     KEEP,
@@ -100,21 +112,36 @@ public class ReviewInput {
     PUBLISH_ALL_REVISIONS
   }
 
-  public static class CommentInput extends Comment {}
+  public static class CommentInput extends Comment {
+    public Boolean unresolved;
+  }
 
+  /** @deprecated removed upstream; the underlying REST resource may still exist. */
+  @Deprecated
   public static class RobotCommentInput extends CommentInput {
     public String robotId;
     public String robotRunId;
     public String url;
     public Map<String, String> properties;
-    public List<FixSuggestionInfo> fixSuggestions;
   }
 
+  @CanIgnoreReturnValue
   public ReviewInput message(String msg) {
     message = msg != null && !msg.isEmpty() ? msg : null;
     return this;
   }
 
+  @CanIgnoreReturnValue
+  public ReviewInput patchSetLevelComment(String message) {
+    Objects.requireNonNull(message);
+    CommentInput comment = new CommentInput();
+    comment.message = message;
+    // TODO(davido): Because of cyclic dependency, we cannot use here Patch.PATCHSET_LEVEL constant
+    comments = Collections.singletonMap("/PATCHSET_LEVEL", Collections.singletonList(comment));
+    return this;
+  }
+
+  @CanIgnoreReturnValue
   public ReviewInput label(String name, short value) {
     if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException();
@@ -126,6 +153,7 @@ public class ReviewInput {
     return this;
   }
 
+  @CanIgnoreReturnValue
   public ReviewInput label(String name, int value) {
     if (value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
       throw new IllegalArgumentException();
@@ -133,16 +161,24 @@ public class ReviewInput {
     return label(name, (short) value);
   }
 
+  @CanIgnoreReturnValue
   public ReviewInput label(String name) {
     return label(name, (short) 1);
   }
 
+  @CanIgnoreReturnValue
   public ReviewInput reviewer(String reviewer) {
-    return reviewer(reviewer, REVIEWER, false);
+    return reviewer(reviewer, REVIEWER, /* confirmed= */ false);
   }
 
+  @CanIgnoreReturnValue
+  public ReviewInput cc(String cc) {
+    return reviewer(cc, CC, /* confirmed= */ false);
+  }
+
+  @CanIgnoreReturnValue
   public ReviewInput reviewer(String reviewer, ReviewerState state, boolean confirmed) {
-    AddReviewerInput input = new AddReviewerInput();
+    ReviewerInput input = new ReviewerInput();
     input.reviewer = reviewer;
     input.state = state;
     input.confirmed = confirmed;
@@ -153,6 +189,7 @@ public class ReviewInput {
     return this;
   }
 
+  @CanIgnoreReturnValue
   public ReviewInput addUserToAttentionSet(String user, String reason) {
     AttentionSetInput input = new AttentionSetInput();
     input.user = user;
@@ -164,6 +201,7 @@ public class ReviewInput {
     return this;
   }
 
+  @CanIgnoreReturnValue
   public ReviewInput removeUserFromAttentionSet(String user, String reason) {
     AttentionSetInput input = new AttentionSetInput();
     input.user = user;
@@ -175,17 +213,20 @@ public class ReviewInput {
     return this;
   }
 
+  @CanIgnoreReturnValue
   public ReviewInput blockAutomaticAttentionSetRules() {
     ignoreAutomaticAttentionSetRules = true;
     return this;
   }
 
+  @CanIgnoreReturnValue
   public ReviewInput setWorkInProgress(boolean workInProgress) {
     this.workInProgress = workInProgress;
     ready = !workInProgress;
     return this;
   }
 
+  @CanIgnoreReturnValue
   public ReviewInput setReady(boolean ready) {
     this.ready = ready;
     workInProgress = !ready;

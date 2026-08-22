@@ -14,7 +14,10 @@
 
 package com.google.gerrit.extensions.api.accounts;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.gerrit.extensions.api.changes.StarsInput;
+import com.google.gerrit.extensions.auth.AuthTokenInfo;
+import com.google.gerrit.extensions.auth.AuthTokenInput;
 import com.google.gerrit.extensions.client.DiffPreferencesInfo;
 import com.google.gerrit.extensions.client.EditPreferencesInfo;
 import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
@@ -22,6 +25,7 @@ import com.google.gerrit.extensions.client.ProjectWatchInfo;
 import com.google.gerrit.extensions.common.AccountDetailInfo;
 import com.google.gerrit.extensions.common.AccountExternalIdInfo;
 import com.google.gerrit.extensions.common.AccountInfo;
+import com.google.gerrit.extensions.common.AccountStateInfo;
 import com.google.gerrit.extensions.common.AgreementInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.EmailInfo;
@@ -39,6 +43,8 @@ public interface AccountApi {
 
   AccountDetailInfo detail() throws RestApiException;
 
+  AccountStateInfo state() throws RestApiException;
+
   boolean getActive() throws RestApiException;
 
   void setActive(boolean active) throws RestApiException;
@@ -47,18 +53,22 @@ public interface AccountApi {
 
   GeneralPreferencesInfo getPreferences() throws RestApiException;
 
+  @CanIgnoreReturnValue
   GeneralPreferencesInfo setPreferences(GeneralPreferencesInfo in) throws RestApiException;
 
   DiffPreferencesInfo getDiffPreferences() throws RestApiException;
 
+  @CanIgnoreReturnValue
   DiffPreferencesInfo setDiffPreferences(DiffPreferencesInfo in) throws RestApiException;
 
   EditPreferencesInfo getEditPreferences() throws RestApiException;
 
+  @CanIgnoreReturnValue
   EditPreferencesInfo setEditPreferences(EditPreferencesInfo in) throws RestApiException;
 
   List<ProjectWatchInfo> getWatchedProjects() throws RestApiException;
 
+  @CanIgnoreReturnValue
   List<ProjectWatchInfo> setWatchedProjects(List<ProjectWatchInfo> in) throws RestApiException;
 
   void deleteWatchedProjects(List<ProjectWatchInfo> in) throws RestApiException;
@@ -66,12 +76,6 @@ public interface AccountApi {
   void starChange(String changeId) throws RestApiException;
 
   void unstarChange(String changeId) throws RestApiException;
-
-  void setStars(String changeId, StarsInput input) throws RestApiException;
-
-  SortedSet<String> getStars(String changeId) throws RestApiException;
-
-  List<ChangeInfo> getStarredChanges() throws RestApiException;
 
   List<GroupInfo> getGroups() throws RestApiException;
 
@@ -81,6 +85,7 @@ public interface AccountApi {
 
   void deleteEmail(String email) throws RestApiException;
 
+  @CanIgnoreReturnValue
   EmailApi createEmail(EmailInput emailInput) throws RestApiException;
 
   EmailApi email(String email) throws RestApiException;
@@ -91,12 +96,14 @@ public interface AccountApi {
 
   List<SshKeyInfo> listSshKeys() throws RestApiException;
 
+  @CanIgnoreReturnValue
   SshKeyInfo addSshKey(String key) throws RestApiException;
 
   void deleteSshKey(int seq) throws RestApiException;
 
   Map<String, GpgKeyInfo> listGpgKeys() throws RestApiException;
 
+  @CanIgnoreReturnValue
   Map<String, GpgKeyInfo> putGpgKeys(List<String> add, List<String> remove) throws RestApiException;
 
   GpgKeyApi gpgKey(String id) throws RestApiException;
@@ -111,16 +118,23 @@ public interface AccountApi {
 
   void deleteExternalIds(List<String> externalIds) throws RestApiException;
 
+  @CanIgnoreReturnValue
   List<DeletedDraftCommentInfo> deleteDraftComments(DeleteDraftCommentsInput input)
       throws RestApiException;
 
   void setName(String name) throws RestApiException;
+
+  @CanIgnoreReturnValue
+  AuthTokenInfo createToken(AuthTokenInput input) throws RestApiException;
+
+  List<AuthTokenInfo> getTokens() throws RestApiException;
 
   /**
    * Generate a new HTTP password.
    *
    * @return the generated password.
    */
+  @Deprecated
   String generateHttpPassword() throws RestApiException;
 
   /**
@@ -131,7 +145,27 @@ public interface AccountApi {
    * @param httpPassword the new password, {@code null} to remove the password.
    * @return the new password, {@code null} if the password was removed.
    */
+  @CanIgnoreReturnValue
+  @Deprecated
   String setHttpPassword(String httpPassword) throws RestApiException;
+
+  void delete() throws RestApiException;
+
+  // The "star" feature (as distinct from starChange/unstarChange above) was removed from this
+  // interface upstream. The methods below are kept, deprecated, for source/binary compatibility
+  // with existing implementers/callers of this interface.
+
+  /** @deprecated removed upstream; the underlying REST resource may still exist. */
+  @Deprecated
+  void setStars(String changeId, StarsInput input) throws RestApiException;
+
+  /** @deprecated removed upstream; the underlying REST resource may still exist. */
+  @Deprecated
+  SortedSet<String> getStars(String changeId) throws RestApiException;
+
+  /** @deprecated removed upstream; the underlying REST resource may still exist. */
+  @Deprecated
+  List<ChangeInfo> getStarredChanges() throws RestApiException;
 
   /**
    * A default implementation which allows source compatibility when adding new methods to the
@@ -145,6 +179,11 @@ public interface AccountApi {
 
     @Override
     public AccountDetailInfo detail() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public AccountStateInfo state() throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -169,8 +208,7 @@ public interface AccountApi {
     }
 
     @Override
-    public GeneralPreferencesInfo setPreferences(GeneralPreferencesInfo in)
-        throws RestApiException {
+    public GeneralPreferencesInfo setPreferences(GeneralPreferencesInfo in) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -200,8 +238,7 @@ public interface AccountApi {
     }
 
     @Override
-    public List<ProjectWatchInfo> setWatchedProjects(List<ProjectWatchInfo> in)
-        throws RestApiException {
+    public List<ProjectWatchInfo> setWatchedProjects(List<ProjectWatchInfo> in) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -217,21 +254,6 @@ public interface AccountApi {
 
     @Override
     public void unstarChange(String changeId) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public void setStars(String changeId, StarsInput input) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public SortedSet<String> getStars(String changeId) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public List<ChangeInfo> getStarredChanges() throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -256,7 +278,7 @@ public interface AccountApi {
     }
 
     @Override
-    public EmailApi createEmail(EmailInput input) throws RestApiException {
+    public EmailApi createEmail(EmailInput emailInput) throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -291,18 +313,17 @@ public interface AccountApi {
     }
 
     @Override
-    public Map<String, GpgKeyInfo> putGpgKeys(List<String> add, List<String> remove)
-        throws RestApiException {
+    public Map<String, GpgKeyInfo> listGpgKeys() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public Map<String, GpgKeyInfo> putGpgKeys(List<String> add, List<String> remove) throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
     public GpgKeyApi gpgKey(String id) throws RestApiException {
-      throw new NotImplementedException();
-    }
-
-    @Override
-    public Map<String, GpgKeyInfo> listGpgKeys() throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -332,13 +353,22 @@ public interface AccountApi {
     }
 
     @Override
-    public List<DeletedDraftCommentInfo> deleteDraftComments(DeleteDraftCommentsInput input)
-        throws RestApiException {
+    public List<DeletedDraftCommentInfo> deleteDraftComments(DeleteDraftCommentsInput input) throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
     public void setName(String name) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public AuthTokenInfo createToken(AuthTokenInput input) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<AuthTokenInfo> getTokens() throws RestApiException {
       throw new NotImplementedException();
     }
 
@@ -349,6 +379,26 @@ public interface AccountApi {
 
     @Override
     public String setHttpPassword(String httpPassword) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void delete() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public void setStars(String changeId, StarsInput input) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public SortedSet<String> getStars(String changeId) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ChangeInfo> getStarredChanges() throws RestApiException {
       throw new NotImplementedException();
     }
   }

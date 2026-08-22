@@ -17,14 +17,31 @@ package com.google.gerrit.extensions.common;
 /** API response containing values from the {@code change} section of {@code gerrit.config}. */
 public class ChangeConfigInfo {
   public Boolean allowBlame;
-  public Boolean showAssigneeInChangesTable;
   public Boolean disablePrivateChanges;
-  public int largeChange;
-  public String replyLabel;
-  public String replyTooltip;
   public int updateDelay;
   public Boolean submitWholeTopic;
   public String mergeabilityComputationBehavior;
-  public Boolean enableAttentionSet;
-  public Boolean enableAssignee;
+  public Boolean conflictsPredicateEnabled;
+  public Boolean allowMarkdownBase64ImagesInComments;
+
+  // The fields below were removed from this class upstream. They are kept here, deprecated, for
+  // source/binary compatibility with existing callers.
+
+  /** @deprecated removed upstream along with the "assignee" feature (superseded by attention set). */
+  @Deprecated public Boolean showAssigneeInChangesTable;
+
+  /** @deprecated removed upstream. */
+  @Deprecated public int largeChange;
+
+  /** @deprecated removed upstream. */
+  @Deprecated public String replyLabel;
+
+  /** @deprecated removed upstream. */
+  @Deprecated public String replyTooltip;
+
+  /** @deprecated removed upstream (attention set is no longer an optional/toggleable feature). */
+  @Deprecated public Boolean enableAttentionSet;
+
+  /** @deprecated removed upstream along with the "assignee" feature (superseded by attention set). */
+  @Deprecated public Boolean enableAssignee;
 }

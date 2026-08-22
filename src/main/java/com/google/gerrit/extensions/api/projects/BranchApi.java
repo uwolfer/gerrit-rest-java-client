@@ -14,12 +14,17 @@
 
 package com.google.gerrit.extensions.api.projects;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.gerrit.extensions.api.changes.ChangeApi.SuggestedReviewersRequest;
+import com.google.gerrit.extensions.common.CommitInfo;
+import com.google.gerrit.extensions.common.ValidationOptionInfos;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import java.util.List;
 
 public interface BranchApi {
+  @CanIgnoreReturnValue
   BranchApi create(BranchInput in) throws RestApiException;
 
   BranchInfo get() throws RestApiException;
@@ -29,7 +34,25 @@ public interface BranchApi {
   /** Returns the content of a file from the HEAD revision. */
   BinaryResult file(String path) throws RestApiException;
 
+  /**
+   * Commits a set of file operations (write/create, delete, rename) to the branch as one commit and
+   * returns the new commit.
+   */
+  CommitInfo createCommit(CreateCommitInput input) throws RestApiException;
+
   List<ReflogEntryInfo> reflog() throws RestApiException;
+
+  SuggestedReviewersRequest suggestReviewers() throws RestApiException;
+
+  ValidationOptionInfos getValidationOptions() throws RestApiException;
+
+  default SuggestedReviewersRequest suggestReviewers(String query) throws RestApiException {
+    return suggestReviewers().withQuery(query);
+  }
+
+  default SuggestedReviewersRequest suggestCcs(String query) throws RestApiException {
+    return suggestReviewers().forCc().withQuery(query);
+  }
 
   /**
    * A default implementation which allows source compatibility when adding new methods to the
@@ -57,7 +80,22 @@ public interface BranchApi {
     }
 
     @Override
+    public CommitInfo createCommit(CreateCommitInput input) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
     public List<ReflogEntryInfo> reflog() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public SuggestedReviewersRequest suggestReviewers() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ValidationOptionInfos getValidationOptions() throws RestApiException {
       throw new NotImplementedException();
     }
   }

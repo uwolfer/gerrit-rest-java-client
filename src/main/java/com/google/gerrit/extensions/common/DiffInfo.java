@@ -32,6 +32,8 @@ public class DiffInfo {
   public List<ContentEntry> content;
   // Links to the file diff in external sites
   public List<DiffWebLinkInfo> webLinks;
+  // Links to edit the file in external sites
+  public List<WebLinkInfo> editWebLinks;
   // Binary file
   public Boolean binary;
 

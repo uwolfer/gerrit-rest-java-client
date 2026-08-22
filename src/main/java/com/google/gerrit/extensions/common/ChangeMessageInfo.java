@@ -14,17 +14,39 @@
 
 package com.google.gerrit.extensions.common;
 
+import com.google.common.collect.Iterables;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Collection;
 import java.util.Objects;
 
+/** Represent {@link com.google.gerrit.entities.ChangeMessage} in the REST API. */
 public class ChangeMessageInfo {
   public String id;
   public String tag;
   public AccountInfo author;
   public AccountInfo realAuthor;
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
   public Timestamp date;
+
   public String message;
+  public Collection<AccountInfo> accountsInMessage;
   public Integer _revisionNumber;
+
+  public ChangeMessageInfo() {}
+
+  public ChangeMessageInfo(String message) {
+    this.message = message;
+  }
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
+  @SuppressWarnings("JdkObsolete")
+  public void setDate(Instant when) {
+    date = Timestamp.from(when);
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -36,6 +58,10 @@ public class ChangeMessageInfo {
           && Objects.equals(realAuthor, cmi.realAuthor)
           && Objects.equals(date, cmi.date)
           && Objects.equals(message, cmi.message)
+          && ((accountsInMessage == null && cmi.accountsInMessage == null)
+              || (accountsInMessage != null
+                  && cmi.accountsInMessage != null
+                  && Iterables.elementsEqual(accountsInMessage, cmi.accountsInMessage)))
           && Objects.equals(_revisionNumber, cmi._revisionNumber);
     }
     return false;
@@ -43,7 +69,8 @@ public class ChangeMessageInfo {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, tag, author, realAuthor, date, message, _revisionNumber);
+    return Objects.hash(
+        id, tag, author, realAuthor, date, message, accountsInMessage, _revisionNumber);
   }
 
   @Override
@@ -63,6 +90,8 @@ public class ChangeMessageInfo {
         + _revisionNumber
         + ", message=["
         + message
-        + "]}";
+        + "], accountsForTemplate="
+        + accountsInMessage
+        + "}";
   }
 }

@@ -14,7 +14,10 @@
 
 package com.google.gerrit.extensions.common;
 
+import com.google.gerrit.common.Nullable;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Objects;
 
 /**
  * Represents a single user included in the attention set. Used in the API. See {@link
@@ -26,14 +29,60 @@ import java.sql.Timestamp;
 public class AttentionSetInfo {
   /** The user included in the attention set. */
   public AccountInfo account;
+
   /** The timestamp of the last update. */
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
   public Timestamp lastUpdate;
+
   /** The human readable reason why the user was added. */
   public String reason;
 
-  public AttentionSetInfo(AccountInfo account, Timestamp lastUpdate, String reason) {
+  /**
+   * The user that might be mentioned in {@link #reason} as the one who caused the update. This is
+   * needed since {@link #reason} contains the account in pseudonymized form and is expanded in the
+   * frontend. {@code null} if there is no such account.
+   */
+  @Nullable public AccountInfo reasonAccount;
+
+  public AttentionSetInfo(
+      AccountInfo account,
+      Timestamp lastUpdate,
+      String reason,
+      @Nullable AccountInfo reasonAccount) {
     this.account = account;
     this.lastUpdate = lastUpdate;
     this.reason = reason;
+    this.reasonAccount = reasonAccount;
+  }
+
+  // TODO(issue-40014498): Migrate timestamp fields in *Info/*Input classes from type Timestamp to
+  // Instant
+  @SuppressWarnings("JdkObsolete")
+  public AttentionSetInfo(
+      AccountInfo account, Instant lastUpdate, String reason, @Nullable AccountInfo reasonAccount) {
+    this.account = account;
+    this.lastUpdate = Timestamp.from(lastUpdate);
+    this.reason = reason;
+    this.reasonAccount = reasonAccount;
+  }
+
+  protected AttentionSetInfo() {}
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof AttentionSetInfo) {
+      AttentionSetInfo attentionSetInfo = (AttentionSetInfo) o;
+      return Objects.equals(account, attentionSetInfo.account)
+          && Objects.equals(lastUpdate, attentionSetInfo.lastUpdate)
+          && Objects.equals(reason, attentionSetInfo.reason)
+          && Objects.equals(reasonAccount, attentionSetInfo.reasonAccount);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(account, lastUpdate, reason, reasonAccount);
   }
 }

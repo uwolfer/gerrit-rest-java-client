@@ -27,6 +27,7 @@ import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gerrit.extensions.common.TestSubmitRuleInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
@@ -131,7 +132,9 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     @Test(dataProvider = "TestCases")
     public void testSubmit(RevisionApiTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectPost(testCase.submitUrl, "{\"wait_for_merge\":false,\"notify\":\"ALL\"}")
+                .expectPost(testCase.submitUrl, "{\"wait_for_merge\":false,\"notify\":\"ALL\"}",
+                    JsonParser.parseString("{}"))
+                .expectGetGson()
                 .expectGetGson()
                 .get();
 
@@ -188,7 +191,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     @Test(dataProvider = "TestCases")
     public void testRebase(RevisionApiTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPost(testCase.rebaseUrl, "{}")
+            .expectPost(testCase.rebaseUrl, "{\"allow_conflicts\":false,\"on_behalf_of_uploader\":false}")
             .expectGetGson()
             .get();
 
@@ -202,7 +205,9 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     @Test(dataProvider = "TestCases")
     public void testSubmitWithSubmitInput(RevisionApiTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-                .expectPost(testCase.submitUrl, "{\"wait_for_merge\":true,\"on_behalf_of\":\"jdoe\",\"notify\":\"ALL\"}")
+                .expectPost(testCase.submitUrl, "{\"wait_for_merge\":true,\"on_behalf_of\":\"jdoe\",\"notify\":\"ALL\"}",
+                    JsonParser.parseString("{}"))
+                .expectGetGson()
                 .expectGetGson()
                 .get();
 

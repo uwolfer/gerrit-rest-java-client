@@ -14,36 +14,82 @@
 
 package com.google.gerrit.extensions.api.config;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.gerrit.extensions.client.DiffPreferencesInfo;
 import com.google.gerrit.extensions.client.EditPreferencesInfo;
 import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
+import com.google.gerrit.extensions.common.CacheInfo;
+import com.google.gerrit.extensions.common.ExperimentInfo;
+import com.google.gerrit.extensions.common.LabelDefinitionInfo;
 import com.google.gerrit.extensions.common.ServerInfo;
+import com.google.gerrit.extensions.common.SubmitRequirementInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 //import com.google.gerrit.extensions.webui.TopMenu;
 import java.util.List;
+import java.util.Map;
 
 public interface Server {
-  /** @return Version of server. */
+  /** Returns version of server. */
   String getVersion() throws RestApiException;
 
   ServerInfo getInfo() throws RestApiException;
 
   GeneralPreferencesInfo getDefaultPreferences() throws RestApiException;
 
+  @CanIgnoreReturnValue
   GeneralPreferencesInfo setDefaultPreferences(GeneralPreferencesInfo in) throws RestApiException;
 
   DiffPreferencesInfo getDefaultDiffPreferences() throws RestApiException;
 
+  @CanIgnoreReturnValue
   DiffPreferencesInfo setDefaultDiffPreferences(DiffPreferencesInfo in) throws RestApiException;
 
   EditPreferencesInfo getDefaultEditPreferences() throws RestApiException;
 
+  @CanIgnoreReturnValue
   EditPreferencesInfo setDefaultEditPreferences(EditPreferencesInfo in) throws RestApiException;
 
   ConsistencyCheckInfo checkConsistency(ConsistencyCheckInput in) throws RestApiException;
 
 //  List<TopMenu.MenuEntry> topMenus() throws RestApiException;
+
+  ExperimentApi experiment(String name) throws RestApiException;
+
+  ListExperimentsRequest listExperiments() throws RestApiException;
+
+  ListGlobalLabelsRequest listGlobalLabels() throws RestApiException;
+
+  ListGlobalSubmitRequirementsRequest listGlobalSubmitRequirements() throws RestApiException;
+
+  CachesApi caches(String name) throws RestApiException;
+
+  Map<String, CacheInfo> listCaches() throws RestApiException;
+
+  abstract class ListExperimentsRequest {
+    private boolean enabledOnly;
+
+    public abstract ImmutableMap<String, ExperimentInfo> get() throws RestApiException;
+
+    public ListExperimentsRequest enabledOnly() {
+      enabledOnly = true;
+      return this;
+    }
+
+    public boolean getEnabledOnly() {
+      return enabledOnly;
+    }
+  }
+
+  abstract class ListGlobalLabelsRequest {
+    public abstract ImmutableList<LabelDefinitionInfo> get() throws RestApiException;
+  }
+
+  abstract class ListGlobalSubmitRequirementsRequest {
+    public abstract ImmutableList<SubmitRequirementInfo> get() throws RestApiException;
+  }
 
   /**
    * A default implementation which allows source compatibility when adding new methods to the
@@ -102,5 +148,36 @@ public interface Server {
 //    public List<TopMenu.MenuEntry> topMenus() throws RestApiException {
 //      throw new NotImplementedException();
 //    }
+
+    @Override
+    public ExperimentApi experiment(String name) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ListExperimentsRequest listExperiments() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ListGlobalLabelsRequest listGlobalLabels() throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public ListGlobalSubmitRequirementsRequest listGlobalSubmitRequirements()
+        throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public CachesApi caches(String name) throws RestApiException {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public Map<String, CacheInfo> listCaches() throws RestApiException {
+      throw new NotImplementedException();
+    }
   }
 }

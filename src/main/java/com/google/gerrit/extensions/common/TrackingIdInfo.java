@@ -14,6 +14,8 @@
 
 package com.google.gerrit.extensions.common;
 
+import java.util.Objects;
+
 public class TrackingIdInfo {
   public String system;
   public String id;
@@ -22,4 +24,20 @@ public class TrackingIdInfo {
     this.system = system;
     this.id = id;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof TrackingIdInfo) {
+      TrackingIdInfo trackingIdInfo = (TrackingIdInfo) o;
+      return Objects.equals(system, trackingIdInfo.system) && Objects.equals(id, trackingIdInfo.id);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(system, id);
+  }
+
+  protected TrackingIdInfo() {}
 }

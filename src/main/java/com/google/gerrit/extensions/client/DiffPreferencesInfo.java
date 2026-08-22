@@ -14,6 +14,13 @@
 
 package com.google.gerrit.extensions.client;
 
+import static com.google.gerrit.extensions.client.NullableBooleanPreferencesFieldComparator.equalBooleanPreferencesFields;
+
+import com.google.common.base.MoreObjects;
+import com.google.gerrit.common.ConvertibleToProto;
+import java.util.Objects;
+
+@ConvertibleToProto
 public class DiffPreferencesInfo {
 
   /** Default number of lines of context. */
@@ -28,10 +35,11 @@ public class DiffPreferencesInfo {
   /** Default line length. */
   public static final int DEFAULT_LINE_LENGTH = 100;
 
-  /** Context setting to display the entire file. */
-  public static final short WHOLE_FILE_CONTEXT = -1;
+  /** @deprecated removed upstream. Context setting to display the entire file. */
+  @Deprecated public static final short WHOLE_FILE_CONTEXT = -1;
 
-  /** Typical valid choices for the default context setting. */
+  /** @deprecated removed upstream. Typical valid choices for the default context setting. */
+  @Deprecated
   public static final short[] CONTEXT_CHOICES = {3, 10, 25, 50, 75, 100, WHOLE_FILE_CONTEXT};
 
   public enum Whitespace {
@@ -39,6 +47,12 @@ public class DiffPreferencesInfo {
     IGNORE_TRAILING,
     IGNORE_LEADING_AND_TRAILING,
     IGNORE_ALL
+  }
+
+  public enum ResponsiveMode {
+    NONE,
+    SHRINK_ONLY,
+    FULL_RESPONSIVE
   }
 
   public Integer context;
@@ -59,12 +73,108 @@ public class DiffPreferencesInfo {
   public Boolean renderEntireFile;
   public Boolean hideEmptyPane;
   public Boolean matchBrackets;
-  public Boolean lineWrapping;
+  @Deprecated public Boolean lineWrapping;
+  public ResponsiveMode responsiveMode;
   public Whitespace ignoreWhitespace;
   public Boolean retainHeader;
   public Boolean skipDeleted;
   public Boolean skipUnchanged;
   public Boolean skipUncommented;
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof DiffPreferencesInfo)) {
+      return false;
+    }
+    DiffPreferencesInfo other = (DiffPreferencesInfo) obj;
+    return Objects.equals(this.context, other.context)
+        && Objects.equals(this.tabSize, other.tabSize)
+        && Objects.equals(this.fontSize, other.fontSize)
+        && Objects.equals(this.lineLength, other.lineLength)
+        && Objects.equals(this.cursorBlinkRate, other.cursorBlinkRate)
+        && equalBooleanPreferencesFields(this.expandAllComments, other.expandAllComments)
+        && equalBooleanPreferencesFields(this.intralineDifference, other.intralineDifference)
+        && equalBooleanPreferencesFields(this.manualReview, other.manualReview)
+        && equalBooleanPreferencesFields(this.showLineEndings, other.showLineEndings)
+        && equalBooleanPreferencesFields(this.showTabs, other.showTabs)
+        && equalBooleanPreferencesFields(this.showWhitespaceErrors, other.showWhitespaceErrors)
+        && equalBooleanPreferencesFields(this.syntaxHighlighting, other.syntaxHighlighting)
+        && equalBooleanPreferencesFields(this.hideTopMenu, other.hideTopMenu)
+        && equalBooleanPreferencesFields(
+            this.autoHideDiffTableHeader, other.autoHideDiffTableHeader)
+        && equalBooleanPreferencesFields(this.hideLineNumbers, other.hideLineNumbers)
+        && equalBooleanPreferencesFields(this.renderEntireFile, other.renderEntireFile)
+        && equalBooleanPreferencesFields(this.hideEmptyPane, other.hideEmptyPane)
+        && equalBooleanPreferencesFields(this.matchBrackets, other.matchBrackets)
+        && equalBooleanPreferencesFields(this.lineWrapping, other.lineWrapping)
+        && Objects.equals(this.responsiveMode, other.responsiveMode)
+        && Objects.equals(this.ignoreWhitespace, other.ignoreWhitespace)
+        && equalBooleanPreferencesFields(this.retainHeader, other.retainHeader)
+        && equalBooleanPreferencesFields(this.skipDeleted, other.skipDeleted)
+        && equalBooleanPreferencesFields(this.skipUnchanged, other.skipUnchanged)
+        && equalBooleanPreferencesFields(this.skipUncommented, other.skipUncommented);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        context,
+        tabSize,
+        fontSize,
+        lineLength,
+        cursorBlinkRate,
+        expandAllComments,
+        intralineDifference,
+        manualReview,
+        showLineEndings,
+        showTabs,
+        showWhitespaceErrors,
+        syntaxHighlighting,
+        hideTopMenu,
+        autoHideDiffTableHeader,
+        hideLineNumbers,
+        renderEntireFile,
+        hideEmptyPane,
+        matchBrackets,
+        lineWrapping,
+        responsiveMode,
+        ignoreWhitespace,
+        retainHeader,
+        skipDeleted,
+        skipUnchanged,
+        skipUncommented);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper("DiffPreferencesInfo")
+        .add("context", context)
+        .add("tabSize", tabSize)
+        .add("fontSize", fontSize)
+        .add("lineLength", lineLength)
+        .add("cursorBlinkRate", cursorBlinkRate)
+        .add("expandAllComments", expandAllComments)
+        .add("intralineDifference", intralineDifference)
+        .add("manualReview", manualReview)
+        .add("showLineEndings", showLineEndings)
+        .add("showTabs", showTabs)
+        .add("showWhitespaceErrors", showWhitespaceErrors)
+        .add("syntaxHighlighting", syntaxHighlighting)
+        .add("hideTopMenu", hideTopMenu)
+        .add("autoHideDiffTableHeader", autoHideDiffTableHeader)
+        .add("hideLineNumbers", hideLineNumbers)
+        .add("renderEntireFile", renderEntireFile)
+        .add("hideEmptyPane", hideEmptyPane)
+        .add("matchBrackets", matchBrackets)
+        .add("lineWrapping", lineWrapping)
+        .add("responsiveMode", responsiveMode)
+        .add("ignoreWhitespace", ignoreWhitespace)
+        .add("retainHeader", retainHeader)
+        .add("skipDeleted", skipDeleted)
+        .add("skipUnchanged", skipUnchanged)
+        .add("skipUncommented", skipUncommented)
+        .toString();
+  }
 
   public static DiffPreferencesInfo defaults() {
     DiffPreferencesInfo i = new DiffPreferencesInfo();
@@ -87,6 +197,7 @@ public class DiffPreferencesInfo {
     i.hideEmptyPane = false;
     i.matchBrackets = false;
     i.lineWrapping = false;
+    i.responsiveMode = ResponsiveMode.NONE;
     i.ignoreWhitespace = Whitespace.IGNORE_NONE;
     i.retainHeader = false;
     i.skipDeleted = false;

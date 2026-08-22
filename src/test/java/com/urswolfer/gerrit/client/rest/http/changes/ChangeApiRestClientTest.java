@@ -199,7 +199,7 @@ public class ChangeApiRestClientTest {
     public void testMove() throws Exception {
         GerritRestClient gerritRestClient = getGerritRestClient(
             "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/move",
-            "{\"destination_branch\":\"destination_branch\"}"
+            "{\"destination_branch\":\"destination_branch\",\"keep_all_votes\":false}"
         );
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
         changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").move("destination_branch");
@@ -211,7 +211,7 @@ public class ChangeApiRestClientTest {
     public void testMoveWithMessage() throws Exception {
         GerritRestClient gerritRestClient = getGerritRestClient(
             "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/move",
-            "{\"message\":\"Move to desination_branch\",\"destination_branch\":\"destination_branch\"}"
+            "{\"message\":\"Move to desination_branch\",\"destination_branch\":\"destination_branch\",\"keep_all_votes\":false}"
         );
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
         MoveInput moveInput = new MoveInput();
@@ -884,7 +884,7 @@ public class ChangeApiRestClientTest {
     public void testRebaseChange() throws Exception {
         GerritRestClient gerritRestClient = getGerritRestClient(
                 "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/rebase",
-                "{\"base\":\"1234\"}"
+                "{\"base\":\"1234\",\"allow_conflicts\":false,\"on_behalf_of_uploader\":false}"
         );
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
         RebaseInput rebaseInput = new RebaseInput();

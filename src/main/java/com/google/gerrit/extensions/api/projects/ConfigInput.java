@@ -34,9 +34,11 @@ public class ConfigInput {
   public InheritableBoolean enableReviewerByEmail;
   public InheritableBoolean matchAuthorToCommitterDate;
   public InheritableBoolean rejectEmptyCommit;
+  public InheritableBoolean skipAddingAuthorAndCommitterAsReviewers;
   public String maxObjectSizeLimit;
   public SubmitType submitType;
   public ProjectState state;
   public Map<String, Map<String, ConfigValue>> pluginConfigValues;
   public Map<String, CommentLinkInput> commentLinks;
+  public String commitMessage;
 }

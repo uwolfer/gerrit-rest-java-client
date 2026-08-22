@@ -14,11 +14,15 @@
 
 package com.google.gerrit.extensions.common;
 
+import com.google.gerrit.common.Nullable;
 import com.google.gerrit.extensions.api.accounts.AccountInput;
+import com.google.gerrit.extensions.api.changes.ApplyPatchInput;
 import com.google.gerrit.extensions.api.changes.NotifyHandling;
 import com.google.gerrit.extensions.api.changes.NotifyInfo;
 import com.google.gerrit.extensions.api.changes.RecipientType;
 import com.google.gerrit.extensions.client.ChangeStatus;
+import com.google.gerrit.extensions.client.ListChangesOption;
+import java.util.List;
 import java.util.Map;
 
 public class ChangeInput {
@@ -33,9 +37,14 @@ public class ChangeInput {
   public String baseChange;
   public String baseCommit;
   public Boolean newBranch;
+  public Map<String, String> validationOptions;
+  public Map<String, String> customKeyedValues;
   public MergeInput merge;
+  public ApplyPatchInput patch;
 
   public AccountInput author;
+
+  @Nullable public List<ListChangesOption> responseFormatOptions;
 
   public ChangeInput() {}
 
@@ -53,8 +62,12 @@ public class ChangeInput {
     this.subject = subject;
   }
 
-  /** Who to send email notifications to after change is created. */
-  public NotifyHandling notify = NotifyHandling.ALL;
+  /**
+   * Who to send email notifications to after change is created. If not specified, defaults to
+   * {@link NotifyHandling#OWNER} if the change is created as work-in-progress, or {@link
+   * NotifyHandling#ALL} otherwise.
+   */
+  public NotifyHandling notify;
 
   public Map<RecipientType, NotifyInfo> notifyDetails;
 }

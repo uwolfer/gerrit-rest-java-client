@@ -31,4 +31,6 @@ public class CherryPickInput {
   public boolean allowConflicts;
   public String topic;
   public boolean allowEmpty;
+  public Map<String, String> validationOptions;
+  public String committerEmail;
 }

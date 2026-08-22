@@ -36,17 +36,26 @@ public class IdString {
     urlEncoded = s;
   }
 
-  /** @return the decoded value of the string. */
+  /** Returns the decoded value of the string. */
   public String get() {
-    return Url.decode(urlEncoded);
+    String data = urlEncoded;
+
+    // URLs use percentage encoding which replaces unsafe ASCII characters with a '%' followed by
+    // two hexadecimal digits. If there is '%' that is not followed by two hexadecimal digits
+    // Url.decode(String) fails with an IllegalArgumentException. To prevent this replace any '%'
+    // that is not followed by two hexadecimal digits by "%25", which is the URL encoding for '%',
+    // before calling Url.decode(String).
+    data = data.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
+
+    return Url.decode(data);
   }
 
-  /** @return true if the string is the empty string. */
+  /** Returns true if the string is the empty string. */
   public boolean isEmpty() {
     return urlEncoded.isEmpty();
   }
 
-  /** @return the original URL encoding supplied by the client. */
+  /** Returns the original URL encoding supplied by the client. */
   public String encoded() {
     return urlEncoded;
   }

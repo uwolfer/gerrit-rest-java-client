@@ -14,6 +14,7 @@
 
 package com.google.gerrit.extensions.api.projects;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.gerrit.extensions.client.ProjectState;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
@@ -46,6 +47,7 @@ public interface Projects {
    * @return API for accessing the newly-created project.
    * @throws RestApiException if an error occurred.
    */
+  @CanIgnoreReturnValue
   ProjectApi create(String name) throws RestApiException;
 
   /**
@@ -55,6 +57,7 @@ public interface Projects {
    * @return API for accessing the newly-created project.
    * @throws RestApiException if an error occurred.
    */
+  @CanIgnoreReturnValue
   ProjectApi create(ProjectInput in) throws RestApiException;
 
   ListRequest list();
@@ -270,12 +273,12 @@ public interface Projects {
     }
 
     @Override
-    public ProjectApi create(ProjectInput in) throws RestApiException {
+    public ProjectApi create(String name) throws RestApiException {
       throw new NotImplementedException();
     }
 
     @Override
-    public ProjectApi create(String name) throws RestApiException {
+    public ProjectApi create(ProjectInput in) throws RestApiException {
       throw new NotImplementedException();
     }
 

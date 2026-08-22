@@ -16,13 +16,14 @@ package com.google.gerrit.extensions.api.changes;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.gerrit.common.UsedAt;
 import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gwtorm.server.StandardKeyEncoder;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -32,21 +33,21 @@ public interface Changes {
   /**
    * Look up a change by numeric ID.
    *
-   * <p><strong>Note:</strong> This method eagerly reads the change. Methods that mutate the change
-   * do not necessarily re-read the change. Therefore, calling a getter method on an instance after
-   * calling a mutation method on that same instance is not guaranteed to reflect the mutation. It
-   * is not recommended to store references to {@code ChangeApi} instances.
+   * <p><strong>Note:</strong> Change number is not guaranteed to unambiguously identify a change.
    *
+   * @see #id(String, int)
+   * @deprecated in favor of {@link #id(String, int)}
    * @param id change number.
    * @return API for accessing the change.
    * @throws RestApiException if an error occurred.
    */
+  @Deprecated(since = "3.9")
   ChangeApi id(int id) throws RestApiException;
 
   /**
    * Look up a change by string ID.
    *
-   * @see #id(int)
+   * @see #id(String, int)
    * @param id any identifier supported by the REST API, including change number, Change-Id, or
    *     project~branch~Change-Id triplet.
    * @return API for accessing the change.
@@ -57,19 +58,39 @@ public interface Changes {
   /**
    * Look up a change by project, branch, and change ID.
    *
-   * @see #id(int)
+   * @see #id(String, int)
    */
   ChangeApi id(String project, String branch, String id) throws RestApiException;
 
   /**
    * Look up a change by project and numeric ID.
    *
+   * <p><strong>Note:</strong> This method eagerly reads the change. Methods that mutate the change
+   * do not necessarily re-read the change. Therefore, calling a getter method on an instance after
+   * calling a mutation method on that same instance is not guaranteed to reflect the mutation. It
+   * is not recommended to store references to {@code ChangeApi} instances. Also note that the
+   * change numeric id without a project name parameter may fail to identify a unique change
+   * element, because the potential conflict with other changes imported from Gerrit instances with
+   * a different Server-Id.
+   *
    * @param project project name.
    * @param id change number.
-   * @see #id(int)
    */
   ChangeApi id(String project, int id) throws RestApiException;
 
+  /**
+   * Look up a change by the given change identifier.
+   *
+   * @see #id(String)
+   * @param changeIdentifier identifier that identifies a change
+   * @return API for accessing the change.
+   * @throws RestApiException if an error occurred.
+   */
+  default ChangeApi id(ChangeIdentifier changeIdentifier) throws RestApiException {
+    return id(changeIdentifier.id());
+  }
+
+  @CanIgnoreReturnValue
   ChangeApi create(ChangeInput in) throws RestApiException;
 
   ChangeInfo createAsInfo(ChangeInput in) throws RestApiException;
@@ -82,8 +103,11 @@ public interface Changes {
     private String query;
     private int limit;
     private int start;
-    private String sortkey; // server version < 2.9, needed for change list paging
     private boolean isNoLimit;
+    private boolean allowIncompleteResults;
+    // Removed upstream (server version < 2.9, needed for change list paging). Kept here, deprecated,
+    // for source/binary compatibility with existing callers.
+    @Deprecated private String sortkey;
     private Set<ListChangesOption> options = EnumSet.noneOf(ListChangesOption.class);
     private ListMultimap<String, String> pluginOptions = ArrayListMultimap.create();
 
@@ -94,6 +118,11 @@ public interface Changes {
       return this;
     }
 
+    /**
+     * @deprecated removed upstream; kept for source/binary compatibility with existing callers. URL
+     *     encodes the query string set via {@link #withQuery(String)}.
+     */
+    @Deprecated
     public QueryRequest encode() {
       query = StandardKeyEncoder.encode(query);
       return this;
@@ -114,9 +143,19 @@ public interface Changes {
       return this;
     }
 
-    // server version < 2.9, needed for change list paging
+    /**
+     * @deprecated removed upstream (server version &lt; 2.9, needed for change list paging); kept
+     *     for source/binary compatibility with existing callers.
+     */
+    @Deprecated
     public QueryRequest withSortkey(String sortkey) {
       this.sortkey = sortkey;
+      return this;
+    }
+
+    @UsedAt(UsedAt.Project.GOOGLE)
+    public QueryRequest withAllowIncompleteResults(boolean allow) {
+      this.allowIncompleteResults = allow;
       return this;
     }
 
@@ -166,9 +205,18 @@ public interface Changes {
       return start;
     }
 
-    // server version < 2.9, needed for change list paging
+    /**
+     * @deprecated removed upstream (server version &lt; 2.9, needed for change list paging); kept
+     *     for source/binary compatibility with existing callers.
+     */
+    @Deprecated
     public String getSortkey() {
       return sortkey;
+    }
+
+    @UsedAt(UsedAt.Project.GOOGLE)
+    public boolean getAllowIncompleteResults() {
+      return allowIncompleteResults;
     }
 
     public Set<ListChangesOption> getOptions() {
@@ -210,7 +258,7 @@ public interface Changes {
     }
 
     @Override
-    public ChangeApi id(String triplet) throws RestApiException {
+    public ChangeApi id(String id) throws RestApiException {
       throw new NotImplementedException();
     }
 

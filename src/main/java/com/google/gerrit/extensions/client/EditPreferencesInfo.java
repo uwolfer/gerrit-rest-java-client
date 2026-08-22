@@ -14,7 +14,14 @@
 
 package com.google.gerrit.extensions.client;
 
+import static com.google.gerrit.extensions.client.NullableBooleanPreferencesFieldComparator.equalBooleanPreferencesFields;
+
+import com.google.common.base.MoreObjects;
+import com.google.gerrit.common.ConvertibleToProto;
+import java.util.Objects;
+
 /* This class is stored in Git config file. */
+@ConvertibleToProto
 public class EditPreferencesInfo {
   public Integer tabSize;
   public Integer lineLength;
@@ -30,6 +37,67 @@ public class EditPreferencesInfo {
   public Boolean indentWithTabs;
   public Boolean autoCloseBrackets;
   public Boolean showBase;
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof EditPreferencesInfo)) {
+      return false;
+    }
+    EditPreferencesInfo other = (EditPreferencesInfo) obj;
+    return Objects.equals(this.tabSize, other.tabSize)
+        && Objects.equals(this.lineLength, other.lineLength)
+        && Objects.equals(this.indentUnit, other.indentUnit)
+        && Objects.equals(this.cursorBlinkRate, other.cursorBlinkRate)
+        && equalBooleanPreferencesFields(this.hideTopMenu, other.hideTopMenu)
+        && equalBooleanPreferencesFields(this.showTabs, other.showTabs)
+        && equalBooleanPreferencesFields(this.showWhitespaceErrors, other.showWhitespaceErrors)
+        && equalBooleanPreferencesFields(this.syntaxHighlighting, other.syntaxHighlighting)
+        && equalBooleanPreferencesFields(this.hideLineNumbers, other.hideLineNumbers)
+        && equalBooleanPreferencesFields(this.matchBrackets, other.matchBrackets)
+        && equalBooleanPreferencesFields(this.lineWrapping, other.lineWrapping)
+        && equalBooleanPreferencesFields(this.indentWithTabs, other.indentWithTabs)
+        && equalBooleanPreferencesFields(this.autoCloseBrackets, other.autoCloseBrackets)
+        && equalBooleanPreferencesFields(this.showBase, other.showBase);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        tabSize,
+        lineLength,
+        indentUnit,
+        cursorBlinkRate,
+        hideTopMenu,
+        showTabs,
+        showWhitespaceErrors,
+        syntaxHighlighting,
+        hideLineNumbers,
+        matchBrackets,
+        lineWrapping,
+        indentWithTabs,
+        autoCloseBrackets,
+        showBase);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper("EditPreferencesInfo")
+        .add("tabSize", tabSize)
+        .add("lineLength", lineLength)
+        .add("indentUnit", indentUnit)
+        .add("cursorBlinkRate", cursorBlinkRate)
+        .add("hideTopMenu", hideTopMenu)
+        .add("showTabs", showTabs)
+        .add("showWhitespaceErrors", showWhitespaceErrors)
+        .add("syntaxHighlighting", syntaxHighlighting)
+        .add("hideLineNumbers", hideLineNumbers)
+        .add("matchBrackets", matchBrackets)
+        .add("lineWrapping", lineWrapping)
+        .add("indentWithTabs", indentWithTabs)
+        .add("autoCloseBrackets", autoCloseBrackets)
+        .add("showBase", showBase)
+        .toString();
+  }
 
   public static EditPreferencesInfo defaults() {
     EditPreferencesInfo i = new EditPreferencesInfo();
