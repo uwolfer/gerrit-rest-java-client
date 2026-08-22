@@ -21,7 +21,6 @@ import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gson.Gson;
 import com.urswolfer.gerrit.client.rest.http.HttpStatusException;
-import org.testng.SkipException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -43,11 +42,11 @@ public class RealServerTest {
     public Object[][] getData() throws Exception {
         URL url = this.getClass().getResource("testhosts.json");
         if (url == null) {
-            String message =
+            System.out.println(
                 "File 'src/test/resources/com/urswolfer/gerrit/client/rest/testhosts.json' not found.\n" +
                 "Not running any " + getClass().getSimpleName() + " tests.\n" +
-                "Create the json file with following content: '[[\"http://gerrit\", null, null], [\"http://host2\", \"user\", \"pw\"]]'.";
-            throw new SkipException(message);
+                "Create the json file with following content: '[[\"http://gerrit\", null, null], [\"http://host2\", \"user\", \"pw\"]]'.");
+            return new Object[0][];
         }
         File file = new File(url.toURI());
         return new Gson().fromJson(new FileReader(file), Object[][].class);
