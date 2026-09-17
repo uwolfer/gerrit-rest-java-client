@@ -182,6 +182,14 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     @Override
+    public ChangeInfo createMergePatchSet(MergePatchSetInput in) throws RestApiException {
+        String request = getRequestPath() + "/merge";
+        String json = gerritRestClient.getGson().toJson(in);
+        JsonElement jsonElement = gerritRestClient.postRequest(request, json);
+        return changeInfosParser.parseSingleChangeInfo(jsonElement);
+    }
+
+    @Override
     public void publish() throws RestApiException {
         String request = getRequestPath() + "/publish";
         gerritRestClient.postRequest(request);

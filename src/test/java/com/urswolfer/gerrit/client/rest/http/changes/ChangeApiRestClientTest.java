@@ -912,6 +912,40 @@ public class ChangeApiRestClientTest {
         EasyMock.verify(gerritRestClient);
     }
 
+    @Test
+    public void testCreateMergePatchSet() throws Exception {
+        JsonElement response = EasyMock.createMock(JsonElement.class);
+        ChangeInfo expectedChangeInfo = new ChangeInfo();
+        expectedChangeInfo.id = "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940";
+        String request = "/changes/" + expectedChangeInfo.id + "/merge";
+        String json = "{\"subject\":\"Refresh feature merge\",\"inherit_parent\":false,"
+                + "\"merge\":{\"source\":\"refs/heads/feature\","
+                + "\"source_branch\":\"refs/heads/feature\",\"allow_conflicts\":false}}";
+
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+                .expectPost(request, json, response)
+                .expectGetGson()
+                .get();
+        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
+        EasyMock.expect(changeInfosParser.parseSingleChangeInfo(response)).andReturn(expectedChangeInfo).once();
+        EasyMock.replay(changeInfosParser);
+
+        ChangeApiRestClient changeApi = new ChangeApiRestClient(gerritRestClient, null,
+                changeInfosParser, null, null, null, null, null, null, null, null, null,
+                expectedChangeInfo.id);
+        MergePatchSetInput input = new MergePatchSetInput();
+        input.subject = "Refresh feature merge";
+        input.inheritParent = false;
+        input.merge = new MergeInput();
+        input.merge.source = "refs/heads/feature";
+        input.merge.sourceBranch = "refs/heads/feature";
+        input.merge.allowConflicts = false;
+
+        ChangeInfo actualChangeInfo = changeApi.createMergePatchSet(input);
+
+        Truth.assertThat(actualChangeInfo).isSameInstanceAs(expectedChangeInfo);
+        EasyMock.verify(gerritRestClient, changeInfosParser);
+    }
     private GerritRestClient getGerritRestClient(String expectedRequest, String expectedJson) throws Exception {
         return new GerritRestClientBuilder()
                 .expectPost(expectedRequest, expectedJson)
