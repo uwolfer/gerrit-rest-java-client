@@ -68,11 +68,13 @@ import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.HEAD;
 public class GerritRestClientTest {
     private String jettyUrl;
     private String githubOAuthJettyUrl;
+    private String countingLoginJettyUrl;
 
     @BeforeClass
     public void startJetty() throws Exception {
         jettyUrl = startJetty(LoginSimulationServlet.class);
         githubOAuthJettyUrl = startJetty(GitHubOAuthLoginSimulationServlet.class);
+        countingLoginJettyUrl = startJetty(CountingLoginSimulationServlet.class);
     }
 
     public String startJetty(Class<? extends HttpServlet> loginServletClass) throws Exception {
@@ -330,6 +332,27 @@ public class GerritRestClientTest {
         // ensure that even with invalidated cache request is possible and cached filled again
         gerritRestClient.requestRest("/changes/", null, GET);
         Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
+    }
+
+    /**
+     * Once the plain GET against /login/ has authenticated us, the form login must not be
+     * attempted: it would post the credentials in the request body and start a second session,
+     * while the token returned to the caller still belongs to the first one.
+     */
+    @Test
+    public void testFormLoginSkippedWhenHttpLoginSucceeds() throws Exception {
+        CountingLoginSimulationServlet.resetCounts();
+        GerritRestClient gerritRestClient = new GerritRestClient(
+            new GerritAuthData.Basic(countingLoginJettyUrl, "foo", "bar"), new HttpRequestExecutor());
+        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
+        loginCacheField.setAccessible(true);
+        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+
+        gerritRestClient.requestRest("/changes/", null, GET);
+
+        Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
+        Truth.assertThat(CountingLoginSimulationServlet.getGetCount()).isEqualTo(1);
+        Truth.assertThat(CountingLoginSimulationServlet.getPostCount()).isEqualTo(0);
     }
 
     /**
