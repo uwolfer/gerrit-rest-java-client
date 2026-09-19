@@ -42,7 +42,6 @@ import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
  */
 public class FileApiRestClient extends FileApi.NotImplemented {
 
-    private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
     private final RevisionApiRestClient revisionApiRestClient;
     private final GerritJson gerritJson;
@@ -59,7 +58,6 @@ public class FileApiRestClient extends FileApi.NotImplemented {
     public FileApiRestClient(GerritRestContext context,
                              RevisionApiRestClient revisionApiRestClient,
                              String path) {
-        this.context = context;
         this.gerritRestClient = context.restClient();
         this.gerritJson = context.json();
         this.revisionApiRestClient = revisionApiRestClient;

@@ -37,6 +37,11 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
  * @author Urs Wolfer
  */
 public class ServerRestClient extends Server.NotImplemented implements Server {
+
+    /**
+     * What {@link #getVersion()} answers when the server has no version endpoint at all.
+     */
+    public static final String VERSION_BEFORE_2_8 = "<2.8";
     private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
     private final GerritJson gerritJson;
@@ -55,7 +60,7 @@ public class ServerRestClient extends Server.NotImplemented implements Server {
         } catch (HttpStatusException e) {
             int statusCode = e.getStatusCode();
             if (statusCode == SC_NOT_FOUND) { // Gerrit older than 2.8
-                return "<2.8";
+                return VERSION_BEFORE_2_8;
             } else {
                 throw e;
             }

@@ -26,6 +26,7 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import java.util.Map;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 /**
  * @author Chenglong Sun
@@ -40,8 +41,9 @@ public class ReviewerApiRestClientTest extends AbstractJsonTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/reviewers/" + ACCOUNT_ID + "/votes", jsonElement)
             .get();
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
-        ReviewerApiRestClient reviewerApiRestClient = new ReviewerApiRestClient(restContext(gerritRestClient), changeApiRestClient, ACCOUNT_ID);
+        GerritRestContext context = restContext(gerritRestClient);
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(context, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ReviewerApiRestClient reviewerApiRestClient = new ReviewerApiRestClient(context, changeApiRestClient, ACCOUNT_ID);
         Map<String, Short> votes = reviewerApiRestClient.votes();
 
         Truth.assertThat(votes.get("Work-In-Progress")).isSameInstanceAs((short) 2);
@@ -54,8 +56,9 @@ public class ReviewerApiRestClientTest extends AbstractJsonTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectDelete("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/reviewers/" + ACCOUNT_ID + "/votes/" + LABEL)
             .get();
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
-        ReviewerApiRestClient reviewerApiRestClient = new ReviewerApiRestClient(restContext(gerritRestClient), changeApiRestClient, ACCOUNT_ID);
+        GerritRestContext context = restContext(gerritRestClient);
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(context, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ReviewerApiRestClient reviewerApiRestClient = new ReviewerApiRestClient(context, changeApiRestClient, ACCOUNT_ID);
         reviewerApiRestClient.deleteVote(LABEL);
 
         EasyMock.verify(gerritRestClient);
