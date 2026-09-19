@@ -16,9 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.gerrit.extensions.api.changes.IncludedInInfo;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
@@ -57,7 +54,7 @@ public class ProjectsRestClientTest {
 
     @DataProvider(name = "ListProjectTestCases")
     public Iterator<ProjectListTestCase[]> listProjectTestCases() throws Exception {
-        return Iterables.transform(Arrays.asList(
+        return Arrays.asList(
             listTestCase().withListParameter(
                 new TestListRequest().withDescription(true)
             ).expectUrl("/projects/?d"),
@@ -92,12 +89,7 @@ public class ProjectsRestClientTest {
             listTestCase().withListParameter(
                 new TestListRequest().withType(Projects.ListRequest.FilterType.CODE)
             ).expectUrl("/projects/?type=CODE")
-        ), new Function<ProjectListTestCase, ProjectListTestCase[]>() {
-            @Override
-            public ProjectListTestCase[] apply(ProjectListTestCase testCase) {
-                return new ProjectListTestCase[]{testCase};
-            }
-        }).iterator();
+        ).stream().map(testCase -> new ProjectListTestCase[]{testCase}).iterator();
     }
 
     private static ProjectListTestCase listTestCase() {
@@ -166,7 +158,7 @@ public class ProjectsRestClientTest {
         public BranchInfoParser setupBranchInfoParser() throws Exception {
             branchInfoParser = EasyMock.createMock(BranchInfoParser.class);
             EasyMock.expect(branchInfoParser.parseBranchInfos(mockJsonElement))
-                .andReturn(Lists.<BranchInfo>newArrayList())
+                .andReturn(new ArrayList<BranchInfo>())
                 .once();
             EasyMock.replay(branchInfoParser);
             return branchInfoParser;
@@ -175,7 +167,7 @@ public class ProjectsRestClientTest {
         public TagInfoParser setupTagInfoParser() throws Exception {
             tagInfoParser = EasyMock.createMock(TagInfoParser.class);
             EasyMock.expect(tagInfoParser.parseTagInfos(mockJsonElement))
-                .andReturn(Lists.<TagInfo>newArrayList())
+                .andReturn(new ArrayList<TagInfo>())
                 .once();
             EasyMock.replay(tagInfoParser);
             return tagInfoParser;

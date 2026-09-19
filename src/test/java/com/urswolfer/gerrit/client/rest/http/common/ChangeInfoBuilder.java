@@ -16,12 +16,12 @@
 
 package com.urswolfer.gerrit.client.rest.http.common;
 
-import com.google.common.collect.Maps;
 import com.google.gerrit.extensions.client.ChangeStatus;
 import com.google.gerrit.extensions.common.*;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -132,7 +132,7 @@ public class ChangeInfoBuilder extends AbstractBuilder {
 
     public ChangeInfoBuilder withLabel(String key, LabelInfo label) {
         if (changeInfo.labels == null) {
-            changeInfo.labels = Maps.newLinkedHashMap();
+            changeInfo.labels = new LinkedHashMap<>();
         }
         changeInfo.labels.put(key, label);
         return this;

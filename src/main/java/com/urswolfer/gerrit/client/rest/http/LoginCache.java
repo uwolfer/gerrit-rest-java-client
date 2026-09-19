@@ -16,12 +16,13 @@
 
 package com.urswolfer.gerrit.client.rest.http;
 
-import com.google.common.base.Optional;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
+
+import java.util.Optional;
 
 /**
  * @author Urs Wolfer
@@ -31,7 +32,7 @@ public class LoginCache {
     private final GerritAuthData authData;
     private boolean githubOAuthDetected;
 
-    private Optional<String> gerritAuthOptional = Optional.absent();
+    private Optional<String> gerritAuthOptional = Optional.empty();
     // remember when host does not support gerrit-auth login method so we don't have to try again
     private boolean hostSupportsGerritAuth = true;
     private String lastConnection;
@@ -58,7 +59,7 @@ public class LoginCache {
 
     public void invalidate() {
         lastConnection = null;
-        gerritAuthOptional = Optional.absent();
+        gerritAuthOptional = Optional.empty();
         hostSupportsGerritAuth = true;
         cookieStore.clear();
     }

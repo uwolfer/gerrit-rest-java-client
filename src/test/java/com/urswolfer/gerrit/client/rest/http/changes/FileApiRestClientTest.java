@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.base.Function;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.client.DiffPreferencesInfo.Whitespace;
 import com.google.gerrit.extensions.common.DiffInfo;
@@ -36,6 +35,7 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.function.Function;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 

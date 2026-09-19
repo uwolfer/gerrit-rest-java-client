@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
-import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gson.JsonElement;
@@ -25,13 +24,14 @@ import com.urswolfer.gerrit.client.rest.http.common.BranchInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Tim Coulson
  */
 public class BranchInfoParserTest extends AbstractParserTest {
-    private static final List<BranchInfo> BRANCH_INFO_LIST = Lists.newArrayList();
+    private static final List<BranchInfo> BRANCH_INFO_LIST = new ArrayList<>();
 
     static {
         BRANCH_INFO_LIST.add(new BranchInfoBuilder()

@@ -16,15 +16,14 @@
 
 package com.urswolfer.gerrit.client.rest.http;
 
-import com.google.common.io.ByteStreams;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * @author Luca Milanesio
@@ -44,6 +43,6 @@ public class GitHubOAuthLoginSimulationServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.addCookie(new Cookie("GerritAccount", "value"));
-        ByteStreams.copy(new FileInputStream(LoginSimulationServlet.INDEX_HTML), resp.getOutputStream());
+        Files.copy(Paths.get(LoginSimulationServlet.INDEX_HTML), resp.getOutputStream());
     }
 }

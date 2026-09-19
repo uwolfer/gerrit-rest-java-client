@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes.parsers;
 
-import com.google.common.collect.Maps;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.*;
 import com.google.gson.JsonElement;
@@ -32,7 +31,7 @@ import java.util.TreeMap;
  */
 public class CommitInfosParserTest extends AbstractParserTest{
 
-    private static final TreeMap<String, ActionInfo> ACTION_INFOS = Maps.newTreeMap();
+    private static final TreeMap<String, ActionInfo> ACTION_INFOS = new TreeMap<>();
 
     static {
         ACTION_INFOS.put("submit",

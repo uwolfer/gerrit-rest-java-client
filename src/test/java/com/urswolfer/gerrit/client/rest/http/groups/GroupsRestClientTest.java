@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.groups;
 
-import com.google.common.collect.Iterables;
 import com.google.gerrit.extensions.api.groups.Groups;
 import com.google.gerrit.extensions.api.groups.Groups.QueryRequest;
 import com.google.gerrit.extensions.client.ListGroupsOption;
@@ -84,7 +83,7 @@ public class GroupsRestClientTest {
 
     @DataProvider(name = "ListGroupsTestCases")
     public Iterator<GroupListTestCase[]> listGroupTestCases() throws Exception {
-        return Iterables.transform(Arrays.asList(
+        return Arrays.asList(
             listTestCase().withListParameter(
                 new TestListRequest()
             ).expectUrl("/groups/"),
@@ -110,7 +109,7 @@ public class GroupsRestClientTest {
                     .withStart(10)
                     .withOwned(true)
             ).expectUrl("/groups/?n=15&S=10&owned&suggest=bar")
-        ), testCase -> new GroupListTestCase[]{testCase}).iterator();
+        ).stream().map(testCase -> new GroupListTestCase[]{testCase}).iterator();
     }
 
     private static GroupListTestCase listTestCase() {
@@ -248,16 +247,14 @@ public class GroupsRestClientTest {
 
     @DataProvider(name = "QueryGroupsTestCases")
     public Iterator<GroupQueryTestCase[]> queryGroupTestCases() throws Exception {
-        return Iterables
-            .transform(
-                Arrays.asList(queryTestCase().withQueryParameter(new TestQueryRequest()).expectUrl("/groups/"),
-                    queryTestCase().withQueryParameter(new TestQueryRequest().withQuery("inname:test"))
-                        .expectUrl("/groups/?query=inname:test"),
-                    queryTestCase()
-                        .withQueryParameter(new TestQueryRequest().withQuery("inname:test")
-                            .withLimit(25).withStart(50))
-                        .expectUrl("/groups/?query=inname:test&limit=25&start=50")),
-                testCase -> new GroupQueryTestCase[]{testCase})
+        return Arrays.asList(queryTestCase().withQueryParameter(new TestQueryRequest()).expectUrl("/groups/"),
+                queryTestCase().withQueryParameter(new TestQueryRequest().withQuery("inname:test"))
+                    .expectUrl("/groups/?query=inname:test"),
+                queryTestCase()
+                    .withQueryParameter(new TestQueryRequest().withQuery("inname:test")
+                        .withLimit(25).withStart(50))
+                    .expectUrl("/groups/?query=inname:test&limit=25&start=50"))
+            .stream().map(testCase -> new GroupQueryTestCase[]{testCase})
             .iterator();
     }
 

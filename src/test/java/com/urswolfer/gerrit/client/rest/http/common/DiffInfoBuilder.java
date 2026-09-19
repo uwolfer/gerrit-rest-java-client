@@ -16,9 +16,9 @@
 
 package com.urswolfer.gerrit.client.rest.http.common;
 
-import com.google.common.collect.Lists;
 import com.google.gerrit.extensions.common.ChangeType;
 import com.google.gerrit.extensions.common.DiffInfo;
+import java.util.ArrayList;
 
 /**
  * @author Thomas Forrer
@@ -52,7 +52,7 @@ public class DiffInfoBuilder {
 
     public DiffInfoBuilder addDiffHeader(String diffHeader) {
         if (diffInfo.diffHeader == null) {
-            diffInfo.diffHeader = Lists.newArrayList();
+            diffInfo.diffHeader = new ArrayList<>();
         }
         diffInfo.diffHeader.add(diffHeader);
         return this;
@@ -64,7 +64,7 @@ public class DiffInfoBuilder {
 
     private DiffInfoBuilder addContent(DiffInfo.ContentEntry content) {
         if (diffInfo.content == null) {
-            diffInfo.content = Lists.newArrayList();
+            diffInfo.content = new ArrayList<>();
         }
         diffInfo.content.add(content);
         return this;
@@ -80,7 +80,7 @@ public class DiffInfoBuilder {
 
         public ContentEntryBuilder withAb(String line) {
             if (contentEntry.ab == null) {
-                contentEntry.ab = Lists.newArrayList();
+                contentEntry.ab = new ArrayList<>();
             }
             contentEntry.ab.add(line);
             return this;
@@ -88,7 +88,7 @@ public class DiffInfoBuilder {
 
         public ContentEntryBuilder withA(String line) {
             if (contentEntry.a == null) {
-                contentEntry.a = Lists.newArrayList();
+                contentEntry.a = new ArrayList<>();
             }
             contentEntry.a.add(line);
             return this;
@@ -96,7 +96,7 @@ public class DiffInfoBuilder {
 
         public ContentEntryBuilder withB(String line) {
             if (contentEntry.b == null) {
-                contentEntry.b = Lists.newArrayList();
+                contentEntry.b = new ArrayList<>();
             }
             contentEntry.b.add(line);
             return this;

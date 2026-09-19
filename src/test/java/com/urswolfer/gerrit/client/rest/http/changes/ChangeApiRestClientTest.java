@@ -16,8 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.client.ListChangesOption;
@@ -34,6 +32,9 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.TreeMap;
 
 /**
  * @author Thomas Forrer
@@ -46,7 +47,7 @@ public class ChangeApiRestClientTest {
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/reviewers", jsonElement)
             .get();
 
-        List<ReviewerInfo> expectedListReviewers = Lists.newArrayList();
+        List<ReviewerInfo> expectedListReviewers = new ArrayList<>();
 
         ReviewerInfosParser reviewerInfoParser = EasyMock.createMock(ReviewerInfosParser.class);
         EasyMock.expect(reviewerInfoParser.parseReviewerInfos(jsonElement)).andReturn(expectedListReviewers).once();
@@ -338,7 +339,7 @@ public class ChangeApiRestClientTest {
                 .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/suggest_reviewers?q=J&n=-1", jsonElement)
                 .get();
 
-        List<SuggestedReviewerInfo> expectedSuggestedReviewerInfos = Lists.newArrayList();
+        List<SuggestedReviewerInfo> expectedSuggestedReviewerInfos = new ArrayList<>();
 
         ReviewerInfosParser reviewerInfosParser = EasyMock.createMock(ReviewerInfosParser.class);
         EasyMock.expect(reviewerInfosParser.parseSuggestReviewerInfos(jsonElement)).andReturn(expectedSuggestedReviewerInfos).once();
@@ -362,7 +363,7 @@ public class ChangeApiRestClientTest {
                 .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/suggest_reviewers?q=J&n=5", jsonElement)
                 .get();
 
-        List<SuggestedReviewerInfo> expectedSuggestedReviewerInfos = Lists.newArrayList();
+        List<SuggestedReviewerInfo> expectedSuggestedReviewerInfos = new ArrayList<>();
 
         ReviewerInfosParser reviewerInfosParser = EasyMock.createMock(ReviewerInfosParser.class);
         EasyMock.expect(reviewerInfosParser.parseSuggestReviewerInfos(jsonElement)).andReturn(expectedSuggestedReviewerInfos).once();
@@ -462,7 +463,7 @@ public class ChangeApiRestClientTest {
                 .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/comments", jsonElement)
                 .get();
 
-        TreeMap<String, List<CommentInfo>> expectedCommentInfos = Maps.newTreeMap();
+        TreeMap<String, List<CommentInfo>> expectedCommentInfos = new TreeMap<>();
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
         EasyMock.expect(commentsParser.parseCommentInfos(jsonElement)).andReturn(expectedCommentInfos).once();
         EasyMock.replay(commentsParser);
@@ -485,7 +486,7 @@ public class ChangeApiRestClientTest {
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/robotcomments", jsonElement)
             .get();
 
-        TreeMap<String, List<RobotCommentInfo>> expectedRobotCommentInfos = Maps.newTreeMap();
+        TreeMap<String, List<RobotCommentInfo>> expectedRobotCommentInfos = new TreeMap<>();
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
         EasyMock.expect(commentsParser.parseRobotCommentInfos(jsonElement)).andReturn(expectedRobotCommentInfos).once();
         EasyMock.replay(commentsParser);
@@ -508,7 +509,7 @@ public class ChangeApiRestClientTest {
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/drafts", jsonElement)
             .get();
 
-        TreeMap<String, List<CommentInfo>> expectedDraftInfos = Maps.newTreeMap();
+        TreeMap<String, List<CommentInfo>> expectedDraftInfos = new TreeMap<>();
         CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
         EasyMock.expect(commentsParser.parseCommentInfos(jsonElement)).andReturn(expectedDraftInfos).once();
         EasyMock.replay(commentsParser);
@@ -579,7 +580,7 @@ public class ChangeApiRestClientTest {
 
         EditInfo expectedEditInfo = new EditInfo();
         CommitInfosParser commitInfosParser = EasyMock.createMock(CommitInfosParser.class);
-        EasyMock.expect(commitInfosParser.parseEditInfos(jsonElement)).andReturn(Lists.newArrayList(expectedEditInfo)).once();
+        EasyMock.expect(commitInfosParser.parseEditInfos(jsonElement)).andReturn(Arrays.asList(expectedEditInfo)).once();
         EasyMock.replay(commitInfosParser);
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, null, null,
@@ -850,7 +851,7 @@ public class ChangeApiRestClientTest {
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/submitted_together", jsonElement)
             .get();
 
-        List<ChangeInfo> expectedChangeInfos = Lists.newArrayList();
+        List<ChangeInfo> expectedChangeInfos = new ArrayList<>();
         ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
         EasyMock.expect(changeInfosParser.parseChangeInfos(jsonElement)).andReturn(expectedChangeInfos).once();
         EasyMock.replay(changeInfosParser);
