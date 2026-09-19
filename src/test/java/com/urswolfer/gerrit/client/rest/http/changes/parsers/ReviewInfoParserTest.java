@@ -16,12 +16,12 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes.parsers;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.testng.annotations.Test;
-import org.testng.collections.Lists;
 
-import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
@@ -30,7 +30,7 @@ import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
  * @author Leonard Brünings
  */
 public class ReviewInfoParserTest extends AbstractParserTest {
-    private static final Set<String> REVIEW_INFO = Sets.newLinkedHashSet(Lists.newArrayList(
+    private static final Set<String> REVIEW_INFO = new LinkedHashSet<>(Arrays.asList(
             "/COMMIT_MSG",
             "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java"
     ));

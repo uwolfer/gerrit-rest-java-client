@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes.parsers;
 
-import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.IncludedInInfo;
 import com.google.gerrit.extensions.client.ChangeStatus;
@@ -28,6 +27,7 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.*;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +36,7 @@ import java.util.Set;
  * @author Thomas Forrer - EFregnan
  */
 public class ChangeInfosParserTest extends AbstractParserTest {
-    private static final List<ChangeInfo> CHANGE_INFOS = Lists.newArrayList();
+    private static final List<ChangeInfo> CHANGE_INFOS = new ArrayList<>();
 
     static {
         AccountInfo uw = new AccountInfoBuilder().withName("Urs Wolfer").get();

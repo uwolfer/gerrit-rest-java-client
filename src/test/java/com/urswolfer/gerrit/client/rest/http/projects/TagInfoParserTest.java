@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
-import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.TagInfo;
 import com.google.gson.JsonElement;
@@ -25,13 +24,14 @@ import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import com.urswolfer.gerrit.client.rest.http.common.TagInfoBuilder;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Pavel Bely
  */
 public class TagInfoParserTest extends AbstractParserTest {
-    private static final List<TagInfo> TAG_INFO_LIST = Lists.newArrayList();
+    private static final List<TagInfo> TAG_INFO_LIST = new ArrayList<>();
 
     static {
         TAG_INFO_LIST.add(new TagInfoBuilder()

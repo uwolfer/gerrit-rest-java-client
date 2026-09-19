@@ -42,7 +42,7 @@ import java.util.TreeMap;
  * @author Thomas Forrer
  */
 public class CommentsParserTest extends AbstractParserTest {
-    private static final TreeMap<String, List<CommentInfo>> COMMENT_INFOS = Maps.newTreeMap();
+    private static final TreeMap<String, List<CommentInfo>> COMMENT_INFOS = new TreeMap<>();
 
     static {
         AccountInfo accountInfo = new AccountInfoBuilder()
@@ -78,7 +78,7 @@ public class CommentsParserTest extends AbstractParserTest {
         ));
     }
 
-    private static final TreeMap<String, List<RobotCommentInfo>> ROBOT_COMMENT_INFOS = Maps.newTreeMap();
+    private static final TreeMap<String, List<RobotCommentInfo>> ROBOT_COMMENT_INFOS = new TreeMap<>();
 
     static {
         AccountInfo accountInfo = new AccountInfoBuilder()

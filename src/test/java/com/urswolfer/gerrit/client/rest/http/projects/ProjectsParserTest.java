@@ -18,7 +18,6 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.access.ProjectAccessInfo;
 import com.google.gerrit.extensions.api.projects.ConfigInfo;
@@ -34,6 +33,7 @@ import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import com.urswolfer.gerrit.client.rest.http.common.ProjectInfoBuilder;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +43,7 @@ import java.util.SortedMap;
  * @author Thomas Forrer
  */
 public class ProjectsParserTest extends AbstractParserTest {
-    private static final List<ProjectInfo> PROJECT_INFO_LIST = Lists.newArrayList();
+    private static final List<ProjectInfo> PROJECT_INFO_LIST = new ArrayList<>();
 
     static {
         PROJECT_INFO_LIST.add(new ProjectInfoBuilder()

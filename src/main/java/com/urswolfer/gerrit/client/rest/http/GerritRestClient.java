@@ -20,11 +20,6 @@ import static com.urswolfer.gerrit.client.rest.http.PreemptiveAuthHttpRequestInt
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_OK;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.Gson;
@@ -74,7 +69,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -275,21 +272,21 @@ public class GerritRestClient implements RestClient {
             // In fact cookies could hurt: googlesource.com Gerrit instances block requests which send a magic cookie
             // named "gi" with a 400 HTTP status (as of 2015-01-29).
             cookieStore.clear();
-            return Optional.absent();
+            return Optional.empty();
         }
         if (authData.isHttpPassword()) {
             // Do not use a Gerrit HTTP password token to authenticate against the
             // login page. This will cause Gerrit to use the password to authenticate
             // against the configured authentication source (LDAP, etc) and potentially
             // lock the account.
-            return Optional.absent();
+            return Optional.empty();
         }
 
         if (loginCache.isGithubOAuthDetected()) {
             // When Gerrit is configured with GitHub/OAuth authentication, do not keep on
             // trying the /login page as it would just result in a continuous loop of failed
             // login attempts.
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Optional<Cookie> gerritAccountCookie = findGerritAccountCookie();
@@ -317,11 +314,11 @@ public class GerritRestClient implements RestClient {
      */
     private Optional<String> tryGerritHttpFormAuth(HttpClientBuilder client, HttpContext httpContext) throws IOException, HttpStatusException {
         if (!authData.isLoginAndPasswordAvailable()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         String loginUrl = authData.getHost() + "/login/";
         HttpPost method = new HttpPost(loginUrl);
-        List<BasicNameValuePair> parameters = Lists.newArrayList(
+        List<BasicNameValuePair> parameters = Arrays.asList(
             new BasicNameValuePair("username", authData.getLogin()),
             new BasicNameValuePair("password", authData.getPassword())
         );
@@ -365,7 +362,7 @@ public class GerritRestClient implements RestClient {
                 }
                 return getXsrfFromHtmlBody(loginResponse);
             }
-            return Optional.absent();
+            return Optional.empty();
         } finally {
             // the connection behind a streaming response is only released once its entity has been
             // consumed, and not every branch above reads the login page body
@@ -389,7 +386,7 @@ public class GerritRestClient implements RestClient {
         if (xsrfCookie.isPresent()) {
             return Optional.of(xsrfCookie.get().getValue());
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
 
@@ -404,7 +401,7 @@ public class GerritRestClient implements RestClient {
                 return Optional.of(matcher.group(1));
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private Optional<Cookie> findGerritAccountCookie() {
@@ -413,12 +410,7 @@ public class GerritRestClient implements RestClient {
 
     private Optional<Cookie> findCookie(final String cookieName) {
         List<Cookie> cookies = cookieStore.getCookies();
-        return Iterables.tryFind(cookies, new Predicate<Cookie>() {
-            @Override
-            public boolean apply(Cookie cookie) {
-                return cookie.getName().equals(cookieName);
-            }
-        });
+        return cookies.stream().filter(cookie -> cookie.getName().equals(cookieName)).findFirst();
     }
 
     private HttpClientBuilder getHttpClient(HttpContext httpContext) {
@@ -466,7 +458,7 @@ public class GerritRestClient implements RestClient {
      */
     private BasicCredentialsProvider getCredentialsProvider() {
         return new BasicCredentialsProvider() {
-            private Set<AuthScope> authAlreadyTried = Sets.newHashSet();
+            private final Set<AuthScope> authAlreadyTried = new HashSet<>();
 
             @Override
             public Credentials getCredentials(AuthScope authscope) {

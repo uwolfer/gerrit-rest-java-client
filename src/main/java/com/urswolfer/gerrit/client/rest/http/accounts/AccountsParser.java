@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gerrit.extensions.api.accounts.DeletedDraftCommentInfo;
 import com.google.gerrit.extensions.client.ProjectWatchInfo;
 import com.google.gerrit.extensions.common.AccountDetailInfo;
@@ -25,6 +24,7 @@ import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.EmailInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 import com.urswolfer.gerrit.client.rest.http.config.parsers.PreferencesParser;
 
 import java.lang.reflect.Type;

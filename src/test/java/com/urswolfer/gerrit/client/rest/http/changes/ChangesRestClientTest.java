@@ -16,9 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.Changes;
@@ -34,9 +31,11 @@ import org.easymock.EasyMock;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.function.Function;
 
 /**
  * @author Thomas Forrer
@@ -49,7 +48,7 @@ public class ChangesRestClientTest {
 
     @DataProvider(name = "ChangesQueryTestCases")
     public Iterator<ChangesQueryTestCase[]> getChangesQueryTestCases() {
-        return Iterables.transform(Arrays.asList(
+        return Arrays.asList(
                 queryParameter(
                         new TestQueryRequest().withQuery("is:open")
                 ).expectUrl("/changes/?q=is:open"),
@@ -80,7 +79,7 @@ public class ChangesRestClientTest {
                 queryParameter(
                     new TestQueryRequest().withQuery("is:merged is:watched").encode()
                 ).expectUrl("/changes/?q=is%3Amerged+is%3Awatched")
-        ), WRAP_IN_ARRAY_FUNCTION).iterator();
+        ).stream().map(WRAP_IN_ARRAY_FUNCTION).iterator();
     }
 
     @Test(dataProvider = "ChangesQueryTestCases")
@@ -222,7 +221,7 @@ public class ChangesRestClientTest {
     private ChangeInfosParser setupChangesParser() throws Exception {
         ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
         EasyMock.expect(changeInfosParser.parseChangeInfos(MOCK_JSON_ELEMENT))
-                .andReturn(Lists.<ChangeInfo>newArrayList())
+                .andReturn(new ArrayList<ChangeInfo>())
                 .once();
         EasyMock.replay(changeInfosParser);
         return changeInfosParser;

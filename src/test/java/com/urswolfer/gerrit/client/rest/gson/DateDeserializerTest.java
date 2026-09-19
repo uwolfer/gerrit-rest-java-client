@@ -16,13 +16,13 @@
 
 package com.urswolfer.gerrit.client.rest.gson;
 
-import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -46,7 +46,7 @@ public class DateDeserializerTest extends DateFormatterTest {
 
     @DataProvider(name = "TestCases")
     public Iterator<TestCase[]> getTestCases() throws Exception {
-        return Lists.newArrayList(
+        return Arrays.asList(
                 forDateString("2013-07-21 14:23:59.207000000")
                         .utcDate(2013, 7, 21, 14, 23, 59),
                 forDateString("2014-01-12 07:12:22.090000000")

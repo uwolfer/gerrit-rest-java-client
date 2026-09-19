@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes.parsers;
 
-import com.google.common.collect.Maps;
 import com.google.gerrit.extensions.common.FileInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
@@ -24,13 +23,14 @@ import com.urswolfer.gerrit.client.rest.http.common.FileInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import org.testng.annotations.Test;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * @author Thomas Forrer
  */
 public class FileInfoParserTest extends AbstractParserTest {
-    private static final Map<String, FileInfo> FILE_INFO_MAP = Maps.newLinkedHashMap();
+    private static final Map<String, FileInfo> FILE_INFO_MAP = new LinkedHashMap<>();
 
     static {
         FILE_INFO_MAP.put(

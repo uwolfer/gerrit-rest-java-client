@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.CherryPickInput;
 import com.google.gerrit.extensions.api.changes.ReviewInput;
@@ -44,6 +43,7 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
@@ -59,7 +59,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
     @DataProvider(name = "TestCases")
     public Iterator<RevisionApiTestCase[]> testCases() throws Exception {
-        return Lists.newArrayList(
+        return Arrays.asList(
                 withRevision("current")
                         .expectRevisionUrl("/changes/" + CHANGE_ID + "/revisions/current")
                         .expectReviewUrl("/changes/" + CHANGE_ID + "/revisions/current/review")

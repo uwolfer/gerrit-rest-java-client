@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
-import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.TagInfo;
 import com.google.gerrit.extensions.api.projects.TagInput;
@@ -55,7 +54,7 @@ public class TagApiRestClientTest {
     @Test
     public void testGetTagsForProject() throws Exception {
         String projectName = "sandbox";
-        ArrayList<TagInfo> mockTags = Lists.newArrayList();
+        ArrayList<TagInfo> mockTags = new ArrayList<>();
         mockTags.add(MOCK_TAG_INFO);
         mockTags.add(MOCK_TAG_INFO);
         mockTags.add(MOCK_TAG_INFO);
@@ -84,7 +83,7 @@ public class TagApiRestClientTest {
     @Test
     public void testGetTagForProject() throws Exception {
         String projectName = "sandbox";
-        ArrayList<TagInfo> mockTags = Lists.newArrayList();
+        ArrayList<TagInfo> mockTags = new ArrayList<>();
         mockTags.add(MOCK_TAG_INFO);
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()

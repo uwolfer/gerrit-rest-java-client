@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http;
 
-import com.google.common.base.Charsets;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.GerritApi;
 import com.google.gerrit.extensions.common.AccountInfo;
@@ -55,6 +54,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,6 +70,7 @@ public class GerritRestClientTest {
     private String githubOAuthJettyUrl;
     private String countingLoginJettyUrl;
     private String xsrfCookieLoginJettyUrl;
+    private String noSessionLoginJettyUrl;
 
     @BeforeClass
     public void startJetty() throws Exception {
@@ -77,6 +78,7 @@ public class GerritRestClientTest {
         githubOAuthJettyUrl = startJetty(GitHubOAuthLoginSimulationServlet.class);
         countingLoginJettyUrl = startJetty(CountingLoginSimulationServlet.class);
         xsrfCookieLoginJettyUrl = startJetty(XsrfCookieLoginSimulationServlet.class);
+        noSessionLoginJettyUrl = startJetty(NoSessionLoginSimulationServlet.class);
     }
 
     public String startJetty(Class<? extends HttpServlet> loginServletClass) throws Exception {
@@ -193,7 +195,7 @@ public class GerritRestClientTest {
     public void testGetCommitMsgHook() throws Exception {
         GerritRestApi gerritClient = getGerritApiWithJettyHost();
         InputStream commitMessageHook = gerritClient.tools().getCommitMessageHook();
-        String result = new BufferedReader(new InputStreamReader(commitMessageHook, Charsets.UTF_8)).readLine();
+        String result = new BufferedReader(new InputStreamReader(commitMessageHook, StandardCharsets.UTF_8)).readLine();
         Truth.assertThat(result).isEqualTo("dummy-commit-msg-hook");
     }
 
@@ -373,6 +375,69 @@ public class GerritRestClientTest {
 
         Truth.assertThat(loginCache.getGerritAuthOptional().get())
             .isEqualTo(XsrfCookieLoginSimulationServlet.XSRF_TOKEN);
+    }
+
+    /**
+     * A Gerrit HTTP password must never be sent to the /login/ page: Gerrit would authenticate it
+     * against the configured auth source (LDAP, ...) and could lock the account.
+     */
+    @Test
+    public void testLoginPageNotUsedWithHttpPassword() throws Exception {
+        CountingLoginSimulationServlet.resetCounts();
+        GerritRestClient gerritRestClient = new GerritRestClient(
+            new GerritAuthData.Basic(countingLoginJettyUrl, "foo", "bar", true), new HttpRequestExecutor());
+        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
+        loginCacheField.setAccessible(true);
+        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+
+        requestChanges(gerritRestClient);
+
+        Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+        Truth.assertThat(CountingLoginSimulationServlet.getGetCount()).isEqualTo(0);
+        Truth.assertThat(CountingLoginSimulationServlet.getPostCount()).isEqualTo(0);
+    }
+
+    /**
+     * Once the GitHub/OAuth handshake has been detected, the /login/ page must not be tried again:
+     * it would just loop over failing login attempts. The detection survives a cache invalidation,
+     * which only resets the "host supports Gerrit-Auth" flag.
+     */
+    @Test
+    public void testLoginPageNotRetriedAfterGitHubOAuthDetected() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClient(
+            new GerritAuthData.Basic(githubOAuthJettyUrl, "foo", "bar"), new HttpRequestExecutor());
+        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
+        loginCacheField.setAccessible(true);
+        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+
+        requestChanges(gerritRestClient);
+        Truth.assertThat(loginCache.isGithubOAuthDetected()).isTrue();
+
+        loginCache.invalidate();
+        Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isTrue();
+        requestChanges(gerritRestClient);
+
+        Truth.assertThat(loginCache.isGithubOAuthDetected()).isTrue();
+        Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+    }
+
+    /**
+     * The form login posts a username and a password, so it is pointless without credentials: when
+     * the GET login yields no token and none are configured, no POST must be made.
+     */
+    @Test
+    public void testFormLoginSkippedWithoutCredentials() throws Exception {
+        NoSessionLoginSimulationServlet.resetCounts();
+        GerritRestClient gerritRestClient = new GerritRestClient(
+            new GerritAuthData.Basic(noSessionLoginJettyUrl), new HttpRequestExecutor());
+        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
+        loginCacheField.setAccessible(true);
+        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+
+        gerritRestClient.requestRest("/changes/", null, GET);
+
+        Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
+        Truth.assertThat(NoSessionLoginSimulationServlet.getPostCount()).isEqualTo(0);
     }
 
     /**

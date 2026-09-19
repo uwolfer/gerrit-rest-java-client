@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
-import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.access.AccessSectionInfo;
 import com.google.gerrit.extensions.api.access.PermissionInfo;
@@ -43,6 +42,7 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -185,7 +185,7 @@ public class ProjectApiRestClientTest {
         projectInput.description = "Feel free to play in the sandbox!";
         projectInput.createEmptyCommit = false;
         projectInput.parent = "playingfield";
-        projectInput.branches = Lists.newArrayList("master", "releases");
+        projectInput.branches = Arrays.asList("master", "releases");
 
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut(
