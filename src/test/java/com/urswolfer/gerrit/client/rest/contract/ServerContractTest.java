@@ -20,6 +20,7 @@ import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.ServerInfo;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
 import com.urswolfer.gerrit.client.rest.http.common.FakeGerritServer;
+import com.urswolfer.gerrit.client.rest.http.config.ServerRestClient;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -53,6 +54,27 @@ public class ServerContractTest {
             .stubStatus("GET", "/config/server/version", 404);
 
         Truth.assertThat(server.api().config().server().getVersion()).isEqualTo("<2.8");
+        server.verify();
+    }
+
+    /**
+     * A version the server reports is cached for the life of the API instance, but the
+     * {@code <2.8} fallback is not: it is inferred from a {@code 404}, which a proxy or a transient
+     * failure can also produce, so it is re-probed rather than pinning the client to the smallest
+     * option set for the rest of the session.
+     */
+    @Test
+    public void theVersionFallbackIsNotCached() throws Exception {
+        FakeGerritServer server = new FakeGerritServer()
+            .stubStatus("GET", "/config/server/version", 404);
+        ServerRestClient serverRestClient = (ServerRestClient) server.api().config().server();
+
+        Truth.assertThat(serverRestClient.getVersionCached()).isEqualTo("<2.8");
+        Truth.assertThat(serverRestClient.getVersionCached()).isEqualTo("<2.8");
+
+        Truth.assertThat(server.trace()).containsExactly(
+            "GET /config/server/version",
+            "GET /config/server/version");
         server.verify();
     }
 

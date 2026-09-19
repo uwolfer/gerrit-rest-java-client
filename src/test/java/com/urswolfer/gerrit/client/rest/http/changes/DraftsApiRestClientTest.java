@@ -26,6 +26,7 @@ import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 /**
  * @author Urs Wolfer
@@ -42,8 +43,9 @@ public class DraftsApiRestClientTest extends AbstractJsonTest {
                 + revisionId + "/drafts/" + draftId, jsonObject)
             .get();
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
-        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(restContext(gerritRestClient), changeApiRestClient, revisionId);
+        GerritRestContext context = restContext(gerritRestClient);
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(context, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(context, changeApiRestClient, revisionId);
 
         CommentInfo commentInfo = revisionApiRestClient.draft(draftId).get();
 
@@ -60,9 +62,10 @@ public class DraftsApiRestClientTest extends AbstractJsonTest {
         CommentInfo expectedCommentInfo = new CommentInfo();
         expectedCommentInfo.id = draftId;
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
-        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(restContext(gerritRestClient), changeApiRestClient, revisionId);
-        DraftApiRestClient draftApiRestClient = new DraftApiRestClient(restContext(gerritRestClient), changeApiRestClient, revisionApiRestClient, expectedCommentInfo);
+        GerritRestContext context = restContext(gerritRestClient);
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(context, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(context, changeApiRestClient, revisionId);
+        DraftApiRestClient draftApiRestClient = new DraftApiRestClient(context, changeApiRestClient, revisionApiRestClient, expectedCommentInfo);
 
         CommentInfo commentInfo = draftApiRestClient.get();
 
@@ -81,9 +84,10 @@ public class DraftsApiRestClientTest extends AbstractJsonTest {
                 "revisions/" + revisionId + "/drafts/" + draftId, "{}", jsonElement)
             .get();
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
-        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(restContext(gerritRestClient), changeApiRestClient, revisionId);
-        DraftApiRestClient draftApiRestClient = new DraftApiRestClient(restContext(gerritRestClient), changeApiRestClient, revisionApiRestClient, "89233d9c_56013406");
+        GerritRestContext context = restContext(gerritRestClient);
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(context, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(context, changeApiRestClient, revisionId);
+        DraftApiRestClient draftApiRestClient = new DraftApiRestClient(context, changeApiRestClient, revisionApiRestClient, "89233d9c_56013406");
 
         draftApiRestClient.update(new DraftInput());
 
@@ -99,9 +103,10 @@ public class DraftsApiRestClientTest extends AbstractJsonTest {
                 "revisions/" + revisionId + "/drafts/" + draftId)
             .get();
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
-        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(restContext(gerritRestClient), changeApiRestClient, revisionId);
-        DraftApiRestClient draftApiRestClient = new DraftApiRestClient(restContext(gerritRestClient), changeApiRestClient, revisionApiRestClient, "89233d9c_56013406");
+        GerritRestContext context = restContext(gerritRestClient);
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(context, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        RevisionApiRestClient revisionApiRestClient = new RevisionApiRestClient(context, changeApiRestClient, revisionId);
+        DraftApiRestClient draftApiRestClient = new DraftApiRestClient(context, changeApiRestClient, revisionApiRestClient, "89233d9c_56013406");
 
         draftApiRestClient.delete();
 

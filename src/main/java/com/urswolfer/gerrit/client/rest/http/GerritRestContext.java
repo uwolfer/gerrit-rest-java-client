@@ -51,9 +51,16 @@ public class GerritRestContext {
     }
 
     /**
-     * The version this Gerrit reports, fetched at most once per API instance.
+     * The version this Gerrit reports, read at most once per API instance.
      *
-     * <p>Two callers racing here both fetch and reach the same answer, which is why this is not
+     * <p>A version a server reports is treated as fixed for the life of this context, so a Gerrit
+     * upgraded underneath a long-lived API instance keeps the option set of the version it reported
+     * first until a new instance is created. The
+     * {@link ServerRestClient#VERSION_BEFORE_2_8} fallback is not cached: it is inferred from a
+     * {@code 404}, which a proxy or a transient failure can also produce, and caching it would pin
+     * the client to the smallest option set for the rest of the session.
+     *
+     * <p>Two callers racing here both read and reach the same answer, which is why this is not
      * synchronized. An explicit {@code config().server().getVersion()} still asks the server every
      * time, as it always has.
      */
@@ -63,7 +70,9 @@ public class GerritRestContext {
             return cached;
         }
         String fetched = new ServerRestClient(this).getVersion();
-        serverVersion.set(fetched);
+        if (!ServerRestClient.VERSION_BEFORE_2_8.equals(fetched)) {
+            serverVersion.set(fetched);
+        }
         return fetched;
     }
 }
