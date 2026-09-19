@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.access.AccessSectionInfo;
 import com.google.gerrit.extensions.api.access.PermissionInfo;
@@ -46,16 +48,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Thomas Forrer
  */
 public class ProjectApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     public static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
@@ -64,7 +61,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox", JsonParser.parseString("{\"id\":\"p1\"}"))
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         ProjectInfo projectInfo = projectsRestClient.name(projectName).get();
 
@@ -79,7 +76,7 @@ public class ProjectApiRestClientTest {
             .expectGet("/projects/sandbox/branches?n=5&s=1&m=s&r=.",
                 JsonParser.parseString("[{\"ref\":\"a\"},{\"ref\":\"b\"},{\"ref\":\"c\"}]"))
             .get();
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, gerritJson, projectName);
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(restContext(gerritRestClient), projectName);
 
         List<BranchInfo> branches = projectApiRestClient.branches()
             .withLimit(5).withStart(1).withRegex(".").withSubstring("s")
@@ -95,7 +92,7 @@ public class ProjectApiRestClientTest {
             .expectGet("/projects/sandbox/config", JsonParser.parseString("{\"description\":\"a project\"}"))
             .get();
         ProjectApiRestClient projectApiRestClient =
-            new ProjectApiRestClient(gerritRestClient, gerritJson, projectName);
+            new ProjectApiRestClient(restContext(gerritRestClient), projectName);
         ConfigInfo configInfo = projectApiRestClient.config();
 
         Truth.assertThat(configInfo.description).isEqualTo("a project");
@@ -111,7 +108,7 @@ public class ProjectApiRestClientTest {
             .get();
         mockConfigInfo.description= "foo";
         ProjectApiRestClient projectApiRestClient =
-            new ProjectApiRestClient(gerritRestClient, gerritJson, projectName);
+            new ProjectApiRestClient(restContext(gerritRestClient), projectName);
         ConfigInput input = new ConfigInput();
         input.description = "foo";
         ConfigInfo configInfo = projectApiRestClient.config(input);
@@ -126,7 +123,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox", RestApiException.wrap(null, null))
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         projectsRestClient.name(projectName).get();
         projectsRestClient.name(projectName).branches().get();
@@ -139,7 +136,7 @@ public class ProjectApiRestClientTest {
             .expectPut("/projects/sandbox", EMPTY_JSON_OBJECT)
             .get();
 
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         projectsRestClient.name(projectName).create();
 
@@ -167,7 +164,7 @@ public class ProjectApiRestClientTest {
                 EMPTY_JSON_OBJECT)
             .get();
 
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         projectsRestClient.name(projectName).create(projectInput);
 
@@ -181,7 +178,7 @@ public class ProjectApiRestClientTest {
             .expectGet("/projects/sandbox/access", JsonParser.parseString("{\"revision\":\"abc123\"}"))
             .get();
 
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, gerritJson, projectName);
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(restContext(gerritRestClient), projectName);
 
         ProjectAccessInfo accessInfo = projectApiRestClient.access();
 
@@ -212,7 +209,7 @@ public class ProjectApiRestClientTest {
                 , JsonParser.parseString("{\"revision\":\"abc123\"}"))
             .get();
 
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, gerritJson, projectName);
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(restContext(gerritRestClient), projectName);
 
         ProjectAccessInfo accessInfo = projectApiRestClient.access(projectAccessInput);
 
@@ -228,7 +225,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox/description", jsonObject)
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         String response = projectsRestClient.name(projectName).description();
 
@@ -242,7 +239,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/projects/sandbox/description", "{\"description\":\"Some Description\"}", EMPTY_JSON_OBJECT)
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         DescriptionInput input = new DescriptionInput();
         input.description = "Some Description";
@@ -257,7 +254,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox/children", JsonParser.parseString("{\"a\":{},\"b\":{},\"c\":{}}"))
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
         List<ProjectInfo> result = projectsRestClient.name(projectName).children();
         Truth.assertThat(result).hasSize(3);
         EasyMock.verify(gerritRestClient);
@@ -270,7 +267,7 @@ public class ProjectApiRestClientTest {
             .expectGet("/projects/sandbox/children?recursive",
                 JsonParser.parseString("{\"a\":{},\"b\":{},\"c\":{}}"))
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
         List<ProjectInfo> result = projectsRestClient.name(projectName).children(true);
         Truth.assertThat(result).hasSize(3);
         EasyMock.verify(gerritRestClient);
@@ -281,7 +278,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox/children/child1", JsonParser.parseString("{\"id\":\"p1\"}"))
             .get();
-        ChildProjectApi client =  new ProjectsRestClient(gerritRestClient, gerritJson).name("sandbox").child("child1");
+        ChildProjectApi client =  new ProjectsRestClient(restContext(gerritRestClient)).name("sandbox").child("child1");
         ProjectInfo returned = client.get();
         Truth.assertThat(returned.id).isEqualTo("p1");
         EasyMock.verify(gerritRestClient);
@@ -295,7 +292,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox/HEAD", jsonObject)
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         String response = projectsRestClient.name(projectName).head();
 
@@ -309,7 +306,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/projects/sandbox/HEAD", "{\"ref\":\"refs/heads/new\"}", EMPTY_JSON_OBJECT)
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
         projectsRestClient.name(projectName).head("refs/heads/new");
 
         EasyMock.verify(gerritRestClient);
@@ -323,7 +320,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox/parent", jsonObject)
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         String response = projectsRestClient.name(projectName).parent();
 
@@ -337,7 +334,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/projects/sandbox/parent", "{\"parent\":\"Parent-project\"}", EMPTY_JSON_OBJECT)
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
         projectsRestClient.name(projectName).parent("Parent-project");
 
         EasyMock.verify(gerritRestClient);
@@ -349,7 +346,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/projects/sandbox/index", "{\"index_children\":true}", EMPTY_JSON_OBJECT)
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
         projectsRestClient.name(projectName).index(true);
         EasyMock.verify(gerritRestClient);
     }
@@ -360,7 +357,7 @@ public class ProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/projects/sandbox/index.changes")
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
         projectsRestClient.name(projectName).indexChanges();
         EasyMock.verify(gerritRestClient);
     }
@@ -372,7 +369,7 @@ public class ProjectApiRestClientTest {
             .expectPost("/projects/sandbox/labels",
                 "{\"commit_message\":\"some commit\",\"create\":[{\"name\":\"reviews\",\"branches\":[\"master\"]}]}")
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         BatchLabelInput input = new BatchLabelInput();
         input.commitMessage = "some commit";

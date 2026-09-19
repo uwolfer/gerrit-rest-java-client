@@ -23,6 +23,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 
 public class EmailApiRestClient extends EmailApi.NotImplemented implements EmailApi {
@@ -33,12 +34,11 @@ public class EmailApiRestClient extends EmailApi.NotImplemented implements Email
     private final String name;
     private final String email;
 
-    public EmailApiRestClient(GerritRestClient gerritRestClient,
-                              GerritJson gerritJson,
+    public EmailApiRestClient(GerritRestContext context,
                               String name,
                               String email) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.name = name;
         this.email = email;
     }

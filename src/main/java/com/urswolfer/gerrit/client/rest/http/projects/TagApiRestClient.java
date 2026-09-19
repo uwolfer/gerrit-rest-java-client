@@ -22,6 +22,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 /**
  * @author Pavel Bely
@@ -32,12 +33,11 @@ public class TagApiRestClient extends TagApi.NotImplemented implements TagApi {
     private final ProjectApiRestClient projectApiRestClient;
     private final String name;
 
-    public TagApiRestClient(GerritRestClient gerritRestClient,
-                            GerritJson gerritJson,
+    public TagApiRestClient(GerritRestContext context,
                             ProjectApiRestClient projectApiRestClient,
                             String name) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.projectApiRestClient = projectApiRestClient;
         this.name = name;
     }

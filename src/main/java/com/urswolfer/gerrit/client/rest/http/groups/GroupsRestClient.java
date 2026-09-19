@@ -27,6 +27,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.Collections;
@@ -39,18 +40,19 @@ import java.util.TreeMap;
  */
 public class GroupsRestClient extends Groups.NotImplemented implements Groups {
 
+    private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
     private final GerritJson gerritJson;
 
-    public GroupsRestClient(GerritRestClient gerritRestClient,
-                            GerritJson gerritJson) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+    public GroupsRestClient(GerritRestContext context) {
+        this.context = context;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
     }
 
     @Override
     public GroupApi id(String id) throws RestApiException {
-        return new GroupApiRestClient(gerritRestClient, gerritJson, id);
+        return new GroupApiRestClient(context, id);
     }
 
     @Override
@@ -66,7 +68,7 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
         String body = gerritJson.toJson(input);
         JsonElement result = gerritRestClient.putRequest(restPath, body);
         GroupInfo info = gerritJson.as(result, GroupInfo.class);
-        return new GroupApiRestClient(gerritRestClient, gerritJson, info.id);
+        return new GroupApiRestClient(context, info.id);
     }
 
     @Override

@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.Changes;
@@ -35,15 +37,11 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.function.Function;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Thomas Forrer
  */
 public class ChangesRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
     private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     private static final Function<ChangesQueryTestCase, ChangesQueryTestCase[]> WRAP_IN_ARRAY_FUNCTION =
@@ -89,7 +87,7 @@ public class ChangesRestClientTest {
     public void testQueryWithParameter(ChangesQueryTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, gerritJson);
+        ChangesRestClient changes = new ChangesRestClient(restContext(gerritRestClient));
 
         Changes.QueryRequest queryRequest = changes.query();
         testCase.queryParameter.apply(queryRequest).get();
@@ -103,7 +101,7 @@ public class ChangesRestClientTest {
                 .expectGet("/changes/?q=is:open", EMPTY_JSON_OBJECT)
                 .get();
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, gerritJson);
+        ChangesRestClient changesRestClient = new ChangesRestClient(restContext(gerritRestClient));
         changesRestClient.query("is:open").get();
 
         EasyMock.verify(gerritRestClient);
@@ -113,7 +111,7 @@ public class ChangesRestClientTest {
     public void testIdAsInt() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, gerritJson);
+        ChangesRestClient changesRestClient = new ChangesRestClient(restContext(gerritRestClient));
 
         ChangeApi changeApi = changesRestClient.id(123);
 
@@ -124,7 +122,7 @@ public class ChangesRestClientTest {
     public void testIdAsProjectWithNr() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, gerritJson);
+        ChangesRestClient changesRestClient = new ChangesRestClient(restContext(gerritRestClient));
 
         ChangeApi changeApi = changesRestClient.id("packages/test", 123);
 
@@ -135,7 +133,7 @@ public class ChangesRestClientTest {
     public void testIdAsTriplet() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, gerritJson);
+        ChangesRestClient changesRestClient = new ChangesRestClient(restContext(gerritRestClient));
 
         ChangeApi changeApi = changesRestClient.id("packages/test", "master", "Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df");
 
@@ -147,7 +145,7 @@ public class ChangesRestClientTest {
         ChangesQueryTestCase testCase = new ChangesQueryTestCase().expectUrl("/changes/");
         GerritRestClient gerritRestClient = setupGerritRestClient(testCase);
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, gerritJson);
+        ChangesRestClient changes = new ChangesRestClient(restContext(gerritRestClient));
 
         changes.query().get();
 
@@ -164,7 +162,7 @@ public class ChangesRestClientTest {
         ChangeInfo changeInfo = new ChangeInfo();
         changeInfo._number = 29;
 
-        ChangesRestClient changes = new ChangesRestClient(gerritRestClient, gerritJson);
+        ChangesRestClient changes = new ChangesRestClient(restContext(gerritRestClient));
 
         ChangeApi changeApi = changes.create(changeInput);
 

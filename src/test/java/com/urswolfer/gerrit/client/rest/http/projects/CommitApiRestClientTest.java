@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.IncludedInInfo;
 import com.google.gerrit.extensions.common.CommitInfo;
@@ -24,14 +26,8 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class CommitApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
-
     @Test
     public void testGet() throws Exception {
         String projectName = "sandbox";
@@ -39,7 +35,7 @@ public class CommitApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox/commits/49f9e84661d06814c1e9fe3d724f8fffb51b60f4", JsonParser.parseString("{\"commit\":\"abc123\"}"))
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         CommitInfo commitInfo = projectsRestClient.name(projectName).commit(commitSha).get();
 
@@ -54,7 +50,7 @@ public class CommitApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox/commits/49f9e84661d06814c1e9fe3d724f8fffb51b60f4/in", JsonParser.parseString("{\"branches\":[\"master\"]}"))
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         IncludedInInfo includedInInfo = projectsRestClient.name(projectName).commit(commitSha).includedIn();
 

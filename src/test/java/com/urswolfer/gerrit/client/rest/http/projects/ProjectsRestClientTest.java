@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.api.projects.Projects;
 import com.google.gson.JsonElement;
@@ -30,15 +32,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Thomas Forrer
  */
 public class ProjectsRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
     @Test
     public void testListProjects() throws Exception {
         ProjectListTestCase testCase = listTestCase().expectUrl("/projects/");
@@ -122,7 +120,7 @@ public class ProjectsRestClientTest {
         }
 
         public ProjectsRestClient getProjectsRestClient() throws Exception {
-            return new ProjectsRestClient(setupGerritRestClient(), gerritJson);
+            return new ProjectsRestClient(restContext(setupGerritRestClient()));
         }
 
         public GerritRestClient setupGerritRestClient() throws Exception {
@@ -256,7 +254,7 @@ public class ProjectsRestClientTest {
         }
 
         public ProjectsRestClient getProjectsRestClient() throws Exception {
-            return new ProjectsRestClient(setupGerritRestClient(), gerritJson);
+            return new ProjectsRestClient(restContext(setupGerritRestClient()));
         }
 
         public GerritRestClient setupGerritRestClient() throws Exception {

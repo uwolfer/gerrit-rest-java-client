@@ -16,19 +16,16 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class EmailApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
@@ -69,6 +66,6 @@ public class EmailApiRestClientTest {
 
     private EmailApiRestClient getEmailApiRestClient(GerritRestClient gerritRestClient,
                                                      String name, String email) {
-        return new EmailApiRestClient(gerritRestClient, gerritJson, name, email);
+        return new EmailApiRestClient(restContext(gerritRestClient), name, email);
     }
 }

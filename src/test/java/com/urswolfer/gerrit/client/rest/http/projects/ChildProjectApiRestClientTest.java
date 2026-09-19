@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.JsonParser;
@@ -23,20 +25,14 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class ChildProjectApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
-
     @Test
     public void testGet() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox/children/child1", JsonParser.parseString("{\"id\":\"p1\"}"))
             .get();
-        ChildProjectApiRestClient client = new ChildProjectApiRestClient(gerritRestClient, gerritJson, "/projects/sandbox", "child1");
+        ChildProjectApiRestClient client = new ChildProjectApiRestClient(restContext(gerritRestClient), "/projects/sandbox", "child1");
         ProjectInfo returned = client.get();
 
         Truth.assertThat(returned.id).isEqualTo("p1");
@@ -48,7 +44,7 @@ public class ChildProjectApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox/children/child1?recursive", JsonParser.parseString("{\"id\":\"p1\"}"))
             .get();
-        ChildProjectApiRestClient client = new ChildProjectApiRestClient(gerritRestClient, gerritJson, "/projects/sandbox", "child1");
+        ChildProjectApiRestClient client = new ChildProjectApiRestClient(restContext(gerritRestClient), "/projects/sandbox", "child1");
         ProjectInfo returned = client.get(true);
 
         Truth.assertThat(returned.id).isEqualTo("p1");

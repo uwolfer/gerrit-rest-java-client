@@ -26,6 +26,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
 
@@ -42,12 +43,11 @@ public class BranchApiRestClient extends BranchApi.NotImplemented implements Bra
     private final ProjectApiRestClient projectApiRestClient;
     private final String name;
 
-    public BranchApiRestClient(GerritRestClient gerritRestClient,
-                               GerritJson gerritJson,
+    public BranchApiRestClient(GerritRestContext context,
                                ProjectApiRestClient projectApiRestClient,
                                String name) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.projectApiRestClient = projectApiRestClient;
         this.name = name;
     }

@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.groups;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.gerrit.extensions.api.groups.Groups;
 import com.google.gerrit.extensions.api.groups.Groups.QueryRequest;
 import com.google.gerrit.extensions.client.ListGroupsOption;
@@ -32,15 +34,11 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Shawn Stafford
  */
 public class GroupsRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
     private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
@@ -48,7 +46,7 @@ public class GroupsRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/groups/jdoe", EMPTY_JSON_OBJECT)
             .get();
-        GroupsRestClient groupsRestClient = new GroupsRestClient(gerritRestClient, gerritJson);
+        GroupsRestClient groupsRestClient = new GroupsRestClient(restContext(gerritRestClient));
         groupsRestClient.id("jdoe").get();
 
         EasyMock.verify(gerritRestClient);
@@ -60,7 +58,7 @@ public class GroupsRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/groups/" + groupName, "{\"name\":\"foo\"}", EMPTY_JSON_OBJECT)
             .get();
-        GroupsRestClient groupsRestClient = new GroupsRestClient(gerritRestClient, gerritJson);
+        GroupsRestClient groupsRestClient = new GroupsRestClient(restContext(gerritRestClient));
         groupsRestClient.create(groupName);
 
         EasyMock.verify(gerritRestClient);
@@ -140,7 +138,7 @@ public class GroupsRestClientTest {
         }
 
         public GroupsRestClient getGroupsRestClient() throws Exception {
-            return new GroupsRestClient(setupGerritRestClient(), gerritJson);
+            return new GroupsRestClient(restContext(setupGerritRestClient()));
         }
 
         public GerritRestClient setupGerritRestClient() throws Exception {
@@ -274,7 +272,7 @@ public class GroupsRestClientTest {
         }
 
         public GroupsRestClient getGroupsRestClient() throws Exception {
-            return new GroupsRestClient(setupGerritRestClient(), gerritJson);
+            return new GroupsRestClient(restContext(setupGerritRestClient()));
         }
 
         public GerritRestClient setupGerritRestClient() throws Exception {

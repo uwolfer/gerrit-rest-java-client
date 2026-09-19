@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.config;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.client.DiffPreferencesInfo;
 import com.google.gerrit.extensions.client.EditPreferencesInfo;
@@ -32,13 +34,8 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class ServerRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
@@ -46,7 +43,7 @@ public class ServerRestClientTest {
         GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
         EasyMock.expect(gerritRestClient.getRequest("/config/server/version")).andReturn(new JsonPrimitive("2.9"));
         EasyMock.replay(gerritRestClient);
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
+        ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
 
         String version = serverRestClient.getVersion();
 
@@ -58,7 +55,7 @@ public class ServerRestClientTest {
         GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
         EasyMock.expect(gerritRestClient.getRequest("/config/server/version")).andThrow(new HttpStatusException(404, "Not found", ""));
         EasyMock.replay(gerritRestClient);
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
+        ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
 
         String version = serverRestClient.getVersion();
 
@@ -70,7 +67,7 @@ public class ServerRestClientTest {
         GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
         EasyMock.expect(gerritRestClient.getRequest("/config/server/version")).andThrow(new HttpStatusException(401, "Unauthorized", ""));
         EasyMock.replay(gerritRestClient);
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
+        ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
 
         serverRestClient.getVersion();
     }
@@ -80,7 +77,7 @@ public class ServerRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/config/server/info",JsonParser.parseString("{\"auth\":{\"auth_type\":\"LDAP\"}}"))
             .get();
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
+        ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
 
         ServerInfo info = serverRestClient.getInfo();
 
@@ -97,7 +94,7 @@ public class ServerRestClientTest {
 
         GeneralPreferencesInfo payload = new GeneralPreferencesInfo();
         payload.changesPerPage = 100;
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
+        ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
         GeneralPreferencesInfo returned = serverRestClient.setDefaultPreferences(payload);
 
         Truth.assertThat(returned.changesPerPage).isEqualTo(25);
@@ -112,7 +109,7 @@ public class ServerRestClientTest {
 
         GeneralPreferencesInfo generalPreferencesInfo = EasyMock.createMock(GeneralPreferencesInfo.class);
 
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
+        ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
         GeneralPreferencesInfo returned = serverRestClient.getDefaultPreferences();
 
         EasyMock.verify(gerritRestClient);
@@ -127,7 +124,7 @@ public class ServerRestClientTest {
 
         DiffPreferencesInfo payload = new DiffPreferencesInfo();
         payload.lineLength = 100;
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
+        ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
         DiffPreferencesInfo returned = serverRestClient.setDefaultDiffPreferences(payload);
 
         Truth.assertThat(returned.tabSize).isEqualTo(8);
@@ -142,7 +139,7 @@ public class ServerRestClientTest {
 
         DiffPreferencesInfo diffPreferencesInfo = EasyMock.createMock(DiffPreferencesInfo.class);
 
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
+        ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
         DiffPreferencesInfo returned = serverRestClient.getDefaultDiffPreferences();
 
         Truth.assertThat(returned.tabSize).isEqualTo(8);
@@ -158,7 +155,7 @@ public class ServerRestClientTest {
 
         EditPreferencesInfo payload = new EditPreferencesInfo();
         payload.lineLength = 100;
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
+        ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
         EditPreferencesInfo returned = serverRestClient.setDefaultEditPreferences(payload);
 
         Truth.assertThat(returned.tabSize).isEqualTo(8);
@@ -173,7 +170,7 @@ public class ServerRestClientTest {
 
         EditPreferencesInfo editPreferencesInfo = EasyMock.createMock(EditPreferencesInfo.class);
 
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
+        ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
         EditPreferencesInfo returned = serverRestClient.getDefaultEditPreferences();
 
         Truth.assertThat(returned.tabSize).isEqualTo(8);

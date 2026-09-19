@@ -22,6 +22,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 /**
  * @author Réda Housni Alaoui
@@ -33,12 +34,11 @@ public class LabelApiRestClient extends LabelApi.NotImplemented implements Label
     private final ProjectApiRestClient projectApiRestClient;
     private final String name;
 
-    public LabelApiRestClient(GerritRestClient gerritRestClient,
-                              GerritJson gerritJson,
+    public LabelApiRestClient(GerritRestContext context,
                               ProjectApiRestClient projectApiRestClient,
                               String name) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.projectApiRestClient = projectApiRestClient;
         this.name = name;
     }

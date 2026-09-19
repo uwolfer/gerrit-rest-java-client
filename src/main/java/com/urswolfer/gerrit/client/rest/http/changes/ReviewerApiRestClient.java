@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 import java.util.Map;
 
@@ -35,12 +36,11 @@ public class ReviewerApiRestClient extends ReviewerApi.NotImplemented implements
     private final ChangeApiRestClient changeApiRestClient;
     private final Integer accountId;
 
-    public ReviewerApiRestClient(GerritRestClient gerritRestClient,
-                                 GerritJson gerritJson,
+    public ReviewerApiRestClient(GerritRestContext context,
                                  ChangeApiRestClient changeApiRestClient,
                                  Integer accountId) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.changeApiRestClient = changeApiRestClient;
         this.accountId = accountId;
     }

@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.client.DiffPreferencesInfo.Whitespace;
 import com.google.gerrit.extensions.restapi.BinaryResult;
@@ -37,16 +39,11 @@ import java.io.ByteArrayOutputStream;
 import java.util.function.Function;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Thomas Forrer
  */
 public class FileApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     private static final String FILE_CONTENT = "some new changes";
     private static final String FILE_PATH = "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java";
 
@@ -72,7 +69,7 @@ public class FileApiRestClientTest {
             .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
 
-        FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, gerritJson, revisionApiRestClient, FILE_PATH);
+        FileApiRestClient fileApiRestClient = new FileApiRestClient(restContext(gerritRestClient), revisionApiRestClient, FILE_PATH);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BinaryResult binaryResult = fileApiRestClient.content();
         try {
@@ -167,7 +164,7 @@ public class FileApiRestClientTest {
         setupServices();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectGet(expectedRequestUrl, jsonElement).get();
 
-        FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, gerritJson, revisionApiRestClient, FILE_PATH);
+        FileApiRestClient fileApiRestClient = new FileApiRestClient(restContext(gerritRestClient), revisionApiRestClient, FILE_PATH);
         method.apply(fileApiRestClient);
 
         EasyMock.verify(gerritRestClient);

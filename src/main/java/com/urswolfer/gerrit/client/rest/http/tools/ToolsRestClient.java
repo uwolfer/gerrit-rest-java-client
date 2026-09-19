@@ -18,6 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.tools;
 
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
 import org.apache.http.HttpResponse;
 
@@ -33,8 +34,8 @@ public class ToolsRestClient implements Tools {
 
     private final GerritRestClient gerritRestClient;
 
-    public ToolsRestClient(GerritRestClient gerritRestClient) {
-        this.gerritRestClient = gerritRestClient;
+    public ToolsRestClient(GerritRestContext context) {
+        this.gerritRestClient = context.restClient();
     }
 
     @Override

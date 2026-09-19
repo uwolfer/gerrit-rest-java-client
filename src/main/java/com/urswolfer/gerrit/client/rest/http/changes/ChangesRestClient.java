@@ -27,6 +27,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.List;
@@ -36,13 +37,14 @@ import java.util.List;
  */
 public class ChangesRestClient extends Changes.NotImplemented implements Changes {
 
+    private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
     private final GerritJson gerritJson;
 
-    public ChangesRestClient(GerritRestClient gerritRestClient,
-                             GerritJson gerritJson) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+    public ChangesRestClient(GerritRestContext context) {
+        this.context = context;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
     }
 
     @Override
@@ -96,7 +98,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(String id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, gerritJson, this, id);
+        return new ChangeApiRestClient(context, this, id);
     }
 
     @Override

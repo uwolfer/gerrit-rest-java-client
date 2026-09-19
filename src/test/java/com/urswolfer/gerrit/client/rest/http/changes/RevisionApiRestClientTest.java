@@ -44,15 +44,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Thomas Forrer
  */
 public class RevisionApiRestClientTest extends AbstractJsonTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     private static final String CHANGE_ID = "packages%2Ftest~master~Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df";
     private static final String FILE_PATH = "src/main/README.md";
     private static final String FILE_PATH_ENCODED = "src%2Fmain%2FREADME.md";
@@ -459,7 +455,7 @@ public class RevisionApiRestClientTest extends AbstractJsonTest {
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {
-        return new ChangesRestClient(gerritRestClient, gerritJson);
+        return new ChangesRestClient(restContext(gerritRestClient));
     }
 
     private static RevisionApiTestCase withRevision(String revision) {

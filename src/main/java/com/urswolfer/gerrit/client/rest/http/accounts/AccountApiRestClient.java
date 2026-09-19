@@ -42,6 +42,7 @@ import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
 import com.urswolfer.gerrit.client.rest.accounts.AccountApi;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
 
@@ -58,14 +59,15 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
 
     private final GerritJson gerritJson;
 
+    private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
     private final String name;
 
-    public AccountApiRestClient(GerritRestClient gerritRestClient,
-                                GerritJson gerritJson,
+    public AccountApiRestClient(GerritRestContext context,
                                 String name) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.context = context;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.name = name;
     }
 
@@ -231,7 +233,7 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
 
     @Override
     public EmailApi email(String email) throws RestApiException {
-        return new EmailApiRestClient(gerritRestClient, gerritJson, name, email);
+        return new EmailApiRestClient(context, name, email);
     }
 
     @Override

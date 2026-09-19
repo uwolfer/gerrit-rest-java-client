@@ -1,5 +1,7 @@
 package com.urswolfer.gerrit.client.rest.http.changes;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.FileContentInput;
 import com.google.gerrit.extensions.api.changes.PublishChangeEditInput;
@@ -22,13 +24,8 @@ import org.testng.annotations.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Optional;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class ChangeEditApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
@@ -159,6 +156,6 @@ public class ChangeEditApiRestClientTest {
     }
 
     private ChangeEditApiRestClient getEditApiClient(GerritRestClient gerritRestClient, String id) {
-        return new ChangeEditApiRestClient(gerritRestClient, gerritJson, id);
+        return new ChangeEditApiRestClient(restContext(gerritRestClient), id);
     }
 }

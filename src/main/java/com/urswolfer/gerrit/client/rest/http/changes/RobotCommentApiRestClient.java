@@ -22,6 +22,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 public class RobotCommentApiRestClient extends RobotCommentApi.NotImplemented implements RobotCommentApi {
 
@@ -30,12 +31,11 @@ public class RobotCommentApiRestClient extends RobotCommentApi.NotImplemented im
     private final GerritJson gerritJson;
     private final String id;
 
-    public RobotCommentApiRestClient(GerritRestClient gerritRestClient,
-                                     GerritJson gerritJson,
+    public RobotCommentApiRestClient(GerritRestContext context,
                                      RevisionApiRestClient revisionApiRestClient,
                                      String id) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.revisionApiRestClient = revisionApiRestClient;
         this.id = id;
     }

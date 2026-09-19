@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gerrit.extensions.api.projects.BranchInput;
@@ -37,16 +39,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Urs Wolfer
  */
 public class BranchApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
     private static final String FILE_CONTENT = "some new changes";
     private static final String FILE_PATH = "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java";
@@ -58,7 +55,7 @@ public class BranchApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/projects/sandbox/branches/some-feature", "{\"create_empty_commit\":false}", EMPTY_JSON_OBJECT)
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         projectsRestClient.name("sandbox").branch("some-feature").create(new BranchInput());
     }
@@ -70,7 +67,7 @@ public class BranchApiRestClientTest {
             .expectGet("/projects/sandbox/branches/master",
                 JsonParser.parseString("{\"ref\":\"refs/heads/master\"}"))
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         BranchInfo branchInfo = projectsRestClient.name(projectName).branch("master").get();
 
@@ -83,7 +80,7 @@ public class BranchApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectDelete("/projects/sandbox/branches/some-feature")
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(restContext(gerritRestClient));
 
         projectsRestClient.name("sandbox").branch("some-feature").delete();
     }
@@ -108,7 +105,7 @@ public class BranchApiRestClientTest {
             .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
 
-        BranchApiRestClient branchApiRestClient = new BranchApiRestClient(gerritRestClient, gerritJson, projectApiRestClient, "master");
+        BranchApiRestClient branchApiRestClient = new BranchApiRestClient(restContext(gerritRestClient), projectApiRestClient, "master");
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BinaryResult binaryResult = branchApiRestClient.file(FILE_PATH);
         try {
