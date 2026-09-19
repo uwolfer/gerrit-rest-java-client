@@ -23,23 +23,15 @@ import com.google.gerrit.extensions.api.config.Config;
 import com.google.gerrit.extensions.api.groups.Groups;
 import com.google.gerrit.extensions.api.projects.Projects;
 import com.urswolfer.gerrit.client.rest.accounts.Accounts;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.HttpClientBuilderExtension;
 import com.urswolfer.gerrit.client.rest.http.HttpRequestExecutor;
-import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
 import com.urswolfer.gerrit.client.rest.http.accounts.AccountsRestClient;
-import com.urswolfer.gerrit.client.rest.http.accounts.SshKeysParser;
-import com.urswolfer.gerrit.client.rest.http.changes.*;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
+import com.urswolfer.gerrit.client.rest.http.changes.ChangesRestClient;
 import com.urswolfer.gerrit.client.rest.http.config.ConfigRestClient;
-import com.urswolfer.gerrit.client.rest.http.config.parsers.ServerConfigParser;
-import com.urswolfer.gerrit.client.rest.http.groups.GroupsParser;
 import com.urswolfer.gerrit.client.rest.http.groups.GroupsRestClient;
-import com.urswolfer.gerrit.client.rest.http.projects.BranchInfoParser;
-import com.urswolfer.gerrit.client.rest.http.projects.ProjectsParser;
 import com.urswolfer.gerrit.client.rest.http.projects.ProjectsRestClient;
-import com.urswolfer.gerrit.client.rest.http.projects.TagInfoParser;
-import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import com.urswolfer.gerrit.client.rest.http.tools.ToolsRestClient;
 import com.urswolfer.gerrit.client.rest.tools.Tools;
 
@@ -50,72 +42,27 @@ import java.util.function.Supplier;
  */
 public class GerritApiImpl extends GerritApi.NotImplemented implements GerritRestApi {
     private final GerritRestClient gerritRestClient;
+    private final GerritJson gerritJson;
 
-    private final Supplier<GroupsRestClient> groupsRestClient = Suppliers.memoize(new com.google.common.base.Supplier<GroupsRestClient>() {
-        @Override
-        public GroupsRestClient get() {
-            return new GroupsRestClient(gerritRestClient, new GroupsParser(gerritRestClient.getGson()));
-        }
-    });
-
-    private final Supplier<AccountsRestClient> accountsRestClient = Suppliers.memoize(new com.google.common.base.Supplier<AccountsRestClient>() {
-        @Override
-        public AccountsRestClient get() {
-            return new AccountsRestClient(gerritRestClient,
-                new AccountsParser(gerritRestClient.getGson()),
-                new SshKeysParser(gerritRestClient.getGson()),
-                new ChangeInfosParser(gerritRestClient.getGson()));
-        }
-    });
-
-    private final Supplier<ChangesRestClient> changesRestClient = Suppliers.memoize(new com.google.common.base.Supplier<ChangesRestClient>() {
-        @Override
-        public ChangesRestClient get() {
-            return new ChangesRestClient(
-                gerritRestClient,
-                new ChangeInfosParser(gerritRestClient.getGson()),
-                new CommentsParser(gerritRestClient.getGson()),
-                new FileInfoParser(gerritRestClient.getGson()),
-                new ReviewerInfosParser(gerritRestClient.getGson()),
-                new ReviewResultParser(gerritRestClient.getGson()),
-                new CommitInfosParser(gerritRestClient.getGson()),
-                new AccountsParser(gerritRestClient.getGson()),
-                new MergeableInfoParser(gerritRestClient.getGson()),
-                new ReviewInfoParser(gerritRestClient.getGson()),
-                new ServerConfigParser(gerritRestClient.getGson()));
-        }
-    });
-
-    private final Supplier<ConfigRestClient> configRestClient = Suppliers.memoize(new com.google.common.base.Supplier<ConfigRestClient>() {
-        @Override
-        public ConfigRestClient get() {
-            return new ConfigRestClient(gerritRestClient,new ServerConfigParser(gerritRestClient.getGson()));
-        }
-    });
-
-    private final Supplier<ProjectsRestClient> projectsRestClient = Suppliers.memoize(new com.google.common.base.Supplier<ProjectsRestClient>() {
-        @Override
-        public ProjectsRestClient get() {
-            return new ProjectsRestClient(
-                gerritRestClient,
-                new ProjectsParser(gerritRestClient.getGson()),
-                new BranchInfoParser(gerritRestClient.getGson()),
-                new TagInfoParser(gerritRestClient.getGson()),
-                new ProjectCommitInfoParser(gerritRestClient.getGson()));
-        }
-    });
-
-    private final Supplier<ToolsRestClient> toolsRestClient = Suppliers.memoize(new com.google.common.base.Supplier<ToolsRestClient>() {
-        @Override
-        public ToolsRestClient get() {
-            return new ToolsRestClient(gerritRestClient);
-        }
-    });
+    private final Supplier<AccountsRestClient> accountsRestClient;
+    private final Supplier<ChangesRestClient> changesRestClient;
+    private final Supplier<ConfigRestClient> configRestClient;
+    private final Supplier<GroupsRestClient> groupsRestClient;
+    private final Supplier<ProjectsRestClient> projectsRestClient;
+    private final Supplier<ToolsRestClient> toolsRestClient;
 
     public GerritApiImpl(GerritAuthData authData,
                          HttpRequestExecutor httpRequestExecutor,
                          HttpClientBuilderExtension... httpClientBuilderExtensions) {
         this.gerritRestClient = new GerritRestClient(authData, httpRequestExecutor, httpClientBuilderExtensions);
+        this.gerritJson = new GerritJson(gerritRestClient.getGson());
+        // built here rather than in field initializers, where a lambda may not yet read a blank final
+        this.accountsRestClient = Suppliers.memoize(() -> new AccountsRestClient(gerritRestClient, gerritJson));
+        this.changesRestClient = Suppliers.memoize(() -> new ChangesRestClient(gerritRestClient, gerritJson));
+        this.configRestClient = Suppliers.memoize(() -> new ConfigRestClient(gerritRestClient, gerritJson));
+        this.groupsRestClient = Suppliers.memoize(() -> new GroupsRestClient(gerritRestClient, gerritJson));
+        this.projectsRestClient = Suppliers.memoize(() -> new ProjectsRestClient(gerritRestClient, gerritJson));
+        this.toolsRestClient = Suppliers.memoize(() -> new ToolsRestClient(gerritRestClient));
     }
 
     @Override

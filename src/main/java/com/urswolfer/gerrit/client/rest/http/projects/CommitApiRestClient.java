@@ -22,37 +22,39 @@ import com.google.gerrit.extensions.common.CommitInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 
 
 public class CommitApiRestClient extends CommitApi.NotImplemented implements CommitApi {
 
     private final GerritRestClient gerritRestClient;
     private final ProjectApiRestClient projectApiRestClient;
-    private final ProjectCommitInfoParser projectCommitInfoParser;
+    private final GerritJson gerritJson;
 
     private final String commit;
 
-    public CommitApiRestClient(GerritRestClient gerritRestClient, ProjectApiRestClient projectApiRestClient,
-                               ProjectCommitInfoParser projectCommitInfoParser, String commit) {
+    public CommitApiRestClient(GerritRestClient gerritRestClient,
+                               GerritJson gerritJson,
+                               ProjectApiRestClient projectApiRestClient,
+                               String commit) {
         this.gerritRestClient = gerritRestClient;
+        this.gerritJson = gerritJson;
         this.projectApiRestClient = projectApiRestClient;
         this.commit = commit;
-        this.projectCommitInfoParser = projectCommitInfoParser;
     }
 
     @Override
     public CommitInfo get() throws RestApiException {
         JsonElement jsonElement = gerritRestClient.getRequest(commitURL());
-        return projectCommitInfoParser.parseSingleCommitInfo(jsonElement);
+        return gerritJson.as(jsonElement, CommitInfo.class);
     }
 
 
     @Override
     public IncludedInInfo includedIn() throws RestApiException {
         JsonElement jsonElement = gerritRestClient.getRequest(commitURL() + "/in");
-        return projectCommitInfoParser.parseIncludedInInfo(jsonElement);
+        return gerritJson.as(jsonElement, IncludedInInfo.class);
     }
 
     protected String commitURL() {

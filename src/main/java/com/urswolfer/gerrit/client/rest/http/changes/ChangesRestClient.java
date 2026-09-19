@@ -25,10 +25,8 @@ import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
-import com.urswolfer.gerrit.client.rest.http.config.parsers.ServerConfigParser;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.List;
@@ -39,40 +37,12 @@ import java.util.List;
 public class ChangesRestClient extends Changes.NotImplemented implements Changes {
 
     private final GerritRestClient gerritRestClient;
-    private final ChangeInfosParser changeInfosParser;
-    private final CommentsParser commentsParser;
-    private final FileInfoParser fileInfoParser;
-    private final ReviewerInfosParser reviewerInfosParser;
-    private final ReviewResultParser reviewResultParser;
-    private final CommitInfosParser commitInfosParser;
-    private final AccountsParser accountsParser;
-    private final MergeableInfoParser mergeableInfoParser;
-    private final ReviewInfoParser reviewInfoParser;
-    private final ServerConfigParser serverConfigParser;
+    private final GerritJson gerritJson;
 
     public ChangesRestClient(GerritRestClient gerritRestClient,
-                             ChangeInfosParser changeInfosParser,
-                             CommentsParser commentsParser,
-                             FileInfoParser fileInfoParser,
-                             ReviewerInfosParser reviewerInfosParser,
-                             ReviewResultParser reviewResultParser,
-                             CommitInfosParser commitInfosParser,
-                             AccountsParser accountsParser,
-                             MergeableInfoParser mergeableInfoParser,
-                             ReviewInfoParser reviewInfoParser,
-                             ServerConfigParser serverConfigParser
-                             ) {
+                             GerritJson gerritJson) {
         this.gerritRestClient = gerritRestClient;
-        this.changeInfosParser = changeInfosParser;
-        this.commentsParser = commentsParser;
-        this.fileInfoParser = fileInfoParser;
-        this.reviewerInfosParser = reviewerInfosParser;
-        this.reviewResultParser = reviewResultParser;
-        this.commitInfosParser = commitInfosParser;
-        this.accountsParser = accountsParser;
-        this.mergeableInfoParser = mergeableInfoParser;
-        this.reviewInfoParser = reviewInfoParser;
-        this.serverConfigParser = serverConfigParser;
+        this.gerritJson = gerritJson;
     }
 
     @Override
@@ -116,7 +86,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         }
 
         JsonElement jsonElement = gerritRestClient.getRequest(url);
-        return changeInfosParser.parseChangeInfos(jsonElement);
+        return gerritJson.asList(jsonElement, ChangeInfo.class);
     }
 
     @Override
@@ -126,9 +96,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
 
     @Override
     public ChangeApi id(String id) throws RestApiException {
-        return new ChangeApiRestClient(gerritRestClient, this, changeInfosParser, commentsParser,
-            fileInfoParser, reviewResultParser, reviewerInfosParser, commitInfosParser,
-            accountsParser, mergeableInfoParser, reviewInfoParser, serverConfigParser, id);
+        return new ChangeApiRestClient(gerritRestClient, gerritJson, this, id);
     }
 
     @Override
@@ -148,9 +116,9 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         }
 
         String url = "/changes/";
-        String changeInput = changeInfosParser.generateChangeInput(in);
+        String changeInput = gerritJson.toJson(in, ChangeInput.class);
         JsonElement result = gerritRestClient.postRequest(url, changeInput);
-        ChangeInfo info = changeInfosParser.parseSingleChangeInfo(result);
+        ChangeInfo info = gerritJson.as(result, ChangeInfo.class);
         return id(info._number);
     }
 }

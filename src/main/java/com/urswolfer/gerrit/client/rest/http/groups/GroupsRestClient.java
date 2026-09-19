@@ -25,6 +25,7 @@ import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
@@ -39,16 +40,17 @@ import java.util.TreeMap;
 public class GroupsRestClient extends Groups.NotImplemented implements Groups {
 
     private final GerritRestClient gerritRestClient;
-    private final GroupsParser groupsParser;
+    private final GerritJson gerritJson;
 
-    public GroupsRestClient(GerritRestClient gerritRestClient, GroupsParser groupsParser) {
+    public GroupsRestClient(GerritRestClient gerritRestClient,
+                            GerritJson gerritJson) {
         this.gerritRestClient = gerritRestClient;
-        this.groupsParser = groupsParser;
+        this.gerritJson = gerritJson;
     }
 
     @Override
     public GroupApi id(String id) throws RestApiException {
-        return new GroupApiRestClient(gerritRestClient, groupsParser, id);
+        return new GroupApiRestClient(gerritRestClient, gerritJson, id);
     }
 
     @Override
@@ -61,10 +63,10 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
     @Override
     public GroupApi create(GroupInput input) throws RestApiException {
         String restPath = GroupApiRestClient.getBaseRequestPath() + "/" + Url.encode(input.name);
-        String body = gerritRestClient.getGson().toJson(input);
+        String body = gerritJson.toJson(input);
         JsonElement result = gerritRestClient.putRequest(restPath, body);
-        GroupInfo info = groupsParser.parseGroupInfo(result);
-        return new GroupApiRestClient(gerritRestClient, groupsParser, info.id);
+        GroupInfo info = gerritJson.as(result, GroupInfo.class);
+        return new GroupApiRestClient(gerritRestClient, gerritJson, info.id);
     }
 
     @Override
@@ -130,7 +132,7 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
         if (result == null) {
             return Collections.emptyList();
         } else {
-            return groupsParser.parseGroupInfos(result);
+            return GroupApiRestClient.parseGroupInfos(gerritJson, result);
         }
     }
 
@@ -170,7 +172,7 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
         if (result == null) {
             return Collections.emptyList();
         } else {
-            return groupsParser.parseGroupInfos(result);
+            return GroupApiRestClient.parseGroupInfos(gerritJson, result);
         }
     }
 

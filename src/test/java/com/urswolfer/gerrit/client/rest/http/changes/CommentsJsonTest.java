@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.changes.parsers;
+package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -25,7 +25,7 @@ import com.google.gerrit.extensions.common.ChangeMessageInfo;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import com.urswolfer.gerrit.client.rest.http.common.AccountInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.ChangeMessageInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.CommentInfoBuilder;
@@ -37,11 +37,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Thomas Forrer
  */
-public class CommentsParserTest extends AbstractParserTest {
+public class CommentsJsonTest extends AbstractJsonTest {
     private static final TreeMap<String, List<CommentInfo>> COMMENT_INFOS = new TreeMap<>();
 
     static {
@@ -149,7 +150,7 @@ public class CommentsParserTest extends AbstractParserTest {
         );
     }
 
-    private CommentsParser commentsParser = new CommentsParser(getGson());
+    private GerritJson gerritJson = new GerritJson(getGson());
 
     @Test
     public void testParseCommentsFileName() throws Exception {
@@ -168,8 +169,8 @@ public class CommentsParserTest extends AbstractParserTest {
         };
         SortedMap<String, Integer> commentsPerFile = Maps.transformValues(comments, listSizeFunction);
         SortedMap<String, Integer> expectedCommentsPerFile = Maps.transformValues(COMMENT_INFOS, listSizeFunction);
-
         Truth.assertThat(commentsPerFile).isEqualTo(expectedCommentsPerFile);
+
     }
 
     @Test
@@ -190,8 +191,8 @@ public class CommentsParserTest extends AbstractParserTest {
         Function<List<RobotCommentInfo>, Integer> listSizeFunction = robotCommentInfos -> robotCommentInfos.size();
         SortedMap<String, Integer> commentsPerFile = Maps.transformValues(robotComments, listSizeFunction);
         SortedMap<String, Integer> expectedCommentsPerFile = Maps.transformValues(ROBOT_COMMENT_INFOS, listSizeFunction);
-
         Truth.assertThat(commentsPerFile).isEqualTo(expectedCommentsPerFile);
+
     }
 
     @Test
@@ -208,8 +209,8 @@ public class CommentsParserTest extends AbstractParserTest {
 
     @Test
     public void testParseSingleCommentInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("comment.json");
-        CommentInfo result = commentsParser.parseSingleCommentInfo(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/comment.json");
+        CommentInfo result = gerritJson.as(jsonElement, CommentInfo.class);
         Truth.assertThat(result.id).isEqualTo("TvcXrmjM");
         Truth.assertThat(result.path).isEqualTo(
             "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java");
@@ -219,8 +220,8 @@ public class CommentsParserTest extends AbstractParserTest {
 
     @Test
     public void testParseSingleRobotCommentInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("robotcomment.json");
-        RobotCommentInfo result = commentsParser.parseSingleRobotCommentInfo(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/robotcomment.json");
+        RobotCommentInfo result = gerritJson.as(jsonElement, RobotCommentInfo.class);
         Truth.assertThat(result.id).isEqualTo("TvcXrmjM");
         Truth.assertThat(result.line).isEqualTo(23);
         Truth.assertThat(result.robotId).isEqualTo("importChecker");
@@ -228,17 +229,17 @@ public class CommentsParserTest extends AbstractParserTest {
     }
 
     private SortedMap<String, List<CommentInfo>> parseComments() throws Exception {
-        JsonElement jsonElement = getJsonElement("comments.json");
-        return commentsParser.parseCommentInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/comments.json");
+        return gerritJson.asSortedMapOfLists(jsonElement, CommentInfo.class);
     }
 
     private SortedMap<String, List<RobotCommentInfo>> parseRobotComments() throws Exception {
-        JsonElement jsonElement = getJsonElement("robotcomments.json");
-        return commentsParser.parseRobotCommentInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/robotcomments.json");
+        return gerritJson.asSortedMapOfLists(jsonElement, RobotCommentInfo.class);
     }
 
     private List<ChangeMessageInfo> parseMessages() throws Exception {
-        JsonElement jsonElement = getJsonElement("messages.json");
-        return commentsParser.parseChangeMessageInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/messages.json");
+        return gerritJson.asList(jsonElement, ChangeMessageInfo.class);
     }
 }

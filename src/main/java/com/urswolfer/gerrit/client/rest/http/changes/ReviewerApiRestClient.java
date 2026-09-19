@@ -20,6 +20,7 @@ import com.google.gerrit.extensions.api.changes.ReviewerApi;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
 import java.util.Map;
@@ -30,13 +31,16 @@ import java.util.Map;
 public class ReviewerApiRestClient extends ReviewerApi.NotImplemented implements ReviewerApi {
 
     private final GerritRestClient gerritRestClient;
+    private final GerritJson gerritJson;
     private final ChangeApiRestClient changeApiRestClient;
     private final Integer accountId;
 
     public ReviewerApiRestClient(GerritRestClient gerritRestClient,
+                                 GerritJson gerritJson,
                                  ChangeApiRestClient changeApiRestClient,
                                  Integer accountId) {
         this.gerritRestClient = gerritRestClient;
+        this.gerritJson = gerritJson;
         this.changeApiRestClient = changeApiRestClient;
         this.accountId = accountId;
     }
@@ -45,7 +49,7 @@ public class ReviewerApiRestClient extends ReviewerApi.NotImplemented implements
     public Map<String, Short> votes() throws RestApiException {
         String request = getRequestPath() + "/votes";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritRestClient.getGson().fromJson(jsonElement, new TypeToken<Map<String, Short>>() {}.getType());
+        return gerritJson.as(jsonElement, new TypeToken<Map<String, Short>>() {}.getType());
     }
 
     @Override

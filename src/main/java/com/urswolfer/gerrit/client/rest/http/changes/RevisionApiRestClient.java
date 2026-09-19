@@ -25,8 +25,8 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
 
@@ -45,31 +45,16 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
     private final GerritRestClient gerritRestClient;
     private final ChangeApiRestClient changeApiRestClient;
-    private final CommentsParser commentsParser;
-    private final FileInfoParser fileInfoParser;
-    private final ReviewResultParser reviewResultParser;
-    private final CommitInfosParser commitInfosParser;
-    private final MergeableInfoParser mergeableInfoParser;
-    private final ReviewInfoParser reviewInfoParser;
+    private final GerritJson gerritJson;
     private final String revision;
 
     public RevisionApiRestClient(GerritRestClient gerritRestClient,
+                                 GerritJson gerritJson,
                                  ChangeApiRestClient changeApiRestClient,
-                                 CommentsParser commentsParser,
-                                 FileInfoParser fileInfoParser,
-                                 ReviewResultParser reviewResultParser,
-                                 CommitInfosParser commitInfosParser,
-                                 MergeableInfoParser mergeableInfoParser,
-                                 ReviewInfoParser reviewInfoParser,
                                  String revision) {
         this.gerritRestClient = gerritRestClient;
+        this.gerritJson = gerritJson;
         this.changeApiRestClient = changeApiRestClient;
-        this.commentsParser = commentsParser;
-        this.fileInfoParser = fileInfoParser;
-        this.reviewResultParser = reviewResultParser;
-        this.commitInfosParser = commitInfosParser;
-        this.mergeableInfoParser = mergeableInfoParser;
-        this.reviewInfoParser = reviewInfoParser;
         this.revision = revision;
     }
 
@@ -86,9 +71,9 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public ReviewResult review(ReviewInput reviewInput) throws RestApiException {
         String request = getRequestPath() + "/review";
-        String json = gerritRestClient.getGson().toJson(reviewInput);
+        String json = gerritJson.toJson(reviewInput);
         JsonElement reviewResult = gerritRestClient.postRequest(request, json);
-        return reviewResultParser.parseReviewResult(reviewResult);
+        return gerritJson.as(reviewResult, ReviewResult.class);
     }
 
     @Override
@@ -99,9 +84,9 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public ChangeInfo submit(SubmitInput submitInput) throws RestApiException {
         String request = changeApiRestClient.getRequestPath() + "/submit";
-        String json = gerritRestClient.getGson().toJson(submitInput);
+        String json = gerritJson.toJson(submitInput);
         JsonElement result = gerritRestClient.postRequest(request, json);
-        return gerritRestClient.getGson().fromJson(result, ChangeInfo.class);
+        return gerritJson.as(result, ChangeInfo.class);
     }
 
     @Override
@@ -113,7 +98,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public ChangeApi cherryPick(CherryPickInput in) throws RestApiException {
         String request = getRequestPath() + "/cherrypick";
-        String json = gerritRestClient.getGson().toJson(in);
+        String json = gerritJson.toJson(in);
         gerritRestClient.postRequest(request, json);
         return changeApiRestClient;
     }
@@ -126,7 +111,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public ChangeApi rebase(RebaseInput in) throws RestApiException {
         String request = getRequestPath() + "/rebase";
-        String json = gerritRestClient.getGson().toJson(in);
+        String json = gerritJson.toJson(in);
         gerritRestClient.postRequest(request, json);
         return changeApiRestClient;
     }
@@ -146,7 +131,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     public MergeableInfo mergeable() throws RestApiException {
         String request = getRequestPath() + "/mergeable";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return mergeableInfoParser.parseMergeableInfo(jsonElement);
+        return gerritJson.as(jsonElement, MergeableInfo.class);
     }
 
     /**
@@ -166,44 +151,44 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     public Set<String> reviewed() throws RestApiException {
         String request = getRequestPath() + "/files?reviewed";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return reviewInfoParser.parseFileInfos(jsonElement);
+        return parseReviewedFiles(jsonElement);
     }
 
     private SortedMap<String, List<CommentInfo>> comments(String type) throws RestApiException {
         String request = getRequestPath() + '/' + type + '/';
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return commentsParser.parseCommentInfos(jsonElement);
+        return gerritJson.asSortedMapOfLists(jsonElement, CommentInfo.class);
     }
 
     @Override
     public Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException {
         String request = getRequestPath() + "/robotcomments/";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return commentsParser.parseRobotCommentInfos(jsonElement);
+        return gerritJson.asSortedMapOfLists(jsonElement, RobotCommentInfo.class);
     }
 
     @Override
     public DraftApi createDraft(DraftInput in) throws RestApiException {
         String request = getRequestPath() + "/drafts";
-        String json = gerritRestClient.getGson().toJson(in);
+        String json = gerritJson.toJson(in);
         JsonElement jsonElement = gerritRestClient.putRequest(request, json);
-        CommentInfo commentInfo = commentsParser.parseSingleCommentInfo(jsonElement.getAsJsonObject());
-        return new DraftApiRestClient(gerritRestClient, changeApiRestClient, this, commentsParser, commentInfo);
+        CommentInfo commentInfo = gerritJson.as(jsonElement.getAsJsonObject(), CommentInfo.class);
+        return new DraftApiRestClient(gerritRestClient, gerritJson, changeApiRestClient, this, commentInfo);
     }
 
     @Override
     public DraftApi draft(String id) throws RestApiException {
-        return new DraftApiRestClient(gerritRestClient, changeApiRestClient, this, commentsParser, id);
+        return new DraftApiRestClient(gerritRestClient, gerritJson, changeApiRestClient, this, id);
     }
 
     @Override
     public CommentApi comment(String id) throws RestApiException {
-        return new CommentApiRestClient(gerritRestClient, this, commentsParser, id);
+        return new CommentApiRestClient(gerritRestClient, gerritJson, this, id);
     }
 
     @Override
     public RobotCommentApi robotComment(String id) throws RestApiException {
-        return new RobotCommentApiRestClient(gerritRestClient, this, commentsParser, id);
+        return new RobotCommentApiRestClient(gerritRestClient, gerritJson, this, id);
     }
 
 
@@ -219,19 +204,19 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
             request += "?parent=" + parentNum;
         }
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return fileInfoParser.parseFileInfos(jsonElement);
+        return gerritJson.asMap(jsonElement, FileInfo.class);
     }
 
     @Override
     public FileApi file(String path) {
-        return new FileApiRestClient(gerritRestClient, this, commitInfosParser, path);
+        return new FileApiRestClient(gerritRestClient, gerritJson, this, path);
     }
 
     @Override
     public CommitInfo commit(boolean addLinks) throws RestApiException {
         String request = getRequestPath() + "/commit" + (addLinks ? "?links" : "");
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return commitInfosParser.parseSingleCommitInfo(jsonElement.getAsJsonObject());
+        return gerritJson.as(jsonElement.getAsJsonObject(), CommitInfo.class);
     }
 
     @Override
@@ -249,14 +234,14 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     public Map<String, ActionInfo> actions() throws RestApiException {
         String request = getRequestPath() + "/actions";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return commitInfosParser.parseActionInfos(jsonElement);
+        return gerritJson.asSortedMap(jsonElement, ActionInfo.class);
     }
 
     @Override
     public SubmitType submitType() throws RestApiException {
         String request = getRequestPath() + "/submit_type";
         JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritRestClient.getGson().fromJson(jsonElement, new TypeToken<SubmitType>() {}.getType());
+        return gerritJson.as(jsonElement, new TypeToken<SubmitType>() {}.getType());
     }
 
     @Override
@@ -282,15 +267,27 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public SubmitType testSubmitType(TestSubmitRuleInput in) throws RestApiException {
         String request = getRequestPath() + "/test.submit_type";
-        String json = gerritRestClient.getGson().toJson(in);
+        String json = gerritJson.toJson(in);
         JsonElement jsonElement = gerritRestClient.postRequest(request,json);
-        return gerritRestClient.getGson().fromJson(jsonElement, new TypeToken<SubmitType>() {}.getType());
+        return gerritJson.as(jsonElement, new TypeToken<SubmitType>() {}.getType());
     }
 
     @Override
     public String description() throws RestApiException {
         String request = getRequestPath() + "/description";
         return gerritRestClient.getRequest(request).getAsString();
+    }
+
+    /**
+     * Gerrit emits a trailing comma in this list and Gson turns that into a null element.
+     *
+     * @see <a href="https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#list-files">list-files</a>
+     * @see <a href="https://github.com/google/gson/issues/494">gson#494</a>
+     */
+    private Set<String> parseReviewedFiles(JsonElement jsonElement) {
+        Set<String> reviewed = gerritJson.asSet(jsonElement, String.class);
+        reviewed.remove(null);
+        return reviewed;
     }
 
     protected String getRequestPath() {

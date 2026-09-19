@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.config.parsers;
+package com.urswolfer.gerrit.client.rest.http.config;
 
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.ServerInfo;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import org.testng.annotations.Test;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Thomas Forrer
  */
-public class ServerConfigParserTest extends AbstractParserTest {
-    private final ServerConfigParser serverConfigParser = new ServerConfigParser(getGson());
+public class ServerConfigJsonTest extends AbstractJsonTest {
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
 
     @Test
     public void testParseServerInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("serverinfo.json");
-        ServerInfo serverInfo = serverConfigParser.parseServerInfo(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/serverinfo.json");
+        ServerInfo serverInfo = gerritJson.as(jsonElement, ServerInfo.class);
 
         Truth.assertThat(serverInfo.auth.authType.name()).isEqualTo("LDAP");
         Truth.assertThat(serverInfo.change.allowBlame).isTrue();

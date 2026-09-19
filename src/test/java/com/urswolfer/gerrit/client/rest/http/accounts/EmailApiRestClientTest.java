@@ -17,22 +17,26 @@
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class EmailApiRestClientTest {
 
-    private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
+
+    private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
     public void get() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/emails/john.doe@example.com", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/emails/john.doe@example.com", EMPTY_JSON_OBJECT)
             .get();
-        EmailApiRestClient emailApiRestClient = getEmailApiRestClient(gerritRestClient, null,
-            "jdoe", "john.doe@example.com");
+        EmailApiRestClient emailApiRestClient = getEmailApiRestClient(gerritRestClient, "jdoe", "john.doe@example.com");
 
         emailApiRestClient.get();
 
@@ -44,8 +48,7 @@ public class EmailApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectDelete("/accounts/jdoe/emails/john.doe@example.com")
             .get();
-        EmailApiRestClient emailApiRestClient = getEmailApiRestClient(gerritRestClient, null,
-            "jdoe", "john.doe@example.com");
+        EmailApiRestClient emailApiRestClient = getEmailApiRestClient(gerritRestClient, "jdoe", "john.doe@example.com");
 
         emailApiRestClient.delete();
 
@@ -55,21 +58,17 @@ public class EmailApiRestClientTest {
     @Test
     public void setPreferred() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/accounts/jdoe/emails/john.doe@example.com/preferred", MOCK_JSON_ELEMENT)
+            .expectPut("/accounts/jdoe/emails/john.doe@example.com/preferred", EMPTY_JSON_OBJECT)
             .get();
-        EmailApiRestClient emailApiRestClient = getEmailApiRestClient(gerritRestClient, null,
-            "jdoe", "john.doe@example.com");
+        EmailApiRestClient emailApiRestClient = getEmailApiRestClient(gerritRestClient, "jdoe", "john.doe@example.com");
 
         emailApiRestClient.setPreferred();
 
         EasyMock.verify(gerritRestClient);
     }
 
-    private EmailApiRestClient getEmailApiRestClient (GerritRestClient gerritRestClient, AccountsParser accountsParser,
-                                                         String name, String email){
-        if(accountsParser == null){
-            accountsParser = EasyMock.createMock(AccountsParser.class);
-        }
-        return new EmailApiRestClient(gerritRestClient, accountsParser, name, email);
+    private EmailApiRestClient getEmailApiRestClient(GerritRestClient gerritRestClient,
+                                                     String name, String email) {
+        return new EmailApiRestClient(gerritRestClient, gerritJson, name, email);
     }
 }

@@ -7,9 +7,10 @@ import com.google.gerrit.extensions.common.EditInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.urswolfer.gerrit.client.rest.RestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.CommitInfosParser;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
@@ -21,33 +22,36 @@ import org.testng.annotations.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Optional;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class ChangeEditApiRestClientTest {
 
-    private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
-    private static final EditInfo MOCK_EDIT_INFO = EasyMock.createMock(EditInfo.class);
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
 
+    private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
     public void testGet() throws Exception {
-        CommitInfosParser commitInfosParser = EasyMock.createMock(CommitInfosParser.class);
-        GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectGet("/changes/1/edit", MOCK_JSON_ELEMENT)
+        // this used to stub a parser to hand back a mock EditInfo; with the parsing no longer
+        // injectable, the response itself carries what the assertion checks
+        JsonElement editInfo = JsonParser.parseString("{\"ref\":\"refs/users/01/1/edit\"}");
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
+            .expectGet("/changes/1/edit", editInfo)
             .get();
-        EasyMock.expect(commitInfosParser.parseEditInfo(MOCK_JSON_ELEMENT))
-            .andReturn(MOCK_EDIT_INFO)
-            .once();
-        EasyMock.replay(commitInfosParser);
-        Optional<EditInfo> returned = getEditApiClient(gerritRestClient,commitInfosParser,"1").get();
-        EasyMock.verify(commitInfosParser, gerritRestClient);
+
+        Optional<EditInfo> returned = getEditApiClient(gerritRestClient, "1").get();
+
+        EasyMock.verify(gerritRestClient);
         Truth.assertThat(returned.isPresent()).isTrue();
-        Truth.assertThat(returned.get()).isEqualTo(MOCK_EDIT_INFO);
+        Truth.assertThat(returned.get().ref).isEqualTo("refs/users/01/1/edit");
     }
 
     @Test
     public void testDelete() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectDelete("/changes/1/edit")
             .get();
-        getEditApiClient(gerritRestClient,null,"1").delete();
+        getEditApiClient(gerritRestClient, "1").delete();
         EasyMock.verify(gerritRestClient);
     }
 
@@ -55,7 +59,7 @@ public class ChangeEditApiRestClientTest {
     public void testRebase() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectPost("/changes/1/edit:rebase")
             .get();
-        getEditApiClient(gerritRestClient,null,"1").rebase();
+        getEditApiClient(gerritRestClient, "1").rebase();
         EasyMock.verify(gerritRestClient);
     }
 
@@ -63,9 +67,8 @@ public class ChangeEditApiRestClientTest {
     public void testPublish() throws Exception {
         PublishChangeEditInput input = EasyMock.createMock(PublishChangeEditInput.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectPost("/changes/1/edit:publish","{}")
-            .expectGetGson()
             .get();
-        getEditApiClient(gerritRestClient,null,"1").publish(input);
+        getEditApiClient(gerritRestClient, "1").publish(input);
         EasyMock.verify(gerritRestClient);
     }
 
@@ -85,7 +88,7 @@ public class ChangeEditApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectRequest("/changes/1/edit/file1",
                 null, RestClient.HttpVerb.GET,httpResponse)
             .get();
-        Optional<BinaryResult> returned = getEditApiClient(gerritRestClient,null,"1").getFile("file1");
+        Optional<BinaryResult> returned = getEditApiClient(gerritRestClient, "1").getFile("file1");
         EasyMock.verify(gerritRestClient);
         Truth.assertThat(returned.isPresent()).isTrue();
         try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
@@ -99,9 +102,8 @@ public class ChangeEditApiRestClientTest {
     public void testRenameFile() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectPost("/changes/1/edit",
                 "{\"old_path\":\"file\",\"new_path\":\"newfile1\"}")
-            .expectGetGson()
             .get();
-        getEditApiClient(gerritRestClient,null,"1").renameFile("file", "newfile1");
+        getEditApiClient(gerritRestClient, "1").renameFile("file", "newfile1");
         EasyMock.verify(gerritRestClient);
     }
 
@@ -109,9 +111,8 @@ public class ChangeEditApiRestClientTest {
     public void testRestoreFile() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectPost("/changes/1/edit",
                 "{\"restore_path\":\"restoredFile\"}")
-            .expectGetGson()
             .get();
-        getEditApiClient(gerritRestClient,null,"1").restoreFile("restoredFile");
+        getEditApiClient(gerritRestClient, "1").restoreFile("restoredFile");
         EasyMock.verify(gerritRestClient);
     }
 
@@ -123,7 +124,7 @@ public class ChangeEditApiRestClientTest {
             .get();
         FileContentInput input = new FileContentInput();
         input.binaryContent = "some text goes here";
-        getEditApiClient(gerritRestClient,null,"1").modifyFile("dir/file1",input);
+        getEditApiClient(gerritRestClient, "1").modifyFile("dir/file1",input);
         EasyMock.verify(gerritRestClient);
     }
 
@@ -131,7 +132,7 @@ public class ChangeEditApiRestClientTest {
     public void testDeleteFile() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectDelete("/changes/1/edit/dir%2Ffile1")
             .get();
-        getEditApiClient(gerritRestClient,null,"1").deleteFile("dir/file1");
+        getEditApiClient(gerritRestClient, "1").deleteFile("dir/file1");
         EasyMock.verify(gerritRestClient);
     }
 
@@ -142,7 +143,7 @@ public class ChangeEditApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectGet("/changes/1/edit:message",
                 element)
             .get();
-        String message = getEditApiClient(gerritRestClient,null,"1").getCommitMessage();
+        String message = getEditApiClient(gerritRestClient, "1").getCommitMessage();
         Truth.assertThat(message).isEqualTo("Some commit message");
         EasyMock.verify(gerritRestClient);
     }
@@ -150,15 +151,14 @@ public class ChangeEditApiRestClientTest {
     @Test
     public void testModifyCommitMessage() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectPut("/changes/1/edit:message",
-                "{\"message\":\"New commit Message\"}",MOCK_JSON_ELEMENT)
-            .expectGetGson()
+                "{\"message\":\"New commit Message\"}",EMPTY_JSON_OBJECT)
             .get();
-        getEditApiClient(gerritRestClient,null,"1")
+        getEditApiClient(gerritRestClient, "1")
             .modifyCommitMessage("New commit Message");
         EasyMock.verify(gerritRestClient);
     }
 
-    private ChangeEditApiRestClient getEditApiClient(GerritRestClient gerritRestClient,CommitInfosParser parser, String id) {
-        return new ChangeEditApiRestClient(gerritRestClient, parser,id);
+    private ChangeEditApiRestClient getEditApiClient(GerritRestClient gerritRestClient, String id) {
+        return new ChangeEditApiRestClient(gerritRestClient, gerritJson, id);
     }
 }

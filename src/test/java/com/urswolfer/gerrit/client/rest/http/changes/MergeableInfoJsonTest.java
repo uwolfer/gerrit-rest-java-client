@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.changes.parsers;
+package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.MergeableInfo;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.http.common.*;
 import org.testng.annotations.Test;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author EFregnan
  */
-public class MergeableInfoParserTest extends AbstractParserTest {
+public class MergeableInfoJsonTest extends AbstractJsonTest {
 
     private static final MergeableInfo MERGEABLE_INFO = new MergeableInfoBuilder()
         .withSubmitType(SubmitType.MERGE_IF_NECESSARY)
@@ -33,7 +34,7 @@ public class MergeableInfoParserTest extends AbstractParserTest {
         .withMergeable(true)
         .get();
 
-    private final MergeableInfoParser mergeableInfoParser = new MergeableInfoParser(getGson());
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
     @Test
     public void testParseMergeableInfo() throws Exception {
@@ -42,7 +43,7 @@ public class MergeableInfoParserTest extends AbstractParserTest {
     }
 
     private MergeableInfo parseMergeable() throws Exception {
-        JsonElement jsonElement = getJsonElement("mergeable.json");
-        return mergeableInfoParser.parseMergeableInfo(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/mergeable.json");
+        return gerritJson.as(jsonElement, MergeableInfo.class);
     }
 }

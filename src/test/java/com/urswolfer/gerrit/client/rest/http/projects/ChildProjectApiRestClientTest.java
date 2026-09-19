@@ -18,52 +18,40 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.ProjectInfo;
-import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
-
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class ChildProjectApiRestClientTest {
 
-    public static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
-    public static final ProjectInfo MOCK_PROJECT_INFO = EasyMock.createMock(ProjectInfo.class);
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
 
 
     @Test
     public void testGet() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/projects/sandbox/children/child1", MOCK_JSON_ELEMENT)
+            .expectGet("/projects/sandbox/children/child1", JsonParser.parseString("{\"id\":\"p1\"}"))
             .get();
-        ProjectsParser projectsParser = EasyMock.createMock(ProjectsParser.class);
-        EasyMock.expect(projectsParser.parseSingleProjectInfo(MOCK_JSON_ELEMENT))
-            .andReturn(MOCK_PROJECT_INFO)
-            .once();
-        EasyMock.replay(projectsParser);
-        ChildProjectApiRestClient client = new ChildProjectApiRestClient(gerritRestClient,
-            projectsParser, "/projects/sandbox", "child1");
+        ChildProjectApiRestClient client = new ChildProjectApiRestClient(gerritRestClient, gerritJson, "/projects/sandbox", "child1");
         ProjectInfo returned = client.get();
 
-        Truth.assertThat(returned).isEqualTo(MOCK_PROJECT_INFO);
-        EasyMock.verify(gerritRestClient,projectsParser);
+        Truth.assertThat(returned.id).isEqualTo("p1");
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testGetRecursive() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/projects/sandbox/children/child1?recursive", MOCK_JSON_ELEMENT)
+            .expectGet("/projects/sandbox/children/child1?recursive", JsonParser.parseString("{\"id\":\"p1\"}"))
             .get();
-        ProjectsParser projectsParser = EasyMock.createMock(ProjectsParser.class);
-        EasyMock.expect(projectsParser.parseSingleProjectInfo(MOCK_JSON_ELEMENT))
-            .andReturn(MOCK_PROJECT_INFO)
-            .once();
-        EasyMock.replay(projectsParser);
-        ChildProjectApiRestClient client = new ChildProjectApiRestClient(gerritRestClient,
-            projectsParser, "/projects/sandbox", "child1");
+        ChildProjectApiRestClient client = new ChildProjectApiRestClient(gerritRestClient, gerritJson, "/projects/sandbox", "child1");
         ProjectInfo returned = client.get(true);
 
-        Truth.assertThat(returned).isEqualTo(MOCK_PROJECT_INFO);
-        EasyMock.verify(gerritRestClient,projectsParser);
+        Truth.assertThat(returned.id).isEqualTo("p1");
+        EasyMock.verify(gerritRestClient);
     }
 }

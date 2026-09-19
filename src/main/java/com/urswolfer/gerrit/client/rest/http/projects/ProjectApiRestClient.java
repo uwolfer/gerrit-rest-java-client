@@ -42,34 +42,29 @@ import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Thomas Forrer
  */
 public class ProjectApiRestClient extends ProjectApi.NotImplemented implements ProjectApi {
+
+
     private final GerritRestClient gerritRestClient;
-    private final ProjectsParser projectsParser;
-    private final BranchInfoParser branchInfoParser;
-    private final TagInfoParser tagInfoParser;
-    private final ProjectCommitInfoParser projectCommitInfoParser;
+    private final GerritJson gerritJson;
     private final String name;
 
     public ProjectApiRestClient(GerritRestClient gerritRestClient,
-                                ProjectsParser projectsParser,
-                                BranchInfoParser branchInfoParser,
-                                TagInfoParser tagInfoParser,
-                                ProjectCommitInfoParser projectCommitInfoParser,
+                                GerritJson gerritJson,
                                 String name) {
         this.gerritRestClient = gerritRestClient;
-        this.projectsParser = projectsParser;
-        this.branchInfoParser = branchInfoParser;
-        this.tagInfoParser = tagInfoParser;
-        this.projectCommitInfoParser = projectCommitInfoParser;
+        this.gerritJson = gerritJson;
         this.name = name;
     }
 
@@ -81,7 +76,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
 
     @Override
     public ProjectApi create(ProjectInput in) throws RestApiException {
-        String body = gerritRestClient.getGson().toJson(in);
+        String body = gerritJson.toJson(in);
         gerritRestClient.putRequest(projectsUrl(), body);
         return this;
     }
@@ -90,7 +85,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
     public ProjectInfo get() {
         try {
             JsonElement jsonElement = gerritRestClient.getRequest(projectsUrl());
-            return projectsParser.parseSingleProjectInfo(jsonElement);
+            return gerritJson.as(jsonElement, ProjectInfo.class);
         } catch (RestApiException e) {
             throw new RuntimeException(e);
         }
@@ -106,44 +101,44 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
     public ProjectAccessInfo access() throws RestApiException {
         String request = projectsUrl() + "/access";
         JsonElement result = gerritRestClient.getRequest(request);
-        return projectsParser.parseProjectAccessInfo(result);
+        return gerritJson.as(result, ProjectAccessInfo.class);
     }
 
     @Override
     public ProjectAccessInfo access(ProjectAccessInput p) throws RestApiException {
         String request = projectsUrl() + "/access";
-        String params = projectsParser.generateProjectAccessInput(p);
+        String params = gerritJson.toJson(p);
         JsonElement result = gerritRestClient.postRequest(request, params);
-        return projectsParser.parseProjectAccessInfo(result);
+        return gerritJson.as(result, ProjectAccessInfo.class);
     }
 
     @Override
     public AccessCheckInfo checkAccess(AccessCheckInput in) throws RestApiException {
         String request = projectsUrl() + "/check.access";
-        String params = gerritRestClient.getGson().toJson(in);
+        String params = gerritJson.toJson(in);
         JsonElement result = gerritRestClient.postRequest(request, params);
-        return projectsParser.parseAccessCheckInfo(result);
+        return gerritJson.as(result, AccessCheckInfo.class);
     }
 
     @Override
     public ConfigInfo config() throws RestApiException {
         String request = projectsUrl() + "/config";
         JsonElement result = gerritRestClient.getRequest(request);
-        return projectsParser.parseConfigInfo(result);
+        return GsonFactory.createForConfigInfo().fromJson(result, ConfigInfo.class);
     }
 
     @Override
     public ConfigInfo config(ConfigInput in) throws RestApiException {
         String request = projectsUrl() + "/config";
-        String body = gerritRestClient.getGson().toJson(in);
+        String body = gerritJson.toJson(in);
         JsonElement result = gerritRestClient.putRequest(request, body);
-        return projectsParser.parseConfigInfo(result);
+        return GsonFactory.createForConfigInfo().fromJson(result, ConfigInfo.class);
     }
 
     @Override
     public void description(DescriptionInput in) throws RestApiException {
         String request = projectsUrl() + "/description";
-        String body = gerritRestClient.getGson().toJson(in);
+        String body = gerritJson.toJson(in);
         gerritRestClient.putRequest(request, body);
     }
 
@@ -159,13 +154,13 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
 
     @Override
     public BranchApi branch(String ref) throws RestApiException {
-        return new BranchApiRestClient(gerritRestClient, branchInfoParser, this, ref);
+        return new BranchApiRestClient(gerritRestClient, gerritJson, this, ref);
     }
 
     private List<BranchInfo> getBranches(ListRefsRequest<BranchInfo> lbr) throws RestApiException {
         String request = projectsUrl() + branchesUrl(lbr);
         JsonElement branches = gerritRestClient.getRequest(request);
-        return branchInfoParser.parseBranchInfos(branches);
+        return gerritJson.asList(branches, BranchInfo.class);
     }
 
     @Override
@@ -180,13 +175,13 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
 
     @Override
     public TagApi tag(String ref) throws RestApiException {
-        return new TagApiRestClient(gerritRestClient, tagInfoParser, this, ref);
+        return new TagApiRestClient(gerritRestClient, gerritJson, this, ref);
     }
 
     private List<TagInfo> getTagInfos(ListRefsRequest<TagInfo> lrr) throws RestApiException {
         String request = projectsUrl() + tagsUrl(lrr);
         JsonElement tags = gerritRestClient.getRequest(request);
-        return tagInfoParser.parseTagInfos(tags);
+        return gerritJson.asList(tags, TagInfo.class);
     }
 
     @Override
@@ -201,17 +196,17 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
             request = request + "?recursive";
         }
         JsonElement children = gerritRestClient.getRequest(request);
-        return projectsParser.parseProjectInfosList(children);
+        return new ArrayList<>(gerritJson.asSortedMap(children, ProjectInfo.class).values());
     }
 
     @Override
     public ChildProjectApi child(String name) {
-        return new ChildProjectApiRestClient(gerritRestClient, projectsParser, projectsUrl(), name);
+        return new ChildProjectApiRestClient(gerritRestClient, gerritJson, projectsUrl(), name);
     }
 
     @Override
     public CommitApi commit(String commit) {
-        return new CommitApiRestClient(gerritRestClient, this, projectCommitInfoParser, commit);
+        return new CommitApiRestClient(gerritRestClient, gerritJson, this, commit);
     }
 
     @Override
@@ -225,7 +220,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         String request = projectsUrl() + "/HEAD";
         HeadInput input = new HeadInput();
         input.ref = head;
-        String body = gerritRestClient.getGson().toJson(input);
+        String body = gerritJson.toJson(input);
         gerritRestClient.putRequest(request, body);
     }
 
@@ -240,7 +235,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         String request = projectsUrl() + "/parent";
         ParentInput input = new ParentInput();
         input.parent = parent;
-        String body = gerritRestClient.getGson().toJson(input);
+        String body = gerritJson.toJson(input);
         gerritRestClient.putRequest(request, body);
     }
 
@@ -249,7 +244,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         String request = projectsUrl() + "/index";
         IndexProjectInput input = new IndexProjectInput();
         input.indexChildren = indexChildren;
-        String body = gerritRestClient.getGson().toJson(input);
+        String body = gerritJson.toJson(input);
         gerritRestClient.postRequest(request, body);
     }
 
@@ -261,13 +256,13 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
 
     @Override
     public LabelApi label(String labelName) throws RestApiException {
-        return new LabelApiRestClient(gerritRestClient, this, labelName);
+        return new LabelApiRestClient(gerritRestClient, gerritJson, this, labelName);
     }
 
     @Override
     public void labels(BatchLabelInput input) throws RestApiException {
         String request = projectsUrl() + "/labels";
-        String body = gerritRestClient.getGson().toJson(input);
+        String body = gerritJson.toJson(input);
         gerritRestClient.postRequest(request, body);
     }
 

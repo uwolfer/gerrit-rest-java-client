@@ -21,23 +21,24 @@ import com.google.gerrit.extensions.common.EmailInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
 
 public class EmailApiRestClient extends EmailApi.NotImplemented implements EmailApi {
 
-    private final AccountsParser accountsParser;
+    private final GerritJson gerritJson;
 
     private final GerritRestClient gerritRestClient;
     private final String name;
     private final String email;
 
     public EmailApiRestClient(GerritRestClient gerritRestClient,
-                              AccountsParser accountsParser,
+                              GerritJson gerritJson,
                               String name,
                               String email) {
         this.gerritRestClient = gerritRestClient;
-        this.accountsParser = accountsParser;
+        this.gerritJson = gerritJson;
         this.name = name;
         this.email = email;
     }
@@ -45,7 +46,7 @@ public class EmailApiRestClient extends EmailApi.NotImplemented implements Email
     @Override
     public EmailInfo get() throws RestApiException {
         JsonElement response = gerritRestClient.getRequest(getRequestPath());
-        return accountsParser.parseSingleEmailInfo(response);
+        return gerritJson.as(response, EmailInfo.class);
     }
 
     @Override

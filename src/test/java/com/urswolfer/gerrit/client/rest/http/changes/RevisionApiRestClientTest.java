@@ -21,18 +21,15 @@ import com.google.gerrit.extensions.api.changes.CherryPickInput;
 import com.google.gerrit.extensions.api.changes.ReviewInput;
 import com.google.gerrit.extensions.api.changes.SubmitInput;
 import com.google.gerrit.extensions.client.SubmitType;
-import com.google.gerrit.extensions.common.CommentInfo;
-import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gerrit.extensions.common.TestSubmitRuleInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.accounts.AccountsParser;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.*;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
-import com.urswolfer.gerrit.client.rest.http.config.parsers.ServerConfigParser;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -47,11 +44,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Thomas Forrer
  */
-public class RevisionApiRestClientTest extends AbstractParserTest {
+public class RevisionApiRestClientTest extends AbstractJsonTest {
+
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
 
     private static final String CHANGE_ID = "packages%2Ftest~master~Ieabd72e73f3da0df90fd6e8cba8f6c5dd7d120df";
     private static final String FILE_PATH = "src/main/README.md";
@@ -108,7 +108,6 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
                         testCase.reviewUrl,
                         "{\"message\":\"Looks good!\",\"labels\":{\"Code-Review\":2},\"omit_duplicate_comments\":false,\"work_in_progress\":false,\"ready\":false,\"ignore_automatic_attention_set_rules\":false}"
                 )
-                .expectGetGson()
                 .get();
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
 
@@ -134,11 +133,9 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectPost(testCase.submitUrl, "{\"wait_for_merge\":false,\"notify\":\"ALL\"}",
                     JsonParser.parseString("{}"))
-                .expectGetGson()
-                .expectGetGson()
                 .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).submit();
 
@@ -150,8 +147,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectDelete(testCase.revisionUrl)
             .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).delete();
 
@@ -163,8 +160,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost(testCase.publishUrl)
             .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).publish();
 
@@ -176,10 +173,9 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost(testCase.cherryPickUrl,
                 "{\"message\":\"Implementing Feature X\",\"destination\":\"release-branch\",\"notify\":\"ALL\",\"keep_reviewers\":false,\"allow_conflicts\":false,\"allow_empty\":false}")
-            .expectGetGson()
             .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
         CherryPickInput cherryPickInput = new CherryPickInput();
         cherryPickInput.message = "Implementing Feature X";
         cherryPickInput.destination = "release-branch";
@@ -192,10 +188,9 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     public void testRebase(RevisionApiTestCase testCase) throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost(testCase.rebaseUrl, "{\"allow_conflicts\":false,\"on_behalf_of_uploader\":false}")
-            .expectGetGson()
             .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).rebase();
 
@@ -207,11 +202,9 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectPost(testCase.submitUrl, "{\"wait_for_merge\":true,\"on_behalf_of\":\"jdoe\",\"notify\":\"ALL\"}",
                     JsonParser.parseString("{}"))
-                .expectGetGson()
-                .expectGetGson()
                 .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         SubmitInput submitInput = new SubmitInput();
         submitInput.onBehalfOf = "jdoe";
@@ -227,8 +220,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectPut(testCase.fileReviewedUrl)
                 .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).setReviewed(FILE_PATH, true);
 
@@ -237,12 +230,12 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
     @Test(dataProvider = "TestCases")
     public void testGetFiles(RevisionApiTestCase testCase) throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        JsonElement jsonElement = new JsonObject();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectGet(testCase.fileUrl, jsonElement)
                 .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).files();
 
@@ -251,12 +244,12 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
     @Test(dataProvider = "TestCases")
     public void testGetCommit(RevisionApiTestCase testCase) throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        JsonElement jsonElement = new JsonObject();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet(testCase.getCommitUrl, jsonElement)
             .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).commit(false);
 
@@ -268,8 +261,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectDelete(testCase.fileReviewedUrl)
                 .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).setReviewed(FILE_PATH, false);
 
@@ -278,88 +271,65 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
     @Test(dataProvider = "TestCases")
     public void testMergeable(RevisionApiTestCase testCase) throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        JsonElement jsonElement = new JsonObject();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet(testCase.mergeableUrl, jsonElement)
             .get();
-
-        MergeableInfoParser mergeableInfoParser = EasyMock.createMock(MergeableInfoParser.class);
-        EasyMock.expect(mergeableInfoParser.parseMergeableInfo(jsonElement)).andReturn(null).once();
-        EasyMock.replay(mergeableInfoParser);
-
-        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, mergeableInfoParser);
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).mergeable();
 
-        EasyMock.verify(gerritRestClient, mergeableInfoParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test(dataProvider = "TestCases")
     public void testGetCommentsAndDrafts(RevisionApiTestCase testCase) throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        JsonElement jsonElement = new JsonObject();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectGet(testCase.getCommentsUrl, jsonElement)
                 .expectGet(testCase.getDraftsUrl, jsonElement)
                 .get();
-
-        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
-        EasyMock.expect(commentsParser.parseCommentInfos(jsonElement)).andReturn(null).times(2);
-        EasyMock.replay(commentsParser);
-
-        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, commentsParser);
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).comments();
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).drafts();
 
-        EasyMock.verify(gerritRestClient, commentsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test(dataProvider = "TestCases")
     public void testGetComment(RevisionApiTestCase testCase) throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        JsonElement jsonElement = new JsonObject();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet(testCase.getCommentsUrl + "TvcXrmjM", jsonElement)
             .get();
-        CommentInfo commentInfo = EasyMock.createMock(CommentInfo.class);
-        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
-        EasyMock.expect(commentsParser.parseSingleCommentInfo(jsonElement)).andReturn(commentInfo).once();
-        EasyMock.replay(commentsParser);
-        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, commentsParser);
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).comment("TvcXrmjM").get();
-        EasyMock.verify(gerritRestClient, commentsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test(dataProvider = "TestCases")
     public void testGetRobotComments(RevisionApiTestCase testCase) throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        JsonElement jsonElement = new JsonObject();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet(testCase.robotCommentsUrl, jsonElement)
             .get();
-
-        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
-        EasyMock.expect(commentsParser.parseRobotCommentInfos(jsonElement)).andReturn(null).once();
-        EasyMock.replay(commentsParser);
-
-        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, commentsParser);
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).robotComments();
 
-        EasyMock.verify(gerritRestClient, commentsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test(dataProvider = "TestCases")
     public void testGetRobotComment(RevisionApiTestCase testCase) throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        JsonElement jsonElement = new JsonObject();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet(testCase.robotCommentsUrl + "TvcXrmjM", jsonElement)
             .get();
-        RobotCommentInfo robotCommentInfo = EasyMock.createMock(RobotCommentInfo.class);
-        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
-        EasyMock.expect(commentsParser.parseSingleRobotCommentInfo(jsonElement)).andReturn(robotCommentInfo).once();
-        EasyMock.replay(commentsParser);
-        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, commentsParser);
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).robotComment("TvcXrmjM").get();
-        EasyMock.verify(gerritRestClient, commentsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
@@ -380,8 +350,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BinaryResult binaryResult = changesRestClient.id(122).revision(1).patch();
@@ -401,20 +371,15 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
     @Test(dataProvider = "TestCases")
     public void testActions(RevisionApiTestCase testCase) throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        JsonElement jsonElement = new JsonObject();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet(testCase.actionsUrl, jsonElement)
             .get();
-
-        CommitInfosParser commitInfosParser = EasyMock.createMock(CommitInfosParser.class);
-        EasyMock.expect(commitInfosParser.parseActionInfos(jsonElement)).andReturn(null).once();
-        EasyMock.replay(commitInfosParser);
-
-        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient, commitInfosParser);
+        ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
 
         changesRestClient.id(CHANGE_ID).revision(testCase.revision).actions();
 
-        EasyMock.verify(gerritRestClient, commitInfosParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test(dataProvider = "TestCases")
@@ -422,7 +387,6 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("submittype.json");
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet(testCase.submitTypeUrl, jsonElement)
-            .expectGetGson()
             .get();
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
         SubmitType expectSubmitType = changesRestClient.id(CHANGE_ID).revision(testCase.revision).submitType();
@@ -436,8 +400,6 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         JsonElement jsonElement = getJsonElement("testsubmittype.json");
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost(testCase.testSubmitTypeUrl, "{\"rule\":\"submit_type(cherry_pick)\",\"filters\":\"SKIP\"}", jsonElement)
-            .expectGetGson()
-            .expectGetGson()
             .get();
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
         TestSubmitRuleInput testSubmitRuleInput = new TestSubmitRuleInput();
@@ -451,7 +413,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
 
     @Test(dataProvider = "TestCases")
     public void testDescription(RevisionApiTestCase testCase) throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
+        JsonElement jsonElement = new JsonPrimitive("a description");
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet(testCase.descriptionUrl, jsonElement)
             .get();
@@ -478,8 +440,8 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
-
         ChangesRestClient changesRestClient = getChangesRestClient(gerritRestClient);
+
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BinaryResult binaryResult = changesRestClient.id(CHANGE_ID).revision("current").submitPreview("zip");
@@ -497,64 +459,7 @@ public class RevisionApiRestClientTest extends AbstractParserTest {
     }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {
-        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
-        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
-        FileInfoParser fileInfoParser = EasyMock.createMock(FileInfoParser.class);
-        ReviewerInfosParser reviewerInfosParser = EasyMock.createMock(ReviewerInfosParser.class);
-        ReviewResultParser reviewResultParser = EasyMock.createMock(ReviewResultParser.class);
-        CommitInfosParser commitInfosParser = EasyMock.createMock(CommitInfosParser.class);
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-        MergeableInfoParser mergeableInfoParser = EasyMock.createMock(MergeableInfoParser.class);
-        ReviewInfoParser reviewInfoParser = EasyMock.createMock(ReviewInfoParser.class);
-        ServerConfigParser serverConfigParser = EasyMock.createMock(ServerConfigParser.class);
-        return new ChangesRestClient(gerritRestClient, changeInfosParser, commentsParser,
-            fileInfoParser, reviewerInfosParser, reviewResultParser,
-            commitInfosParser, accountsParser, mergeableInfoParser, reviewInfoParser, serverConfigParser);
-    }
-
-    private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommentsParser commentsParser) {
-        return new ChangesRestClient(
-                gerritRestClient,
-                EasyMock.createMock(ChangeInfosParser.class),
-                commentsParser,
-                EasyMock.createMock(FileInfoParser.class),
-                EasyMock.createMock(ReviewerInfosParser.class),
-                EasyMock.createMock(ReviewResultParser.class),
-                EasyMock.createMock(CommitInfosParser.class),
-                EasyMock.createMock(AccountsParser.class),
-                EasyMock.createMock(MergeableInfoParser.class),
-                EasyMock.createMock(ReviewInfoParser.class),
-                EasyMock.createMock(ServerConfigParser.class));
-    }
-
-    private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, MergeableInfoParser mergeableInfoParser) {
-        return new ChangesRestClient(
-            gerritRestClient,
-            EasyMock.createMock(ChangeInfosParser.class),
-            EasyMock.createMock(CommentsParser.class),
-            EasyMock.createMock(FileInfoParser.class),
-            EasyMock.createMock(ReviewerInfosParser.class),
-            EasyMock.createMock(ReviewResultParser.class),
-            EasyMock.createMock(CommitInfosParser.class),
-            EasyMock.createMock(AccountsParser.class),
-            mergeableInfoParser,
-            EasyMock.createMock(ReviewInfoParser.class),
-            EasyMock.createMock(ServerConfigParser.class));
-    }
-
-    private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient, CommitInfosParser commitInfosParser) {
-        return new ChangesRestClient(
-            gerritRestClient,
-            EasyMock.createMock(ChangeInfosParser.class),
-            EasyMock.createMock(CommentsParser.class),
-            EasyMock.createMock(FileInfoParser.class),
-            EasyMock.createMock(ReviewerInfosParser.class),
-            EasyMock.createMock(ReviewResultParser.class),
-            commitInfosParser,
-            EasyMock.createMock(AccountsParser.class),
-            EasyMock.createMock(MergeableInfoParser.class),
-            EasyMock.createMock(ReviewInfoParser.class),
-            EasyMock.createMock(ServerConfigParser.class));
+        return new ChangesRestClient(gerritRestClient, gerritJson);
     }
 
     private static RevisionApiTestCase withRevision(String revision) {

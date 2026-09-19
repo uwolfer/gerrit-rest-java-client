@@ -22,6 +22,8 @@ import com.google.gerrit.extensions.api.projects.BranchInput;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.apache.commons.codec.binary.Base64;
@@ -33,17 +35,19 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Collections;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Urs Wolfer
  */
 public class BranchApiRestClientTest {
 
-    private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
-    private static final BranchInfo MOCK_BRANCH_INFO = EasyMock.createMock(BranchInfo.class);
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
+
+    private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
     private static final String FILE_CONTENT = "some new changes";
     private static final String FILE_PATH = "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java";
 
@@ -52,10 +56,9 @@ public class BranchApiRestClientTest {
     @Test
     public void testCreateBranch() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/projects/sandbox/branches/some-feature", "{\"create_empty_commit\":false}", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/projects/sandbox/branches/some-feature", "{\"create_empty_commit\":false}", EMPTY_JSON_OBJECT)
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null, null, null);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
 
         projectsRestClient.name("sandbox").branch("some-feature").create(new BranchInput());
     }
@@ -64,18 +67,15 @@ public class BranchApiRestClientTest {
     public void testGetBranchInfoForName() throws Exception {
         String projectName = "sandbox";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/projects/sandbox/branches/master", MOCK_JSON_ELEMENT)
+            .expectGet("/projects/sandbox/branches/master",
+                JsonParser.parseString("{\"ref\":\"refs/heads/master\"}"))
             .get();
-        ProjectsParser projectsParser = new ProjectsParserBuilder().get();
-        BranchInfoParser branchInfoParser = new BranchInfoParserBuilder()
-            .expectParseBranchInfos(MOCK_JSON_ELEMENT, Collections.singletonList(MOCK_BRANCH_INFO))
-            .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, branchInfoParser, null, null);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
 
         BranchInfo branchInfo = projectsRestClient.name(projectName).branch("master").get();
 
-        EasyMock.verify(gerritRestClient, projectsParser);
-        Truth.assertThat(branchInfo).isEqualTo(MOCK_BRANCH_INFO);
+        Truth.assertThat(branchInfo.ref).isEqualTo("refs/heads/master");
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class BranchApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectDelete("/projects/sandbox/branches/some-feature")
             .get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, null, null, null, null);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
 
         projectsRestClient.name("sandbox").branch("some-feature").delete();
     }
@@ -108,7 +108,7 @@ public class BranchApiRestClientTest {
             .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
 
-        BranchApiRestClient branchApiRestClient = new BranchApiRestClient(gerritRestClient, null, projectApiRestClient, "master");
+        BranchApiRestClient branchApiRestClient = new BranchApiRestClient(gerritRestClient, gerritJson, projectApiRestClient, "master");
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BinaryResult binaryResult = branchApiRestClient.file(FILE_PATH);
         try {

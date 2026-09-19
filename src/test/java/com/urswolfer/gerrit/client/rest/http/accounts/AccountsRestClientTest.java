@@ -16,56 +16,46 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
-import com.google.gerrit.extensions.common.AccountInfo;
-import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.ChangeInfosParser;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Thomas Forrer
  */
 public class AccountsRestClientTest {
-    private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
-    private static final AccountInfo MOCK_ACCOUNT_INFO = EasyMock.createMock(AccountInfo.class);
-    private static final SshKeyInfo MOCK_SSHKEY_INFO = EasyMock.createMock(SshKeyInfo.class);
+
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
+    private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
     public void testId() throws Exception {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet("/accounts/jdoe");
-        AccountsParser accountsParser = getAccountsParser();
-        SshKeysParser sshKeysParser = getSshKeysParser();
-        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser, sshKeysParser, changeInfosParser);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, gerritJson);
         accountsRestClient.id("jdoe").get();
 
-        EasyMock.verify(gerritRestClient, accountsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testSelf() throws Exception {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet("/accounts/self");
-        AccountsParser accountsParser = getAccountsParser();
-        SshKeysParser sshKeysParser = getSshKeysParser();
-        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser, sshKeysParser, changeInfosParser);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, gerritJson);
         accountsRestClient.self().get();
 
-        EasyMock.verify(gerritRestClient, accountsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testSuggestAccount() throws Exception {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet(
                 "/accounts/?suggest&q=jdoe&n=5");
-        AccountsRestClient accountsRestClient = new AccountsRestClient(
-                gerritRestClient,
-                EasyMock.createMock(AccountsParser.class),
-                EasyMock.createMock(SshKeysParser.class),
-                EasyMock.createMock(ChangeInfosParser.class));
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, gerritJson);
 
         accountsRestClient.suggestAccounts("jdoe").withLimit(5).get();
 
@@ -76,23 +66,17 @@ public class AccountsRestClientTest {
     public void testCreate() throws Exception {
         String username = "foo";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGetGson()
-            .expectPut("/accounts/" + username, "{\"username\":\"foo\"}", MOCK_JSON_ELEMENT)
+            .expectPut("/accounts/" + username, "{\"username\":\"foo\"}", EMPTY_JSON_OBJECT)
             .get();
-        AccountsParser accountsParser = new AccountsParserBuilder()
-            .expectParseAccountInfo(MOCK_JSON_ELEMENT, MOCK_ACCOUNT_INFO)
-            .get();
-        SshKeysParser sshParser = EasyMock.createMock(SshKeysParser.class);
-        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, accountsParser, sshParser, changeInfosParser);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, gerritJson);
         accountsRestClient.create(username);
-        EasyMock.verify(gerritRestClient, accountsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     private GerritRestClient gerritRestClientExpectGet(String expectedUrl) throws Exception {
         GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
         EasyMock.expect(gerritRestClient.getRequest(expectedUrl))
-            .andReturn(MOCK_JSON_ELEMENT).once();
+            .andReturn(EMPTY_JSON_OBJECT).once();
         EasyMock.replay(gerritRestClient);
         return gerritRestClient;
     }
@@ -100,7 +84,7 @@ public class AccountsRestClientTest {
     private GerritRestClient gerritRestClientExpectPut(String expectedUrl) throws Exception {
         GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
         EasyMock.expect(gerritRestClient.putRequest(expectedUrl))
-            .andReturn(MOCK_JSON_ELEMENT).once();
+            .andReturn(EMPTY_JSON_OBJECT).once();
         EasyMock.replay(gerritRestClient);
         return gerritRestClient;
     }
@@ -108,24 +92,10 @@ public class AccountsRestClientTest {
     private GerritRestClient gerritRestClientExpectDelete(String expectedUrl) throws Exception {
         GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
         EasyMock.expect(gerritRestClient.deleteRequest(expectedUrl))
-            .andReturn(MOCK_JSON_ELEMENT).once();
+            .andReturn(EMPTY_JSON_OBJECT).once();
         EasyMock.replay(gerritRestClient);
         return gerritRestClient;
     }
 
-    private AccountsParser getAccountsParser() throws Exception {
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-        EasyMock.expect(accountsParser.parseAccountInfo(MOCK_JSON_ELEMENT))
-                .andReturn(MOCK_ACCOUNT_INFO).once();
-        EasyMock.replay(accountsParser);
-        return accountsParser;
-    }
 
-    private SshKeysParser getSshKeysParser() throws Exception {
-        SshKeysParser sshKeysParser = EasyMock.createMock(SshKeysParser.class);
-        EasyMock.expect(sshKeysParser.parseSshKeyInfo(MOCK_JSON_ELEMENT))
-            .andReturn(MOCK_SSHKEY_INFO).once();
-        EasyMock.replay(sshKeysParser);
-        return sshKeysParser;
-    }
 }
