@@ -69,12 +69,14 @@ public class GerritRestClientTest {
     private String jettyUrl;
     private String githubOAuthJettyUrl;
     private String countingLoginJettyUrl;
+    private String xsrfCookieLoginJettyUrl;
 
     @BeforeClass
     public void startJetty() throws Exception {
         jettyUrl = startJetty(LoginSimulationServlet.class);
         githubOAuthJettyUrl = startJetty(GitHubOAuthLoginSimulationServlet.class);
         countingLoginJettyUrl = startJetty(CountingLoginSimulationServlet.class);
+        xsrfCookieLoginJettyUrl = startJetty(XsrfCookieLoginSimulationServlet.class);
     }
 
     public String startJetty(Class<? extends HttpServlet> loginServletClass) throws Exception {
@@ -353,6 +355,24 @@ public class GerritRestClientTest {
         Truth.assertThat(loginCache.getGerritAuthOptional()).isPresent();
         Truth.assertThat(CountingLoginSimulationServlet.getGetCount()).isEqualTo(1);
         Truth.assertThat(CountingLoginSimulationServlet.getPostCount()).isEqualTo(0);
+    }
+
+    /**
+     * Gerrit >= 2.12 returns the XSRF token in a cookie. That cookie wins over the legacy token
+     * embedded in the start page HTML, and the login page body is not parsed for it.
+     */
+    @Test
+    public void testXsrfTokenTakenFromCookie() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClient(
+            new GerritAuthData.Basic(xsrfCookieLoginJettyUrl), new HttpRequestExecutor());
+        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
+        loginCacheField.setAccessible(true);
+        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+
+        gerritRestClient.requestRest("/changes/", null, GET);
+
+        Truth.assertThat(loginCache.getGerritAuthOptional().get())
+            .isEqualTo(XsrfCookieLoginSimulationServlet.XSRF_TOKEN);
     }
 
     /**

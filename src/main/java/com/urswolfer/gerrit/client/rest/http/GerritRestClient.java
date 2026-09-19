@@ -356,15 +356,21 @@ public class GerritRestClient implements RestClient {
     }
 
     private Optional<String> extractGerritAuth(HttpResponse loginResponse, HttpContext httpContext) throws IOException, HttpStatusException {
-        checkStatusCodeServerError(loginResponse);
-        if (!loginCache.isGitHubOAuthRequested(httpContext) && loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
-            Optional<String> xsrfCookie = getXsrfCookie();
-            if (xsrfCookie.isPresent()) {
-                return xsrfCookie;
+        try {
+            checkStatusCodeServerError(loginResponse);
+            if (!loginCache.isGitHubOAuthRequested(httpContext) && loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
+                Optional<String> xsrfCookie = getXsrfCookie();
+                if (xsrfCookie.isPresent()) {
+                    return xsrfCookie;
+                }
+                return getXsrfFromHtmlBody(loginResponse);
             }
-            return getXsrfFromHtmlBody(loginResponse);
+            return Optional.absent();
+        } finally {
+            // the connection behind a streaming response is only released once its entity has been
+            // consumed, and not every branch above reads the login page body
+            EntityUtils.consume(loginResponse.getEntity());
         }
-        return Optional.absent();
     }
 
     private boolean isSessionValid(HttpClientBuilder client, HttpContext httpContext) throws IOException {
