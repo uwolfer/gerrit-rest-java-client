@@ -27,6 +27,7 @@ import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.common.FileInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
+import com.urswolfer.gerrit.client.rest.GerritRestApi;
 import com.urswolfer.gerrit.client.rest.http.common.FakeGerritServer;
 import org.apache.commons.codec.binary.Base64;
 import org.testng.annotations.Test;
@@ -48,6 +49,15 @@ public class ChangesContractTest {
 
     private static final String CHANGE_ID = "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940";
     private static final String CHANGE_PATH = "/changes/" + CHANGE_ID;
+    private static final String OTHER_CHANGE_ID = "myProject~master~I0000000000000000000000000000000000000000";
+    private static final String OTHER_CHANGE_PATH = "/changes/" + OTHER_CHANGE_ID;
+
+    /** Everything Gerrit 2.10 understands, minus {@code CHECK}. */
+    private static final String OPTIONS_FOR_2_10 =
+        "o=LABELS&o=DETAILED_LABELS&o=CURRENT_REVISION&o=ALL_REVISIONS"
+            + "&o=CURRENT_COMMIT&o=ALL_COMMITS&o=CURRENT_FILES&o=ALL_FILES&o=DETAILED_ACCOUNTS"
+            + "&o=MESSAGES&o=CURRENT_ACTIONS&o=REVIEWED&o=DRAFT_COMMENTS&o=DOWNLOAD_COMMANDS"
+            + "&o=WEB_LINKS";
 
     @Test
     public void query() throws Exception {
@@ -97,15 +107,11 @@ public class ChangesContractTest {
     /**
      * {@code get()} asks the server for its version first, so it can limit the requested
      * {@link ListChangesOption}s to the ones that version understands - here everything up to
-     * {@code WEB_LINKS}, which is what Gerrit 2.10 supports, minus {@code CHECK}. The version is
-     * currently cached per {@code ChangeApi} instance, so every change costs an extra round trip.
+     * {@code WEB_LINKS}, which is what Gerrit 2.10 supports, minus {@code CHECK}.
      */
     @Test
     public void getFetchesServerVersionFirst() throws Exception {
-        String options = "o=LABELS&o=DETAILED_LABELS&o=CURRENT_REVISION&o=ALL_REVISIONS"
-            + "&o=CURRENT_COMMIT&o=ALL_COMMITS&o=CURRENT_FILES&o=ALL_FILES&o=DETAILED_ACCOUNTS"
-            + "&o=MESSAGES&o=CURRENT_ACTIONS&o=REVIEWED&o=DRAFT_COMMENTS&o=DOWNLOAD_COMMANDS"
-            + "&o=WEB_LINKS";
+        String options = OPTIONS_FOR_2_10;
         FakeGerritServer server = new FakeGerritServer()
             .stubJson("GET", "/config/server/version", "\"2.10.1\"")
             .stub("GET", CHANGE_PATH + '?' + options, "changes/parsers/change.json");
@@ -115,6 +121,28 @@ public class ChangesContractTest {
         Truth.assertThat(server.trace()).containsExactly(
             "GET /config/server/version",
             "GET " + CHANGE_PATH + '?' + options).inOrder();
+        server.verify();
+    }
+
+    /**
+     * The version is read once for the whole API instance. It used to be cached per
+     * {@code ChangeApi}, so each change cost its own {@code /config/server/version} request.
+     */
+    @Test
+    public void getReadsTheServerVersionOncePerApiInstance() throws Exception {
+        FakeGerritServer server = new FakeGerritServer()
+            .stubJson("GET", "/config/server/version", "\"2.10.1\"")
+            .stub("GET", CHANGE_PATH + '?' + OPTIONS_FOR_2_10, "changes/parsers/change.json")
+            .stub("GET", OTHER_CHANGE_PATH + '?' + OPTIONS_FOR_2_10, "changes/parsers/change.json");
+        GerritRestApi api = server.api();
+
+        api.changes().id(CHANGE_ID).get();
+        api.changes().id(OTHER_CHANGE_ID).get();
+
+        Truth.assertThat(server.trace()).containsExactly(
+            "GET /config/server/version",
+            "GET " + CHANGE_PATH + '?' + OPTIONS_FOR_2_10,
+            "GET " + OTHER_CHANGE_PATH + '?' + OPTIONS_FOR_2_10).inOrder();
         server.verify();
     }
 

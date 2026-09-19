@@ -27,6 +27,7 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
 
@@ -45,11 +46,10 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
 
     private final GerritJson gerritJson;
 
-    public ChangeEditApiRestClient(GerritRestClient gerritRestClient,
-                                   GerritJson gerritJson,
+    public ChangeEditApiRestClient(GerritRestContext context,
                                    String id) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.id = id;
     }
 

@@ -16,27 +16,25 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Thomas Forrer
  */
 public class AccountsRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
     private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
     public void testId() throws Exception {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet("/accounts/jdoe");
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, gerritJson);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(restContext(gerritRestClient));
         accountsRestClient.id("jdoe").get();
 
         EasyMock.verify(gerritRestClient);
@@ -45,7 +43,7 @@ public class AccountsRestClientTest {
     @Test
     public void testSelf() throws Exception {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet("/accounts/self");
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, gerritJson);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(restContext(gerritRestClient));
         accountsRestClient.self().get();
 
         EasyMock.verify(gerritRestClient);
@@ -55,7 +53,7 @@ public class AccountsRestClientTest {
     public void testSuggestAccount() throws Exception {
         GerritRestClient gerritRestClient = gerritRestClientExpectGet(
                 "/accounts/?suggest&q=jdoe&n=5");
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, gerritJson);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(restContext(gerritRestClient));
 
         accountsRestClient.suggestAccounts("jdoe").withLimit(5).get();
 
@@ -68,7 +66,7 @@ public class AccountsRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/accounts/" + username, "{\"username\":\"foo\"}", EMPTY_JSON_OBJECT)
             .get();
-        AccountsRestClient accountsRestClient = new AccountsRestClient(gerritRestClient, gerritJson);
+        AccountsRestClient accountsRestClient = new AccountsRestClient(restContext(gerritRestClient));
         accountsRestClient.create(username);
         EasyMock.verify(gerritRestClient);
     }

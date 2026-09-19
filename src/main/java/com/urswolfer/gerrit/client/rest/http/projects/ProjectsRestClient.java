@@ -26,6 +26,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.SortedMap;
@@ -36,13 +37,14 @@ import java.util.TreeMap;
  */
 public class ProjectsRestClient extends Projects.NotImplemented implements Projects {
 
+    private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
     private final GerritJson gerritJson;
 
-    public ProjectsRestClient(GerritRestClient gerritRestClient,
-                              GerritJson gerritJson) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+    public ProjectsRestClient(GerritRestContext context) {
+        this.context = context;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
     }
 
     @Override
@@ -57,7 +59,7 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
 
     @Override
     public ProjectApi name(String name) throws RestApiException {
-        return new ProjectApiRestClient(gerritRestClient, gerritJson, name);
+        return new ProjectApiRestClient(context, name);
     }
 
     private SortedMap<String, ProjectInfo> list(ListRequest listParameter) throws RestApiException {
@@ -115,6 +117,6 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
         String projectInput = gerritJson.toJson(in, ProjectInput.class);
         JsonElement result = gerritRestClient.putRequest(url, projectInput);
         ProjectInfo info = gerritJson.as(result, ProjectInfo.class);
-        return new ProjectApiRestClient(gerritRestClient, gerritJson, info.name);
+        return new ProjectApiRestClient(context, info.name);
     }
 }

@@ -45,6 +45,7 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.ArrayList;
@@ -56,15 +57,16 @@ import java.util.List;
 public class ProjectApiRestClient extends ProjectApi.NotImplemented implements ProjectApi {
 
 
+    private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
     private final GerritJson gerritJson;
     private final String name;
 
-    public ProjectApiRestClient(GerritRestClient gerritRestClient,
-                                GerritJson gerritJson,
+    public ProjectApiRestClient(GerritRestContext context,
                                 String name) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.context = context;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.name = name;
     }
 
@@ -154,7 +156,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
 
     @Override
     public BranchApi branch(String ref) throws RestApiException {
-        return new BranchApiRestClient(gerritRestClient, gerritJson, this, ref);
+        return new BranchApiRestClient(context, this, ref);
     }
 
     private List<BranchInfo> getBranches(ListRefsRequest<BranchInfo> lbr) throws RestApiException {
@@ -175,7 +177,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
 
     @Override
     public TagApi tag(String ref) throws RestApiException {
-        return new TagApiRestClient(gerritRestClient, gerritJson, this, ref);
+        return new TagApiRestClient(context, this, ref);
     }
 
     private List<TagInfo> getTagInfos(ListRefsRequest<TagInfo> lrr) throws RestApiException {
@@ -201,12 +203,12 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
 
     @Override
     public ChildProjectApi child(String name) {
-        return new ChildProjectApiRestClient(gerritRestClient, gerritJson, projectsUrl(), name);
+        return new ChildProjectApiRestClient(context, projectsUrl(), name);
     }
 
     @Override
     public CommitApi commit(String commit) {
-        return new CommitApiRestClient(gerritRestClient, gerritJson, this, commit);
+        return new CommitApiRestClient(context, this, commit);
     }
 
     @Override
@@ -256,7 +258,7 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
 
     @Override
     public LabelApi label(String labelName) throws RestApiException {
-        return new LabelApiRestClient(gerritRestClient, gerritJson, this, labelName);
+        return new LabelApiRestClient(context, this, labelName);
     }
 
     @Override

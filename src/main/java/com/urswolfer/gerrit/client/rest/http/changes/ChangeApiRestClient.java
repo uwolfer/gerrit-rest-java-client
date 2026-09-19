@@ -26,7 +26,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.config.ServerRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
 import java.util.*;
@@ -36,21 +36,20 @@ import java.util.*;
  */
 public class ChangeApiRestClient extends ChangeApi.NotImplemented implements ChangeApi {
 
+    private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
     private final ChangesRestClient changesRestClient;
     private final GerritJson gerritJson;
     private final String id;
-    private final ServerRestClient serverRestClient;
 
-    public ChangeApiRestClient(GerritRestClient gerritRestClient,
-                               GerritJson gerritJson,
+    public ChangeApiRestClient(GerritRestContext context,
                                ChangesRestClient changesRestClient,
                                String id) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.context = context;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.changesRestClient = changesRestClient;
         this.id = id;
-        this.serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public RevisionApi revision(String id) throws RestApiException {
-        return new RevisionApiRestClient(gerritRestClient, gerritJson, this, id);
+        return new RevisionApiRestClient(context, this, id);
     }
 
     @Override
@@ -122,7 +121,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         String json = gerritJson.toJson(revertInput);
         ChangeInfo newChangeInfo =
             gerritJson.as(gerritRestClient.postRequest(request, json), ChangeInfo.class);
-        return new ChangeApiRestClient(gerritRestClient, gerritJson, changesRestClient, newChangeInfo.id);
+        return new ChangeApiRestClient(context, changesRestClient, newChangeInfo.id);
     }
 
     @Override
@@ -252,7 +251,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public ChangeInfo get() throws RestApiException {
-        return get(ListChangesOptionByVersion.allSupported(serverRestClient.getVersionCached()));
+        return get(ListChangesOptionByVersion.allSupported(context.serverVersion()));
     }
 
     @Override
@@ -269,7 +268,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public ChangeEditApi edit() throws RestApiException {
-        return new ChangeEditApiRestClient(gerritRestClient, gerritJson, id);
+        return new ChangeEditApiRestClient(context, id);
     }
 
     @Override

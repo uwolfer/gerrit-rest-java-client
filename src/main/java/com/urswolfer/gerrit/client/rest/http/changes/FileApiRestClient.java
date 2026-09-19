@@ -26,6 +26,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
@@ -41,6 +42,7 @@ import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
  */
 public class FileApiRestClient extends FileApi.NotImplemented {
 
+    private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
     private final RevisionApiRestClient revisionApiRestClient;
     private final GerritJson gerritJson;
@@ -54,12 +56,12 @@ public class FileApiRestClient extends FileApi.NotImplemented {
         }
     });
 
-    public FileApiRestClient(GerritRestClient gerritRestClient,
-                             GerritJson gerritJson,
+    public FileApiRestClient(GerritRestContext context,
                              RevisionApiRestClient revisionApiRestClient,
                              String path) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.context = context;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.revisionApiRestClient = revisionApiRestClient;
         this.path = path;
     }

@@ -27,9 +27,9 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.HttpStatusException;
 
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 
@@ -37,22 +37,21 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
  * @author Urs Wolfer
  */
 public class ServerRestClient extends Server.NotImplemented implements Server {
+    private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
-    private final AtomicReference<String> version = new AtomicReference<>();
     private final GerritJson gerritJson;
 
-    public ServerRestClient(GerritRestClient gerritRestClient,
-                            GerritJson gerritJson) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+    public ServerRestClient(GerritRestContext context) {
+        this.context = context;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
     }
 
     @Override
     public String getVersion() throws RestApiException {
         try {
             JsonElement jsonElement = gerritRestClient.getRequest("/config/server/version");
-            version.set(jsonElement.getAsString());
-            return version.get();
+            return jsonElement.getAsString();
         } catch (HttpStatusException e) {
             int statusCode = e.getStatusCode();
             if (statusCode == SC_NOT_FOUND) { // Gerrit older than 2.8
@@ -115,8 +114,10 @@ public class ServerRestClient extends Server.NotImplemented implements Server {
         return gerritJson.as(result, ConsistencyCheckInfo.class);
     }
 
+    /**
+     * The version, read once per API instance rather than once per client.
+     */
     public String getVersionCached() throws RestApiException {
-        String gerritVersion = version.get();
-        return gerritVersion == null ? getVersion() : gerritVersion;
+        return context.serverVersion();
     }
 }

@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gson.JsonParser;
@@ -23,13 +25,8 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.junit.Test;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class RobotCommentApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     private static final String COMMENT_ID = "TvcXrmjM";
     private static final String REVISION_ID = "ec047590bc7fb8db7ae03ebac336488bfc1c5e12";
 
@@ -45,7 +42,7 @@ public class RobotCommentApiRestClientTest {
             "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revisions/" + REVISION_ID);
         EasyMock.replay(revisionApiRestClient);
 
-        RobotCommentApiRestClient robotCommentApiRestClient = new RobotCommentApiRestClient(gerritRestClient, gerritJson, revisionApiRestClient, COMMENT_ID);
+        RobotCommentApiRestClient robotCommentApiRestClient = new RobotCommentApiRestClient(restContext(gerritRestClient), revisionApiRestClient, COMMENT_ID);
 
         RobotCommentInfo result = robotCommentApiRestClient.get();
 

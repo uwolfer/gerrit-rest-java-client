@@ -24,6 +24,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 
 public class CommitApiRestClient extends CommitApi.NotImplemented implements CommitApi {
@@ -34,12 +35,11 @@ public class CommitApiRestClient extends CommitApi.NotImplemented implements Com
 
     private final String commit;
 
-    public CommitApiRestClient(GerritRestClient gerritRestClient,
-                               GerritJson gerritJson,
+    public CommitApiRestClient(GerritRestContext context,
                                ProjectApiRestClient projectApiRestClient,
                                String commit) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.projectApiRestClient = projectApiRestClient;
         this.commit = commit;
     }

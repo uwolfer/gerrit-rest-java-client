@@ -20,6 +20,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 
 import java.io.File;
@@ -44,6 +46,13 @@ public abstract class AbstractJsonTest {
      */
     public static GerritJson getGerritJson() {
         return new GerritJson(getGson());
+    }
+
+    /**
+     * The context a REST client is built from, around the given (usually mocked) rest client.
+     */
+    public static GerritRestContext restContext(GerritRestClient gerritRestClient) {
+        return new GerritRestContext(gerritRestClient, getGerritJson());
     }
 
     protected File getFile(String resourceName) throws Exception {

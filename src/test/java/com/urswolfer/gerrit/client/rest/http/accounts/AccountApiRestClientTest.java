@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.accounts;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.accounts.DeleteDraftCommentsInput;
 import com.google.gerrit.extensions.api.accounts.DisplayNameInput;
@@ -53,16 +55,11 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Urs Wolfer
  */
 public class AccountApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
@@ -608,10 +605,10 @@ public class AccountApiRestClientTest {
     }
 
     private AccountsRestClient getAccountsRestClient(GerritRestClient gerritRestClient) {
-        return new AccountsRestClient(gerritRestClient, gerritJson);
+        return new AccountsRestClient(restContext(gerritRestClient));
     }
 
     private AccountApiRestClient getAccountApiRestClient(GerritRestClient gerritRestClient, String name) {
-        return new AccountApiRestClient(gerritRestClient, gerritJson, name);
+        return new AccountApiRestClient(restContext(gerritRestClient), name);
     }
 }

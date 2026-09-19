@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.gerrit.extensions.common.LabelDefinitionInput;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,16 +29,11 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Réda Housni Alaoui
  */
 public class LabelApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     public static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
@@ -84,6 +81,6 @@ public class LabelApiRestClientTest {
     }
 
     private ProjectApiRestClient createProjectApiRestClient(GerritRestClient gerritRestClient, String projectName) {
-        return new ProjectApiRestClient(gerritRestClient, gerritJson, projectName);
+        return new ProjectApiRestClient(restContext(gerritRestClient), projectName);
     }
 }

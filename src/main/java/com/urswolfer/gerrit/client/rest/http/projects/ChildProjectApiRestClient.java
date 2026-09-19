@@ -23,6 +23,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 public class ChildProjectApiRestClient extends ChildProjectApi.NotImplemented implements ChildProjectApi {
 
@@ -32,12 +33,11 @@ public class ChildProjectApiRestClient extends ChildProjectApi.NotImplemented im
     private final String name;
     private final String parentUrl;
 
-    public ChildProjectApiRestClient(GerritRestClient gerritRestClient,
-                                     GerritJson gerritJson,
+    public ChildProjectApiRestClient(GerritRestContext context,
                                      String parentUrl,
                                      String name) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.parentUrl = parentUrl;
         this.name = name;
     }

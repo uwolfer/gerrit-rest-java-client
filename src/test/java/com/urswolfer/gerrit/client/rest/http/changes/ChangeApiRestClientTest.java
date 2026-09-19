@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.client.ListChangesOption;
@@ -32,15 +34,11 @@ import org.testng.annotations.Test;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Thomas Forrer
  */
 public class ChangeApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
     @Test
     public void testListReviewers() throws Exception {
         JsonElement jsonElement = JsonParser.parseString("[{\"name\":\"John Doe\"}]");
@@ -49,7 +47,7 @@ public class ChangeApiRestClientTest {
             .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<ReviewerInfo> listReviewers = changeApiRestClient.listReviewers();
 
@@ -243,7 +241,7 @@ public class ChangeApiRestClientTest {
                 "{\"notify\":\"ALL\"}", revertingChangeJsonElement)
             .get();
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, gerritJson);
+        ChangesRestClient changesRestClient = new ChangesRestClient(restContext(gerritRestClient));
 
         String revertingChangeId = changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").revert().id();
 
@@ -258,7 +256,7 @@ public class ChangeApiRestClientTest {
             .expectPost("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revert", "{\"message\":\"Change need revert.\",\"notify\":\"ALL\"}", revertingChangeJsonElement)
             .get();
 
-        ChangesRestClient changesRestClient = new ChangesRestClient(gerritRestClient, gerritJson);
+        ChangesRestClient changesRestClient = new ChangesRestClient(restContext(gerritRestClient));
         RevertInput revertInput = new RevertInput();
         revertInput.message = "Change need revert.";
         changesRestClient.id("myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940").revert(revertInput);
@@ -299,7 +297,7 @@ public class ChangeApiRestClientTest {
                 .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/suggest_reviewers?q=J&n=-1", jsonElement)
                 .get();
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J").get();
 
@@ -315,7 +313,7 @@ public class ChangeApiRestClientTest {
                 .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/suggest_reviewers?q=J&n=5", jsonElement)
                 .get();
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<SuggestedReviewerInfo> suggestedReviewerInfos = changeApiRestClient.suggestReviewers("J").withLimit(5).get();
 
@@ -333,7 +331,7 @@ public class ChangeApiRestClientTest {
 
         ChangeInfo expectedChangeInfo = new ChangeInfo();
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         ChangeInfo changeInfo = changeApiRestClient.check();
 
@@ -349,7 +347,7 @@ public class ChangeApiRestClientTest {
             .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         IncludedInInfo includedInInfo = changeApiRestClient.includedIn();
 
@@ -372,7 +370,7 @@ public class ChangeApiRestClientTest {
 
         ChangeInfo expectedChangeInfo = new ChangeInfo();
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         ChangeInfo changeInfo = changeApiRestClient.check(fixInput);
 
@@ -388,7 +386,7 @@ public class ChangeApiRestClientTest {
                 .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         Map<String, List<CommentInfo>> commentInfos = changeApiRestClient.comments();
 
@@ -405,7 +403,7 @@ public class ChangeApiRestClientTest {
             .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         Map<String, List<RobotCommentInfo>> robotCommentInfos = changeApiRestClient.robotComments();
 
@@ -422,7 +420,7 @@ public class ChangeApiRestClientTest {
             .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         Map<String, List<CommentInfo>> draftInfos = changeApiRestClient.drafts();
 
@@ -439,7 +437,7 @@ public class ChangeApiRestClientTest {
             .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<ChangeMessageInfo> messageInfos = changeApiRestClient.messages();
 
@@ -456,7 +454,7 @@ public class ChangeApiRestClientTest {
             .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         Set<String> hashtags = changeApiRestClient.getHashtags();
 
@@ -473,7 +471,7 @@ public class ChangeApiRestClientTest {
             .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         EditInfo editInfo = changeApiRestClient.getEdit();
 
@@ -515,7 +513,7 @@ public class ChangeApiRestClientTest {
             .expectPut("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/assignee",
                 "{\"assignee\":\"foo\"}",jsonElement)
             .get();
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         AssigneeInput assigneeInput = new AssigneeInput();
         assigneeInput.assignee = "foo";
         AccountInfo assigneeInfo =
@@ -532,7 +530,7 @@ public class ChangeApiRestClientTest {
             .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         AccountInfo assigneeInfo = changeApiRestClient.getAssignee();
 
@@ -548,7 +546,7 @@ public class ChangeApiRestClientTest {
             .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<AccountInfo> pastAssigneesInfo = changeApiRestClient.getPastAssignees();
 
@@ -563,7 +561,7 @@ public class ChangeApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectDelete("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/assignee",jsonElement)
             .get();
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         AssigneeInput assigneeInput = new AssigneeInput();
         assigneeInput.assignee = "foo";
         AccountInfo assigneeInfo =
@@ -580,7 +578,7 @@ public class ChangeApiRestClientTest {
             .get();
         ChangeInfo expectedChangeInfo = EasyMock.createMock(ChangeInfo.class);
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         EnumSet<ListChangesOption> options = EnumSet.of(ListChangesOption.LABELS, ListChangesOption.DETAILED_LABELS);
         ChangeInfo result = changeApiRestClient.get(options);
 
@@ -618,7 +616,7 @@ public class ChangeApiRestClientTest {
             .get();
         ChangeInfo expectedChangeInfo = EasyMock.createMock(ChangeInfo.class);
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, expectedChangeId);
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, expectedChangeId);
         ChangeInfo result = changeApiRestClient.get();
 
         Truth.assertThat(result.id).isEqualTo("foo");
@@ -644,7 +642,7 @@ public class ChangeApiRestClientTest {
             .get();
         ChangeInfo expectedChangeInfo = EasyMock.createMock(ChangeInfo.class);
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, expectedChangeId);
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, expectedChangeId);
         ChangeInfo result = changeApiRestClient.get();
 
         Truth.assertThat(result.id).isEqualTo("foo");
@@ -659,7 +657,7 @@ public class ChangeApiRestClientTest {
             .get();
         ChangeInfo expectedChangeInfo = EasyMock.createMock(ChangeInfo.class);
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         ChangeInfo result = changeApiRestClient.info();
 
         Truth.assertThat(result.id).isEqualTo("foo");
@@ -687,7 +685,7 @@ public class ChangeApiRestClientTest {
             .get();
 
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         List<ChangeInfo> changeInfos = changeApiRestClient.submittedTogether();
 
@@ -702,7 +700,7 @@ public class ChangeApiRestClientTest {
             .expectPut("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/ignore")
             .get();
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         changeApiRestClient.ignore(true);
 
@@ -715,7 +713,7 @@ public class ChangeApiRestClientTest {
             .expectPut("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/unignore")
             .get();
 
-        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(gerritRestClient, gerritJson, null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
+        ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         changeApiRestClient.ignore(false);
 
@@ -750,7 +748,7 @@ public class ChangeApiRestClientTest {
                 .expectPost(request, json, response)
                 .get();
 
-        ChangeApiRestClient changeApi = new ChangeApiRestClient(gerritRestClient, gerritJson, null, expectedChangeInfo.id);
+        ChangeApiRestClient changeApi = new ChangeApiRestClient(restContext(gerritRestClient), null, expectedChangeInfo.id);
         MergePatchSetInput input = new MergePatchSetInput();
         input.subject = "Refresh feature merge";
         input.inheritParent = false;
@@ -777,6 +775,6 @@ public class ChangeApiRestClientTest {
   }
 
     private ChangesRestClient getChangesRestClient(GerritRestClient gerritRestClient) {
-        return new ChangesRestClient(gerritRestClient, gerritJson);
+        return new ChangesRestClient(restContext(gerritRestClient));
     }
 }

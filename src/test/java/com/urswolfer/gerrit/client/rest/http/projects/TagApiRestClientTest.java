@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.TagInfo;
 import com.google.gerrit.extensions.api.projects.TagInput;
@@ -28,16 +30,11 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Pavel Bely
  */
 public class TagApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     public static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
     public static final TagInfo MOCK_TAG_INFO = EasyMock.createMock(TagInfo.class);
 
@@ -47,7 +44,7 @@ public class TagApiRestClientTest {
             .expectPut("/projects/sandbox/tags/some-tag", "{}", EMPTY_JSON_OBJECT)
             .get();
         ProjectsRestClient projectsRestClient =
-            new ProjectsRestClient(gerritRestClient, gerritJson);
+            new ProjectsRestClient(restContext(gerritRestClient));
 
         projectsRestClient.name("sandbox").tag("some-tag").create(new TagInput());
     }
@@ -59,7 +56,7 @@ public class TagApiRestClientTest {
             .expectGet("/projects/sandbox/tags?n=3&s=1",
                 JsonParser.parseString("[{\"ref\":\"a\"},{\"ref\":\"b\"},{\"ref\":\"c\"}]"))
             .get();
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, gerritJson, projectName);
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(restContext(gerritRestClient), projectName);
 
         List<TagInfo> tags = projectApiRestClient.tags()
             .withLimit(3)
@@ -76,7 +73,7 @@ public class TagApiRestClientTest {
                 JsonParser.parseString("{\"ref\":\"refs/tags/v0.0.1\"}"))
             .get();
 
-        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(gerritRestClient, gerritJson, projectName);
+        ProjectApiRestClient projectApiRestClient = new ProjectApiRestClient(restContext(gerritRestClient), projectName);
 
         TagInfo tag = projectApiRestClient.tag("v0.0.1")
             .get();
@@ -91,7 +88,7 @@ public class TagApiRestClientTest {
             .expectDelete("/projects/sandbox/tags/some-tag")
             .get();
         ProjectsRestClient projectsRestClient =
-            new ProjectsRestClient(gerritRestClient, gerritJson);
+            new ProjectsRestClient(restContext(gerritRestClient));
 
         projectsRestClient.name("sandbox").tag("some-tag").delete();
     }

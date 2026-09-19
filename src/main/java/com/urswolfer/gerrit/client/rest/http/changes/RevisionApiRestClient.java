@@ -27,6 +27,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
 
@@ -43,17 +44,18 @@ import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
  */
 public class RevisionApiRestClient extends RevisionApi.NotImplemented implements RevisionApi {
 
+    private final GerritRestContext context;
     private final GerritRestClient gerritRestClient;
     private final ChangeApiRestClient changeApiRestClient;
     private final GerritJson gerritJson;
     private final String revision;
 
-    public RevisionApiRestClient(GerritRestClient gerritRestClient,
-                                 GerritJson gerritJson,
+    public RevisionApiRestClient(GerritRestContext context,
                                  ChangeApiRestClient changeApiRestClient,
                                  String revision) {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.context = context;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.changeApiRestClient = changeApiRestClient;
         this.revision = revision;
     }
@@ -173,22 +175,22 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         String json = gerritJson.toJson(in);
         JsonElement jsonElement = gerritRestClient.putRequest(request, json);
         CommentInfo commentInfo = gerritJson.as(jsonElement.getAsJsonObject(), CommentInfo.class);
-        return new DraftApiRestClient(gerritRestClient, gerritJson, changeApiRestClient, this, commentInfo);
+        return new DraftApiRestClient(context, changeApiRestClient, this, commentInfo);
     }
 
     @Override
     public DraftApi draft(String id) throws RestApiException {
-        return new DraftApiRestClient(gerritRestClient, gerritJson, changeApiRestClient, this, id);
+        return new DraftApiRestClient(context, changeApiRestClient, this, id);
     }
 
     @Override
     public CommentApi comment(String id) throws RestApiException {
-        return new CommentApiRestClient(gerritRestClient, gerritJson, this, id);
+        return new CommentApiRestClient(context, this, id);
     }
 
     @Override
     public RobotCommentApi robotComment(String id) throws RestApiException {
-        return new RobotCommentApiRestClient(gerritRestClient, gerritJson, this, id);
+        return new RobotCommentApiRestClient(context, this, id);
     }
 
 
@@ -209,7 +211,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
     @Override
     public FileApi file(String path) {
-        return new FileApiRestClient(gerritRestClient, gerritJson, this, path);
+        return new FileApiRestClient(context, this, path);
     }
 
     @Override

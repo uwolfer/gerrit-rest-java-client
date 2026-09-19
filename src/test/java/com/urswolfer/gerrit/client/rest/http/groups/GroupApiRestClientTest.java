@@ -16,6 +16,8 @@
 
 package com.urswolfer.gerrit.client.rest.http.groups;
 
+import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.restContext;
+
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.GroupInfo;
@@ -29,16 +31,11 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Shawn Stafford
  */
 public class GroupApiRestClientTest {
-
-    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
-
     private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
@@ -46,7 +43,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/groups/foo", JsonParser.parseString("{\"id\":\"g1\"}"))
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), "foo");
 
         GroupInfo groupInfo = groupApiRestClient.get();
 
@@ -59,7 +56,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/groups/foo/detail", JsonParser.parseString("{\"id\":\"g1\"}"))
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), "foo");
 
         GroupInfo groupInfo = groupApiRestClient.detail();
 
@@ -72,7 +69,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/groups/foo/owner", JsonParser.parseString("{\"id\":\"g1\"}"))
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), "foo");
 
         GroupInfo groupInfo = groupApiRestClient.owner();
 
@@ -86,7 +83,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/groups/foo/owner", owner, EMPTY_JSON_OBJECT)
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), "foo");
 
         groupApiRestClient.owner(owner);
 
@@ -100,7 +97,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/groups/foo/name", jsonObject)
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, groupName);
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), groupName);
 
         String name = groupApiRestClient.name();
 
@@ -116,7 +113,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/groups/foo/name", newGroupName, jsonObject)
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, groupName);
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), groupName);
 
         groupApiRestClient.name(newGroupName);
 
@@ -130,7 +127,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/groups/foo/description", jsonObject)
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, groupName);
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), groupName);
 
         String description = groupApiRestClient.description();
 
@@ -146,7 +143,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/groups/foo/description", description, jsonObject)
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, groupName);
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), groupName);
 
         groupApiRestClient.description(description);
 
@@ -159,7 +156,7 @@ public class GroupApiRestClientTest {
             .expectGet("/groups/foo/members", JsonParser.parseString("[{\"name\":\"John Doe\"}]"))
             .expectGet("/groups/foo/members?recursive", JsonParser.parseString("[{\"name\":\"Jane Roe\"}]"))
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), "foo");
 
         List<AccountInfo> members = groupApiRestClient.members();
         List<AccountInfo> membersRecursive = groupApiRestClient.members(true);
@@ -176,7 +173,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/groups/foo/groups/", JsonParser.parseString("[{\"id\":\"g1\"}]"))
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), "foo");
 
         List<GroupInfo> groupInfos = groupApiRestClient.includedGroups();
 
@@ -190,7 +187,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/groups/foo/members", "{\"members\":[\"joe\",\"peter\"]}")
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), "foo");
 
         groupApiRestClient.addMembers("joe", "peter");
 
@@ -202,7 +199,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/groups/foo/groups", "{\"groups\":[\"g1\",\"g2\"]}")
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), "foo");
 
         groupApiRestClient.addGroups("g1", "g2");
 
@@ -214,7 +211,7 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/groups/foo/groups.delete", "{\"groups\":[\"g1\",\"g2\"]}")
             .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), "foo");
 
         groupApiRestClient.removeGroups("g1", "g2");
 
@@ -225,7 +222,7 @@ public class GroupApiRestClientTest {
     public void testRemoveMembers() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/groups/foo/members.delete", "{\"members\":[\"joe\",\"peter\"]}").get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(restContext(gerritRestClient), "foo");
         groupApiRestClient.removeMembers("joe", "peter");
         EasyMock.verify(gerritRestClient);
     }

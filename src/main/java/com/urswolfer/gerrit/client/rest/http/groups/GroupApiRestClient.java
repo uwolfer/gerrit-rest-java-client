@@ -24,6 +24,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
+import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,12 +45,11 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
     private final GerritRestClient gerritRestClient;
     private final String groupId;
 
-    public GroupApiRestClient(GerritRestClient gerritRestClient,
-                              GerritJson gerritJson,
+    public GroupApiRestClient(GerritRestContext context,
                               String id)
     {
-        this.gerritRestClient = gerritRestClient;
-        this.gerritJson = gerritJson;
+        this.gerritRestClient = context.restClient();
+        this.gerritJson = context.json();
         this.groupId = id;
     }
 
