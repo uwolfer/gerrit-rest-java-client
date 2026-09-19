@@ -302,8 +302,12 @@ public class GerritRestClient implements RestClient {
     }
 
     private Optional<String> updateGerritAuth(HttpContext httpContext, HttpClientBuilder client) throws IOException, HttpStatusException {
-        Optional<String> gerritAuthOptional = tryGerritHttpAuth(client, httpContext)
-            .or(tryGerritHttpFormAuth(client, httpContext));
+        Optional<String> gerritAuthOptional = tryGerritHttpAuth(client, httpContext);
+        if (!gerritAuthOptional.isPresent()) {
+            // only fall back to the form login - which posts the credentials in the request body and
+            // starts another session - when the plain GET did not already authenticate us
+            gerritAuthOptional = tryGerritHttpFormAuth(client, httpContext);
+        }
         loginCache.setGerritAuthOptional(gerritAuthOptional);
         return gerritAuthOptional;
     }
@@ -352,11 +356,21 @@ public class GerritRestClient implements RestClient {
     }
 
     private Optional<String> extractGerritAuth(HttpResponse loginResponse, HttpContext httpContext) throws IOException, HttpStatusException {
-        checkStatusCodeServerError(loginResponse);
-        if (!loginCache.isGitHubOAuthRequested(httpContext) && loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
-            return getXsrfCookie().or(getXsrfFromHtmlBody(loginResponse));
+        try {
+            checkStatusCodeServerError(loginResponse);
+            if (!loginCache.isGitHubOAuthRequested(httpContext) && loginResponse.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
+                Optional<String> xsrfCookie = getXsrfCookie();
+                if (xsrfCookie.isPresent()) {
+                    return xsrfCookie;
+                }
+                return getXsrfFromHtmlBody(loginResponse);
+            }
+            return Optional.absent();
+        } finally {
+            // the connection behind a streaming response is only released once its entity has been
+            // consumed, and not every branch above reads the login page body
+            EntityUtils.consume(loginResponse.getEntity());
         }
-        return Optional.absent();
     }
 
     private boolean isSessionValid(HttpClientBuilder client, HttpContext httpContext) throws IOException {
