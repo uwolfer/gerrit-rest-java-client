@@ -19,21 +19,22 @@ package com.urswolfer.gerrit.client.rest.http.accounts;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Philip Moore
  */
-public class SshKeyParserTest extends AbstractParserTest {
-    private final SshKeysParser sshKeysParser = new SshKeysParser(getGson());
+public class SshKeyJsonTest extends AbstractJsonTest {
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
     private final SshKeyInfo keyOneInfo;
 
-    public SshKeyParserTest() {
+    public SshKeyJsonTest() {
         this.keyOneInfo = new SshKeyInfo();
         this.keyOneInfo.seq = 1;
         this.keyOneInfo.sshPublicKey = "ssh_key1";
@@ -46,27 +47,27 @@ public class SshKeyParserTest extends AbstractParserTest {
     @Test
     public void testParseSshKeyInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("self/sshkey.json");
-        SshKeyInfo keyInfo = sshKeysParser.parseSshKeyInfo(jsonElement);
+        SshKeyInfo keyInfo = gerritJson.as(jsonElement, SshKeyInfo.class);
         GerritAssert.assertEquals(keyInfo, keyOneInfo);
     }
 
     @Test
     public void testParseSshKeyInfoWithNullJsonElement() throws Exception {
-        SshKeyInfo keyInfo = sshKeysParser.parseSshKeyInfo(null);
+        SshKeyInfo keyInfo = gerritJson.as(null, SshKeyInfo.class);
         Truth.assertThat(keyInfo).isNull();
     }
 
     @Test
     public void testParseSshKeyInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("self/sshkeys.json");
-        List<SshKeyInfo> keyInfos = sshKeysParser.parseSshKeyInfos(jsonElement);
+        List<SshKeyInfo> keyInfos = gerritJson.asList(jsonElement, SshKeyInfo.class);
         Truth.assertThat(keyInfos).hasSize(2);
     }
 
     @Test
     public void testParseSingleSshKeyInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("self/sshkey.json");
-        List<SshKeyInfo> keyInfos = sshKeysParser.parseSshKeyInfos(jsonElement);
+        List<SshKeyInfo> keyInfos = gerritJson.asList(jsonElement, SshKeyInfo.class);
         Truth.assertThat(keyInfos).hasSize(1);
     }
 }

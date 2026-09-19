@@ -18,13 +18,12 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.client.DiffPreferencesInfo.Whitespace;
-import com.google.gerrit.extensions.common.DiffInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.CommitInfosParser;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
@@ -38,11 +37,15 @@ import java.io.ByteArrayOutputStream;
 import java.util.function.Function;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Thomas Forrer
  */
 public class FileApiRestClientTest {
+
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
 
     private static final String FILE_CONTENT = "some new changes";
     private static final String FILE_PATH = "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java";
@@ -69,7 +72,7 @@ public class FileApiRestClientTest {
             .expectRequest(requestUrl, null, GET, httpResponse)
             .get();
 
-        FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, revisionApiRestClient, null, FILE_PATH);
+        FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, gerritJson, revisionApiRestClient, FILE_PATH);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BinaryResult binaryResult = fileApiRestClient.content();
         try {
@@ -159,20 +162,15 @@ public class FileApiRestClientTest {
     }
 
     private void testDiff(Function<FileApiRestClient, Void> method, String expectedRequestUrl) throws Exception {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
-        DiffInfo diffInfo = EasyMock.createMock(DiffInfo.class);
-
-        CommitInfosParser commitInfosParser = EasyMock.createMock(CommitInfosParser.class);
-        EasyMock.expect(commitInfosParser.parseDiffInfo(jsonElement)).andReturn(diffInfo).once();
-        EasyMock.replay(commitInfosParser);
+        JsonElement jsonElement = new JsonObject();
 
         setupServices();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectGet(expectedRequestUrl, jsonElement).get();
 
-        FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, revisionApiRestClient, commitInfosParser, FILE_PATH);
+        FileApiRestClient fileApiRestClient = new FileApiRestClient(gerritRestClient, gerritJson, revisionApiRestClient, FILE_PATH);
         method.apply(fileApiRestClient);
 
-        EasyMock.verify(gerritRestClient, commitInfosParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     private String getBaseRequestUrl() {

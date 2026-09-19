@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.changes.parsers;
+package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.ReviewResult;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import org.junit.Test;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Urs Wolfer
  */
-public class ReviewResultParserTest extends AbstractParserTest {
-    private final ReviewResultParser reviewResultParser = new ReviewResultParser(getGson());
+public class ReviewResultJsonTest extends AbstractJsonTest {
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
     @Test
     public void testParseCommitInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("review.json");
-        ReviewResult reviewResult = reviewResultParser.parseReviewResult(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/review.json");
+        ReviewResult reviewResult = gerritJson.as(jsonElement, ReviewResult.class);
         Truth.assertThat(reviewResult.labels.size()).isEqualTo(1);
         Truth.assertThat(reviewResult.reviewers).isNull();
     }

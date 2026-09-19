@@ -24,8 +24,8 @@ import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.CommitInfosParser;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
 
@@ -43,7 +43,7 @@ public class FileApiRestClient extends FileApi.NotImplemented {
 
     private final GerritRestClient gerritRestClient;
     private final RevisionApiRestClient revisionApiRestClient;
-    private final CommitInfosParser commitInfosParser;
+    private final GerritJson gerritJson;
     private final String path;
 
     private final Supplier<String> requestPath = Suppliers.memoize(new com.google.common.base.Supplier<String>() {
@@ -55,11 +55,12 @@ public class FileApiRestClient extends FileApi.NotImplemented {
     });
 
     public FileApiRestClient(GerritRestClient gerritRestClient,
+                             GerritJson gerritJson,
                              RevisionApiRestClient revisionApiRestClient,
-                             CommitInfosParser commitInfosParser, String path) {
+                             String path) {
         this.gerritRestClient = gerritRestClient;
+        this.gerritJson = gerritJson;
         this.revisionApiRestClient = revisionApiRestClient;
-        this.commitInfosParser = commitInfosParser;
         this.path = path;
     }
 
@@ -128,7 +129,7 @@ public class FileApiRestClient extends FileApi.NotImplemented {
         }
 
         JsonElement jsonElement = gerritRestClient.getRequest(url);
-        return commitInfosParser.parseDiffInfo(jsonElement);
+        return gerritJson.as(jsonElement, DiffInfo.class);
     }
 
     protected String getRequestPath() {

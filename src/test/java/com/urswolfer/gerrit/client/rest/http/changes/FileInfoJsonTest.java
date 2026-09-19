@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.changes.parsers;
+package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.gerrit.extensions.common.FileInfo;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import com.urswolfer.gerrit.client.rest.http.common.FileInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import org.testng.annotations.Test;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Thomas Forrer
  */
-public class FileInfoParserTest extends AbstractParserTest {
+public class FileInfoJsonTest extends AbstractJsonTest {
     private static final Map<String, FileInfo> FILE_INFO_MAP = new LinkedHashMap<>();
 
     static {
@@ -43,13 +44,13 @@ public class FileInfoParserTest extends AbstractParserTest {
         );
     }
 
-    private final FileInfoParser fileInfoParser = new FileInfoParser(getGson());
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
     @Test
     public void testParseFileInfos() throws Exception {
-        JsonElement jsonElement = getJsonElement("files.json");
+        JsonElement jsonElement = getJsonElement("parsers/files.json");
 
-        Map<String, FileInfo> fileInfoMap = fileInfoParser.parseFileInfos(jsonElement);
+        Map<String, FileInfo> fileInfoMap = gerritJson.asMap(jsonElement, FileInfo.class);
         GerritAssert.assertEquals(fileInfoMap, FILE_INFO_MAP);
     }
 }

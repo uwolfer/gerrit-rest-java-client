@@ -20,84 +20,77 @@ import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.GroupInfo;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
-import java.util.Collections;
 import java.util.List;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Shawn Stafford
  */
 public class GroupApiRestClientTest {
 
-    private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
-    private static final GroupInfo MOCK_GROUP_INFO = EasyMock.createMock(GroupInfo.class);
-    private static final AccountInfo MOCK_ACCOUNT_INFO = EasyMock.createMock(AccountInfo.class);
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
+
+    private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
     public void testGetGroupInfo() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/groups/foo", MOCK_JSON_ELEMENT)
+            .expectGet("/groups/foo", JsonParser.parseString("{\"id\":\"g1\"}"))
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder()
-            .expectParseGroupInfo(MOCK_JSON_ELEMENT, MOCK_GROUP_INFO)
-            .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
 
         GroupInfo groupInfo = groupApiRestClient.get();
 
-        EasyMock.verify(gerritRestClient, groupsParser);
-        Truth.assertThat(groupInfo).isEqualTo(MOCK_GROUP_INFO);
+        Truth.assertThat(groupInfo.id).isEqualTo("g1");
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testGetGroupDetail() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/groups/foo/detail", MOCK_JSON_ELEMENT)
+            .expectGet("/groups/foo/detail", JsonParser.parseString("{\"id\":\"g1\"}"))
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder()
-            .expectParseGroupInfo(MOCK_JSON_ELEMENT, MOCK_GROUP_INFO)
-            .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
 
         GroupInfo groupInfo = groupApiRestClient.detail();
 
-        EasyMock.verify(gerritRestClient, groupsParser);
-        Truth.assertThat(groupInfo).isEqualTo(MOCK_GROUP_INFO);
+        Truth.assertThat(groupInfo.id).isEqualTo("g1");
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testGetGroupOwner() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/groups/foo/owner", MOCK_JSON_ELEMENT)
+            .expectGet("/groups/foo/owner", JsonParser.parseString("{\"id\":\"g1\"}"))
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder()
-            .expectParseGroupInfo(MOCK_JSON_ELEMENT, MOCK_GROUP_INFO)
-            .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
 
         GroupInfo groupInfo = groupApiRestClient.owner();
 
-        EasyMock.verify(gerritRestClient, groupsParser);
-        Truth.assertThat(groupInfo).isEqualTo(MOCK_GROUP_INFO);
+        Truth.assertThat(groupInfo.id).isEqualTo("g1");
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testSetGroupOwner() throws Exception {
         String owner = "joe";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/groups/foo/owner", owner, MOCK_JSON_ELEMENT)
+            .expectPut("/groups/foo/owner", owner, EMPTY_JSON_OBJECT)
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder().get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
 
         groupApiRestClient.owner(owner);
 
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
@@ -107,12 +100,11 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/groups/foo/name", jsonObject)
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder().get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, groupName);
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, groupName);
 
         String name = groupApiRestClient.name();
 
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
         Truth.assertThat(name).isEqualTo(groupName);
     }
 
@@ -124,12 +116,11 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/groups/foo/name", newGroupName, jsonObject)
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder().get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, groupName);
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, groupName);
 
         groupApiRestClient.name(newGroupName);
 
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
@@ -139,12 +130,11 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/groups/foo/description", jsonObject)
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder().get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, groupName);
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, groupName);
 
         String description = groupApiRestClient.description();
 
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
         Truth.assertThat(description).isEqualTo(groupName);
     }
 
@@ -156,99 +146,87 @@ public class GroupApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/groups/foo/description", description, jsonObject)
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder().get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, groupName);
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, groupName);
 
         groupApiRestClient.description(description);
 
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testGetGroupMembers() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/groups/foo/members", MOCK_JSON_ELEMENT)
-            .expectGet("/groups/foo/members?recursive", MOCK_JSON_ELEMENT)
+            .expectGet("/groups/foo/members", JsonParser.parseString("[{\"name\":\"John Doe\"}]"))
+            .expectGet("/groups/foo/members?recursive", JsonParser.parseString("[{\"name\":\"Jane Roe\"}]"))
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder()
-            .expectParseGroupMembers(MOCK_JSON_ELEMENT, Collections.singletonList(MOCK_ACCOUNT_INFO))
-            .expectParseGroupMembers(MOCK_JSON_ELEMENT, Collections.singletonList(MOCK_ACCOUNT_INFO))
-            .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
 
         List<AccountInfo> members = groupApiRestClient.members();
         List<AccountInfo> membersRecursive = groupApiRestClient.members(true);
 
-        EasyMock.verify(gerritRestClient, groupsParser);
-        Truth.assertThat(members.get(0)).isEqualTo(MOCK_ACCOUNT_INFO);
-        Truth.assertThat(membersRecursive.get(0)).isEqualTo(MOCK_ACCOUNT_INFO);
+        Truth.assertThat(members).hasSize(1);
+        Truth.assertThat(members.get(0).name).isEqualTo("John Doe");
+        Truth.assertThat(membersRecursive).hasSize(1);
+        Truth.assertThat(membersRecursive.get(0).name).isEqualTo("Jane Roe");
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testGetIncludedGroups() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/groups/foo/groups/", MOCK_JSON_ELEMENT)
+            .expectGet("/groups/foo/groups/", JsonParser.parseString("[{\"id\":\"g1\"}]"))
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder()
-            .expectParseGroupInfos(MOCK_JSON_ELEMENT, Collections.singletonList(MOCK_GROUP_INFO))
-            .get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
 
         List<GroupInfo> groupInfos = groupApiRestClient.includedGroups();
 
-        EasyMock.verify(gerritRestClient, groupsParser);
-        Truth.assertThat(groupInfos.get(0)).isEqualTo(MOCK_GROUP_INFO);
+        Truth.assertThat(groupInfos).hasSize(1);
+        Truth.assertThat(groupInfos.get(0).id).isEqualTo("g1");
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testAddMembers() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGetGson()
             .expectPost("/groups/foo/members", "{\"members\":[\"joe\",\"peter\"]}")
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder().get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
 
         groupApiRestClient.addMembers("joe", "peter");
 
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testAddGroups() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGetGson()
             .expectPost("/groups/foo/groups", "{\"groups\":[\"g1\",\"g2\"]}")
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder().get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
 
         groupApiRestClient.addGroups("g1", "g2");
 
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testRemoveGroups() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGetGson()
             .expectPost("/groups/foo/groups.delete", "{\"groups\":[\"g1\",\"g2\"]}")
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder().get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
 
         groupApiRestClient.removeGroups("g1", "g2");
 
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testRemoveMembers() throws Exception {
-        GerritRestClient gerritRestClient = new GerritRestClientBuilder().expectGetGson()
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/groups/foo/members.delete", "{\"members\":[\"joe\",\"peter\"]}").get();
-        GroupsParser groupsParser = new GroupsParserBuilder().get();
-        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, groupsParser, "foo");
+        GroupApiRestClient groupApiRestClient = new GroupApiRestClient(gerritRestClient, gerritJson, "foo");
         groupApiRestClient.removeMembers("joe", "peter");
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
     }
 }

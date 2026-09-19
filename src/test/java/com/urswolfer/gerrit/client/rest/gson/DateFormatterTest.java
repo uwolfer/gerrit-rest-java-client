@@ -17,7 +17,7 @@
 package com.urswolfer.gerrit.client.rest.gson;
 
 import com.google.gson.JsonElement;
-import org.easymock.EasyMock;
+import com.google.gson.JsonPrimitive;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -33,10 +33,7 @@ public abstract class DateFormatterTest {
     }
 
     protected static JsonElement getJsonElementForDateString(String dateAsString) {
-        JsonElement jsonElement = EasyMock.createMock(JsonElement.class);
-        EasyMock.expect(jsonElement.getAsString()).andReturn(dateAsString).once();
-        EasyMock.replay(jsonElement);
-        return jsonElement;
+        return new JsonPrimitive(dateAsString);
     }
 
     protected static final class TestCase {

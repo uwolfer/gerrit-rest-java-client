@@ -24,6 +24,7 @@ import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
@@ -37,23 +38,23 @@ import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
  */
 public class BranchApiRestClient extends BranchApi.NotImplemented implements BranchApi {
     private final GerritRestClient gerritRestClient;
-    private final BranchInfoParser branchInfoParser;
+    private final GerritJson gerritJson;
     private final ProjectApiRestClient projectApiRestClient;
     private final String name;
 
     public BranchApiRestClient(GerritRestClient gerritRestClient,
-                               BranchInfoParser branchInfoParser,
+                               GerritJson gerritJson,
                                ProjectApiRestClient projectApiRestClient,
                                String name) {
         this.gerritRestClient = gerritRestClient;
-        this.branchInfoParser = branchInfoParser;
+        this.gerritJson = gerritJson;
         this.projectApiRestClient = projectApiRestClient;
         this.name = name;
     }
 
     @Override
     public BranchApi create(BranchInput in) throws RestApiException {
-        String json = gerritRestClient.getGson().toJson(in);
+        String json = gerritJson.toJson(in);
         gerritRestClient.putRequest(branchUrl(), json);
         return this;
     }
@@ -61,7 +62,7 @@ public class BranchApiRestClient extends BranchApi.NotImplemented implements Bra
     @Override
     public BranchInfo get() throws RestApiException {
         JsonElement jsonElement = gerritRestClient.getRequest(branchUrl());
-        return Iterables.getOnlyElement(branchInfoParser.parseBranchInfos(jsonElement));
+        return Iterables.getOnlyElement(gerritJson.asList(jsonElement, BranchInfo.class));
     }
 
     @Override

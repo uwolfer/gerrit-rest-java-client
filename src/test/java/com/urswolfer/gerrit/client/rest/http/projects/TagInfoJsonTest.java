@@ -19,18 +19,19 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.TagInfo;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import com.urswolfer.gerrit.client.rest.http.common.TagInfoBuilder;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Pavel Bely
  */
-public class TagInfoParserTest extends AbstractParserTest {
+public class TagInfoJsonTest extends AbstractJsonTest {
     private static final List<TagInfo> TAG_INFO_LIST = new ArrayList<>();
 
     static {
@@ -51,13 +52,13 @@ public class TagInfoParserTest extends AbstractParserTest {
                 .get());
     }
 
-    private final TagInfoParser tagInfoParser = new TagInfoParser(getGson());
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
     @Test
     public void testParseTagInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("tags.json");
 
-        List<TagInfo> tagInfos = tagInfoParser.parseTagInfos(jsonElement);
+        List<TagInfo> tagInfos = gerritJson.asList(jsonElement, TagInfo.class);
 
         Truth.assertThat(tagInfos.size()).isEqualTo(3);
         for (int i = 0; i < tagInfos.size(); i++) {
@@ -71,7 +72,7 @@ public class TagInfoParserTest extends AbstractParserTest {
     public void testParseTagInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("tag.json");
 
-        List<TagInfo> tagInfos = tagInfoParser.parseTagInfos(jsonElement);
+        List<TagInfo> tagInfos = gerritJson.asList(jsonElement, TagInfo.class);
 
         Truth.assertThat(tagInfos.size()).isEqualTo(1);
         GerritAssert.assertEquals(tagInfos.get(0), new TagInfoBuilder()

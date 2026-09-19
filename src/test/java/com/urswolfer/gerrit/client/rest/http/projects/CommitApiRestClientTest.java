@@ -19,36 +19,32 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.IncludedInInfo;
 import com.google.gerrit.extensions.common.CommitInfo;
-import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
-import com.urswolfer.gerrit.client.rest.http.projects.parsers.ProjectCommitInfoParser;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
-
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class CommitApiRestClientTest {
 
-    public static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
-    private static final CommitInfo MOCK_COMMIT_INFO = EasyMock.createMock(CommitInfo.class);
-    private static final IncludedInInfo MOCK_INCLUDED_IN_INFO = EasyMock.createMock(IncludedInInfo.class);
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
+
 
     @Test
     public void testGet() throws Exception {
         String projectName = "sandbox";
         String commitSha = "49f9e84661d06814c1e9fe3d724f8fffb51b60f4";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/projects/sandbox/commits/49f9e84661d06814c1e9fe3d724f8fffb51b60f4", MOCK_JSON_ELEMENT)
+            .expectGet("/projects/sandbox/commits/49f9e84661d06814c1e9fe3d724f8fffb51b60f4", JsonParser.parseString("{\"commit\":\"abc123\"}"))
             .get();
-        ProjectsParser projectsParser = new ProjectsParserBuilder().get();
-        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder()
-            .expectParseCommitInfo(MOCK_JSON_ELEMENT, MOCK_COMMIT_INFO).get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, null, null, projectCommitInfoParser);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
 
         CommitInfo commitInfo = projectsRestClient.name(projectName).commit(commitSha).get();
 
-        EasyMock.verify(gerritRestClient, projectsParser);
-        Truth.assertThat(commitInfo).isEqualTo(MOCK_COMMIT_INFO);
+        Truth.assertThat(commitInfo.commit).isEqualTo("abc123");
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
@@ -56,16 +52,13 @@ public class CommitApiRestClientTest {
         String projectName = "sandbox";
         String commitSha = "49f9e84661d06814c1e9fe3d724f8fffb51b60f4";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/projects/sandbox/commits/49f9e84661d06814c1e9fe3d724f8fffb51b60f4/in", MOCK_JSON_ELEMENT)
+            .expectGet("/projects/sandbox/commits/49f9e84661d06814c1e9fe3d724f8fffb51b60f4/in", JsonParser.parseString("{\"branches\":[\"master\"]}"))
             .get();
-        ProjectsParser projectsParser = new ProjectsParserBuilder().get();
-        ProjectCommitInfoParser projectCommitInfoParser = new ProjectCommitInfoParserBuilder()
-            .expectParseIncludedIn(MOCK_JSON_ELEMENT, MOCK_INCLUDED_IN_INFO).get();
-        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, projectsParser, null, null, projectCommitInfoParser);
+        ProjectsRestClient projectsRestClient = new ProjectsRestClient(gerritRestClient, gerritJson);
 
         IncludedInInfo includedInInfo = projectsRestClient.name(projectName).commit(commitSha).includedIn();
 
-        EasyMock.verify(gerritRestClient, projectsParser);
-        Truth.assertThat(includedInInfo).isEqualTo(MOCK_INCLUDED_IN_INFO);
+        Truth.assertThat(includedInInfo.branches).containsExactly("master");
+        EasyMock.verify(gerritRestClient);
     }
 }

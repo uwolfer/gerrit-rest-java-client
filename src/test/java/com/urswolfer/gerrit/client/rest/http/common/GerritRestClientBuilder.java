@@ -17,6 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http.common;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import org.apache.http.HttpResponse;
 import org.easymock.EasyMock;
@@ -43,7 +44,7 @@ public final class GerritRestClientBuilder {
     }
 
     public GerritRestClientBuilder expectPut(String url) throws Exception {
-        return expectPut(url, EasyMock.createMock(JsonElement.class));
+        return expectPut(url, new JsonObject());
     }
 
     public GerritRestClientBuilder expectPut(String url, JsonElement result) throws Exception {
@@ -58,12 +59,12 @@ public final class GerritRestClientBuilder {
 
     public GerritRestClientBuilder expectPost(String url) throws Exception {
         EasyMock.expect(gerritRestClient.postRequest(url))
-                .andReturn(EasyMock.createMock(JsonElement.class)).once();
+                .andReturn(new JsonObject()).once();
         return this;
     }
 
     public GerritRestClientBuilder expectPost(String url, String requestBody) throws Exception {
-        return expectPost(url, requestBody, EasyMock.createMock(JsonElement.class));
+        return expectPost(url, requestBody, new JsonObject());
     }
 
     public GerritRestClientBuilder expectPost(String url, String requestBody, JsonElement result) throws Exception {
@@ -73,7 +74,7 @@ public final class GerritRestClientBuilder {
     }
 
     public GerritRestClientBuilder expectDelete(String url) throws Exception {
-        return expectDelete(url,EasyMock.createMock(JsonElement.class));
+        return expectDelete(url,new JsonObject());
     }
 
     public GerritRestClientBuilder expectDelete(String url,JsonElement result) throws Exception {
@@ -94,8 +95,4 @@ public final class GerritRestClientBuilder {
         return this;
     }
 
-    public GerritRestClientBuilder expectGetGson() {
-        EasyMock.expect(gerritRestClient.getGson()).andReturn(AbstractParserTest.getGson()).once();
-        return this;
-    }
 }

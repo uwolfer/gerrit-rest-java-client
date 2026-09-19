@@ -40,6 +40,10 @@ public class GsonFactory {
 
     private GsonFactory() {}
 
+    private static final Gson CONFIG_INFO_GSON = getBuilder()
+        .registerTypeAdapter(ImmutableMap.class, new ImmutableMapStringListAdaptor())
+        .create();
+
     public static GsonBuilder getBuilder(){
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(Date.class, new DateDeserializer());
@@ -50,6 +54,14 @@ public class GsonFactory {
 
     public static Gson create() {
         return getBuilder().create();
+    }
+
+    /**
+     * {@code ConfigInfo} carries {@code ImmutableMap} fields, which Gson cannot build without
+     * this adapter.
+     */
+    public static Gson createForConfigInfo() {
+        return CONFIG_INFO_GSON;
     }
 
     public static class ImmutableMapStringListAdaptor implements JsonDeserializer<ImmutableMap<String, ImmutableList<String>>> {

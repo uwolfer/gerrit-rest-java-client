@@ -19,18 +19,19 @@ package com.urswolfer.gerrit.client.rest.http.projects;
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.projects.BranchInfo;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import com.urswolfer.gerrit.client.rest.http.common.BranchInfoBuilder;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Tim Coulson
  */
-public class BranchInfoParserTest extends AbstractParserTest {
+public class BranchInfoJsonTest extends AbstractJsonTest {
     private static final List<BranchInfo> BRANCH_INFO_LIST = new ArrayList<>();
 
     static {
@@ -51,13 +52,13 @@ public class BranchInfoParserTest extends AbstractParserTest {
                 .get());
     }
 
-    private final BranchInfoParser branchInfoParser = new BranchInfoParser(getGson());
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
     @Test
     public void testParseBranchInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("branches.json");
 
-        List<BranchInfo> branchInfos = branchInfoParser.parseBranchInfos(jsonElement);
+        List<BranchInfo> branchInfos = gerritJson.asList(jsonElement, BranchInfo.class);
 
         Truth.assertThat(branchInfos.size()).isEqualTo(3);
         for (int i = 0; i < branchInfos.size(); i++) {
@@ -71,7 +72,7 @@ public class BranchInfoParserTest extends AbstractParserTest {
     public void testParseBranchInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("branch.json");
 
-        List<BranchInfo> branchInfos = branchInfoParser.parseBranchInfos(jsonElement);
+        List<BranchInfo> branchInfos = gerritJson.asList(jsonElement, BranchInfo.class);
 
         Truth.assertThat(branchInfos.size()).isEqualTo(1);
         GerritAssert.assertEquals(branchInfos.get(0), new BranchInfoBuilder()

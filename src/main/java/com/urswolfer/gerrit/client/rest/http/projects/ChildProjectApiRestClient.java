@@ -21,19 +21,23 @@ import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
 public class ChildProjectApiRestClient extends ChildProjectApi.NotImplemented implements ChildProjectApi {
 
     private final GerritRestClient gerritRestClient;
 
-    private final ProjectsParser projectsParser;
+    private final GerritJson gerritJson;
     private final String name;
     private final String parentUrl;
 
-    public ChildProjectApiRestClient(GerritRestClient gerritRestClient, ProjectsParser projectsParser, String parentUrl, String name) {
+    public ChildProjectApiRestClient(GerritRestClient gerritRestClient,
+                                     GerritJson gerritJson,
+                                     String parentUrl,
+                                     String name) {
         this.gerritRestClient = gerritRestClient;
-        this.projectsParser = projectsParser;
+        this.gerritJson = gerritJson;
         this.parentUrl = parentUrl;
         this.name = name;
     }
@@ -50,7 +54,7 @@ public class ChildProjectApiRestClient extends ChildProjectApi.NotImplemented im
             requestUrl = requestUrl + "?recursive";
         }
         JsonElement jsonElement = gerritRestClient.getRequest(requestUrl);
-        return projectsParser.parseSingleProjectInfo(jsonElement);
+        return gerritJson.as(jsonElement, ProjectInfo.class);
     }
 
     protected String childProjectUrl() {

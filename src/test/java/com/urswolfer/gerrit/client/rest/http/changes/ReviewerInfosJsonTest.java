@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.changes.parsers;
+package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.AddReviewerResult;
@@ -22,51 +22,52 @@ import com.google.gerrit.extensions.api.changes.ReviewerInfo;
 import com.google.gerrit.extensions.api.changes.ReviewerResult;
 import com.google.gerrit.extensions.common.SuggestedReviewerInfo;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author EFregnan
  */
-public class ReviewerInfosParserTest extends AbstractParserTest {
-    private final ReviewerInfosParser reviewerInfoParser = new ReviewerInfosParser(getGson());
+public class ReviewerInfosJsonTest extends AbstractJsonTest {
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
     @Test
     public void testParseReviewerInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("reviewer.json");
-        List<ReviewerInfo> reviewerInfos = reviewerInfoParser.parseReviewerInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/reviewer.json");
+        List<ReviewerInfo> reviewerInfos = gerritJson.asList(jsonElement, ReviewerInfo.class);
         Truth.assertThat(reviewerInfos).hasSize(1);
         Truth.assertThat(reviewerInfos.get(0).approvals.get("Code-Review")).isEqualTo("+2");
     }
 
     @Test
     public void testParseReviewersInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("reviewers.json");
-        List<ReviewerInfo> reviewerInfos = reviewerInfoParser.parseReviewerInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/reviewers.json");
+        List<ReviewerInfo> reviewerInfos = gerritJson.asList(jsonElement, ReviewerInfo.class);
         Truth.assertThat(reviewerInfos).hasSize(2);
         Truth.assertThat(reviewerInfos.get(1).approvals.get("My-Own-Label")).isEqualTo("-2");
     }
 
     @Test
     public void testParseSuggestReviewerInfos() throws Exception {
-        JsonElement jsonElement = getJsonElement("suggestreviewer.json");
-        List<SuggestedReviewerInfo> suggestedReviewerInfos = reviewerInfoParser.parseSuggestReviewerInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/suggestreviewer.json");
+        List<SuggestedReviewerInfo> suggestedReviewerInfos = gerritJson.asList(jsonElement, SuggestedReviewerInfo.class);
         Truth.assertThat(suggestedReviewerInfos).hasSize(1);
     }
 
     @Test
     public void testParseSuggestReviewersInfos() throws Exception {
-        JsonElement jsonElement = getJsonElement("suggestreviewers.json");
-        List<SuggestedReviewerInfo> suggestedReviewerInfos = reviewerInfoParser.parseSuggestReviewerInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/suggestreviewers.json");
+        List<SuggestedReviewerInfo> suggestedReviewerInfos = gerritJson.asList(jsonElement, SuggestedReviewerInfo.class);
         Truth.assertThat(suggestedReviewerInfos).hasSize(2);
     }
 
     @Test
     public void testParseCommitInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("addreviewer.json");
-        AddReviewerResult addReviewerResult = reviewerInfoParser.parseAddReviewerResult(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/addreviewer.json");
+        AddReviewerResult addReviewerResult = gerritJson.as(jsonElement, AddReviewerResult.class);
         Truth.assertThat(addReviewerResult.input).isEqualTo("john.doe@example.com");
         Truth.assertThat(addReviewerResult.reviewers.size()).isEqualTo(1);
         Truth.assertThat(addReviewerResult.reviewers.get(0)._accountId).isEqualTo(1000096);
@@ -74,8 +75,8 @@ public class ReviewerInfosParserTest extends AbstractParserTest {
 
     @Test
     public void testParseReviewerResult() throws Exception {
-        JsonElement jsonElement = getJsonElement("addreviewer.json");
-        ReviewerResult reviewerResult = reviewerInfoParser.parseReviewerResult(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/addreviewer.json");
+        ReviewerResult reviewerResult = gerritJson.as(jsonElement, ReviewerResult.class);
         Truth.assertThat(reviewerResult.input).isEqualTo("john.doe@example.com");
         Truth.assertThat(reviewerResult.reviewers.size()).isEqualTo(1);
         Truth.assertThat(reviewerResult.reviewers.get(0)._accountId).isEqualTo(1000096);
