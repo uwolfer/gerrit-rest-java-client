@@ -26,18 +26,13 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
-import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
-import org.apache.http.HttpResponse;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 
 /**
  * @author Urs Wolfer
@@ -45,7 +40,6 @@ import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 public class RevisionApiRestClient extends RevisionApi.NotImplemented implements RevisionApi {
 
     private final GerritRestContext context;
-    private final GerritRestClient gerritRestClient;
     private final ChangeApiRestClient changeApiRestClient;
     private final GerritJson gerritJson;
     private final String revision;
@@ -54,7 +48,6 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
                                  ChangeApiRestClient changeApiRestClient,
                                  String revision) {
         this.context = context;
-        this.gerritRestClient = context.restClient();
         this.gerritJson = context.json();
         this.changeApiRestClient = changeApiRestClient;
         this.revision = revision;
@@ -66,16 +59,12 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
     @Override
     public void delete() throws RestApiException {
-        String request = getRequestPath();
-        gerritRestClient.deleteRequest(request);
+        context.delete(getRequestPath()).send();
     }
 
     @Override
     public ReviewResult review(ReviewInput reviewInput) throws RestApiException {
-        String request = getRequestPath() + "/review";
-        String json = gerritJson.toJson(reviewInput);
-        JsonElement reviewResult = gerritRestClient.postRequest(request, json);
-        return gerritJson.as(reviewResult, ReviewResult.class);
+        return context.post(getRequestPath() + "/review").body(reviewInput).as(ReviewResult.class);
     }
 
     @Override
@@ -85,23 +74,17 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
     @Override
     public ChangeInfo submit(SubmitInput submitInput) throws RestApiException {
-        String request = changeApiRestClient.getRequestPath() + "/submit";
-        String json = gerritJson.toJson(submitInput);
-        JsonElement result = gerritRestClient.postRequest(request, json);
-        return gerritJson.as(result, ChangeInfo.class);
+        return context.post(changeApiRestClient.getRequestPath() + "/submit").body(submitInput).as(ChangeInfo.class);
     }
 
     @Override
     public void publish() throws RestApiException {
-        String request = getRequestPath() + "/publish";
-        gerritRestClient.postRequest(request);
+        context.post(getRequestPath() + "/publish").send();
     }
 
     @Override
     public ChangeApi cherryPick(CherryPickInput in) throws RestApiException {
-        String request = getRequestPath() + "/cherrypick";
-        String json = gerritJson.toJson(in);
-        gerritRestClient.postRequest(request, json);
+        context.post(getRequestPath() + "/cherrypick").body(in).send();
         return changeApiRestClient;
     }
 
@@ -112,9 +95,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
 
     @Override
     public ChangeApi rebase(RebaseInput in) throws RestApiException {
-        String request = getRequestPath() + "/rebase";
-        String json = gerritJson.toJson(in);
-        gerritRestClient.postRequest(request, json);
+        context.post(getRequestPath() + "/rebase").body(in).send();
         return changeApiRestClient;
     }
 
@@ -123,17 +104,15 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         String encodedPath = Url.encode(path);
         String url = String.format("/changes/%s/revisions/%s/files/%s/reviewed", changeApiRestClient.id(), revision, encodedPath);
         if (reviewed) {
-            gerritRestClient.putRequest(url);
+            context.put(url).send();
         } else {
-            gerritRestClient.deleteRequest(url);
+            context.delete(url).send();
         }
     }
 
     @Override
     public MergeableInfo mergeable() throws RestApiException {
-        String request = getRequestPath() + "/mergeable";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.as(jsonElement, MergeableInfo.class);
+        return context.get(getRequestPath() + "/mergeable").as(MergeableInfo.class);
     }
 
     /**
@@ -152,28 +131,23 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public Set<String> reviewed() throws RestApiException {
         String request = getRequestPath() + "/files?reviewed";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        JsonElement jsonElement = context.get(request).asJson();
         return parseReviewedFiles(jsonElement);
     }
 
     private SortedMap<String, List<CommentInfo>> comments(String type) throws RestApiException {
-        String request = getRequestPath() + '/' + type + '/';
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.asSortedMapOfLists(jsonElement, CommentInfo.class);
+        return context.get(getRequestPath() + '/' + type + '/').asSortedMapOfLists(CommentInfo.class);
     }
 
     @Override
     public Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException {
-        String request = getRequestPath() + "/robotcomments/";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.asSortedMapOfLists(jsonElement, RobotCommentInfo.class);
+        return context.get(getRequestPath() + "/robotcomments/").asSortedMapOfLists(RobotCommentInfo.class);
     }
 
     @Override
     public DraftApi createDraft(DraftInput in) throws RestApiException {
         String request = getRequestPath() + "/drafts";
-        String json = gerritJson.toJson(in);
-        JsonElement jsonElement = gerritRestClient.putRequest(request, json);
+        JsonElement jsonElement = context.put(request).body(in).asJson();
         CommentInfo commentInfo = gerritJson.as(jsonElement.getAsJsonObject(), CommentInfo.class);
         return new DraftApiRestClient(context, changeApiRestClient, this, commentInfo);
     }
@@ -205,8 +179,7 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
         if (parentNum > 0) {
             request += "?parent=" + parentNum;
         }
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.asMap(jsonElement, FileInfo.class);
+        return context.get(request).asMap(FileInfo.class);
     }
 
     @Override
@@ -217,33 +190,24 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
     @Override
     public CommitInfo commit(boolean addLinks) throws RestApiException {
         String request = getRequestPath() + "/commit" + (addLinks ? "?links" : "");
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        JsonElement jsonElement = context.get(request).asJson();
         return gerritJson.as(jsonElement.getAsJsonObject(), CommitInfo.class);
     }
 
     @Override
     public BinaryResult patch() throws RestApiException {
         String request = getRequestPath() + "/patch";
-        try {
-            HttpResponse response = gerritRestClient.request(request, null, GET);
-            return BinaryResultUtils.createBinaryResult(response);
-        } catch (IOException e) {
-            throw RestApiException.wrap("Failed to get patch.", e);
-        }
+        return context.get(request).binary("Failed to get patch.");
     }
 
     @Override
     public Map<String, ActionInfo> actions() throws RestApiException {
-        String request = getRequestPath() + "/actions";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.asSortedMap(jsonElement, ActionInfo.class);
+        return context.get(getRequestPath() + "/actions").asSortedMap(ActionInfo.class);
     }
 
     @Override
     public SubmitType submitType() throws RestApiException {
-        String request = getRequestPath() + "/submit_type";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.as(jsonElement, new TypeToken<SubmitType>() {}.getType());
+        return context.get(getRequestPath() + "/submit_type").as(new TypeToken<SubmitType>() {}.getType());
     }
 
     @Override
@@ -258,26 +222,17 @@ public class RevisionApiRestClient extends RevisionApi.NotImplemented implements
             request += "?format=" + format;
         }
 
-        try {
-            HttpResponse response = gerritRestClient.request(request, null, GET);
-            return BinaryResultUtils.createBinaryResult(response);
-        } catch (IOException e) {
-            throw RestApiException.wrap("Request failed.", e);
-        }
+        return context.get(request).binary("Request failed.");
     }
 
     @Override
     public SubmitType testSubmitType(TestSubmitRuleInput in) throws RestApiException {
-        String request = getRequestPath() + "/test.submit_type";
-        String json = gerritJson.toJson(in);
-        JsonElement jsonElement = gerritRestClient.postRequest(request,json);
-        return gerritJson.as(jsonElement, new TypeToken<SubmitType>() {}.getType());
+        return context.post(getRequestPath() + "/test.submit_type").body(in).as(new TypeToken<SubmitType>() {}.getType());
     }
 
     @Override
     public String description() throws RestApiException {
-        String request = getRequestPath() + "/description";
-        return gerritRestClient.getRequest(request).getAsString();
+        return context.get(getRequestPath() + "/description").asString();
     }
 
     /**

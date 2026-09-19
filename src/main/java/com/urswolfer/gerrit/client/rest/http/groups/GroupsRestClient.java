@@ -26,9 +26,8 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
-import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
+import com.urswolfer.gerrit.client.rest.http.UrlQuery;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,12 +40,10 @@ import java.util.TreeMap;
 public class GroupsRestClient extends Groups.NotImplemented implements Groups {
 
     private final GerritRestContext context;
-    private final GerritRestClient gerritRestClient;
     private final GerritJson gerritJson;
 
     public GroupsRestClient(GerritRestContext context) {
         this.context = context;
-        this.gerritRestClient = context.restClient();
         this.gerritJson = context.json();
     }
 
@@ -65,8 +62,7 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
     @Override
     public GroupApi create(GroupInput input) throws RestApiException {
         String restPath = GroupApiRestClient.getBaseRequestPath() + "/" + Url.encode(input.name);
-        String body = gerritJson.toJson(input);
-        JsonElement result = gerritRestClient.putRequest(restPath, body);
+        JsonElement result = context.put(restPath).body(input).asJson();
         GroupInfo info = gerritJson.as(result, GroupInfo.class);
         return new GroupApiRestClient(context, info.id);
     }
@@ -89,24 +85,6 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
     }
 
     private List<GroupInfo> list(ListRequest listParameter) throws RestApiException {
-        String query = "";
-        if (listParameter.getLimit() > 0) {
-            query = UrlUtils.appendToUrlQuery(query, "n=" + listParameter.getLimit());
-        }
-        if (listParameter.getStart() > 0) {
-            query = UrlUtils.appendToUrlQuery(query, "S=" + listParameter.getStart());
-        }
-        if (listParameter.getOwned()) {
-            query = UrlUtils.appendToUrlQuery(query, "owned");
-        }
-        if (!Strings.isNullOrEmpty(listParameter.getSuggest())) {
-            // 1. If this option is set and n is not set, then n defaults to 10
-            // 2. When using this option, the project or p option can be used to
-            //    name the current project, to allow context-dependent suggestions
-            // 3. Not compatible with visible-to-all, owned, user, match, q, or S
-            query = UrlUtils.appendToUrlQuery(query, "suggest=" + listParameter.getSuggest());
-        }
-
         if (listParameter.getVisibleToAll()) {
             throw new NotImplementedException();
         }
@@ -126,16 +104,16 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
             throw new NotImplementedException();
         }
 
-        String url = GroupApiRestClient.getBaseRequestPath() + "/";
-        if (!Strings.isNullOrEmpty(query)) {
-            url += '?' + query;
-        }
-        JsonElement result = gerritRestClient.getRequest(url);
-        if (result == null) {
-            return Collections.emptyList();
-        } else {
-            return GroupApiRestClient.parseGroupInfos(gerritJson, result);
-        }
+        // suggest: when set and n is not, n defaults to 10; the project or p option can name the
+        // current project for context-dependent suggestions; not compatible with visible-to-all,
+        // owned, user, match, q or S
+        String url = UrlQuery.of(GroupApiRestClient.getBaseRequestPath() + "/")
+            .paramIfPositive("n", listParameter.getLimit())
+            .paramIfPositive("S", listParameter.getStart())
+            .flagIf(listParameter.getOwned(), "owned")
+            .paramIfNotEmpty("suggest", listParameter.getSuggest())
+            .toUrl();
+        return groupInfos(url);
     }
 
     @Override
@@ -152,30 +130,27 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
      * this method may does not support Gerrit versions lower than 3.2.0
      */
     protected List<GroupInfo> query(QueryRequest queryRequest) throws RestApiException {
-        String query = "";
-        if (!Strings.isNullOrEmpty(queryRequest.getQuery())) {
-            query = UrlUtils.appendToUrlQuery(query, "query=" + queryRequest.getQuery());
-        }
-        if (queryRequest.getLimit() > 0) {
-            query = UrlUtils.appendToUrlQuery(query, "limit=" + queryRequest.getLimit());
-        }
-        if (queryRequest.getStart() > 0) {
-            query = UrlUtils.appendToUrlQuery(query, "start=" + queryRequest.getStart());
-        }
         if (!queryRequest.getOptions().isEmpty()) {
             throw new NotImplementedException();
         }
 
-        String url = GroupApiRestClient.getBaseRequestPath() + "/";
-        if (!Strings.isNullOrEmpty(query)) {
-            url += '?' + query;
-        }
-        JsonElement result = gerritRestClient.getRequest(url);
+        String url = UrlQuery.of(GroupApiRestClient.getBaseRequestPath() + "/")
+            .paramIfNotEmpty("query", queryRequest.getQuery())
+            .paramIfPositive("limit", queryRequest.getLimit())
+            .paramIfPositive("start", queryRequest.getStart())
+            .toUrl();
+        return groupInfos(url);
+    }
+
+    /**
+     * Both listing endpoints answer with nothing at all when there is nothing to list.
+     */
+    private List<GroupInfo> groupInfos(String url) throws RestApiException {
+        JsonElement result = context.get(url).asJson();
         if (result == null) {
             return Collections.emptyList();
-        } else {
-            return GroupApiRestClient.parseGroupInfos(gerritJson, result);
         }
+        return GroupApiRestClient.parseGroupInfos(context.json(), result);
     }
 
     @Override

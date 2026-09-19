@@ -21,14 +21,13 @@ import com.google.gerrit.extensions.api.projects.*;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 /**
  * @author Pavel Bely
  */
 public class TagApiRestClient extends TagApi.NotImplemented implements TagApi {
-    private final GerritRestClient gerritRestClient;
+    private final GerritRestContext context;
     private final GerritJson gerritJson;
     private final ProjectApiRestClient projectApiRestClient;
     private final String name;
@@ -36,7 +35,7 @@ public class TagApiRestClient extends TagApi.NotImplemented implements TagApi {
     public TagApiRestClient(GerritRestContext context,
                             ProjectApiRestClient projectApiRestClient,
                             String name) {
-        this.gerritRestClient = context.restClient();
+        this.context = context;
         this.gerritJson = context.json();
         this.projectApiRestClient = projectApiRestClient;
         this.name = name;
@@ -44,20 +43,19 @@ public class TagApiRestClient extends TagApi.NotImplemented implements TagApi {
 
     @Override
     public TagApi create(TagInput in) throws RestApiException {
-        String json = gerritJson.toJson(in);
-        gerritRestClient.putRequest(tagUrl(), json);
+        context.put(tagUrl()).body(in).send();
         return this;
     }
 
     @Override
     public TagInfo get() throws RestApiException {
-        JsonElement jsonElement = gerritRestClient.getRequest(tagUrl());
+        JsonElement jsonElement = context.get(tagUrl()).asJson();
         return Iterables.getOnlyElement(gerritJson.asList(jsonElement, TagInfo.class));
     }
 
     @Override
     public void delete() throws RestApiException{
-        gerritRestClient.deleteRequest(tagUrl());
+        context.delete(tagUrl()).send();
     }
 
     protected String tagUrl() {

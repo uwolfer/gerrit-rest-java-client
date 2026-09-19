@@ -16,35 +16,26 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
 import com.google.gerrit.extensions.api.changes.FileApi;
 import com.google.gerrit.extensions.common.DiffInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
-import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
-import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
-import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
+import com.urswolfer.gerrit.client.rest.http.UrlQuery;
 
-import org.apache.http.HttpResponse;
 
-import java.io.IOException;
 import java.util.function.Supplier;
 
-import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 
 /**
  * @author Thomas Forrer
  */
 public class FileApiRestClient extends FileApi.NotImplemented {
 
-    private final GerritRestClient gerritRestClient;
+    private final GerritRestContext context;
     private final RevisionApiRestClient revisionApiRestClient;
-    private final GerritJson gerritJson;
     private final String path;
 
     private final Supplier<String> requestPath = Suppliers.memoize(new com.google.common.base.Supplier<String>() {
@@ -58,8 +49,7 @@ public class FileApiRestClient extends FileApi.NotImplemented {
     public FileApiRestClient(GerritRestContext context,
                              RevisionApiRestClient revisionApiRestClient,
                              String path) {
-        this.gerritRestClient = context.restClient();
-        this.gerritJson = context.json();
+        this.context = context;
         this.revisionApiRestClient = revisionApiRestClient;
         this.path = path;
     }
@@ -67,12 +57,7 @@ public class FileApiRestClient extends FileApi.NotImplemented {
     @Override
     public BinaryResult content() throws RestApiException {
         String request = getRequestPath() + "/content";
-        try {
-            HttpResponse response = gerritRestClient.request(request, null, GET);
-            return BinaryResultUtils.createBinaryResult(response);
-        } catch (IOException e) {
-            throw RestApiException.wrap("Failed to get file content.", e);
-        }
+        return context.get(request).binary("Failed to get file content.");
     }
 
     @Override
@@ -105,31 +90,15 @@ public class FileApiRestClient extends FileApi.NotImplemented {
     }
 
     private DiffInfo diff(DiffRequest diffRequest, int parent) throws RestApiException {
-        String query = "";
+        String url = UrlQuery.of(getRequestPath() + "/diff")
+            .paramIfNotEmpty("base", diffRequest.getBase())
+            .paramIf(diffRequest.getContext() != null, "context", diffRequest.getContext())
+            .paramIf(diffRequest.getIntraline() != null, "intraline", diffRequest.getIntraline())
+            .paramIf(diffRequest.getWhitespace() != null, "whitespace", diffRequest.getWhitespace())
+            .paramIfPositive("parent", parent)
+            .toUrl();
 
-        if (!Strings.isNullOrEmpty(diffRequest.getBase())) {
-            query = UrlUtils.appendToUrlQuery(query, "base=" + diffRequest.getBase());
-        }
-        if (diffRequest.getContext() != null) {
-            query = UrlUtils.appendToUrlQuery(query, "context=" + diffRequest.getContext());
-        }
-        if (diffRequest.getIntraline() != null) {
-            query = UrlUtils.appendToUrlQuery(query, "intraline=" + diffRequest.getIntraline());
-        }
-        if (diffRequest.getWhitespace() != null) {
-            query = UrlUtils.appendToUrlQuery(query, "whitespace=" + diffRequest.getWhitespace());
-        }
-        if (parent > 0) {
-            query = UrlUtils.appendToUrlQuery(query, "parent=" + parent);
-        }
-
-        String url = getRequestPath() +  "/diff";
-        if (!Strings.isNullOrEmpty(query)) {
-            url += '?' + query;
-        }
-
-        JsonElement jsonElement = gerritRestClient.getRequest(url);
-        return gerritJson.as(jsonElement, DiffInfo.class);
+        return context.get(url).as(DiffInfo.class);
     }
 
     protected String getRequestPath() {

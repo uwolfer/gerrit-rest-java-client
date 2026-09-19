@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.gerrit.extensions.api.changes.*;
 import com.google.gerrit.extensions.client.ListChangesOption;
@@ -25,9 +24,8 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
-import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
+import com.urswolfer.gerrit.client.rest.http.UrlQuery;
 
 import java.util.*;
 
@@ -37,7 +35,6 @@ import java.util.*;
 public class ChangeApiRestClient extends ChangeApi.NotImplemented implements ChangeApi {
 
     private final GerritRestContext context;
-    private final GerritRestClient gerritRestClient;
     private final ChangesRestClient changesRestClient;
     private final GerritJson gerritJson;
     private final String id;
@@ -46,7 +43,6 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
                                ChangesRestClient changesRestClient,
                                String id) {
         this.context = context;
-        this.gerritRestClient = context.restClient();
         this.gerritJson = context.json();
         this.changesRestClient = changesRestClient;
         this.id = id;
@@ -79,9 +75,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public void abandon(AbandonInput abandonInput) throws RestApiException {
-        String request = getRequestPath() + "/abandon";
-        String json = gerritJson.toJson(abandonInput);
-        gerritRestClient.postRequest(request, json);
+        context.post(getRequestPath() + "/abandon").body(abandonInput).send();
     }
 
     @Override
@@ -91,9 +85,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public void restore(RestoreInput restoreInput) throws RestApiException {
-        String request = getRequestPath() + "/restore";
-        String json = gerritJson.toJson(restoreInput);
-        gerritRestClient.postRequest(request, json);
+        context.post(getRequestPath() + "/restore").body(restoreInput).send();
     }
 
     @Override
@@ -105,9 +97,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public void move(MoveInput moveInput) throws RestApiException {
-        String request = getRequestPath() + "/move";
-        String json = gerritJson.toJson(moveInput);
-        gerritRestClient.postRequest(request, json);
+        context.post(getRequestPath() + "/move").body(moveInput).send();
     }
 
     @Override
@@ -117,10 +107,9 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public ChangeApi revert(RevertInput revertInput) throws RestApiException {
-        String request = getRequestPath() + "/revert";
-        String json = gerritJson.toJson(revertInput);
-        ChangeInfo newChangeInfo =
-            gerritJson.as(gerritRestClient.postRequest(request, json), ChangeInfo.class);
+        ChangeInfo newChangeInfo = context.post(getRequestPath() + "/revert")
+            .body(revertInput)
+            .as(ChangeInfo.class);
         return new ChangeApiRestClient(context, changesRestClient, newChangeInfo.id);
     }
 
@@ -132,8 +121,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     @Override
     public RevertSubmissionInfo revertSubmission(RevertInput in) throws RestApiException{
         String request = getRequestPath() + "/revert_submission";
-        String json = gerritJson.toJson(in);
-        JsonElement revertedChanges = gerritRestClient.postRequest(request, json);
+        JsonElement revertedChanges = context.post(request).body(in).asJson();
         RevertSubmissionInfo revertSubmissionInfo = new RevertSubmissionInfo();
         revertSubmissionInfo.revertChanges = gerritJson.asList(revertedChanges, ChangeInfo.class);
         return revertSubmissionInfo;
@@ -141,43 +129,34 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public ChangeInfo createMergePatchSet(MergePatchSetInput in) throws RestApiException {
-        String request = getRequestPath() + "/merge";
-        String json = gerritJson.toJson(in);
-        JsonElement jsonElement = gerritRestClient.postRequest(request, json);
-        return gerritJson.as(jsonElement, ChangeInfo.class);
+        return context.post(getRequestPath() + "/merge").body(in).as(ChangeInfo.class);
     }
 
     @Override
     public void publish() throws RestApiException {
-        String request = getRequestPath() + "/publish";
-        gerritRestClient.postRequest(request);
+        context.post(getRequestPath() + "/publish").send();
     }
 
     @Override
     public void delete() throws RestApiException {
-        String request = getRequestPath();
-        gerritRestClient.deleteRequest(request);
+        context.delete(getRequestPath()).send();
     }
 
     @Override
     public String topic() throws RestApiException {
-        String request = getRequestPath() + "/topic";
-        return gerritRestClient.getRequest(request).getAsString();
+        return context.get(getRequestPath() + "/topic").asString();
     }
 
     @Override
     public void topic(String topic) throws RestApiException {
         String request = getRequestPath() + "/topic";
         Map<String, String> topicInput = Collections.singletonMap("topic", topic);
-        String json = gerritJson.toJson(topicInput);
-        gerritRestClient.putRequest(request, json);
+        context.put(request).body(topicInput).send();
     }
 
     @Override
     public IncludedInInfo includedIn() throws RestApiException {
-        String request = getRequestPath() + "/in";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.as(jsonElement, IncludedInInfo.class);
+        return context.get(getRequestPath() + "/in").as(IncludedInInfo.class);
     }
 
     @Deprecated
@@ -188,25 +167,17 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public List<ReviewerInfo> reviewers() throws RestApiException {
-        String request = getRequestPath() + "/reviewers";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.asList(jsonElement, ReviewerInfo.class);
+        return context.get(getRequestPath() + "/reviewers").asList(ReviewerInfo.class);
     }
 
     @Override
     public AddReviewerResult addReviewer(AddReviewerInput in) throws RestApiException {
-        String request = getRequestPath() + "/reviewers";
-        String json = gerritJson.toJson(in);
-        JsonElement reviewerResult = gerritRestClient.postRequest(request, json);
-        return gerritJson.as(reviewerResult, AddReviewerResult.class);
+        return context.post(getRequestPath() + "/reviewers").body(in).as(AddReviewerResult.class);
     }
 
     @Override
     public ReviewerResult addReviewer(ReviewerInput in) throws RestApiException {
-        String request = getRequestPath() + "/reviewers";
-        String json = gerritJson.toJson(in);
-        JsonElement reviewerResult = gerritRestClient.postRequest(request, json);
-        return gerritJson.as(reviewerResult, ReviewerResult.class);
+        return context.post(getRequestPath() + "/reviewers").body(in).as(ReviewerResult.class);
     }
 
     @Override
@@ -230,23 +201,13 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     }
 
     private List<SuggestedReviewerInfo> getSuggestedReviewers(String queryPart) throws RestApiException {
-        String request = getRequestPath() + String.format("/suggest_reviewers?%s", queryPart);
-        JsonElement suggestedReviewers = gerritRestClient.getRequest(request);
-        return gerritJson.asList(suggestedReviewers, SuggestedReviewerInfo.class);
+        return context.get(getRequestPath() + String.format("/suggest_reviewers?%s", queryPart)).asList(SuggestedReviewerInfo.class);
     }
 
     @Override
     public ChangeInfo get(EnumSet<ListChangesOption> options) throws RestApiException {
-        String query = "";
-        for (ListChangesOption option : options) {
-            query = UrlUtils.appendToUrlQuery(query, "o=" + option);
-        }
-        String url = getRequestPath();
-        if (!Strings.isNullOrEmpty(query)) {
-            url += '?' + query;
-        }
-        JsonElement jsonElement = gerritRestClient.getRequest(url);
-        return gerritJson.as(jsonElement, ChangeInfo.class);
+        String url = UrlQuery.of(getRequestPath()).params("o", options).toUrl();
+        return context.get(url).as(ChangeInfo.class);
     }
 
     @Override
@@ -262,7 +223,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
     @Override
     public EditInfo getEdit() throws RestApiException {
         String request = getRequestPath() + "/edit";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
+        JsonElement jsonElement = context.get(request).asJson();
         return Iterables.getOnlyElement(gerritJson.asList(jsonElement, EditInfo.class));
     }
 
@@ -280,122 +241,90 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public void setMessage(CommitMessageInput in) throws RestApiException {
-        String request = getRequestPath() + "/message";
-        String json = gerritJson.toJson(in);
-        gerritRestClient.postRequest(request, json);
+        context.post(getRequestPath() + "/message").body(in).send();
     }
 
     @Override
     public void setHashtags(HashtagsInput input) throws RestApiException {
-        String request = getRequestPath() + "/hashtags";
-        String json = gerritJson.toJson(input);
-        gerritRestClient.postRequest(request, json);
+        context.post(getRequestPath() + "/hashtags").body(input).send();
     }
 
     @Override
     public Set<String> getHashtags() throws RestApiException {
-        String request = getRequestPath() + "/hashtags";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.asSet(jsonElement, String.class);
+        return context.get(getRequestPath() + "/hashtags").asSet(String.class);
     }
 
     @Override
     public AccountInfo setAssignee(AssigneeInput input) throws RestApiException {
-        String request = getRequestPath() + "/assignee";
-        String json = gerritJson.toJson(input);
-        JsonElement jsonElement= gerritRestClient.putRequest(request, json);
-        return gerritJson.as(jsonElement, AccountInfo.class);
+        return context.put(getRequestPath() + "/assignee").body(input).as(AccountInfo.class);
     }
 
     @Override
     public AccountInfo getAssignee() throws RestApiException {
-        String request = getRequestPath() + "/assignee";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.as(jsonElement, AccountInfo.class);
+        return context.get(getRequestPath() + "/assignee").as(AccountInfo.class);
     }
 
     @Override
     public List<AccountInfo> getPastAssignees() throws RestApiException {
-        String request = getRequestPath() + "/past_assignees";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.asList(jsonElement, AccountInfo.class);
+        return context.get(getRequestPath() + "/past_assignees").asList(AccountInfo.class);
     }
 
     public AccountInfo deleteAssignee() throws RestApiException {
         String request = getRequestPath() + "/assignee";
-        JsonElement jsonElement= gerritRestClient.deleteRequest(request);
+        JsonElement jsonElement= context.delete(request).asJson();
         return gerritJson.as(jsonElement, AccountInfo.class);
     }
 
 
     @Override
     public ChangeInfo check() throws RestApiException {
-        String request = getRequestPath() + "/check";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.as(jsonElement, ChangeInfo.class);
+        return context.get(getRequestPath() + "/check").as(ChangeInfo.class);
     }
 
     @Override
     public ChangeInfo check(FixInput in) throws RestApiException {
-        String request = getRequestPath() + "/check";
-        String json = gerritJson.toJson(in);
-        JsonElement jsonElement = gerritRestClient.postRequest(request, json);
-        return gerritJson.as(jsonElement, ChangeInfo.class);
+        return context.post(getRequestPath() + "/check").body(in).as(ChangeInfo.class);
     }
 
     @Override
     public Map<String, List<CommentInfo>> comments() throws RestApiException {
-      String request = getRequestPath() + "/comments";
-      JsonElement jsonElement = gerritRestClient.getRequest(request);
-      return gerritJson.asSortedMapOfLists(jsonElement, CommentInfo.class);
+      return context.get(getRequestPath() + "/comments").asSortedMapOfLists(CommentInfo.class);
     }
 
     @Override
     public Map<String, List<RobotCommentInfo>> robotComments() throws RestApiException {
-        String request = getRequestPath() + "/robotcomments";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.asSortedMapOfLists(jsonElement, RobotCommentInfo.class);
+        return context.get(getRequestPath() + "/robotcomments").asSortedMapOfLists(RobotCommentInfo.class);
     }
 
     @Override
     public Map<String, List<CommentInfo>> drafts() throws RestApiException {
-        String request = getRequestPath() + "/drafts";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.asSortedMapOfLists(jsonElement, CommentInfo.class);
+        return context.get(getRequestPath() + "/drafts").asSortedMapOfLists(CommentInfo.class);
     }
 
     @Override
     public void index() throws RestApiException {
-      String request = getRequestPath() + "/index";
-      gerritRestClient.postRequest(request);
+      context.post(getRequestPath() + "/index").send();
     }
 
     @Override
     public List<ChangeInfo> submittedTogether() throws RestApiException {
-        String url = getRequestPath() + "/submitted_together";
-        JsonElement jsonElement = gerritRestClient.getRequest(url);
-        return gerritJson.asList(jsonElement, ChangeInfo.class);
+        return context.get(getRequestPath() + "/submitted_together").asList(ChangeInfo.class);
     }
 
     @Override
     public List<ChangeMessageInfo> messages() throws RestApiException {
-        String request = getRequestPath() + "/messages";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.asList(jsonElement, ChangeMessageInfo.class);
+        return context.get(getRequestPath() + "/messages").asList(ChangeMessageInfo.class);
     }
 
     @Override
     public void ignore(boolean ignore) throws RestApiException {
         String path = ignore ? "/ignore" : "/unignore";
-        String request = getRequestPath() + path;
-        gerritRestClient.putRequest(request);
+        context.put(getRequestPath() + path).send();
     }
 
     @Override
     public void rebase(RebaseInput in) throws RestApiException {
-        String url = getRequestPath() + "/rebase";
-        String json = gerritJson.toJson(in);
-        gerritRestClient.postRequest(url, json);
+        context.post(getRequestPath() + "/rebase").body(in).send();
     }
 
     protected String getRequestPath() {

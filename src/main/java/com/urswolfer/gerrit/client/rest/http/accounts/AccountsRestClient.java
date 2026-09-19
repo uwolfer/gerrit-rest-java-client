@@ -24,7 +24,6 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.accounts.AccountApi;
 import com.urswolfer.gerrit.client.rest.accounts.Accounts;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 import java.util.List;
@@ -35,12 +34,10 @@ import java.util.List;
 public class AccountsRestClient extends Accounts.NotImplemented implements Accounts {
 
     private final GerritRestContext context;
-    private final GerritRestClient gerritRestClient;
     private final GerritJson gerritJson;
 
     public AccountsRestClient(GerritRestContext context) {
         this.context = context;
-        this.gerritRestClient = context.restClient();
         this.gerritJson = context.json();
     }
 
@@ -90,8 +87,7 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
     @Override
     public AccountApi create(AccountInput input) throws RestApiException {
         String requestPath = String.format("/accounts/%s", Url.encode(input.username));
-        String body = gerritJson.toJson(input);
-        JsonElement result = gerritRestClient.putRequest(requestPath,body);
+        JsonElement result = context.put(requestPath).body(input).asJson();
         AccountInfo info = gerritJson.as(result, AccountInfo.class);
         return new AccountApiRestClient(context, info.username);
     }
@@ -102,8 +98,6 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
     }
 
     private List<AccountInfo> getSuggestAccounts(String queryPart) throws RestApiException {
-        String request = String.format("/accounts/?suggest&%s", queryPart);
-        JsonElement suggestedReviewers = gerritRestClient.getRequest(request);
-        return gerritJson.asList(suggestedReviewers, AccountInfo.class);
+        return context.get(String.format("/accounts/?suggest&%s", queryPart)).asList(AccountInfo.class);
     }
 }

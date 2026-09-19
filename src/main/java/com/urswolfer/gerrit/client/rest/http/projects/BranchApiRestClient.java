@@ -25,20 +25,15 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
-import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
-import org.apache.http.HttpResponse;
 
-import java.io.IOException;
 
-import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 
 /**
  * @author Ingo Rissmann
  */
 public class BranchApiRestClient extends BranchApi.NotImplemented implements BranchApi {
-    private final GerritRestClient gerritRestClient;
+    private final GerritRestContext context;
     private final GerritJson gerritJson;
     private final ProjectApiRestClient projectApiRestClient;
     private final String name;
@@ -46,7 +41,7 @@ public class BranchApiRestClient extends BranchApi.NotImplemented implements Bra
     public BranchApiRestClient(GerritRestContext context,
                                ProjectApiRestClient projectApiRestClient,
                                String name) {
-        this.gerritRestClient = context.restClient();
+        this.context = context;
         this.gerritJson = context.json();
         this.projectApiRestClient = projectApiRestClient;
         this.name = name;
@@ -54,32 +49,26 @@ public class BranchApiRestClient extends BranchApi.NotImplemented implements Bra
 
     @Override
     public BranchApi create(BranchInput in) throws RestApiException {
-        String json = gerritJson.toJson(in);
-        gerritRestClient.putRequest(branchUrl(), json);
+        context.put(branchUrl()).body(in).send();
         return this;
     }
 
     @Override
     public BranchInfo get() throws RestApiException {
-        JsonElement jsonElement = gerritRestClient.getRequest(branchUrl());
+        JsonElement jsonElement = context.get(branchUrl()).asJson();
         return Iterables.getOnlyElement(gerritJson.asList(jsonElement, BranchInfo.class));
     }
 
     @Override
     public void delete() throws RestApiException {
-        gerritRestClient.deleteRequest(branchUrl());
+        context.delete(branchUrl()).send();
     }
 
     @Override
     public BinaryResult file(String path) throws RestApiException {
         String encodedPath = Url.encode(path);
         String request = branchUrl() + "/files/" + encodedPath + "/content";
-        try {
-            HttpResponse response = gerritRestClient.request(request, null, GET);
-            return BinaryResultUtils.createBinaryResult(response);
-        } catch (IOException e) {
-            throw RestApiException.wrap("Failed to get file content.", e);
-        }
+        return context.get(request).binary("Failed to get file content.");
     }
 
     protected String branchUrl() {

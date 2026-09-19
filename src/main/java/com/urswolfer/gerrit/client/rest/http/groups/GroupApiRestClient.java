@@ -23,7 +23,6 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 import java.util.ArrayList;
@@ -42,13 +41,13 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
     private static final String BASE_URL = "/groups";
 
     private final GerritJson gerritJson;
-    private final GerritRestClient gerritRestClient;
+    private final GerritRestContext context;
     private final String groupId;
 
     public GroupApiRestClient(GerritRestContext context,
                               String id)
     {
-        this.gerritRestClient = context.restClient();
+        this.context = context;
         this.gerritJson = context.json();
         this.groupId = id;
     }
@@ -82,53 +81,45 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
 
     @Override
     public GroupInfo get() throws RestApiException {
-        String restPath = getRequestPath();
-        JsonElement result = gerritRestClient.getRequest(restPath);
-        return gerritJson.as(result, GroupInfo.class);
+        return context.get(getRequestPath()).as(GroupInfo.class);
     }
 
     @Override
     public GroupInfo detail() throws RestApiException {
-        String restPath = getRequestPath() + "/detail";
-        JsonElement result = gerritRestClient.getRequest(restPath);
-        return gerritJson.as(result, GroupInfo.class);
+        return context.get(getRequestPath() + "/detail").as(GroupInfo.class);
     }
 
     @Override
     public String name() throws RestApiException {
-        String restPath = getRequestPath() + "/name";
-        return gerritRestClient.getRequest(restPath).getAsString();
+        return context.get(getRequestPath() + "/name").asString();
     }
 
     @Override
     public void name(String name) throws RestApiException {
         String restPath = getRequestPath() + "/name";
-        gerritRestClient.putRequest(restPath, name);
+        context.put(restPath).rawBody(name).send();
     }
 
     @Override
     public GroupInfo owner() throws RestApiException {
-        String restPath = getRequestPath() + "/owner";
-        JsonElement result = gerritRestClient.getRequest(restPath);
-        return gerritJson.as(result, GroupInfo.class);
+        return context.get(getRequestPath() + "/owner").as(GroupInfo.class);
     }
 
     @Override
     public void owner(String owner) throws RestApiException {
         String restPath = getRequestPath() + "/owner";
-        gerritRestClient.putRequest(restPath, owner);
+        context.put(restPath).rawBody(owner).send();
     }
 
     @Override
     public String description() throws RestApiException {
-        String restPath = getRequestPath() + "/description";
-        return gerritRestClient.getRequest(restPath).getAsString();
+        return context.get(getRequestPath() + "/description").asString();
     }
 
     @Override
     public void description(String description) throws RestApiException {
         String restPath = getRequestPath() + "/description";
-        gerritRestClient.putRequest(restPath, description);
+        context.put(restPath).rawBody(description).send();
     }
 
     @Override
@@ -142,8 +133,7 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
         if (recursive) {
             restPath += "?recursive";
         }
-        JsonElement result = gerritRestClient.getRequest(restPath);
-        return gerritJson.asList(result, AccountInfo.class);
+        return context.get(restPath).asList(AccountInfo.class);
     }
 
     @Override
@@ -154,14 +144,13 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
         // { members: [ "member1", "member2" ] }
         Map<String, List<String>> memberMap =
             Collections.singletonMap("members", Arrays.asList(members));
-        String json = gerritJson.toJson(memberMap);
-        gerritRestClient.postRequest(restPath, json);
+        context.post(restPath).body(memberMap).send();
     }
 
     @Override
     public List<GroupInfo> includedGroups() throws RestApiException {
         String restPath = getRequestPath() + "/groups/";
-        JsonElement result = gerritRestClient.getRequest(restPath);
+        JsonElement result = context.get(restPath).asJson();
         return parseGroupInfos(gerritJson, result);
     }
 
@@ -175,7 +164,7 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
             Collections.singletonMap("groups", Arrays.asList(groups));
         String json = gerritJson.toJson(groupMap);
 
-        gerritRestClient.postRequest(restPath, json);
+        context.post(restPath).rawBody(json).send();
     }
 
     @Override
@@ -185,7 +174,7 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
             Collections.singletonMap("groups", Arrays.asList(groups));
         String json = gerritJson.toJson(groupMap);
 
-        gerritRestClient.postRequest(restPath, json);
+        context.post(restPath).rawBody(json).send();
     }
 
     @Override
@@ -193,7 +182,6 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
         String restPath = getRequestPath() + "/members.delete";
         Map<String, List<String>> memberMap =
             Collections.singletonMap("members", Arrays.asList(members));
-        String json = gerritJson.toJson(memberMap);
-        gerritRestClient.postRequest(restPath, json);
+        context.post(restPath).body(memberMap).send();
     }
 }
