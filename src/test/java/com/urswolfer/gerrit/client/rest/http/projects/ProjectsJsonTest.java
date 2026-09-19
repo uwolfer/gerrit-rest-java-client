@@ -28,7 +28,7 @@ import com.google.gerrit.extensions.client.SubmitType;
 import com.google.gerrit.extensions.common.ProjectInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import com.urswolfer.gerrit.client.rest.http.common.ProjectInfoBuilder;
 import org.testng.annotations.Test;
@@ -38,11 +38,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.SortedMap;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 
 /**
  * @author Thomas Forrer
  */
-public class ProjectsParserTest extends AbstractParserTest {
+public class ProjectsJsonTest extends AbstractJsonTest {
     private static final List<ProjectInfo> PROJECT_INFO_LIST = new ArrayList<>();
 
     static {
@@ -57,13 +59,13 @@ public class ProjectsParserTest extends AbstractParserTest {
                 .get());
     }
 
-    private final ProjectsParser projectsParser = new ProjectsParser(getGson());
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
     @Test
     public void testParseProjectInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("projects.json");
 
-        SortedMap<String, ProjectInfo> projectInfos = projectsParser.parseProjectInfos(jsonElement);
+        SortedMap<String, ProjectInfo> projectInfos = gerritJson.asSortedMap(jsonElement, ProjectInfo.class);
 
         Truth.assertThat(projectInfos.size()).isEqualTo(3);
         int i = 0;
@@ -78,7 +80,7 @@ public class ProjectsParserTest extends AbstractParserTest {
     public void testParseProjectInfosList() throws Exception {
         JsonElement jsonElement = getJsonElement("projects.json");
 
-        List<ProjectInfo> projectInfos = projectsParser.parseProjectInfosList(jsonElement);
+        List<ProjectInfo> projectInfos = new ArrayList<>(gerritJson.asSortedMap(jsonElement, ProjectInfo.class).values());
 
         Truth.assertThat(projectInfos.size()).isEqualTo(3);
         int i = 0;
@@ -93,7 +95,7 @@ public class ProjectsParserTest extends AbstractParserTest {
     public void testParseSingleProjectInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("project.json");
 
-        ProjectInfo projectInfo = projectsParser.parseSingleProjectInfo(jsonElement);
+        ProjectInfo projectInfo = gerritJson.as(jsonElement, ProjectInfo.class);
 
         GerritAssert.assertEquals(projectInfo, new ProjectInfoBuilder()
             .withId("Hello-World")
@@ -111,7 +113,7 @@ public class ProjectsParserTest extends AbstractParserTest {
         projectInput.description = "This is a demo project.";
         projectInput.owners = Collections.singletonList("MyProject-Owners");
 
-        String outputForTesting = projectsParser.generateProjectInput(projectInput);
+        String outputForTesting = gerritJson.toJson(projectInput, ProjectInput.class);
 
         ProjectInput parsedJson = new Gson().fromJson(outputForTesting, ProjectInput.class);
         Truth.assertThat(parsedJson.name).isEqualTo(projectInput.name);
@@ -123,7 +125,7 @@ public class ProjectsParserTest extends AbstractParserTest {
     public void testParseProjectConfigInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("configInfo.json");
 
-        ConfigInfo configInfo = projectsParser.parseConfigInfo(jsonElement);
+        ConfigInfo configInfo = GsonFactory.createForConfigInfo().fromJson(jsonElement, ConfigInfo.class);
 
 
         Truth.assertThat(configInfo.maxObjectSizeLimit.value).isEqualTo("10m");
@@ -141,7 +143,7 @@ public class ProjectsParserTest extends AbstractParserTest {
     public void testParseAccessCheckInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("projectAccessInfo.json");
 
-        ProjectAccessInfo accessInfo = projectsParser.parseProjectAccessInfo(jsonElement);
+        ProjectAccessInfo accessInfo = gerritJson.as(jsonElement, ProjectAccessInfo.class);
 
         Truth.assertThat(accessInfo.canAdd).isTrue();
         Truth.assertThat(accessInfo.canAddTags).isTrue();

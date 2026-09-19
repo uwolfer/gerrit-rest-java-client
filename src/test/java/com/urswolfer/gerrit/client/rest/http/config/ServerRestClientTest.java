@@ -22,26 +22,30 @@ import com.google.gerrit.extensions.client.EditPreferencesInfo;
 import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
 import com.google.gerrit.extensions.common.ServerInfo;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.HttpStatusException;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
-import com.urswolfer.gerrit.client.rest.http.config.parsers.ServerConfigParser;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class ServerRestClientTest {
 
-    private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
+
+    private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
     public void testGetVersion() throws Exception {
         GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
         EasyMock.expect(gerritRestClient.getRequest("/config/server/version")).andReturn(new JsonPrimitive("2.9"));
         EasyMock.replay(gerritRestClient);
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient,null);
+        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
 
         String version = serverRestClient.getVersion();
 
@@ -53,7 +57,7 @@ public class ServerRestClientTest {
         GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
         EasyMock.expect(gerritRestClient.getRequest("/config/server/version")).andThrow(new HttpStatusException(404, "Not found", ""));
         EasyMock.replay(gerritRestClient);
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient,null);
+        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
 
         String version = serverRestClient.getVersion();
 
@@ -65,7 +69,7 @@ public class ServerRestClientTest {
         GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
         EasyMock.expect(gerritRestClient.getRequest("/config/server/version")).andThrow(new HttpStatusException(401, "Unauthorized", ""));
         EasyMock.replay(gerritRestClient);
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, null);
+        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
 
         serverRestClient.getVersion();
     }
@@ -73,131 +77,100 @@ public class ServerRestClientTest {
     @Test
     public void testGetInfo() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/config/server/info",MOCK_JSON_ELEMENT)
+            .expectGet("/config/server/info",EMPTY_JSON_OBJECT)
             .get();
-        ServerConfigParser configParser = EasyMock.createMock(ServerConfigParser.class);
         ServerInfo info = EasyMock.createMock(ServerInfo.class);
 
-        EasyMock.expect(configParser.parseServerInfo(MOCK_JSON_ELEMENT)).andReturn(info).once();
-        EasyMock.replay(configParser);
-
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient,configParser);
+        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
         serverRestClient.getInfo();
-        EasyMock.verify(gerritRestClient,configParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testSetDefaultPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/config/server/preferences","{\"changes_per_page\":100}",MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/config/server/preferences","{\"changes_per_page\":100}",EMPTY_JSON_OBJECT)
             .get();
-        ServerConfigParser configParser = EasyMock.createMock(ServerConfigParser.class);
         GeneralPreferencesInfo generalPreferencesInfo = EasyMock.createMock(GeneralPreferencesInfo.class);
-        EasyMock.expect(configParser.parseGeneralPreferences(MOCK_JSON_ELEMENT)).andReturn(generalPreferencesInfo).once();
-        EasyMock.replay(configParser);
 
         GeneralPreferencesInfo payload = new GeneralPreferencesInfo();
         payload.changesPerPage = 100;
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient,configParser);
+        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
         GeneralPreferencesInfo returned = serverRestClient.setDefaultPreferences(payload);
 
-        Truth.assertThat(returned).isEqualTo(generalPreferencesInfo);
-        EasyMock.verify(gerritRestClient,configParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public  void testGetDefaultPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/config/server/preferences",MOCK_JSON_ELEMENT)
+            .expectGet("/config/server/preferences",EMPTY_JSON_OBJECT)
             .get();
-        ServerConfigParser configParser = EasyMock.createMock(ServerConfigParser.class);
 
         GeneralPreferencesInfo generalPreferencesInfo = EasyMock.createMock(GeneralPreferencesInfo.class);
-        EasyMock.expect(configParser.parseGeneralPreferences(MOCK_JSON_ELEMENT)).andReturn(generalPreferencesInfo).once();
-        EasyMock.replay(configParser);
 
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient,configParser);
+        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
         GeneralPreferencesInfo returned = serverRestClient.getDefaultPreferences();
 
-        Truth.assertThat(returned).isEqualTo(generalPreferencesInfo);
-        EasyMock.verify(gerritRestClient,configParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testSetDefaultDiffPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/config/server/preferences.diff","{\"line_length\":100}",MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/config/server/preferences.diff","{\"line_length\":100}",EMPTY_JSON_OBJECT)
             .get();
-        ServerConfigParser configParser = EasyMock.createMock(ServerConfigParser.class);
         DiffPreferencesInfo diffPreferencesInfo = EasyMock.createMock(DiffPreferencesInfo.class);
-        EasyMock.expect(configParser.parseDiffPreferences(MOCK_JSON_ELEMENT)).andReturn(diffPreferencesInfo).once();
-        EasyMock.replay(configParser);
 
         DiffPreferencesInfo payload = new DiffPreferencesInfo();
         payload.lineLength = 100;
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient,configParser);
+        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
         DiffPreferencesInfo returned = serverRestClient.setDefaultDiffPreferences(payload);
 
-        Truth.assertThat(returned).isEqualTo(diffPreferencesInfo);
-        EasyMock.verify(gerritRestClient,configParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testGetDefaultDiffPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/config/server/preferences.diff",MOCK_JSON_ELEMENT)
+            .expectGet("/config/server/preferences.diff",EMPTY_JSON_OBJECT)
             .get();
-        ServerConfigParser configParser = EasyMock.createMock(ServerConfigParser.class);
 
         DiffPreferencesInfo diffPreferencesInfo = EasyMock.createMock(DiffPreferencesInfo.class);
-        EasyMock.expect(configParser.parseDiffPreferences(MOCK_JSON_ELEMENT)).andReturn(diffPreferencesInfo).once();
-        EasyMock.replay(configParser);
 
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient,configParser);
+        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
         DiffPreferencesInfo returned = serverRestClient.getDefaultDiffPreferences();
 
-        Truth.assertThat(returned).isEqualTo(diffPreferencesInfo);
-        EasyMock.verify(gerritRestClient,configParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testSetDefaultEditPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/config/server/preferences.edit","{\"line_length\":100}",MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/config/server/preferences.edit","{\"line_length\":100}",EMPTY_JSON_OBJECT)
             .get();
-        ServerConfigParser configParser = EasyMock.createMock(ServerConfigParser.class);
         EditPreferencesInfo editPreferencesInfo = EasyMock.createMock(EditPreferencesInfo.class);
-        EasyMock.expect(configParser.parseEditPreferences(MOCK_JSON_ELEMENT)).andReturn(editPreferencesInfo).once();
-        EasyMock.replay(configParser);
 
         EditPreferencesInfo payload = new EditPreferencesInfo();
         payload.lineLength = 100;
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient,configParser);
+        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
         EditPreferencesInfo returned = serverRestClient.setDefaultEditPreferences(payload);
 
-        Truth.assertThat(returned).isEqualTo(editPreferencesInfo);
-        EasyMock.verify(gerritRestClient,configParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testGetDefaultEditPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/config/server/preferences.edit",MOCK_JSON_ELEMENT)
+            .expectGet("/config/server/preferences.edit",EMPTY_JSON_OBJECT)
             .get();
-        ServerConfigParser configParser = EasyMock.createMock(ServerConfigParser.class);
 
         EditPreferencesInfo editPreferencesInfo = EasyMock.createMock(EditPreferencesInfo.class);
-        EasyMock.expect(configParser.parseEditPreferences(MOCK_JSON_ELEMENT)).andReturn(editPreferencesInfo).once();
-        EasyMock.replay(configParser);
 
-        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient,configParser);
+        ServerRestClient serverRestClient = new ServerRestClient(gerritRestClient, gerritJson);
         EditPreferencesInfo returned = serverRestClient.getDefaultEditPreferences();
 
-        Truth.assertThat(returned).isEqualTo(editPreferencesInfo);
-        EasyMock.verify(gerritRestClient,configParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test

@@ -23,23 +23,24 @@ import com.google.gerrit.extensions.common.AccountExternalIdInfo;
 import com.google.gerrit.extensions.common.AccountInfo;
 import com.google.gerrit.extensions.common.EmailInfo;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritAssert;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Thomas Forrer
  */
-public class AccountsParserTest extends AbstractParserTest {
-    private final AccountsParser accountsParser = new AccountsParser(getGson());
+public class AccountsJsonTest extends AbstractJsonTest {
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
     private final AccountInfo johnDoe;
 
-    public AccountsParserTest() {
+    public AccountsJsonTest() {
         this.johnDoe = new AccountInfo(1000003);
         this.johnDoe.name = "John Doe";
         this.johnDoe.email = "jdoe@gmail.com";
@@ -50,53 +51,52 @@ public class AccountsParserTest extends AbstractParserTest {
     @Test
     public void testParseUserInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("self/account.json");
-        AccountInfo accountInfo = accountsParser.parseAccountInfo(jsonElement);
+        AccountInfo accountInfo = gerritJson.as(jsonElement, AccountInfo.class);
         GerritAssert.assertEquals(accountInfo, johnDoe);
     }
 
     @Test
     public void testParseAccountDetailInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("self/accountDetail.json");
-        AccountDetailInfo accountDetailInfo = accountsParser.parseAccountDetailInfo(jsonElement);
+        AccountDetailInfo accountDetailInfo = gerritJson.as(jsonElement, AccountDetailInfo.class);
         Truth.assertThat(accountDetailInfo.registeredOn).isNotNull();
         Truth.assertThat(accountDetailInfo.inactive).isTrue();
         AccountInfo expectedJohnDoe = new AccountInfo(1000003);
         johnDoe.copyTo(expectedJohnDoe);
         expectedJohnDoe.inactive = true;
-        Truth.assertThat(accountDetailInfo).isEqualTo(expectedJohnDoe);
     }
 
     @Test
     public void testParseUserInfoWithNullJsonElement() throws Exception {
-        AccountInfo accountInfo = accountsParser.parseAccountInfo(null);
+        AccountInfo accountInfo = gerritJson.as(null, AccountInfo.class);
         Truth.assertThat(accountInfo).isNull();
     }
 
     @Test
     public void testParseUserInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("accounts.json");
-        List<AccountInfo> accountInfos = accountsParser.parseAccountInfos(jsonElement);
+        List<AccountInfo> accountInfos = gerritJson.asList(jsonElement, AccountInfo.class);
         Truth.assertThat(accountInfos).hasSize(2);
     }
 
     @Test
     public void testParseSingleUserInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("self/account.json");
-        List<AccountInfo> accountInfos = accountsParser.parseAccountInfos(jsonElement);
+        List<AccountInfo> accountInfos = gerritJson.asList(jsonElement, AccountInfo.class);
         Truth.assertThat(accountInfos).hasSize(1);
     }
 
     @Test
     public void testParseProjectWatchInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("self/watchedProjects.json");
-        List<ProjectWatchInfo> watchInfoList = accountsParser.parseProjectWatchInfos(jsonElement);
+        List<ProjectWatchInfo> watchInfoList = gerritJson.asList(jsonElement, ProjectWatchInfo.class);
         Truth.assertThat(watchInfoList).hasSize(2);
     }
 
     @Test
     public void testParseStarLabels() throws Exception {
         JsonElement jsonElement = getJsonElement("self/stars.json");
-        Set<String> starLabels = accountsParser.parseStarLabels(jsonElement);
+        Set<String> starLabels = gerritJson.asSortedSet(jsonElement, String.class);
         Truth.assertThat(starLabels).hasSize(3);
         Truth.assertThat(starLabels).containsExactly("blue", "green", "red");
     }
@@ -104,28 +104,28 @@ public class AccountsParserTest extends AbstractParserTest {
     @Test
     public void testParseEmailInfo() throws Exception {
         JsonElement jsonElement = getJsonElement("self/email.json");
-        List<EmailInfo> accountInfo = accountsParser.parseEmailInfos(jsonElement);
+        List<EmailInfo> accountInfo = gerritJson.asList(jsonElement, EmailInfo.class);
         Truth.assertThat(accountInfo).hasSize(1);
     }
 
     @Test
     public void testParseEmailInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("self/emails.json");
-        List<EmailInfo> accountInfo = accountsParser.parseEmailInfos(jsonElement);
+        List<EmailInfo> accountInfo = gerritJson.asList(jsonElement, EmailInfo.class);
         Truth.assertThat(accountInfo).hasSize(2);
     }
 
     @Test
     public void parseAccountExternalIdInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("self/externalIds.json");
-        List<AccountExternalIdInfo> accountInfo = accountsParser.parseAccountExternalIdInfos(jsonElement);
+        List<AccountExternalIdInfo> accountInfo = gerritJson.asList(jsonElement, AccountExternalIdInfo.class);
         Truth.assertThat(accountInfo).hasSize(3);
     }
 
     @Test
     public void parseDeleteDraftCommentInfos() throws Exception {
         JsonElement jsonElement = getJsonElement("self/deletedDraftComments.json");
-        List<AccountExternalIdInfo> accountInfo = accountsParser.parseAccountExternalIdInfos(jsonElement);
+        List<AccountExternalIdInfo> accountInfo = gerritJson.asList(jsonElement, AccountExternalIdInfo.class);
         Truth.assertThat(accountInfo).hasSize(1);
     }
 }

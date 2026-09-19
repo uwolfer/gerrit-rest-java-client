@@ -25,8 +25,8 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.CommitInfosParser;
 import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
 import org.apache.http.HttpResponse;
 
@@ -43,12 +43,14 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
     private final GerritRestClient gerritRestClient;
     private final String id;
 
-    private final CommitInfosParser commitInfosParser;
+    private final GerritJson gerritJson;
 
-    public ChangeEditApiRestClient(GerritRestClient gerritRestClient, CommitInfosParser commitInfosParser, String id) {
+    public ChangeEditApiRestClient(GerritRestClient gerritRestClient,
+                                   GerritJson gerritJson,
+                                   String id) {
         this.gerritRestClient = gerritRestClient;
+        this.gerritJson = gerritJson;
         this.id = id;
-        this.commitInfosParser = commitInfosParser;
     }
 
     @Override
@@ -57,7 +59,7 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
         if(result.isJsonNull()){
             return Optional.empty();
         }
-        return Optional.of(commitInfosParser.parseEditInfo(result));
+        return Optional.of(gerritJson.as(result, EditInfo.class));
     }
 
     @Override
@@ -79,7 +81,7 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
     @Override
     public void publish(PublishChangeEditInput input) throws RestApiException {
         String request = getRequestPath() + ":publish";
-        String json = gerritRestClient.getGson().toJson(input);
+        String json = gerritJson.toJson(input);
         gerritRestClient.postRequest(request,json);
     }
 
@@ -110,7 +112,7 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
     }
 
     private void changeFile(ChangeEditInput input) throws RestApiException {
-        String json = gerritRestClient.getGson().toJson(input);
+        String json = gerritJson.toJson(input);
         gerritRestClient.postRequest(getRequestPath(),json);
     }
 
@@ -148,7 +150,7 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
 
     public void modifyCommitMessage(ChangeEditMessageInput input) throws RestApiException {
         String request = getRequestPath() + ":message";
-        String json = gerritRestClient.getGson().toJson(input);
+        String json = gerritJson.toJson(input);
         gerritRestClient.putRequest(request,json);
     }
 

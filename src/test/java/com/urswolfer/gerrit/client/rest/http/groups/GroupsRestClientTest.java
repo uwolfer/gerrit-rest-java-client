@@ -21,6 +21,7 @@ import com.google.gerrit.extensions.api.groups.Groups.QueryRequest;
 import com.google.gerrit.extensions.client.ListGroupsOption;
 import com.google.gerrit.extensions.common.GroupInfo;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
@@ -32,42 +33,38 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Shawn Stafford
  */
 public class GroupsRestClientTest {
-    private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
-    private static final GroupInfo MOCK_GROUP_INFO = EasyMock.createMock(GroupInfo.class);
+
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
+    private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
     public void testId() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/groups/jdoe", MOCK_JSON_ELEMENT)
+            .expectGet("/groups/jdoe", EMPTY_JSON_OBJECT)
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder()
-            .expectParseGroupInfo(MOCK_JSON_ELEMENT, MOCK_GROUP_INFO)
-            .get();
-        GroupsRestClient groupsRestClient = new GroupsRestClient(gerritRestClient, groupsParser);
+        GroupsRestClient groupsRestClient = new GroupsRestClient(gerritRestClient, gerritJson);
         groupsRestClient.id("jdoe").get();
 
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testCreate() throws Exception {
         String groupName = "foo";
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGetGson()
-            .expectPut("/groups/" + groupName, "{\"name\":\"foo\"}", MOCK_JSON_ELEMENT)
+            .expectPut("/groups/" + groupName, "{\"name\":\"foo\"}", EMPTY_JSON_OBJECT)
             .get();
-        GroupsParser groupsParser = new GroupsParserBuilder()
-            .expectParseGroupInfo(MOCK_JSON_ELEMENT, MOCK_GROUP_INFO)
-            .get();
-        GroupsRestClient groupsRestClient = new GroupsRestClient(gerritRestClient, groupsParser);
+        GroupsRestClient groupsRestClient = new GroupsRestClient(gerritRestClient, gerritJson);
         groupsRestClient.create(groupName);
 
-        EasyMock.verify(gerritRestClient, groupsParser);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
@@ -119,9 +116,8 @@ public class GroupsRestClientTest {
     private static final class GroupListTestCase {
         private TestListRequest listParameter = new TestListRequest();
         private String expectedUrl;
-        private JsonElement mockJsonElement = EasyMock.createMock(JsonElement.class);
+        private JsonElement mockJsonElement = new JsonObject();
         private GerritRestClient gerritRestClient;
-        private GroupsParser groupsParser;
 
         public GroupListTestCase withListParameter(TestListRequest listParameter) {
             this.listParameter = listParameter;
@@ -141,14 +137,11 @@ public class GroupsRestClientTest {
         }
 
         public void verify() {
-            EasyMock.verify(gerritRestClient, groupsParser);
+            EasyMock.verify(gerritRestClient);
         }
 
         public GroupsRestClient getGroupsRestClient() throws Exception {
-            return new GroupsRestClient(
-                setupGerritRestClient(),
-                setupGroupsParser()
-            );
+            return new GroupsRestClient(setupGerritRestClient(), gerritJson);
         }
 
         public GerritRestClient setupGerritRestClient() throws Exception {
@@ -160,14 +153,6 @@ public class GroupsRestClientTest {
             return gerritRestClient;
         }
 
-        public GroupsParser setupGroupsParser() throws Exception {
-            groupsParser = EasyMock.createMock(GroupsParser.class);
-            EasyMock.expect(groupsParser.parseGroupInfos(mockJsonElement))
-                .andReturn(new ArrayList<>())
-                .once();
-            EasyMock.replay(groupsParser);
-            return groupsParser;
-        }
 
         @Override
         public String toString() {
@@ -265,9 +250,8 @@ public class GroupsRestClientTest {
     private static final class GroupQueryTestCase {
         private TestQueryRequest queryParameter = new TestQueryRequest();
         private String expectedUrl;
-        private JsonElement mockJsonElement = EasyMock.createMock(JsonElement.class);
+        private JsonElement mockJsonElement = new JsonObject();
         private GerritRestClient gerritRestClient;
-        private GroupsParser groupsParser;
 
         public GroupQueryTestCase withQueryParameter(TestQueryRequest listParameter) {
             this.queryParameter = listParameter;
@@ -287,11 +271,11 @@ public class GroupsRestClientTest {
         }
 
         public void verify() {
-            EasyMock.verify(gerritRestClient, groupsParser);
+            EasyMock.verify(gerritRestClient);
         }
 
         public GroupsRestClient getGroupsRestClient() throws Exception {
-            return new GroupsRestClient(setupGerritRestClient(), setupGroupsParser());
+            return new GroupsRestClient(setupGerritRestClient(), gerritJson);
         }
 
         public GerritRestClient setupGerritRestClient() throws Exception {
@@ -299,13 +283,6 @@ public class GroupsRestClientTest {
             EasyMock.expect(gerritRestClient.getRequest(expectedUrl)).andReturn(mockJsonElement).once();
             EasyMock.replay(gerritRestClient);
             return gerritRestClient;
-        }
-
-        public GroupsParser setupGroupsParser() {
-            groupsParser = EasyMock.createMock(GroupsParser.class);
-            EasyMock.expect(groupsParser.parseGroupInfos(mockJsonElement)).andReturn(new ArrayList<>()).once();
-            EasyMock.replay(groupsParser);
-            return groupsParser;
         }
 
         @Override

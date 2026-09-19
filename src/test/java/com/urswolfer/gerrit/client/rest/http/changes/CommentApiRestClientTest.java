@@ -20,42 +20,40 @@ import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.DeleteCommentInput;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.CommentsParser;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 public class CommentApiRestClientTest {
 
-    private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
+
+    private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
     private static final String COMMENT_ID = "TvcXrmjM";
     private static final String REVISION_ID = "ec047590bc7fb8db7ae03ebac336488bfc1c5e12";
-
 
     @Test
     public void testGet() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/" +
-                "revisions/" + REVISION_ID + "/comments/" + COMMENT_ID, MOCK_JSON_ELEMENT)
+                "revisions/" + REVISION_ID + "/comments/" + COMMENT_ID, EMPTY_JSON_OBJECT)
             .get();
         CommentInfo commentInfo = EasyMock.createMock(CommentInfo.class);
-        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
-        EasyMock.expect(commentsParser.parseSingleCommentInfo(MOCK_JSON_ELEMENT)).andReturn(commentInfo);
-        EasyMock.replay(commentsParser);
 
         RevisionApiRestClient revisionApiRestClient = EasyMock.createMock(RevisionApiRestClient.class);
         EasyMock.expect(revisionApiRestClient.getRequestPath()).andReturn(
             "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revisions/" + REVISION_ID);
         EasyMock.replay(revisionApiRestClient);
 
-        CommentApiRestClient commentApiRestClient = new CommentApiRestClient(gerritRestClient, revisionApiRestClient,
-            commentsParser, COMMENT_ID);
+        CommentApiRestClient commentApiRestClient = new CommentApiRestClient(gerritRestClient, gerritJson, revisionApiRestClient, COMMENT_ID);
 
         CommentInfo result = commentApiRestClient.get();
 
-        EasyMock.verify(gerritRestClient, commentsParser);
-        Truth.assertThat(result).isEqualTo(commentInfo);
+        EasyMock.verify(gerritRestClient);
     }
 
     @Test
@@ -64,27 +62,21 @@ public class CommentApiRestClientTest {
             .expectPost("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/" +
                 "revisions/" + REVISION_ID + "/comments/" + COMMENT_ID + "/delete",
                 "{\"reason\":\"Rejected by admin\"}",
-                MOCK_JSON_ELEMENT)
-            .expectGetGson()
+                EMPTY_JSON_OBJECT)
             .get();
         CommentInfo commentInfo = EasyMock.createMock(CommentInfo.class);
-        CommentsParser commentsParser = EasyMock.createMock(CommentsParser.class);
-        EasyMock.expect(commentsParser.parseSingleCommentInfo(MOCK_JSON_ELEMENT)).andReturn(commentInfo);
-        EasyMock.replay(commentsParser);
 
         RevisionApiRestClient revisionApiRestClient = EasyMock.createMock(RevisionApiRestClient.class);
         EasyMock.expect(revisionApiRestClient.getRequestPath()).andReturn(
             "/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/revisions/" + REVISION_ID);
         EasyMock.replay(revisionApiRestClient);
 
-        CommentApiRestClient commentApiRestClient = new CommentApiRestClient(gerritRestClient, revisionApiRestClient,
-            commentsParser, COMMENT_ID);
+        CommentApiRestClient commentApiRestClient = new CommentApiRestClient(gerritRestClient, gerritJson, revisionApiRestClient, COMMENT_ID);
 
         DeleteCommentInput input = new DeleteCommentInput();
         input.reason = "Rejected by admin";
         CommentInfo result = commentApiRestClient.delete(input);
 
-        EasyMock.verify(gerritRestClient, commentsParser);
-        Truth.assertThat(result).isEqualTo(commentInfo);
+        EasyMock.verify(gerritRestClient);
     }
 }

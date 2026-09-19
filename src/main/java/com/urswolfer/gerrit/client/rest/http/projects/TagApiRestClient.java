@@ -20,6 +20,7 @@ import com.google.common.collect.Iterables;
 import com.google.gerrit.extensions.api.projects.*;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 
 /**
@@ -27,23 +28,23 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
  */
 public class TagApiRestClient extends TagApi.NotImplemented implements TagApi {
     private final GerritRestClient gerritRestClient;
-    private final TagInfoParser tagInfoParser;
+    private final GerritJson gerritJson;
     private final ProjectApiRestClient projectApiRestClient;
     private final String name;
 
     public TagApiRestClient(GerritRestClient gerritRestClient,
-                            TagInfoParser tagInfoParser,
+                            GerritJson gerritJson,
                             ProjectApiRestClient projectApiRestClient,
                             String name) {
         this.gerritRestClient = gerritRestClient;
-        this.tagInfoParser = tagInfoParser;
+        this.gerritJson = gerritJson;
         this.projectApiRestClient = projectApiRestClient;
         this.name = name;
     }
 
     @Override
     public TagApi create(TagInput in) throws RestApiException {
-        String json = gerritRestClient.getGson().toJson(in);
+        String json = gerritJson.toJson(in);
         gerritRestClient.putRequest(tagUrl(), json);
         return this;
     }
@@ -51,7 +52,7 @@ public class TagApiRestClient extends TagApi.NotImplemented implements TagApi {
     @Override
     public TagInfo get() throws RestApiException {
         JsonElement jsonElement = gerritRestClient.getRequest(tagUrl());
-        return Iterables.getOnlyElement(tagInfoParser.parseTagInfos(jsonElement));
+        return Iterables.getOnlyElement(gerritJson.asList(jsonElement, TagInfo.class));
     }
 
     @Override

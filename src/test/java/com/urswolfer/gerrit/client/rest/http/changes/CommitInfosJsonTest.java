@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.changes.parsers;
+package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.common.*;
@@ -25,11 +25,12 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author EFregnan
  */
-public class CommitInfosParserTest extends AbstractParserTest{
+public class CommitInfosJsonTest extends AbstractJsonTest{
 
     private static final TreeMap<String, ActionInfo> ACTION_INFOS = new TreeMap<>();
 
@@ -100,7 +101,7 @@ public class CommitInfosParserTest extends AbstractParserTest{
         return fileMeta;
     }
 
-    private CommitInfosParser commitInfosParser = new CommitInfosParser(getGson());
+    private GerritJson gerritJson = new GerritJson(getGson());
 
     @Test
     public void testParseActionInfos() throws Exception {
@@ -109,30 +110,30 @@ public class CommitInfosParserTest extends AbstractParserTest{
     }
 
     private SortedMap<String, ActionInfo> parseActions() throws Exception {
-        JsonElement jsonElement = getJsonElement("actions.json");
-        return commitInfosParser.parseActionInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/actions.json");
+        return gerritJson.asSortedMap(jsonElement, ActionInfo.class);
     }
 
     @Test
     public void testParseCommitInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("commit.json");
-        List<CommitInfo> commitInfos = commitInfosParser.parseCommitInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/commit.json");
+        List<CommitInfo> commitInfos = gerritJson.asList(jsonElement, CommitInfo.class);
         Truth.assertThat(commitInfos).hasSize(1);
         Truth.assertThat(commitInfos.get(0).message).isEqualTo("Use an EventBus to manage star icons  Image widgets that need to ...");
     }
 
     @Test
     public void testParseDiffInfo() throws Exception {
-        CommitInfosParser parser = new CommitInfosParser(getGson());
-        JsonElement jsonElement = getJsonElement("diff.json");
-        DiffInfo diffInfo = parser.parseDiffInfo(jsonElement);
+        GerritJson gerritJson = new GerritJson(getGson());
+        JsonElement jsonElement = getJsonElement("parsers/diff.json");
+        DiffInfo diffInfo = gerritJson.as(jsonElement, DiffInfo.class);
         GerritAssert.assertEquals(diffInfo, DIFF_INFO);
     }
 
     @Test
     public void testParseEditInfos() throws Exception {
-        JsonElement jsonElement = getJsonElement("edit.json");
-        List<EditInfo> editInfos = commitInfosParser.parseEditInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/edit.json");
+        List<EditInfo> editInfos = gerritJson.asList(jsonElement, EditInfo.class);
         Truth.assertThat(editInfos).hasSize(1);
         Truth.assertThat(editInfos.get(0).baseRevision).isEqualTo("184ebe53805e102605d11f6b143486d15c23a09c");
         Truth.assertThat(editInfos.get(0).fetch.get("git").url).isEqualTo("git://localhost/gerrit");
@@ -141,8 +142,8 @@ public class CommitInfosParserTest extends AbstractParserTest{
 
     @Test
     public void testParseEditInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("changeEditInfo.json");
-        EditInfo request = commitInfosParser.parseEditInfo(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/changeEditInfo.json");
+        EditInfo request = gerritJson.as(jsonElement, EditInfo.class);
         Truth.assertThat(request.baseRevision).isEqualTo("c35558e0925e6985c91f3a16921537d5e572b7a3");
         Truth.assertThat(request.commit.subject).isEqualTo("Use an EventBus to manage star icons");
         Truth.assertThat(request.commit.message).isEqualTo("Use an EventBus to manage star icons\n\nImage widgets that need to ...");

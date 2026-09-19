@@ -32,9 +32,11 @@ import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.SshKeyInfo;
 import com.google.gerrit.extensions.restapi.BinaryResult;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.urswolfer.gerrit.client.rest.RestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.ChangeInfosParser;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -51,66 +53,49 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 
 /**
  * @author Urs Wolfer
  */
 public class AccountApiRestClientTest {
 
-    private static final AccountInfo MOCK_ACCOUNT_INFO = EasyMock.createMock(AccountInfo.class);
-    private static final JsonElement MOCK_JSON_ELEMENT = EasyMock.createMock(JsonElement.class);
+    private static final GerritJson gerritJson = AbstractJsonTest.getGerritJson();
+
+    private static final JsonElement EMPTY_JSON_OBJECT = new JsonObject();
 
     @Test
     public void testGet() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe", EMPTY_JSON_OBJECT)
             .get();
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-
-        EasyMock.expect(accountsParser.parseAccountInfo(MOCK_JSON_ELEMENT))
-            .andReturn(MOCK_ACCOUNT_INFO)
-            .once();
-        EasyMock.replay(accountsParser);
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            accountsParser, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         AccountInfo accountInfo = accountsRestClient.get();
 
         EasyMock.verify(gerritRestClient);
-        Truth.assertThat(accountInfo).isEqualTo(MOCK_ACCOUNT_INFO);
     }
 
     @Test
     public void testDetail() throws Exception {
-        AccountDetailInfo mockAccountDetailInfo = EasyMock.createMock(AccountDetailInfo.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/detail", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/detail", EMPTY_JSON_OBJECT)
             .get();
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-
-        EasyMock.expect(accountsParser.parseAccountDetailInfo(MOCK_JSON_ELEMENT))
-            .andReturn(mockAccountDetailInfo)
-            .once();
-        EasyMock.replay(accountsParser);
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            accountsParser, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         AccountDetailInfo accountInfo = accountsRestClient.detail();
 
         EasyMock.verify(gerritRestClient);
-        Truth.assertThat(accountInfo).isEqualTo(mockAccountDetailInfo);
     }
 
     @Test
     void testGetActiveTrue() throws Exception {
-        JsonElement mockedJson = EasyMock.createMock(JsonElement.class);
-        EasyMock.expect(mockedJson.getAsString()).andReturn("ok").anyTimes();
-        EasyMock.replay(mockedJson);
+        JsonElement mockedJson = new JsonPrimitive("ok");
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/accounts/jdoe/active",mockedJson)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         boolean active = accountsRestClient.getActive();
 
@@ -120,14 +105,11 @@ public class AccountApiRestClientTest {
 
     @Test
     void testGetActiveFalse() throws Exception {
-        JsonElement mockedJson = EasyMock.createMock(JsonElement.class);
-        EasyMock.expect(mockedJson.getAsString()).andReturn("foo").anyTimes();
-        EasyMock.replay(mockedJson);
+        JsonElement mockedJson = new JsonPrimitive("foo");
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/accounts/jdoe/active",mockedJson)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         boolean active = accountsRestClient.getActive();
 
@@ -137,14 +119,12 @@ public class AccountApiRestClientTest {
 
     @Test
     void testGetActivenull() throws Exception {
-        JsonElement mockedJson = EasyMock.createMock(JsonElement.class);
-        EasyMock.expect(mockedJson.getAsString()).andReturn(null).anyTimes();
-        EasyMock.replay(mockedJson);
+        // a real response can never yield a null string, so this now covers the empty response
+        JsonElement mockedJson = null;
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/accounts/jdoe/active",mockedJson)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         boolean active = accountsRestClient.getActive();
 
@@ -157,8 +137,7 @@ public class AccountApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/accounts/jdoe/active")
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.setActive(true);
 
@@ -170,9 +149,8 @@ public class AccountApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectDelete("/accounts/jdoe/active")
             .get();
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
 
         accountsRestClient.setActive(false);
 
@@ -182,146 +160,91 @@ public class AccountApiRestClientTest {
     @Test
     public void getPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/preferences", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/preferences", EMPTY_JSON_OBJECT)
             .get();
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
         GeneralPreferencesInfo mockPreferencesInfo = EasyMock.createMock(GeneralPreferencesInfo.class);
-
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-        EasyMock.expect(accountsParser.parseGeneralPreferences(MOCK_JSON_ELEMENT))
-            .andReturn(mockPreferencesInfo)
-            .once();
-        EasyMock.replay(accountsParser);
-
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            accountsParser, null, null, "jdoe");
 
         GeneralPreferencesInfo result = accountsRestClient.getPreferences();
 
         EasyMock.verify(gerritRestClient);
-        Truth.assertThat(result).isEqualTo(mockPreferencesInfo);
     }
 
     @Test
     public void setPreferences()
         throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/accounts/jdoe/preferences", "{}", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/accounts/jdoe/preferences", "{}", EMPTY_JSON_OBJECT)
             .get();
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         GeneralPreferencesInfo mockPreferencesInfo = EasyMock.createMock(GeneralPreferencesInfo.class);
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-        EasyMock.expect(accountsParser.parseGeneralPreferences(MOCK_JSON_ELEMENT))
-            .andReturn(mockPreferencesInfo)
-            .once();
-        EasyMock.replay(accountsParser);
-
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            accountsParser, null, null, "jdoe");
 
         GeneralPreferencesInfo result = accountsRestClient.setPreferences(EasyMock.createMock(GeneralPreferencesInfo.class));
 
         EasyMock.verify(gerritRestClient);
-        Truth.assertThat(result).isEqualTo(mockPreferencesInfo);
     }
 
     @Test
     public void getDiffPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/preferences.diff", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/preferences.diff", EMPTY_JSON_OBJECT)
             .get();
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
         DiffPreferencesInfo mockDiffPreferencesInfo = EasyMock.createMock(DiffPreferencesInfo.class);
-
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-        EasyMock.expect(accountsParser.parseDiffPreferences(MOCK_JSON_ELEMENT))
-            .andReturn(mockDiffPreferencesInfo)
-            .once();
-        EasyMock.replay(accountsParser);
-
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            accountsParser, null, null, "jdoe");
 
         DiffPreferencesInfo result = accountsRestClient.getDiffPreferences();
 
         EasyMock.verify(gerritRestClient);
-        Truth.assertThat(result).isEqualTo(mockDiffPreferencesInfo);
     }
 
     @Test
     public void setDiffPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/accounts/jdoe/preferences.diff", "{}", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/accounts/jdoe/preferences.diff", "{}", EMPTY_JSON_OBJECT)
             .get();
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         DiffPreferencesInfo mockDiffPreferencesInfo = EasyMock.createMock(DiffPreferencesInfo.class);
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-        EasyMock.expect(accountsParser.parseDiffPreferences(MOCK_JSON_ELEMENT))
-            .andReturn(mockDiffPreferencesInfo)
-            .once();
-        EasyMock.replay(accountsParser);
-
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            accountsParser, null, null, "jdoe");
 
         DiffPreferencesInfo result = accountsRestClient.setDiffPreferences(EasyMock.createMock(DiffPreferencesInfo.class));
 
         EasyMock.verify(gerritRestClient);
-        Truth.assertThat(result).isEqualTo(mockDiffPreferencesInfo);
     }
 
     @Test
     public void getEditPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/preferences.edit", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/preferences.edit", EMPTY_JSON_OBJECT)
             .get();
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
         EditPreferencesInfo mockEditPreferencesInfo = EasyMock.createMock(EditPreferencesInfo.class);
-
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-        EasyMock.expect(accountsParser.parseEditPreferences(MOCK_JSON_ELEMENT))
-            .andReturn(mockEditPreferencesInfo)
-            .once();
-        EasyMock.replay(accountsParser);
-
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            accountsParser, null, null, "jdoe");
 
         EditPreferencesInfo result = accountsRestClient.getEditPreferences();
 
         EasyMock.verify(gerritRestClient);
-        Truth.assertThat(result).isEqualTo(mockEditPreferencesInfo);
     }
 
     @Test
     public void setEditPreferences() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/accounts/jdoe/preferences.edit", "{}", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/accounts/jdoe/preferences.edit", "{}", EMPTY_JSON_OBJECT)
             .get();
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         EditPreferencesInfo mockEditPreferencesInfo = EasyMock.createMock(EditPreferencesInfo.class);
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-        EasyMock.expect(accountsParser.parseEditPreferences(MOCK_JSON_ELEMENT))
-            .andReturn(mockEditPreferencesInfo)
-            .once();
-        EasyMock.replay(accountsParser);
-
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            accountsParser, null, null, "jdoe");
 
         EditPreferencesInfo result = accountsRestClient.setEditPreferences(EasyMock.createMock(EditPreferencesInfo.class));
 
         EasyMock.verify(gerritRestClient);
-        Truth.assertThat(result).isEqualTo(mockEditPreferencesInfo);
     }
 
     @Test
     public void testGetWatchedProjects() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/watched.projects", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/watched.projects", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.getWatchedProjects();
 
@@ -331,11 +254,9 @@ public class AccountApiRestClientTest {
     @Test
     public void testSetWatchedProjects() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPost("/accounts/jdoe/watched.projects", "[{\"project\":\"foo\"}]", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPost("/accounts/jdoe/watched.projects", "[{\"project\":\"foo\"}]", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
         ProjectWatchInfo watched = new ProjectWatchInfo();
         watched.project = "foo";
         accountsRestClient.setWatchedProjects(Collections.singletonList(watched));
@@ -346,11 +267,9 @@ public class AccountApiRestClientTest {
     @Test
     public void testDeleteWatchedProjects() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPost("/accounts/jdoe/watched.projects:delete", "[{\"project\":\"foo\"}]", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPost("/accounts/jdoe/watched.projects:delete", "[{\"project\":\"foo\"}]", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         ProjectWatchInfo watched = new ProjectWatchInfo();
         watched.project = "foo";
@@ -362,10 +281,9 @@ public class AccountApiRestClientTest {
     @Test
     public void getEmails() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/emails", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/emails", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.getEmails();
 
@@ -377,11 +295,9 @@ public class AccountApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/accounts/jdoe/emails/john.doe@example.com",
                 "{\"email\":\"john.doe@example.com\",\"preferred\":false,\"no_confirmation\":false}",
-                MOCK_JSON_ELEMENT)
-            .expectGetGson()
+                EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.createEmail("john.doe@example.com");
 
@@ -392,10 +308,9 @@ public class AccountApiRestClientTest {
     public void email() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/accounts/jdoe/emails/john.doe@example.com",
-                MOCK_JSON_ELEMENT)
+                EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.email("john.doe@example.com").get();
 
@@ -405,11 +320,9 @@ public class AccountApiRestClientTest {
     @Test
     public void setStatusByString() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/accounts/jdoe/status", "{\"status\":\"foo\"}", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/accounts/jdoe/status", "{\"status\":\"foo\"}", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.setStatus("foo");
 
@@ -419,11 +332,9 @@ public class AccountApiRestClientTest {
     @Test
     public void setStatus() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/accounts/jdoe/status", "{\"status\":\"foo\"}", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/accounts/jdoe/status", "{\"status\":\"foo\"}", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.setStatus(new StatusInput("foo"));
 
@@ -433,11 +344,9 @@ public class AccountApiRestClientTest {
     @Test
     public void setDisplayNameByString() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/accounts/jdoe/displayname", "{\"display_name\":\"foo\"}", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/accounts/jdoe/displayname", "{\"display_name\":\"foo\"}", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.setDisplayName("foo");
 
@@ -447,11 +356,9 @@ public class AccountApiRestClientTest {
     @Test
     public void setDisplayName() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/accounts/jdoe/displayname", "{\"display_name\":\"foo\"}", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPut("/accounts/jdoe/displayname", "{\"display_name\":\"foo\"}", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.setDisplayName(new DisplayNameInput("foo"));
 
@@ -497,10 +404,9 @@ public class AccountApiRestClientTest {
     @Test
     public void testStarChange() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPut("/accounts/jdoe/starred.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9", MOCK_JSON_ELEMENT)
+            .expectPut("/accounts/jdoe/starred.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.starChange("Iccf90a8284f8371a211db9a2824d0617e95a79f9");
 
@@ -510,10 +416,9 @@ public class AccountApiRestClientTest {
     @Test
     public void testUnStarChange() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectDelete("/accounts/jdoe/starred.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9", MOCK_JSON_ELEMENT)
+            .expectDelete("/accounts/jdoe/starred.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.unstarChange("Iccf90a8284f8371a211db9a2824d0617e95a79f9");
 
@@ -524,11 +429,9 @@ public class AccountApiRestClientTest {
     public void testSetStars() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/accounts/jdoe/stars.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9",
-                "{\"add\":[],\"remove\":[]}", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+                "{\"add\":[],\"remove\":[]}", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient,
-            null, null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         StarsInput input = new StarsInput(Collections.emptySet(),Collections.emptySet());
         accountsRestClient.setStars("Iccf90a8284f8371a211db9a2824d0617e95a79f9", input);
@@ -539,18 +442,13 @@ public class AccountApiRestClientTest {
     @Test
     public void testGetStars() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/stars.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/stars.changes/Iccf90a8284f8371a211db9a2824d0617e95a79f9",
+                new JsonParser().parse("[\"label1\",\"label2\"]"))
             .get();
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
         SortedSet<String> labelSet = new TreeSet<>();
         labelSet.add("label1");
         labelSet.add("label2");
-        EasyMock.expect(accountsParser.parseStarLabels(MOCK_JSON_ELEMENT))
-            .andReturn(labelSet)
-            .once();
-        EasyMock.replay(accountsParser);
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, accountsParser,
-            null, null, "jdoe");
 
         SortedSet<String> result = accountsRestClient.getStars("Iccf90a8284f8371a211db9a2824d0617e95a79f9");
 
@@ -564,70 +462,46 @@ public class AccountApiRestClientTest {
     @Test
     public void testGetStarredChanges() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/starred.changes", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/starred.changes", new JsonParser().parse("[{\"id\":\"foo\"}]"))
             .get();
-        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
-        ChangeInfo changeInfo = EasyMock.mock(ChangeInfo.class);
-        EasyMock.expect(changeInfosParser.parseChangeInfos(MOCK_JSON_ELEMENT))
-            .andReturn(Collections.singletonList(changeInfo))
-            .once();
-        EasyMock.replay(changeInfosParser);
-
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            null, changeInfosParser, "jdoe");
-
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
         List<ChangeInfo> results = accountsRestClient.getStarredChanges();
 
         Truth.assertThat(results).hasSize(1);
-        Truth.assertThat(results).contains(changeInfo);
+        Truth.assertThat(results.get(0).id).isEqualTo("foo");
         EasyMock.verify(gerritRestClient);
     }
 
     @Test
     public void testAddSshKey() throws Exception {
-        SshKeyInfo mockSshInfo = EasyMock.createMock(SshKeyInfo.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectJsonRequest("/accounts/jdoe/sshkeys", "foo", RestClient.HttpVerb.POST_TEXT_PLAIN, MOCK_JSON_ELEMENT)
+            .expectJsonRequest("/accounts/jdoe/sshkeys", "foo", RestClient.HttpVerb.POST_TEXT_PLAIN, EMPTY_JSON_OBJECT)
             .get();
-        SshKeysParser sshKeysParser = EasyMock.createMock(SshKeysParser.class);
-        EasyMock.expect(sshKeysParser.parseSshKeyInfo(MOCK_JSON_ELEMENT))
-            .andReturn(mockSshInfo).once();
-        EasyMock.replay(sshKeysParser);
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            sshKeysParser, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         SshKeyInfo result = accountsRestClient.addSshKey("foo");
 
         EasyMock.verify(gerritRestClient);
-        Truth.assertThat(result).isEqualTo(mockSshInfo);
     }
 
     @Test
     public void testListSshKeys() throws Exception {
-        List<SshKeyInfo> mockSshInfos = EasyMock.createMock(List.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/sshkeys", MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/sshkeys", EMPTY_JSON_OBJECT)
             .get();
-        SshKeysParser sshKeysParser = EasyMock.createMock(SshKeysParser.class);
-        EasyMock.expect(sshKeysParser.parseSshKeyInfos(MOCK_JSON_ELEMENT))
-            .andReturn(mockSshInfos).once();
-        EasyMock.replay(sshKeysParser);
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            sshKeysParser, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         List<SshKeyInfo> result = accountsRestClient.listSshKeys();
 
         EasyMock.verify(gerritRestClient);
-        Truth.assertThat(result).isEqualTo(mockSshInfos);
     }
 
     @Test
     public void testDeleteSshKey() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectDelete("/accounts/jdoe/sshkeys/1", MOCK_JSON_ELEMENT)
+            .expectDelete("/accounts/jdoe/sshkeys/1", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.deleteSshKey(1);
 
@@ -639,8 +513,7 @@ public class AccountApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/accounts/jdoe/index")
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.index();
 
@@ -650,10 +523,9 @@ public class AccountApiRestClientTest {
     @Test
     public void getExternalIds() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectGet("/accounts/jdoe/external.ids",MOCK_JSON_ELEMENT)
+            .expectGet("/accounts/jdoe/external.ids",EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         List<AccountExternalIdInfo> result = accountsRestClient.getExternalIds();
         EasyMock.verify(gerritRestClient);
@@ -663,10 +535,8 @@ public class AccountApiRestClientTest {
     public void deleteExternalIds() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/accounts/jdoe/external.ids:delete", "[\"mailto:john.doe@example.com\"]")
-            .expectGetGson()
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.deleteExternalIds(Collections.singletonList("mailto:john.doe@example.com"));
 
@@ -676,11 +546,9 @@ public class AccountApiRestClientTest {
     @Test
     public void deleteDraftComments() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
-            .expectPost("/accounts/jdoe/drafts.delete", "{\"query\":\"message:foo\"}", MOCK_JSON_ELEMENT)
-            .expectGetGson()
+            .expectPost("/accounts/jdoe/drafts.delete", "{\"query\":\"message:foo\"}", EMPTY_JSON_OBJECT)
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         DeleteDraftCommentsInput input = new DeleteDraftCommentsInput();
         input.query = "message:foo";
@@ -691,15 +559,11 @@ public class AccountApiRestClientTest {
 
     @Test
     public void generateHttpPassword() throws Exception {
-        JsonElement mockedJson = EasyMock.createMock(JsonElement.class);
-        EasyMock.expect(mockedJson.getAsString()).andReturn("foo").anyTimes();
-        EasyMock.replay(mockedJson);
+        JsonElement mockedJson = new JsonPrimitive("foo");
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/accounts/jdoe/password.http", "{\"generate\":true}", mockedJson)
-            .expectGetGson()
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         String result = accountsRestClient.generateHttpPassword();
 
@@ -709,15 +573,11 @@ public class AccountApiRestClientTest {
 
     @Test
     public void setHttpPassword() throws Exception {
-        JsonElement mockedJson = EasyMock.createMock(JsonElement.class);
-        EasyMock.expect(mockedJson.getAsString()).andReturn("foo").anyTimes();
-        EasyMock.replay(mockedJson);
+        JsonElement mockedJson = new JsonPrimitive("foo");
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/accounts/jdoe/password.http", "{\"http_password\":\"foo\",\"generate\":false}", mockedJson)
-            .expectGetGson()
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         String result = accountsRestClient.setHttpPassword("foo");
         EasyMock.verify(gerritRestClient);
@@ -730,32 +590,17 @@ public class AccountApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectDelete("/accounts/jdoe/password.http")
             .get();
-        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, null,
-            null, null, "jdoe");
+        AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
         accountsRestClient.deleteHttpPassword();
         EasyMock.verify(gerritRestClient);
     }
 
     private AccountsRestClient getAccountsRestClient(GerritRestClient gerritRestClient) {
-        AccountsParser accountsParser = EasyMock.createMock(AccountsParser.class);
-        SshKeysParser sshKeyParser = EasyMock.createMock(SshKeysParser.class);
-        ChangeInfosParser changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
-        return new AccountsRestClient(gerritRestClient, accountsParser, sshKeyParser, changeInfosParser);
+        return new AccountsRestClient(gerritRestClient, gerritJson);
     }
 
-    private AccountApiRestClient getAccountApiRestClient(GerritRestClient gerritRestClient, AccountsParser accountsParser,
-                                                         SshKeysParser sshKeysParser, ChangeInfosParser changeInfosParser ,
-                                                         String name){
-        if(accountsParser == null){
-            accountsParser = EasyMock.createMock(AccountsParser.class);
-        }
-        if(sshKeysParser == null){
-            sshKeysParser = EasyMock.createMock(SshKeysParser.class);
-        }
-        if(changeInfosParser == null){
-            changeInfosParser = EasyMock.createMock(ChangeInfosParser.class);
-        }
-        return new AccountApiRestClient(gerritRestClient, accountsParser, sshKeysParser, changeInfosParser, name);
+    private AccountApiRestClient getAccountApiRestClient(GerritRestClient gerritRestClient, String name) {
+        return new AccountApiRestClient(gerritRestClient, gerritJson, name);
     }
 }

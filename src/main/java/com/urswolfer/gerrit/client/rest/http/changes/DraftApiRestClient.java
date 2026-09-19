@@ -21,8 +21,8 @@ import com.google.gerrit.extensions.api.changes.DraftInput;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.CommentsParser;
 
 /**
  * @author Urs Wolfer
@@ -32,41 +32,41 @@ public class DraftApiRestClient extends DraftApi.NotImplemented implements Draft
     private final GerritRestClient gerritRestClient;
     private final ChangeApiRestClient changeApiRestClient;
     private final RevisionApiRestClient revisionApiRestClient;
-    private final CommentsParser commentsParser;
+    private final GerritJson gerritJson;
     private final CommentInfo commentInfo;
     private final String id;
 
     public DraftApiRestClient(GerritRestClient gerritRestClient,
+                              GerritJson gerritJson,
                               ChangeApiRestClient changeApiRestClient,
                               RevisionApiRestClient revisionApiRestClient,
-                              CommentsParser commentsParser,
                               CommentInfo commentInfo) {
         this.gerritRestClient = gerritRestClient;
+        this.gerritJson = gerritJson;
         this.changeApiRestClient = changeApiRestClient;
         this.revisionApiRestClient = revisionApiRestClient;
-        this.commentsParser = commentsParser;
         this.commentInfo = commentInfo;
         this.id = null;
     }
 
     public DraftApiRestClient(GerritRestClient gerritRestClient,
+                              GerritJson gerritJson,
                               ChangeApiRestClient changeApiRestClient,
                               RevisionApiRestClient revisionApiRestClient,
-                              CommentsParser commentsParser,
                               String id) {
         this.gerritRestClient = gerritRestClient;
+        this.gerritJson = gerritJson;
         this.changeApiRestClient = changeApiRestClient;
         this.revisionApiRestClient = revisionApiRestClient;
-        this.commentsParser = commentsParser;
         this.id = id;
         this.commentInfo = null;
     }
 
     @Override
     public CommentInfo update(DraftInput in) throws RestApiException {
-        String json = gerritRestClient.getGson().toJson(in);
+        String json = gerritJson.toJson(in);
         JsonElement jsonElement = gerritRestClient.putRequest(getUrl(), json);
-        return commentsParser.parseSingleCommentInfo(jsonElement.getAsJsonObject());
+        return gerritJson.as(jsonElement.getAsJsonObject(), CommentInfo.class);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class DraftApiRestClient extends DraftApi.NotImplemented implements Draft
             return commentInfo;
         }
         JsonElement jsonElement = gerritRestClient.getRequest(getUrl());
-        return commentsParser.parseSingleCommentInfo(jsonElement.getAsJsonObject());
+        return gerritJson.as(jsonElement.getAsJsonObject(), CommentInfo.class);
     }
 
     private String getUrl() {

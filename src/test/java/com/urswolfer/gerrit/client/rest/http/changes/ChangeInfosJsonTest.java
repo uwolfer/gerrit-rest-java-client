@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.changes.parsers;
+package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.api.changes.IncludedInInfo;
@@ -31,11 +31,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Thomas Forrer - EFregnan
  */
-public class ChangeInfosParserTest extends AbstractParserTest {
+public class ChangeInfosJsonTest extends AbstractJsonTest {
     private static final List<ChangeInfo> CHANGE_INFOS = new ArrayList<>();
 
     static {
@@ -94,14 +95,14 @@ public class ChangeInfosParserTest extends AbstractParserTest {
         HASHTAGS.add("last");
     }
 
-    private final ChangeInfosParser changeInfosParser = new ChangeInfosParser(getGson());
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
 
     @Test
     public void testParseChangeInfos() throws Exception {
-        JsonElement jsonElement = getJsonElement("changes.json");
+        JsonElement jsonElement = getJsonElement("parsers/changes.json");
 
-        List<ChangeInfo> changeInfos = changeInfosParser.parseChangeInfos(jsonElement);
+        List<ChangeInfo> changeInfos = gerritJson.asList(jsonElement, ChangeInfo.class);
         Truth.assertThat(changeInfos.size()).isEqualTo(3);
 
         for (int i = 0; i < changeInfos.size(); i++) {
@@ -113,9 +114,9 @@ public class ChangeInfosParserTest extends AbstractParserTest {
 
     @Test
     public void testParseSingleChangeInfos() throws Exception {
-        JsonElement jsonElement = getJsonElement("change.json");
+        JsonElement jsonElement = getJsonElement("parsers/change.json");
 
-        List<ChangeInfo> changeInfos = changeInfosParser.parseChangeInfos(jsonElement);
+        List<ChangeInfo> changeInfos = gerritJson.asList(jsonElement, ChangeInfo.class);
 
         Truth.assertThat(changeInfos.size()).isEqualTo(1);
 
@@ -124,9 +125,9 @@ public class ChangeInfosParserTest extends AbstractParserTest {
 
     @Test
     public void testParseSingleChangeInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("change.json");
+        JsonElement jsonElement = getJsonElement("parsers/change.json");
 
-        ChangeInfo changeInfo = changeInfosParser.parseSingleChangeInfo(jsonElement);
+        ChangeInfo changeInfo = gerritJson.as(jsonElement, ChangeInfo.class);
 
         GerritAssert.assertEquals(changeInfo, CHANGE_INFOS.get(0));
     }
@@ -140,7 +141,7 @@ public class ChangeInfosParserTest extends AbstractParserTest {
         changeInput.topic = "create-change-in-browser";
         changeInput.status = ChangeStatus.DRAFT;
 
-        String outputForTesting = changeInfosParser.generateChangeInput(changeInput);
+        String outputForTesting = gerritJson.toJson(changeInput, ChangeInput.class);
 
         ChangeInput parsedJson = new Gson().fromJson(outputForTesting, ChangeInput.class);
         Truth.assertThat(parsedJson.project).isEqualTo(changeInput.project);
@@ -156,14 +157,14 @@ public class ChangeInfosParserTest extends AbstractParserTest {
     }
 
     private Set<String> parseHashtags() throws Exception {
-        JsonElement jsonElement = getJsonElement("hashtags.json");
-        return changeInfosParser.parseHashtags(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/hashtags.json");
+        return gerritJson.asSet(jsonElement, String.class);
     }
 
     @Test
     public void testParseEditInfo() throws Exception {
-        JsonElement jsonElement = getJsonElement("includedin.json");
-        IncludedInInfo includedInInfo = changeInfosParser.parseIncludedInInfos(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/includedin.json");
+        IncludedInInfo includedInInfo = gerritJson.as(jsonElement, IncludedInInfo.class);
         Truth.assertThat(includedInInfo.branches).hasSize(4);
         Truth.assertThat(includedInInfo.tags).hasSize(3);
         Truth.assertThat(includedInInfo.branches).containsAtLeast("integration/master", "integration/releases/2.12", "master", "releases/2.12");

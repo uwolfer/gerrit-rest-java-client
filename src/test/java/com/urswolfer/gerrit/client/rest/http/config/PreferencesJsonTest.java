@@ -14,42 +14,43 @@
  * limitations under the License.
  */
 
-package com.urswolfer.gerrit.client.rest.http.config.parsers;
+package com.urswolfer.gerrit.client.rest.http.config;
 
 import com.google.common.truth.Truth;
 import com.google.gerrit.extensions.client.DiffPreferencesInfo;
 import com.google.gerrit.extensions.client.EditPreferencesInfo;
 import com.google.gerrit.extensions.client.GeneralPreferencesInfo;
 import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.http.common.AbstractParserTest;
+import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import org.testng.annotations.Test;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 
 /**
  * @author Thomas Forrer
  */
-public class PreferencesParserTest extends AbstractParserTest {
-    private final PreferencesParser preferencesParser = new PreferencesParser(getGson());
+public class PreferencesJsonTest extends AbstractJsonTest {
+    private final GerritJson gerritJson = new GerritJson(getGson());
 
 
     @Test
     public void testParseGeneralPreferences() throws Exception {
-        JsonElement jsonElement = getJsonElement("generalPreferences.json");
-        GeneralPreferencesInfo preferencesInfo = preferencesParser.parseGeneralPreferences(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/generalPreferences.json");
+        GeneralPreferencesInfo preferencesInfo = gerritJson.as(jsonElement, GeneralPreferencesInfo.class);
         Truth.assertThat(preferencesInfo.changesPerPage).isEqualTo(25);
         Truth.assertThat(preferencesInfo.workInProgressByDefault).isTrue();
     }
 
     @Test
     public void testParseDiffPreferences() throws Exception {
-        JsonElement jsonElement = getJsonElement("diffPreferences.json");
-        DiffPreferencesInfo diffPreferencesInfo = preferencesParser.parseDiffPreferences(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/diffPreferences.json");
+        DiffPreferencesInfo diffPreferencesInfo = gerritJson.as(jsonElement, DiffPreferencesInfo.class);
         Truth.assertThat(diffPreferencesInfo.ignoreWhitespace).isEqualTo(DiffPreferencesInfo.Whitespace.IGNORE_NONE);
     }
 
     @Test
     public void testParseEditPreferences() throws Exception {
-        JsonElement jsonElement = getJsonElement("editPreferences.json");
-        EditPreferencesInfo editPreferencesInfo = preferencesParser.parseEditPreferences(jsonElement);
+        JsonElement jsonElement = getJsonElement("parsers/editPreferences.json");
+        EditPreferencesInfo editPreferencesInfo = gerritJson.as(jsonElement, EditPreferencesInfo.class);
         Truth.assertThat(editPreferencesInfo.lineLength).isEqualTo(100);
         Truth.assertThat(editPreferencesInfo.showTabs).isEqualTo(true);
     }

@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Pins what {@code gerritApi.changes()} puts on the wire and what it makes of the response.
@@ -265,6 +266,24 @@ public class ChangesContractTest {
         } finally {
             binaryResult.close();
         }
+        server.verify();
+    }
+
+    /**
+     * Gerrit emits a trailing comma in the reviewed-files list, which Gson turns into a null
+     * element; the client has to drop it. That lived in a parser of its own until the parsers were
+     * folded into GerritJson, so it is now only reachable through the API.
+     */
+    @Test
+    public void reviewedFilesDropTheTrailingNull() throws Exception {
+        FakeGerritServer server = new FakeGerritServer()
+            .stub("GET", CHANGE_PATH + "/revisions/1/files?reviewed", "changes/parsers/files-reviewed.json");
+
+        Set<String> reviewed = server.api().changes().id(CHANGE_ID).revision("1").reviewed();
+
+        Truth.assertThat(reviewed).containsExactly(
+            "/COMMIT_MSG",
+            "gerrit-server/src/main/java/com/google/gerrit/server/project/RefControl.java");
         server.verify();
     }
 

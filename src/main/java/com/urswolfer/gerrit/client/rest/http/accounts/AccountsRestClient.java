@@ -23,8 +23,8 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.accounts.AccountApi;
 import com.urswolfer.gerrit.client.rest.accounts.Accounts;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.ChangeInfosParser;
 
 import java.util.List;
 
@@ -34,21 +34,17 @@ import java.util.List;
 public class AccountsRestClient extends Accounts.NotImplemented implements Accounts {
 
     private final GerritRestClient gerritRestClient;
-    private final AccountsParser accountsParser;
-    private final SshKeysParser sshKeysParser;
-    private final ChangeInfosParser changeInfosParser;
+    private final GerritJson gerritJson;
 
-    public AccountsRestClient(GerritRestClient gerritRestClient, AccountsParser accountsParser,
-                              SshKeysParser sshKeysParser, ChangeInfosParser changeInfosParser) {
+    public AccountsRestClient(GerritRestClient gerritRestClient,
+                              GerritJson gerritJson) {
         this.gerritRestClient = gerritRestClient;
-        this.accountsParser = accountsParser;
-        this.sshKeysParser = sshKeysParser;
-        this.changeInfosParser = changeInfosParser;
+        this.gerritJson = gerritJson;
     }
 
     @Override
     public AccountApi id(String id) throws RestApiException {
-        return new AccountApiRestClient(gerritRestClient, accountsParser, sshKeysParser, changeInfosParser, id);
+        return new AccountApiRestClient(gerritRestClient, gerritJson, id);
     }
 
     @Override
@@ -92,10 +88,10 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
     @Override
     public AccountApi create(AccountInput input) throws RestApiException {
         String requestPath = String.format("/accounts/%s", Url.encode(input.username));
-        String body = gerritRestClient.getGson().toJson(input);
+        String body = gerritJson.toJson(input);
         JsonElement result = gerritRestClient.putRequest(requestPath,body);
-        AccountInfo info = accountsParser.parseAccountInfo(result);
-        return new AccountApiRestClient(gerritRestClient, accountsParser, sshKeysParser, changeInfosParser, info.username);
+        AccountInfo info = gerritJson.as(result, AccountInfo.class);
+        return new AccountApiRestClient(gerritRestClient, gerritJson, info.username);
     }
 
     private List<AccountInfo> suggestAccounts(SuggestAccountsRequest r) throws RestApiException {
@@ -106,6 +102,6 @@ public class AccountsRestClient extends Accounts.NotImplemented implements Accou
     private List<AccountInfo> getSuggestAccounts(String queryPart) throws RestApiException {
         String request = String.format("/accounts/?suggest&%s", queryPart);
         JsonElement suggestedReviewers = gerritRestClient.getRequest(request);
-        return accountsParser.parseAccountInfos(suggestedReviewers);
+        return gerritJson.asList(suggestedReviewers, AccountInfo.class);
     }
 }

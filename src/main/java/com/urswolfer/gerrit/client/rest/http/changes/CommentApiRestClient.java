@@ -21,37 +21,37 @@ import com.google.gerrit.extensions.api.changes.DeleteCommentInput;
 import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
-import com.urswolfer.gerrit.client.rest.http.changes.parsers.CommentsParser;
 
 public class CommentApiRestClient extends CommentApi.NotImplemented implements CommentApi {
 
     private final GerritRestClient gerritRestClient;
     private final RevisionApiRestClient revisionApiRestClient;
-    private final CommentsParser commentsParser;
+    private final GerritJson gerritJson;
     private final String id;
 
     public CommentApiRestClient(GerritRestClient gerritRestClient,
-                              RevisionApiRestClient revisionApiRestClient,
-                              CommentsParser commentsParser,
-                              String id) {
+                                GerritJson gerritJson,
+                                RevisionApiRestClient revisionApiRestClient,
+                                String id) {
         this.gerritRestClient = gerritRestClient;
+        this.gerritJson = gerritJson;
         this.revisionApiRestClient = revisionApiRestClient;
-        this.commentsParser = commentsParser;
         this.id = id;
     }
 
     @Override
     public CommentInfo get() throws RestApiException {
         JsonElement response = gerritRestClient.getRequest(getRequestPath());
-        return commentsParser.parseSingleCommentInfo(response);
+        return gerritJson.as(response, CommentInfo.class);
     }
 
     @Override
     public CommentInfo delete(DeleteCommentInput input) throws RestApiException {
-        String body = gerritRestClient.getGson().toJson(input);
+        String body = gerritJson.toJson(input);
         JsonElement response = gerritRestClient.postRequest(getRequestPath() + "/delete", body);
-        return commentsParser.parseSingleCommentInfo(response);
+        return gerritJson.as(response, CommentInfo.class);
     }
 
     protected String getRequestPath() {

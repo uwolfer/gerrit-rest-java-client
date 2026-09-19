@@ -19,6 +19,7 @@ package com.urswolfer.gerrit.client.rest.http.common;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.gson.GsonFactory;
 
 import java.io.File;
@@ -28,14 +29,21 @@ import java.net.URL;
 /**
  * @author Thomas Forrer
  */
-public abstract class AbstractParserTest {
+public abstract class AbstractJsonTest {
     protected JsonElement getJsonElement(String resourceName) throws Exception {
         File file = getFile(resourceName);
         return new JsonParser().parse(new FileReader(file));
     }
 
-    protected static Gson getGson() {
+    public static Gson getGson() {
         return GsonFactory.create();
+    }
+
+    /**
+     * The JSON conversion the REST clients use, built on the same Gson the client configures.
+     */
+    public static GerritJson getGerritJson() {
+        return new GerritJson(getGson());
     }
 
     protected File getFile(String resourceName) throws Exception {
