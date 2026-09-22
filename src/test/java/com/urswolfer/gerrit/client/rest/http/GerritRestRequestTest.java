@@ -25,6 +25,7 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.testng.Assert.fail;
 
 /**
  * How {@link GerritRestRequest} reaches the rest client: with no body it uses the client's own verb
@@ -56,16 +57,26 @@ public class GerritRestRequestTest extends AbstractJsonTest {
     }
 
     /**
-     * The verb methods take no body, so a body set on a GET has to go the other way rather than be
-     * dropped on the floor.
+     * A GET has nowhere to put a body, so setting one fails where it is set - before anything is
+     * sent and before the login round trips - rather than being dropped on the way out.
      */
     @Test
-    public void getSendsABodyWhenOneIsSet() throws Exception {
-        GerritRestClient client = new GerritRestClientBuilder()
-            .expectJsonRequest("/changes/", "{\"q\":\"is:open\"}", HttpVerb.GET, new JsonObject())
-            .get();
+    public void getRejectsABodyBeforeSendingAnything() throws Exception {
+        GerritRestClient client = new GerritRestClientBuilder().get();
+        GerritRestRequest request = restContext(client).get("/changes/");
 
-        restContext(client).get("/changes/").rawBody("{\"q\":\"is:open\"}").send();
+        try {
+            request.rawBody("{\"q\":\"is:open\"}");
+            fail("expected IllegalStateException");
+        } catch (IllegalStateException expected) {
+            assertThat(expected).hasMessageThat().contains("/changes/");
+        }
+        try {
+            request.body(new JsonObject());
+            fail("expected IllegalStateException");
+        } catch (IllegalStateException expected) {
+            // same for a serialized body
+        }
 
         EasyMock.verify(client);
     }

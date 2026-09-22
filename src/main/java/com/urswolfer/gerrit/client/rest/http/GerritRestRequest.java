@@ -65,8 +65,7 @@ public final class GerritRestRequest {
      * Serializes {@code value} as the request body.
      */
     public GerritRestRequest body(Object value) {
-        this.body = json.toJson(value);
-        return this;
+        return setBody(json.toJson(value));
     }
 
     /**
@@ -74,14 +73,25 @@ public final class GerritRestRequest {
      * written even when a subclass instance is passed.
      */
     public GerritRestRequest body(Object value, Type type) {
-        this.body = json.toJson(value, type);
-        return this;
+        return setBody(json.toJson(value, type));
     }
 
     /**
      * Sends {@code body} unchanged, for the endpoints that take something other than JSON.
      */
     public GerritRestRequest rawBody(String body) {
+        return setBody(body);
+    }
+
+    /**
+     * A GET has nowhere to put a body and no Gerrit endpoint wants one, so setting one is a mistake
+     * in the calling code. Saying so here, before anything is sent, beats dropping it on the way out
+     * or failing after the login round trips.
+     */
+    private GerritRestRequest setBody(String body) {
+        if (verb == HttpVerb.GET) {
+            throw new IllegalStateException("GET requests cannot carry a body: " + path);
+        }
         this.body = body;
         return this;
     }
@@ -166,13 +176,13 @@ public final class GerritRestRequest {
     /**
      * Dispatches to the rest client's own verb methods rather than to
      * {@link GerritRestClient#requestJson}, so that what reaches the client is exactly what these
-     * call sites sent before. Those methods take no body, so a request that has one goes to
-     * {@code requestJson} instead - which is what they delegate to anyway - rather than dropping it.
+     * call sites sent before. {@code deleteRequest} takes no body, so a DELETE that has one goes to
+     * {@code requestJson} instead - which is what it delegates to anyway - rather than dropping it.
      */
     private JsonElement execute() throws RestApiException {
         switch (verb) {
             case GET:
-                return body == null ? restClient.getRequest(path) : restClient.requestJson(path, body, verb);
+                return restClient.getRequest(path);
             case POST:
                 return body == null ? restClient.postRequest(path) : restClient.postRequest(path, body);
             case PUT:

@@ -25,8 +25,25 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.urswolfer.gerrit.client.rest.GerritAuthData;
 import com.urswolfer.gerrit.client.rest.GerritRestApi;
 import com.urswolfer.gerrit.client.rest.GerritRestApiFactory;
+import org.apache.http.Header;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -44,21 +61,25 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServlet;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.DELETE;
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.HEAD;
 
@@ -320,9 +341,7 @@ public class GerritRestClientTest {
     public void testGerritAuthExtractionAndCache() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(jettyUrl), new HttpRequestExecutor());
-        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
-        loginCacheField.setAccessible(true);
-        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+        LoginCache loginCache = gerritRestClient.loginCache();
 
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
         gerritRestClient.requestRest("/changes/", null, GET);
@@ -348,9 +367,7 @@ public class GerritRestClientTest {
         CountingLoginSimulationServlet.resetCounts();
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(countingLoginJettyUrl, "foo", "bar"), new HttpRequestExecutor());
-        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
-        loginCacheField.setAccessible(true);
-        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+        LoginCache loginCache = gerritRestClient.loginCache();
 
         gerritRestClient.requestRest("/changes/", null, GET);
 
@@ -367,9 +384,7 @@ public class GerritRestClientTest {
     public void testXsrfTokenTakenFromCookie() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(xsrfCookieLoginJettyUrl), new HttpRequestExecutor());
-        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
-        loginCacheField.setAccessible(true);
-        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+        LoginCache loginCache = gerritRestClient.loginCache();
 
         gerritRestClient.requestRest("/changes/", null, GET);
 
@@ -386,9 +401,7 @@ public class GerritRestClientTest {
         CountingLoginSimulationServlet.resetCounts();
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(countingLoginJettyUrl, "foo", "bar", true), new HttpRequestExecutor());
-        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
-        loginCacheField.setAccessible(true);
-        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+        LoginCache loginCache = gerritRestClient.loginCache();
 
         requestChanges(gerritRestClient);
 
@@ -406,9 +419,7 @@ public class GerritRestClientTest {
     public void testLoginPageNotRetriedAfterGitHubOAuthDetected() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(githubOAuthJettyUrl, "foo", "bar"), new HttpRequestExecutor());
-        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
-        loginCacheField.setAccessible(true);
-        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+        LoginCache loginCache = gerritRestClient.loginCache();
 
         requestChanges(gerritRestClient);
         Truth.assertThat(loginCache.isGithubOAuthDetected()).isTrue();
@@ -430,9 +441,7 @@ public class GerritRestClientTest {
         NoSessionLoginSimulationServlet.resetCounts();
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(noSessionLoginJettyUrl), new HttpRequestExecutor());
-        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
-        loginCacheField.setAccessible(true);
-        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+        LoginCache loginCache = gerritRestClient.loginCache();
 
         gerritRestClient.requestRest("/changes/", null, GET);
 
@@ -449,9 +458,7 @@ public class GerritRestClientTest {
     public void testGerritAuthNotAvailable() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(jettyUrl, "foo", "bar"), new HttpRequestExecutor());
-        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
-        loginCacheField.setAccessible(true);
-        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+        LoginCache loginCache = gerritRestClient.loginCache();
 
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
         Truth.assertThat(loginCache.getHostSupportsGerritAuth()).isTrue();
@@ -471,9 +478,7 @@ public class GerritRestClientTest {
     public void testGerritWithGitHubOAuth() throws Exception {
         GerritRestClient gerritRestClient = new GerritRestClient(
             new GerritAuthData.Basic(githubOAuthJettyUrl, "foo", "bar"), new HttpRequestExecutor());
-        Field loginCacheField = gerritRestClient.getClass().getDeclaredField("loginCache");
-        loginCacheField.setAccessible(true);
-        LoginCache loginCache = (LoginCache) loginCacheField.get(gerritRestClient);
+        LoginCache loginCache = gerritRestClient.loginCache();
 
         Truth.assertThat(loginCache.getGerritAuthOptional().isPresent()).isFalse();
         requestChanges(gerritRestClient);
@@ -489,7 +494,7 @@ public class GerritRestClientTest {
      */
     @Test
     public void testGerritAuthPatternExtractsToken() throws Exception {
-        Field patternField = GerritRestClient.class.getDeclaredField("GERRIT_AUTH_PATTERN");
+        Field patternField = GerritAuthenticator.class.getDeclaredField("GERRIT_AUTH_PATTERN");
         patternField.setAccessible(true);
         Pattern gerritAuthPattern = (Pattern) patternField.get(null);
 
@@ -499,6 +504,171 @@ public class GerritRestClientTest {
         Truth.assertThat(matcher.group(1)).isEqualTo("AGaX_CruyH1_pMhQTiv2U-Rr4HXo5VQxe3sAVAnsOrhrcbK7Wxzjdgqr");
 
         Truth.assertThat(gerritAuthPattern.matcher("no auth token here").find()).isFalse();
+    }
+
+    /**
+     * The verb methods the client offers take no body, and the request object a DELETE used to be
+     * built from could not hold one either, so a body set on a DELETE reached neither. Gerrit's
+     * delete-vote endpoint is a DELETE that carries an input object, so the whole path has to
+     * carry it through.
+     */
+    @Test
+    public void testDeleteCarriesItsBodyToTheWire() throws Exception {
+        CapturingExecutor executor = new CapturingExecutor();
+        GerritRestClient gerritRestClient =
+            new GerritRestClient(new GerritAuthData.Basic(jettyUrl), executor);
+
+        gerritRestClient.requestRest("/changes/1/reviewers/jdoe/delete", "{\"label\":\"Code-Review\"}", DELETE);
+
+        Truth.assertThat(executor.method.getMethod()).isEqualTo("DELETE");
+        Truth.assertThat(executor.body).isEqualTo("{\"label\":\"Code-Review\"}");
+        Truth.assertThat(executor.method.getURI().toString())
+            .isEqualTo(jettyUrl + "/changes/1/reviewers/jdoe/delete");
+    }
+
+    /**
+     * The retry after an expired session used to go out with only the JSON Accept header, so a
+     * request for plain text or a binary came back as something else the second time round.
+     */
+    @Test
+    public void testRetryAfterExpiredSessionKeepsTheCallersHeaders() throws Exception {
+        ScriptedExecutor executor = new ScriptedExecutor();
+        executor.forbiddenLeft = 1;
+        GerritRestClient gerritRestClient = new GerritRestClient(new GerritAuthData.Basic(jettyUrl), executor);
+
+        gerritRestClient.request("/changes/1/revisions/1/patch", null, GET, new BasicHeader("Accept", "text/plain"));
+
+        List<HttpRequestBase> sent = executor.requestsTo("/changes/1/revisions/1/patch");
+        Truth.assertThat(sent).hasSize(2);
+        for (HttpRequestBase request : sent) {
+            Header[] accept = request.getHeaders("Accept");
+            Truth.assertThat(accept).hasLength(1);
+            Truth.assertThat(accept[0].getValue()).isEqualTo("text/plain");
+        }
+    }
+
+    /**
+     * Only the status of the session check is wanted, but its connection is not released until the
+     * body has been read; the login page response next to it was already consumed for that reason.
+     */
+    @Test
+    public void testSessionCheckReleasesItsResponse() throws Exception {
+        ScriptedExecutor executor = new ScriptedExecutor();
+        GerritRestClient gerritRestClient = new GerritRestClient(new GerritAuthData.Basic(jettyUrl), executor);
+
+        gerritRestClient.requestRest("/changes/", null, GET); // logs in, which sets the session cookie
+        gerritRestClient.requestRest("/changes/", null, GET); // has a cookie, so checks the session first
+
+        Truth.assertThat(executor.requestsTo("/accounts/self")).hasSize(1);
+        Truth.assertThat(executor.sessionCheckBodyClosed).isTrue();
+    }
+
+    /**
+     * {@link HttpClientBuilderExtension#extendCredentialProvider} says that what it returns is used
+     * from then on, but the result used to be dropped and the client kept the provider it started
+     * with. Against the basic-auth protected {@code /a} path, only the extension's provider has the
+     * credentials.
+     */
+    @Test
+    public void testCredentialsProviderFromExtensionIsUsed() throws Exception {
+        final List<AuthScope> asked = new ArrayList<>();
+        final BasicCredentialsProvider extensionProvider = new BasicCredentialsProvider() {
+            @Override
+            public Credentials getCredentials(AuthScope authscope) {
+                asked.add(authscope);
+                return new UsernamePasswordCredentials("foo", "bar");
+            }
+        };
+        HttpClientBuilderExtension extension = new HttpClientBuilderExtension() {
+            @Override
+            public CredentialsProvider extendCredentialProvider(HttpClientBuilder httpClientBuilder,
+                                                                CredentialsProvider credentialsProvider,
+                                                                GerritAuthData authData) {
+                return extensionProvider;
+            }
+        };
+        GerritRestClient gerritRestClient =
+            new GerritRestClient(new GerritAuthData.Basic(jettyUrl), new HttpRequestExecutor(), extension);
+
+        try {
+            gerritRestClient.requestRest("/a/changes/", null, GET);
+            Assert.fail("expected the unmapped /a/changes/ to answer 404 once authenticated");
+        } catch (HttpStatusException e) {
+            // 404 means the credentials were accepted; the provider the client started with has none
+            Truth.assertThat(e.getStatusCode()).isEqualTo(404);
+        }
+        Truth.assertThat(asked).isNotEmpty();
+    }
+
+    /**
+     * Plays a Gerrit that hands out a session on {@code /login/}: the session cookies go straight
+     * into the cookie store the client put in the context, as a real client would do on a response.
+     * Other requests get a {@code 403} while {@link #forbiddenLeft} lasts, and a 200 after that.
+     */
+    private static final class ScriptedExecutor extends HttpRequestExecutor {
+        private final List<HttpRequestBase> requests = new ArrayList<>();
+        private int forbiddenLeft;
+        private boolean sessionCheckBodyClosed;
+
+        @Override
+        public HttpResponse execute(HttpClientBuilder client, HttpRequestBase method, HttpContext context) {
+            requests.add(method);
+            String path = method.getURI().getPath();
+            if (path.endsWith("/login/")) {
+                CookieStore cookieStore = (CookieStore) context.getAttribute(HttpClientContext.COOKIE_STORE);
+                cookieStore.addCookie(new BasicClientCookie("GerritAccount", "session"));
+                cookieStore.addCookie(new BasicClientCookie("XSRF_TOKEN", "token"));
+                return new BasicHttpResponse(HttpVersion.HTTP_1_1, 200, null);
+            }
+            BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1, 200, null);
+            if (path.endsWith("/accounts/self")) {
+                BasicHttpEntity entity = new BasicHttpEntity();
+                entity.setContent(new ByteArrayInputStream("{}".getBytes(StandardCharsets.UTF_8)) {
+                    @Override
+                    public void close() throws IOException {
+                        sessionCheckBodyClosed = true;
+                        super.close();
+                    }
+                });
+                response.setEntity(entity);
+                return response;
+            }
+            if (forbiddenLeft > 0) {
+                forbiddenLeft--;
+                return new BasicHttpResponse(HttpVersion.HTTP_1_1, 403, null);
+            }
+            return response;
+        }
+
+        private List<HttpRequestBase> requestsTo(String path) {
+            List<HttpRequestBase> matching = new ArrayList<>();
+            for (HttpRequestBase request : requests) {
+                if (request.getURI().getPath().endsWith(path)) {
+                    matching.add(request);
+                }
+            }
+            return matching;
+        }
+    }
+
+    /**
+     * Answers every request with an empty 200 and keeps the request it was handed, so that what the
+     * client assembled can be asserted without a server.
+     */
+    private static final class CapturingExecutor extends HttpRequestExecutor {
+        private HttpRequestBase method;
+        private String body;
+
+        @Override
+        public HttpResponse execute(HttpClientBuilder client, HttpRequestBase method, HttpContext context)
+                throws IOException {
+            this.method = method;
+            if (method instanceof HttpEntityEnclosingRequest) {
+                org.apache.http.HttpEntity entity = ((HttpEntityEnclosingRequest) method).getEntity();
+                this.body = entity == null ? null : EntityUtils.toString(entity, StandardCharsets.UTF_8);
+            }
+            return new BasicHttpResponse(HttpVersion.HTTP_1_1, 200, null);
+        }
     }
 
     private void requestChanges(GerritRestClient gerritRestClient) throws IOException, HttpStatusException {
