@@ -78,22 +78,4 @@ public class AccountsRestClientTest {
         EasyMock.replay(gerritRestClient);
         return gerritRestClient;
     }
-
-    private GerritRestClient gerritRestClientExpectPut(String expectedUrl) throws Exception {
-        GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
-        EasyMock.expect(gerritRestClient.putRequest(expectedUrl))
-            .andReturn(EMPTY_JSON_OBJECT).once();
-        EasyMock.replay(gerritRestClient);
-        return gerritRestClient;
-    }
-
-    private GerritRestClient gerritRestClientExpectDelete(String expectedUrl) throws Exception {
-        GerritRestClient gerritRestClient = EasyMock.createMock(GerritRestClient.class);
-        EasyMock.expect(gerritRestClient.deleteRequest(expectedUrl))
-            .andReturn(EMPTY_JSON_OBJECT).once();
-        EasyMock.replay(gerritRestClient);
-        return gerritRestClient;
-    }
-
-
 }

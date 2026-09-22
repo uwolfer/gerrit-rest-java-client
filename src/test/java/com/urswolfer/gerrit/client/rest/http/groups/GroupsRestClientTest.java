@@ -21,6 +21,7 @@ import static com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest.rest
 import com.google.gerrit.extensions.api.groups.Groups;
 import com.google.gerrit.extensions.api.groups.Groups.QueryRequest;
 import com.google.gerrit.extensions.client.ListGroupsOption;
+import com.google.gerrit.extensions.restapi.NotImplementedException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
@@ -29,11 +30,9 @@ import org.easymock.EasyMock;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author Shawn Stafford
@@ -62,6 +61,47 @@ public class GroupsRestClientTest {
         groupsRestClient.create(groupName);
 
         EasyMock.verify(gerritRestClient);
+    }
+
+    /**
+     * The list parameters the client cannot send yet must say so rather than return an unfiltered
+     * list, and must do it before any request goes out.
+     */
+    @Test(dataProvider = "UnsupportedListParameters", expectedExceptions = NotImplementedException.class)
+    public void testUnsupportedListParameterIsRejected(String parameter, Consumer<Groups.ListRequest> setter)
+            throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
+        Groups.ListRequest list = new GroupsRestClient(restContext(gerritRestClient)).list();
+        setter.accept(list);
+        try {
+            list.get();
+        } finally {
+            EasyMock.verify(gerritRestClient);
+        }
+    }
+
+    @DataProvider(name = "UnsupportedListParameters")
+    public Object[][] unsupportedListParameters() {
+        return new Object[][] {
+            {"options", (Consumer<Groups.ListRequest>) list -> list.addOption(ListGroupsOption.MEMBERS)},
+            {"project", (Consumer<Groups.ListRequest>) list -> list.withProject("p")},
+            {"group", (Consumer<Groups.ListRequest>) list -> list.addGroup("uuid")},
+            {"visible-to-all", (Consumer<Groups.ListRequest>) list -> list.withVisibleToAll(true)},
+            {"user", (Consumer<Groups.ListRequest>) list -> list.withUser("jdoe")},
+            {"substring", (Consumer<Groups.ListRequest>) list -> list.withSubstring("dev")},
+        };
+    }
+
+    @Test(expectedExceptions = NotImplementedException.class)
+    public void testQueryWithOptionsIsRejected() throws Exception {
+        GerritRestClient gerritRestClient = new GerritRestClientBuilder().get();
+        Groups.QueryRequest query = new GroupsRestClient(restContext(gerritRestClient)).query()
+            .withOption(ListGroupsOption.MEMBERS);
+        try {
+            query.get();
+        } finally {
+            EasyMock.verify(gerritRestClient);
+        }
     }
 
     @Test
@@ -158,17 +198,9 @@ public class GroupsRestClientTest {
     }
 
     private final static class TestListRequest {
-        private EnumSet<ListGroupsOption> options =
-            EnumSet.noneOf(ListGroupsOption.class);
-        private List<String> projects = new ArrayList<>();
-        private List<String> groups = new ArrayList<>();
-
-        private Boolean visibleToAll;
-        private String user;
         private Boolean owned;
         private Integer limit;
         private Integer start;
-        private String substring;
         private String suggest;
 
         public TestListRequest withOwned(boolean owned) {
@@ -289,9 +321,6 @@ public class GroupsRestClientTest {
     }
 
     private final static class TestQueryRequest {
-        private EnumSet<ListGroupsOption> options = EnumSet.noneOf(ListGroupsOption.class);
-        private List<String> projects = new ArrayList<>();
-        private List<String> groups = new ArrayList<>();
         private Integer limit;
         private Integer start;
         private String query;

@@ -198,7 +198,7 @@ public class CommentsJsonTest extends AbstractJsonTest {
     @Test
     public void testParseRobotCommentInfos() throws Exception {
         SortedMap<String, List<RobotCommentInfo>> robotComments = parseRobotComments();
-        GerritAssert.assertRobotCommentsEquals(robotComments, ROBOT_COMMENT_INFOS);
+        GerritAssert.assertEquals(robotComments, ROBOT_COMMENT_INFOS);
     }
 
     @Test
