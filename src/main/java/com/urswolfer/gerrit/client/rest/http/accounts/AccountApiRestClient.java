@@ -45,12 +45,10 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import java.util.List;
 import java.util.SortedSet;
 
-
 /**
  * @author Urs Wolfer
  */
 public class AccountApiRestClient extends AccountApi.NotImplemented implements AccountApi {
-
 
     private final GerritRestContext context;
     private final String name;

@@ -30,7 +30,6 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 import java.util.Optional;
 
-
 /**
  * @author Jun Qiu
  */

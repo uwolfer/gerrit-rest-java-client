@@ -26,7 +26,6 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 public class ConfigRestClient extends Config.NotImplemented implements Config {
     private final GerritRestContext context;
 
-
     public ConfigRestClient(GerritRestContext context) {
         this.context = context;
     }

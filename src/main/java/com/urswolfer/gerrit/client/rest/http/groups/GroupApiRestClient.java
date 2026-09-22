@@ -162,9 +162,7 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
         // { groups: [ "group1", "group2 ] }
         Map<String, List<String>> groupMap =
             Collections.singletonMap("groups", Arrays.asList(groups));
-        String json = gerritJson.toJson(groupMap);
-
-        context.post(restPath).rawBody(json).send();
+        context.post(restPath).body(groupMap).send();
     }
 
     @Override
@@ -172,9 +170,7 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
         String restPath = getRequestPath() + "/groups.delete";
         Map<String, List<String>> groupMap =
             Collections.singletonMap("groups", Arrays.asList(groups));
-        String json = gerritJson.toJson(groupMap);
-
-        context.post(restPath).rawBody(json).send();
+        context.post(restPath).body(groupMap).send();
     }
 
     @Override

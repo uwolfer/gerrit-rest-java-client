@@ -166,18 +166,19 @@ public final class GerritRestRequest {
     /**
      * Dispatches to the rest client's own verb methods rather than to
      * {@link GerritRestClient#requestJson}, so that what reaches the client is exactly what these
-     * call sites sent before.
+     * call sites sent before. Those methods take no body, so a request that has one goes to
+     * {@code requestJson} instead - which is what they delegate to anyway - rather than dropping it.
      */
     private JsonElement execute() throws RestApiException {
         switch (verb) {
             case GET:
-                return restClient.getRequest(path);
+                return body == null ? restClient.getRequest(path) : restClient.requestJson(path, body, verb);
             case POST:
                 return body == null ? restClient.postRequest(path) : restClient.postRequest(path, body);
             case PUT:
                 return body == null ? restClient.putRequest(path) : restClient.putRequest(path, body);
             case DELETE:
-                return restClient.deleteRequest(path);
+                return body == null ? restClient.deleteRequest(path) : restClient.requestJson(path, body, verb);
             default:
                 return restClient.requestJson(path, body, verb);
         }

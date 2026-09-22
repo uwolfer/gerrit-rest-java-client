@@ -25,9 +25,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 import com.urswolfer.gerrit.client.rest.http.UrlQuery;
 
-
 import java.util.function.Supplier;
-
 
 /**
  * @author Thomas Forrer

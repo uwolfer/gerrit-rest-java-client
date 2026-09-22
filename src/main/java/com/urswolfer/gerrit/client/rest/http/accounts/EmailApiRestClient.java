@@ -22,7 +22,6 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
-
 public class EmailApiRestClient extends EmailApi.NotImplemented implements EmailApi {
 
 

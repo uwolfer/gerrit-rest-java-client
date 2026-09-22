@@ -27,8 +27,6 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
-
-
 /**
  * @author Ingo Rissmann
  */
