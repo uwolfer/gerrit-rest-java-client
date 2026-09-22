@@ -106,7 +106,9 @@ public class GerritAssert {
             } else if (value instanceof Collection) {
                 nested(value, () -> writeElements(collectionKind((Collection<?>) value), (Collection<?>) value, depth));
             } else if (value.getClass().isArray()) {
-                nested(value, () -> writeElements("array", arrayElements(value), depth));
+                // the component type, so an int[] is not an Integer[] once the elements are boxed
+                nested(value, () -> writeElements(value.getClass().getComponentType().getName() + "[]",
+                    arrayElements(value), depth));
             } else if (isJdkType(value.getClass())) {
                 throw new IllegalArgumentException("GerritAssert does not know how to compare "
                     + value.getClass().getName() + "; add a case for it to GerritAssert.Describer");

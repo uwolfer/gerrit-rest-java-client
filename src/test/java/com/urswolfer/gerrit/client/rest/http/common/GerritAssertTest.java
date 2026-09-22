@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -198,16 +199,45 @@ public class GerritAssertTest {
         GerritAssert.assertEquals(URI.create("http://a"), URI.create("http://a"));
     }
 
+    @Test(expectedExceptions = AssertionError.class)
+    public void arrayComponentTypesAreCompared() {
+        GerritAssert.assertEquals(new int[] {1}, new Integer[] {1});
+    }
+
+    @Test(expectedExceptions = AssertionError.class)
+    public void aStringArrayIsNotAnObjectArray() {
+        GerritAssert.assertEquals(new String[] {"a"}, new Object[] {"a"});
+    }
+
+    @Test
+    public void equalArraysPass() {
+        GerritAssert.assertEquals(new int[] {1, 2}, new int[] {1, 2});
+    }
+
     /**
-     * Double-brace fixtures are anonymous subclasses; their fields are compared like any other,
-     * and the reference they keep to the enclosing test is not.
+     * Double-brace fixtures are anonymous subclasses. Both sides here come from the one anonymous
+     * class, so only the field value differs.
      */
     @Test(expectedExceptions = AssertionError.class)
-    @SuppressWarnings("serial")
     public void anonymousSubclassesAreComparedByTheirFields() {
-        AccountInfo jane = new AccountInfo(1) {{ name = "Jane"; }};
-        AccountInfo john = new AccountInfo(1) {{ name = "John"; }};
-        GerritAssert.assertEquals(jane, john);
+        GerritAssert.assertEquals(anonymousAccount("Jane", "x"), anonymousAccount("John", "x"));
+    }
+
+    /**
+     * What an anonymous class captures - the enclosing test, a local variable - lives in synthetic
+     * fields the compiler adds, which are not part of the value.
+     */
+    @Test
+    public void whatAnAnonymousClassCapturesIsNotCompared() {
+        GerritAssert.assertEquals(anonymousAccount("Jane", "x"), anonymousAccount("Jane", "y"));
+    }
+
+    @SuppressWarnings("serial")
+    private AccountInfo anonymousAccount(String accountName, String captured) {
+        return new AccountInfo(1) {{
+            name = accountName;
+            Objects.requireNonNull(captured); // referenced, so the compiler captures it
+        }};
     }
 
     private static AccountInfo account(int id, String name) {
