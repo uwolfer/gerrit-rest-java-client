@@ -21,40 +21,33 @@ import com.google.gerrit.extensions.api.projects.CommitApi;
 import com.google.gerrit.extensions.common.CommitInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
-import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 
 public class CommitApiRestClient extends CommitApi.NotImplemented implements CommitApi {
 
-    private final GerritRestClient gerritRestClient;
+    private final GerritRestContext context;
     private final ProjectApiRestClient projectApiRestClient;
-    private final GerritJson gerritJson;
 
     private final String commit;
 
     public CommitApiRestClient(GerritRestContext context,
                                ProjectApiRestClient projectApiRestClient,
                                String commit) {
-        this.gerritRestClient = context.restClient();
-        this.gerritJson = context.json();
+        this.context = context;
         this.projectApiRestClient = projectApiRestClient;
         this.commit = commit;
     }
 
     @Override
     public CommitInfo get() throws RestApiException {
-        JsonElement jsonElement = gerritRestClient.getRequest(commitURL());
-        return gerritJson.as(jsonElement, CommitInfo.class);
+        return context.get(commitURL()).as(CommitInfo.class);
     }
 
 
     @Override
     public IncludedInInfo includedIn() throws RestApiException {
-        JsonElement jsonElement = gerritRestClient.getRequest(commitURL() + "/in");
-        return gerritJson.as(jsonElement, IncludedInInfo.class);
+        return context.get(commitURL() + "/in").as(IncludedInInfo.class);
     }
 
     protected String commitURL() {

@@ -16,19 +16,16 @@
 
 package com.urswolfer.gerrit.client.rest.http.changes;
 
-import com.google.common.base.Strings;
 import com.google.gerrit.extensions.api.changes.ChangeApi;
 import com.google.gerrit.extensions.api.changes.Changes;
-import com.google.gerrit.extensions.client.ListChangesOption;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.ChangeInput;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
-import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
+import com.urswolfer.gerrit.client.rest.http.UrlQuery;
 
 import java.util.List;
 
@@ -38,12 +35,10 @@ import java.util.List;
 public class ChangesRestClient extends Changes.NotImplemented implements Changes {
 
     private final GerritRestContext context;
-    private final GerritRestClient gerritRestClient;
     private final GerritJson gerritJson;
 
     public ChangesRestClient(GerritRestContext context) {
         this.context = context;
-        this.gerritRestClient = context.restClient();
         this.gerritJson = context.json();
     }
 
@@ -63,32 +58,16 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
     }
 
     private List<ChangeInfo> get(QueryRequest queryRequest) throws RestApiException {
-        String query = "";
+        String url = UrlQuery.of("/changes/")
+            .paramIfNotEmpty("q", queryRequest.getQuery())
+            .paramIfPositive("n", queryRequest.getLimit())
+            .paramIfPositive("S", queryRequest.getStart())
+            // sortkey is for server versions before 2.9, which paged change lists with it
+            .paramIfNotEmpty("N", queryRequest.getSortkey())
+            .params("o", queryRequest.getOptions())
+            .toUrl();
 
-        if (!Strings.isNullOrEmpty(queryRequest.getQuery())) {
-            query = UrlUtils.appendToUrlQuery(query, "q=" + queryRequest.getQuery());
-        }
-        if (queryRequest.getLimit() > 0) {
-            query = UrlUtils.appendToUrlQuery(query, "n=" + queryRequest.getLimit());
-        }
-        if (queryRequest.getStart() > 0) {
-            query = UrlUtils.appendToUrlQuery(query, "S=" + queryRequest.getStart());
-        }
-        // server version < 2.9, needed for change list paging
-        if (!Strings.isNullOrEmpty(queryRequest.getSortkey())) {
-            query = UrlUtils.appendToUrlQuery(query, "N=" + queryRequest.getSortkey());
-        }
-        for (ListChangesOption option : queryRequest.getOptions()) {
-            query = UrlUtils.appendToUrlQuery(query, "o=" + option);
-        }
-
-        String url = "/changes/";
-        if (!Strings.isNullOrEmpty(query)) {
-            url += '?' + query;
-        }
-
-        JsonElement jsonElement = gerritRestClient.getRequest(url);
-        return gerritJson.asList(jsonElement, ChangeInfo.class);
+        return context.get(url).asList(ChangeInfo.class);
     }
 
     @Override
@@ -118,8 +97,7 @@ public class ChangesRestClient extends Changes.NotImplemented implements Changes
         }
 
         String url = "/changes/";
-        String changeInput = gerritJson.toJson(in, ChangeInput.class);
-        JsonElement result = gerritRestClient.postRequest(url, changeInput);
+        JsonElement result = context.post(url).body(in, ChangeInput.class).asJson();
         ChangeInfo info = gerritJson.as(result, ChangeInfo.class);
         return id(info._number);
     }

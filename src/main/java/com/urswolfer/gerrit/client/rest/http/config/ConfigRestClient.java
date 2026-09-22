@@ -18,8 +18,6 @@ package com.urswolfer.gerrit.client.rest.http.config;
 
 import com.google.gerrit.extensions.api.config.Config;
 import com.google.gerrit.extensions.api.config.Server;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 /**
@@ -27,14 +25,9 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
  */
 public class ConfigRestClient extends Config.NotImplemented implements Config {
     private final GerritRestContext context;
-    private final GerritRestClient gerritRestClient;
-
-    private final GerritJson gerritJson;
 
     public ConfigRestClient(GerritRestContext context) {
         this.context = context;
-        this.gerritRestClient = context.restClient();
-        this.gerritJson = context.json();
     }
 
     @Override

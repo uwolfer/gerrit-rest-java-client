@@ -40,52 +40,38 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
 import com.urswolfer.gerrit.client.rest.accounts.AccountApi;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
-import com.urswolfer.gerrit.client.rest.http.util.BinaryResultUtils;
-import org.apache.http.HttpResponse;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.SortedSet;
-
-import static com.urswolfer.gerrit.client.rest.RestClient.HttpVerb.GET;
 
 /**
  * @author Urs Wolfer
  */
 public class AccountApiRestClient extends AccountApi.NotImplemented implements AccountApi {
 
-    private final GerritJson gerritJson;
-
     private final GerritRestContext context;
-    private final GerritRestClient gerritRestClient;
     private final String name;
 
     public AccountApiRestClient(GerritRestContext context,
                                 String name) {
         this.context = context;
-        this.gerritRestClient = context.restClient();
-        this.gerritJson = context.json();
         this.name = name;
     }
 
     @Override
     public AccountInfo get() throws RestApiException {
-        JsonElement result = gerritRestClient.getRequest(getRequestPath());
-        return gerritJson.as(result, AccountInfo.class);
+        return context.get(getRequestPath()).as(AccountInfo.class);
     }
 
     @Override
     public AccountDetailInfo detail() throws RestApiException {
-        JsonElement result = gerritRestClient.getRequest(getRequestPath() + "/detail");
-        return gerritJson.as(result, AccountDetailInfo.class);
+        return context.get(getRequestPath() + "/detail").as(AccountDetailInfo.class);
     }
 
     @Override
     public boolean getActive() throws RestApiException {
-        JsonElement result = gerritRestClient.getRequest(getRequestPath() + "/active");
+        JsonElement result = context.get(getRequestPath() + "/active").asJson();
         if(result == null) {
             return false;
         }
@@ -100,97 +86,81 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
     public void setActive(boolean active) throws RestApiException {
         String requestPath = getRequestPath() + "/active";
         if(active){
-            gerritRestClient.putRequest(requestPath);
+            context.put(requestPath).send();
         }else {
-            gerritRestClient.deleteRequest(requestPath);
+            context.delete(requestPath).send();
         }
     }
 
     @Override
     public GeneralPreferencesInfo getPreferences() throws RestApiException {
-        JsonElement result = gerritRestClient.getRequest(getRequestPath() + "/preferences");
-        return gerritJson.as(result, GeneralPreferencesInfo.class);
+        return context.get(getRequestPath() + "/preferences").as(GeneralPreferencesInfo.class);
     }
 
     @Override
     public GeneralPreferencesInfo setPreferences(GeneralPreferencesInfo input)
         throws RestApiException {
-        String body = gerritJson.toJson(input);
-        JsonElement result = gerritRestClient.putRequest(getRequestPath() + "/preferences", body);
-        return gerritJson.as(result, GeneralPreferencesInfo.class);
+        return context.put(getRequestPath() + "/preferences").body(input).as(GeneralPreferencesInfo.class);
     }
 
     @Override
     public DiffPreferencesInfo getDiffPreferences() throws RestApiException {
-        JsonElement result = gerritRestClient.getRequest(getRequestPath() + "/preferences.diff");
-        return gerritJson.as(result, DiffPreferencesInfo.class);
+        return context.get(getRequestPath() + "/preferences.diff").as(DiffPreferencesInfo.class);
     }
 
     @Override
     public DiffPreferencesInfo setDiffPreferences(DiffPreferencesInfo input) throws RestApiException {
-        String body = gerritJson.toJson(input);
-        JsonElement result = gerritRestClient.putRequest(getRequestPath() + "/preferences.diff", body);
-        return gerritJson.as(result, DiffPreferencesInfo.class);
+        return context.put(getRequestPath() + "/preferences.diff").body(input).as(DiffPreferencesInfo.class);
     }
 
     @Override
     public EditPreferencesInfo getEditPreferences() throws RestApiException {
-        JsonElement result = gerritRestClient.getRequest(getRequestPath() + "/preferences.edit");
-        return gerritJson.as(result, EditPreferencesInfo.class);
+        return context.get(getRequestPath() + "/preferences.edit").as(EditPreferencesInfo.class);
     }
 
     @Override
     public EditPreferencesInfo setEditPreferences(EditPreferencesInfo input) throws RestApiException {
-        String body = gerritJson.toJson(input);
-        JsonElement result = gerritRestClient.putRequest(getRequestPath() + "/preferences.edit", body);
-        return gerritJson.as(result, EditPreferencesInfo.class);
+        return context.put(getRequestPath() + "/preferences.edit").body(input).as(EditPreferencesInfo.class);
     }
 
     @Override
     public List<ProjectWatchInfo> getWatchedProjects() throws RestApiException{
-        JsonElement result = gerritRestClient.getRequest(getRequestPath() + "/watched.projects");
-        return gerritJson.asList(result, ProjectWatchInfo.class);
+        return context.get(getRequestPath() + "/watched.projects").asList(ProjectWatchInfo.class);
     }
 
     @Override
     public List<ProjectWatchInfo> setWatchedProjects(List<ProjectWatchInfo> in) throws RestApiException{
-        String body = gerritJson.toJson(in);
-        JsonElement result = gerritRestClient.postRequest(getRequestPath() + "/watched.projects", body);
-        return gerritJson.asList(result, ProjectWatchInfo.class);
+        return context.post(getRequestPath() + "/watched.projects").body(in).asList(ProjectWatchInfo.class);
     }
 
     @Override
     public void deleteWatchedProjects(List<ProjectWatchInfo> in) throws RestApiException{
-        String body = gerritJson.toJson(in);
-        gerritRestClient.postRequest(getRequestPath() + "/watched.projects:delete", body);
+        context.post(getRequestPath() + "/watched.projects:delete").body(in).send();
     }
 
     @Override
     public void starChange(String id) throws RestApiException {
-        gerritRestClient.putRequest(createStarredUrl(id));
+        context.put(createStarredUrl(id)).send();
     }
 
     @Override
     public void unstarChange(String id) throws RestApiException {
-        gerritRestClient.deleteRequest(createStarredUrl(id));
+        context.delete(createStarredUrl(id)).send();
     }
 
     @Override
     public void setStars(String changeId, StarsInput input) throws RestApiException {
-        String body = gerritJson.toJson(input);
-        gerritRestClient.postRequest(createStarsUrl(changeId), body);
+        context.post(createStarsUrl(changeId)).body(input).send();
     }
 
     @Override
     public SortedSet<String> getStars(String changeId) throws RestApiException {
-        JsonElement result = gerritRestClient.getRequest(createStarsUrl(changeId));
-        return gerritJson.asSortedSet(result, String.class);
+        return context.get(createStarsUrl(changeId)).asSortedSet(String.class);
     }
 
     @Override
     public List<ChangeInfo> getStarredChanges() throws RestApiException {
-        JsonElement response = gerritRestClient.getRequest(getRequestPath() + "/starred.changes");
-        return gerritJson.asList(response, ChangeInfo.class);
+        return context.get(getRequestPath() + "/starred.changes").asList(ChangeInfo.class);
     }
 
     /**
@@ -209,8 +179,7 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
 
     @Override
     public List<EmailInfo> getEmails() throws RestApiException {
-        JsonElement response = gerritRestClient.getRequest(getRequestPath() + "/emails");
-        return gerritJson.asList(response, EmailInfo.class);
+        return context.get(getRequestPath() + "/emails").asList(EmailInfo.class);
     }
 
     @Override
@@ -226,8 +195,7 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
 
     @Override
     public EmailApi createEmail(EmailInput input) throws RestApiException {
-        String body = gerritJson.toJson(input);
-        gerritRestClient.putRequest(getRequestPath() + "/emails/" + input.email, body);
+        context.put(getRequestPath() + "/emails/" + input.email).body(input).send();
         return email(input.email);
     }
 
@@ -242,8 +210,7 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
     }
 
     public void setStatus(StatusInput input) throws RestApiException {
-        String body = gerritJson.toJson(input);
-        gerritRestClient.putRequest(getRequestPath() + "/status", body);
+        context.put(getRequestPath() + "/status").body(input).send();
     }
 
     @Override
@@ -252,64 +219,51 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
     }
 
     public void setDisplayName(DisplayNameInput input) throws RestApiException {
-        String body = gerritJson.toJson(input);
-        gerritRestClient.putRequest(getRequestPath() + "/displayname", body);
+        context.put(getRequestPath() + "/displayname").body(input).send();
     }
 
     @Override
     public BinaryResult downloadAvatar(int size) throws RestApiException {
         String request = getRequestPath() + "/avatar?s=" + size;
-        try {
-            HttpResponse response = gerritRestClient.request(request, null, GET);
-            return BinaryResultUtils.createBinaryResult(response);
-        } catch (IOException e) {
-            throw RestApiException.wrap("Failed to get avatar.", e);
-        }
+        return context.get(request).binary("Failed to get avatar.");
     }
 
     @Override
     public SshKeyInfo addSshKey(String key) throws RestApiException {
-        String request = getRequestPath() + "/sshkeys";
-        JsonElement result = gerritRestClient.requestJson(request,key, HttpVerb.POST_TEXT_PLAIN);
-        return gerritJson.as(result, SshKeyInfo.class);
+        return context.request(HttpVerb.POST_TEXT_PLAIN, getRequestPath() + "/sshkeys")
+            .rawBody(key)
+            .as(SshKeyInfo.class);
     }
 
     @Override
     public List<SshKeyInfo> listSshKeys() throws RestApiException {
-        String request = getRequestPath() + "/sshkeys";
-        JsonElement result = gerritRestClient.getRequest(request);
-        return gerritJson.asList(result, SshKeyInfo.class);
+        return context.get(getRequestPath() + "/sshkeys").asList(SshKeyInfo.class);
     }
 
     @Override
     public void deleteSshKey(int seq) throws RestApiException {
-        String request = getRequestPath()+ "/sshkeys/" + seq;
-        gerritRestClient.deleteRequest(request);
+        context.delete(getRequestPath()+ "/sshkeys/" + seq).send();
     }
 
     @Override
     public void index() throws RestApiException {
-        gerritRestClient.postRequest(getRequestPath() + "/index");
+        context.post(getRequestPath() + "/index").send();
     }
 
     @Override
     public List<AccountExternalIdInfo> getExternalIds() throws RestApiException {
-        JsonElement result = gerritRestClient.getRequest(getRequestPath() + "/external.ids");
-        return gerritJson.asList(result, AccountExternalIdInfo.class);
+        return context.get(getRequestPath() + "/external.ids").asList(AccountExternalIdInfo.class);
     }
 
     @Override
     public void deleteExternalIds(List<String> externalIds) throws RestApiException {
-        String body = gerritJson.toJson(externalIds);
-        gerritRestClient.postRequest(getRequestPath() + "/external.ids:delete", body);
+        context.post(getRequestPath() + "/external.ids:delete").body(externalIds).send();
     }
 
     @Override
     public List<DeletedDraftCommentInfo> deleteDraftComments(DeleteDraftCommentsInput input)
         throws RestApiException {
-        String body = gerritJson.toJson(input);
-        JsonElement result = gerritRestClient.postRequest(getRequestPath() + "/drafts.delete", body);
-        return gerritJson.asList(result, DeletedDraftCommentInfo.class);
+        return context.post(getRequestPath() + "/drafts.delete").body(input).asList(DeletedDraftCommentInfo.class);
     }
 
     @Override
@@ -327,13 +281,12 @@ public class AccountApiRestClient extends AccountApi.NotImplemented implements A
     }
 
     public String setHttpPassword(HttpPasswordInput input) throws RestApiException {
-        String body = gerritJson.toJson(input);
-        JsonElement result = gerritRestClient.putRequest(getRequestPath() + "/password.http", body);
+        JsonElement result = context.put(getRequestPath() + "/password.http").body(input).asJson();
         return result.getAsString();
     }
 
     public void deleteHttpPassword() throws RestApiException {
-        gerritRestClient.deleteRequest(getRequestPath() + "/password.http");
+        context.delete(getRequestPath() + "/password.http").send();
     }
 
     private String getRequestPath() {

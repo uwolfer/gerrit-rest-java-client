@@ -22,7 +22,6 @@ import com.google.gerrit.extensions.common.CommentInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 /**
@@ -30,7 +29,7 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
  */
 public class DraftApiRestClient extends DraftApi.NotImplemented implements DraftApi {
 
-    private final GerritRestClient gerritRestClient;
+    private final GerritRestContext context;
     private final ChangeApiRestClient changeApiRestClient;
     private final RevisionApiRestClient revisionApiRestClient;
     private final GerritJson gerritJson;
@@ -41,7 +40,7 @@ public class DraftApiRestClient extends DraftApi.NotImplemented implements Draft
                               ChangeApiRestClient changeApiRestClient,
                               RevisionApiRestClient revisionApiRestClient,
                               CommentInfo commentInfo) {
-        this.gerritRestClient = context.restClient();
+        this.context = context;
         this.gerritJson = context.json();
         this.changeApiRestClient = changeApiRestClient;
         this.revisionApiRestClient = revisionApiRestClient;
@@ -53,7 +52,7 @@ public class DraftApiRestClient extends DraftApi.NotImplemented implements Draft
                               ChangeApiRestClient changeApiRestClient,
                               RevisionApiRestClient revisionApiRestClient,
                               String id) {
-        this.gerritRestClient = context.restClient();
+        this.context = context;
         this.gerritJson = context.json();
         this.changeApiRestClient = changeApiRestClient;
         this.revisionApiRestClient = revisionApiRestClient;
@@ -63,14 +62,13 @@ public class DraftApiRestClient extends DraftApi.NotImplemented implements Draft
 
     @Override
     public CommentInfo update(DraftInput in) throws RestApiException {
-        String json = gerritJson.toJson(in);
-        JsonElement jsonElement = gerritRestClient.putRequest(getUrl(), json);
+        JsonElement jsonElement = context.put(getUrl()).body(in).asJson();
         return gerritJson.as(jsonElement.getAsJsonObject(), CommentInfo.class);
     }
 
     @Override
     public void delete() throws RestApiException {
-        gerritRestClient.deleteRequest(getUrl());
+        context.delete(getUrl()).send();
     }
 
     @Override
@@ -78,7 +76,7 @@ public class DraftApiRestClient extends DraftApi.NotImplemented implements Draft
         if (commentInfo != null) {
             return commentInfo;
         }
-        JsonElement jsonElement = gerritRestClient.getRequest(getUrl());
+        JsonElement jsonElement = context.get(getUrl()).asJson();
         return gerritJson.as(jsonElement.getAsJsonObject(), CommentInfo.class);
     }
 

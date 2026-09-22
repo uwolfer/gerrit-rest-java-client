@@ -19,31 +19,25 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 import com.google.gerrit.extensions.api.changes.RobotCommentApi;
 import com.google.gerrit.extensions.common.RobotCommentInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
-import com.google.gson.JsonElement;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 public class RobotCommentApiRestClient extends RobotCommentApi.NotImplemented implements RobotCommentApi {
 
-    private final GerritRestClient gerritRestClient;
+    private final GerritRestContext context;
     private final RevisionApiRestClient revisionApiRestClient;
-    private final GerritJson gerritJson;
     private final String id;
 
     public RobotCommentApiRestClient(GerritRestContext context,
                                      RevisionApiRestClient revisionApiRestClient,
                                      String id) {
-        this.gerritRestClient = context.restClient();
-        this.gerritJson = context.json();
+        this.context = context;
         this.revisionApiRestClient = revisionApiRestClient;
         this.id = id;
     }
 
     @Override
     public RobotCommentInfo get() throws RestApiException {
-        JsonElement response = gerritRestClient.getRequest(getRequestPath());
-        return gerritJson.as(response, RobotCommentInfo.class);
+        return context.get(getRequestPath()).as(RobotCommentInfo.class);
     }
 
     protected String getRequestPath() {

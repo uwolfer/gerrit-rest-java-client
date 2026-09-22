@@ -17,6 +17,7 @@
 package com.urswolfer.gerrit.client.rest.http;
 
 import com.google.gerrit.extensions.restapi.RestApiException;
+import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.config.ServerRestClient;
 
@@ -48,6 +49,29 @@ public class GerritRestContext {
 
     public GerritJson json() {
         return json;
+    }
+
+    public GerritRestRequest get(String path) {
+        return new GerritRestRequest(this, HttpVerb.GET, path);
+    }
+
+    public GerritRestRequest post(String path) {
+        return new GerritRestRequest(this, HttpVerb.POST, path);
+    }
+
+    public GerritRestRequest put(String path) {
+        return new GerritRestRequest(this, HttpVerb.PUT, path);
+    }
+
+    public GerritRestRequest delete(String path) {
+        return new GerritRestRequest(this, HttpVerb.DELETE, path);
+    }
+
+    /**
+     * A call with a verb the shorthands above do not cover, such as the plain-text variants.
+     */
+    public GerritRestRequest request(HttpVerb verb, String path) {
+        return new GerritRestRequest(this, verb, path);
     }
 
     /**

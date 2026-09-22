@@ -16,7 +16,6 @@
 
 package com.urswolfer.gerrit.client.rest.http.projects;
 
-import com.google.common.base.Strings;
 import com.google.gerrit.extensions.api.projects.ProjectApi;
 import com.google.gerrit.extensions.api.projects.ProjectInput;
 import com.google.gerrit.extensions.api.projects.Projects;
@@ -25,9 +24,8 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
-import com.urswolfer.gerrit.client.rest.http.util.UrlUtils;
+import com.urswolfer.gerrit.client.rest.http.UrlQuery;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -38,12 +36,10 @@ import java.util.TreeMap;
 public class ProjectsRestClient extends Projects.NotImplemented implements Projects {
 
     private final GerritRestContext context;
-    private final GerritRestClient gerritRestClient;
     private final GerritJson gerritJson;
 
     public ProjectsRestClient(GerritRestContext context) {
         this.context = context;
-        this.gerritRestClient = context.restClient();
         this.gerritJson = context.json();
     }
 
@@ -63,41 +59,22 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
     }
 
     private SortedMap<String, ProjectInfo> list(ListRequest listParameter) throws RestApiException {
-        String query = "";
-
-        if (listParameter.getDescription()) {
-            query = UrlUtils.appendToUrlQuery(query, "d");
-        }
-        if (listParameter.getShowTree()) {
-            query = UrlUtils.appendToUrlQuery(query, "t");
-        }
-        if (!Strings.isNullOrEmpty(listParameter.getPrefix())) {
-            query = UrlUtils.appendToUrlQuery(query, "p=" + listParameter.getPrefix());
-        }
-        if (listParameter.getLimit() > 0) {
-            query = UrlUtils.appendToUrlQuery(query, "n=" + listParameter.getLimit());
-        }
-        if (listParameter.getStart() > 0) {
-            query = UrlUtils.appendToUrlQuery(query, "S=" + listParameter.getStart());
-        }
-        for (final String branch : listParameter.getBranches()) {
-            query = UrlUtils.appendToUrlQuery(query, "b=" + branch);
-        }
         ListRequest.FilterType filterType = listParameter.getFilterType();
-        if (filterType != null && filterType != ListRequest.FilterType.ALL) {
-            query = UrlUtils.appendToUrlQuery(query, "type=" + filterType);
-        }
+        String url = UrlQuery.of("/projects/")
+            .flagIf(listParameter.getDescription(), "d")
+            .flagIf(listParameter.getShowTree(), "t")
+            .paramIfNotEmpty("p", listParameter.getPrefix())
+            .paramIfPositive("n", listParameter.getLimit())
+            .paramIfPositive("S", listParameter.getStart())
+            .params("b", listParameter.getBranches())
+            .paramIf(filterType != null && filterType != ListRequest.FilterType.ALL, "type", filterType)
+            .toUrl();
 
-        String url = "/projects/";
-        if (!Strings.isNullOrEmpty(query)) {
-            url += '?' + query;
-        }
-
-        JsonElement result = gerritRestClient.getRequest(url);
+        JsonElement result = context.get(url).asJson();
         if (result == null) {
             return new TreeMap<>();
         }
-        return gerritJson.asSortedMap(result, ProjectInfo.class);
+        return context.json().asSortedMap(result, ProjectInfo.class);
     }
 
     @Override
@@ -114,8 +91,7 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
         }
 
         String url = String.format("/projects/%s", Url.encode(in.name));
-        String projectInput = gerritJson.toJson(in, ProjectInput.class);
-        JsonElement result = gerritRestClient.putRequest(url, projectInput);
+        JsonElement result = context.put(url).body(in, ProjectInput.class).asJson();
         ProjectInfo info = gerritJson.as(result, ProjectInfo.class);
         return new ProjectApiRestClient(context, info.name);
     }

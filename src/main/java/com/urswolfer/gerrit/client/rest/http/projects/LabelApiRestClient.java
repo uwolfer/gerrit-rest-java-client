@@ -20,8 +20,6 @@ import com.google.gerrit.extensions.api.projects.LabelApi;
 import com.google.gerrit.extensions.common.LabelDefinitionInput;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 /**
@@ -29,24 +27,21 @@ import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
  */
 public class LabelApiRestClient extends LabelApi.NotImplemented implements LabelApi {
 
-    private final GerritRestClient gerritRestClient;
-    private final GerritJson gerritJson;
+    private final GerritRestContext context;
     private final ProjectApiRestClient projectApiRestClient;
     private final String name;
 
     public LabelApiRestClient(GerritRestContext context,
                               ProjectApiRestClient projectApiRestClient,
                               String name) {
-        this.gerritRestClient = context.restClient();
-        this.gerritJson = context.json();
+        this.context = context;
         this.projectApiRestClient = projectApiRestClient;
         this.name = name;
     }
 
     @Override
     public LabelApi create(LabelDefinitionInput input) throws RestApiException {
-        String body = gerritJson.toJson(input);
-        gerritRestClient.putRequest(labelUrl(), body);
+        context.put(labelUrl()).body(input).send();
         return this;
     }
 

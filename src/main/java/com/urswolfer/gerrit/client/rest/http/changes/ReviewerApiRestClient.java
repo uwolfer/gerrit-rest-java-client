@@ -18,10 +18,7 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.gerrit.extensions.api.changes.ReviewerApi;
 import com.google.gerrit.extensions.restapi.RestApiException;
-import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
-import com.urswolfer.gerrit.client.rest.gson.GerritJson;
-import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
 
 import java.util.Map;
@@ -31,31 +28,26 @@ import java.util.Map;
  */
 public class ReviewerApiRestClient extends ReviewerApi.NotImplemented implements ReviewerApi {
 
-    private final GerritRestClient gerritRestClient;
-    private final GerritJson gerritJson;
+    private final GerritRestContext context;
     private final ChangeApiRestClient changeApiRestClient;
     private final Integer accountId;
 
     public ReviewerApiRestClient(GerritRestContext context,
                                  ChangeApiRestClient changeApiRestClient,
                                  Integer accountId) {
-        this.gerritRestClient = context.restClient();
-        this.gerritJson = context.json();
+        this.context = context;
         this.changeApiRestClient = changeApiRestClient;
         this.accountId = accountId;
     }
 
     @Override
     public Map<String, Short> votes() throws RestApiException {
-        String request = getRequestPath() + "/votes";
-        JsonElement jsonElement = gerritRestClient.getRequest(request);
-        return gerritJson.as(jsonElement, new TypeToken<Map<String, Short>>() {}.getType());
+        return context.get(getRequestPath() + "/votes").as(new TypeToken<Map<String, Short>>() {}.getType());
     }
 
     @Override
     public void deleteVote(String label) throws RestApiException {
-        String request = getRequestPath() + "/votes/" + label;
-        gerritRestClient.deleteRequest(request);
+        context.delete(getRequestPath() + "/votes/" + label).send();
     }
 
     protected String getRequestPath() {
