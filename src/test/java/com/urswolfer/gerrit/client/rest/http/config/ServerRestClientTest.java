@@ -90,7 +90,6 @@ public class ServerRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/config/server/preferences","{\"changes_per_page\":100}",JsonParser.parseString("{\"changes_per_page\":25}"))
             .get();
-        GeneralPreferencesInfo generalPreferencesInfo = EasyMock.createMock(GeneralPreferencesInfo.class);
 
         GeneralPreferencesInfo payload = new GeneralPreferencesInfo();
         payload.changesPerPage = 100;
@@ -107,10 +106,8 @@ public class ServerRestClientTest {
             .expectGet("/config/server/preferences",EMPTY_JSON_OBJECT)
             .get();
 
-        GeneralPreferencesInfo generalPreferencesInfo = EasyMock.createMock(GeneralPreferencesInfo.class);
-
         ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
-        GeneralPreferencesInfo returned = serverRestClient.getDefaultPreferences();
+        serverRestClient.getDefaultPreferences();
 
         EasyMock.verify(gerritRestClient);
     }
@@ -120,7 +117,6 @@ public class ServerRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/config/server/preferences.diff","{\"line_length\":100}",JsonParser.parseString("{\"tab_size\":8}"))
             .get();
-        DiffPreferencesInfo diffPreferencesInfo = EasyMock.createMock(DiffPreferencesInfo.class);
 
         DiffPreferencesInfo payload = new DiffPreferencesInfo();
         payload.lineLength = 100;
@@ -137,8 +133,6 @@ public class ServerRestClientTest {
             .expectGet("/config/server/preferences.diff",JsonParser.parseString("{\"tab_size\":8}"))
             .get();
 
-        DiffPreferencesInfo diffPreferencesInfo = EasyMock.createMock(DiffPreferencesInfo.class);
-
         ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
         DiffPreferencesInfo returned = serverRestClient.getDefaultDiffPreferences();
 
@@ -151,7 +145,6 @@ public class ServerRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPut("/config/server/preferences.edit","{\"line_length\":100}",JsonParser.parseString("{\"tab_size\":8}"))
             .get();
-        EditPreferencesInfo editPreferencesInfo = EasyMock.createMock(EditPreferencesInfo.class);
 
         EditPreferencesInfo payload = new EditPreferencesInfo();
         payload.lineLength = 100;
@@ -168,8 +161,6 @@ public class ServerRestClientTest {
             .expectGet("/config/server/preferences.edit",JsonParser.parseString("{\"tab_size\":8}"))
             .get();
 
-        EditPreferencesInfo editPreferencesInfo = EasyMock.createMock(EditPreferencesInfo.class);
-
         ServerRestClient serverRestClient = new ServerRestClient(restContext(gerritRestClient));
         EditPreferencesInfo returned = serverRestClient.getDefaultEditPreferences();
 
@@ -179,5 +170,6 @@ public class ServerRestClientTest {
 
     @Test
     public void testCheckConsistency() throws Exception {
+        // TODO: not implemented yet.
     }
 }

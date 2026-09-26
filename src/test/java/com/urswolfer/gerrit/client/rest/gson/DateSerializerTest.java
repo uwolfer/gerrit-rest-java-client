@@ -31,13 +31,13 @@ public class DateSerializerTest extends DateFormatterTest {
     private final DateSerializer dateSerializer = new DateSerializer();
 
     @Test(dataProvider = "TestCases")
-    public void testSerialize(TestCase testCase) throws Exception {
+    public void testSerialize(TestCase testCase) {
         JsonElement jsonElement = dateSerializer.serialize(testCase.date, null, null);
         Truth.assertThat(jsonElement.getAsString()).isEqualTo(testCase.getJsonElement().getAsString());
     }
 
     @DataProvider(name = "TestCases")
-    public Iterator<TestCase[]> getTestCases() throws Exception {
+    public Iterator<TestCase[]> getTestCases() {
         return Arrays.asList(
                 forDateString("2013-07-21 14:23:59")
                         .utcDate(2013, 7, 21, 14, 23, 59),

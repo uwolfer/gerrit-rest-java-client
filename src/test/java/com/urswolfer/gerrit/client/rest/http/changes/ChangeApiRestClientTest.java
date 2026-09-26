@@ -130,7 +130,6 @@ public class ChangeApiRestClientTest {
 
     @Test
     public void testGetTopic() throws Exception {
-        JsonElement jsonElement = new JsonObject();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
                 .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/topic",
                     new JsonPrimitive("my-topic"))
@@ -329,8 +328,6 @@ public class ChangeApiRestClientTest {
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/check", jsonElement)
             .get();
 
-        ChangeInfo expectedChangeInfo = new ChangeInfo();
-
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
         ChangeInfo changeInfo = changeApiRestClient.check();
@@ -367,8 +364,6 @@ public class ChangeApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectPost("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/check", json, jsonElement)
             .get();
-
-        ChangeInfo expectedChangeInfo = new ChangeInfo();
 
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
 
@@ -576,8 +571,6 @@ public class ChangeApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940?o=LABELS&o=DETAILED_LABELS", jsonElement)
             .get();
-        ChangeInfo expectedChangeInfo = EasyMock.createMock(ChangeInfo.class);
-
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         EnumSet<ListChangesOption> options = EnumSet.of(ListChangesOption.LABELS, ListChangesOption.DETAILED_LABELS);
         ChangeInfo result = changeApiRestClient.get(options);
@@ -614,8 +607,6 @@ public class ChangeApiRestClientTest {
             .expectGet("/changes/" + expectedChangeId + "?o=" + listOptions, jsonElement)
             .expectGet("/config/server/version", new JsonPrimitive("2.14.20-102-g0b53142"))
             .get();
-        ChangeInfo expectedChangeInfo = EasyMock.createMock(ChangeInfo.class);
-
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, expectedChangeId);
         ChangeInfo result = changeApiRestClient.get();
 
@@ -640,8 +631,6 @@ public class ChangeApiRestClientTest {
             .expectGet("/changes/" + expectedChangeId + "?o=" + listOptions, jsonElement)
             .expectGet("/config/server/version", new JsonPrimitive("99.99"))
             .get();
-        ChangeInfo expectedChangeInfo = EasyMock.createMock(ChangeInfo.class);
-
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, expectedChangeId);
         ChangeInfo result = changeApiRestClient.get();
 
@@ -655,8 +644,6 @@ public class ChangeApiRestClientTest {
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940", jsonElement)
             .get();
-        ChangeInfo expectedChangeInfo = EasyMock.createMock(ChangeInfo.class);
-
         ChangeApiRestClient changeApiRestClient = new ChangeApiRestClient(restContext(gerritRestClient), null, "myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940");
         ChangeInfo result = changeApiRestClient.info();
 

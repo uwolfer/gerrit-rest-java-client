@@ -48,7 +48,9 @@ import java.util.SortedSet;
 /**
  * @author Urs Wolfer
  */
-public class AccountApiRestClient extends AccountApi.NotImplemented implements AccountApi {
+public class AccountApiRestClient
+        extends com.google.gerrit.extensions.api.accounts.AccountApi.NotImplemented
+        implements AccountApi {
 
     private final GerritRestContext context;
     private final String name;

@@ -37,7 +37,6 @@ public class CommentApiRestClientTest {
             .expectGet("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/" +
                 "revisions/" + REVISION_ID + "/comments/" + COMMENT_ID, JsonParser.parseString("{\"message\":\"a comment\"}"))
             .get();
-        CommentInfo commentInfo = EasyMock.createMock(CommentInfo.class);
 
         RevisionApiRestClient revisionApiRestClient = EasyMock.createMock(RevisionApiRestClient.class);
         EasyMock.expect(revisionApiRestClient.getRequestPath()).andReturn(
@@ -60,7 +59,6 @@ public class CommentApiRestClientTest {
                 "{\"reason\":\"Rejected by admin\"}",
                 JsonParser.parseString("{\"message\":\"a comment\"}"))
             .get();
-        CommentInfo commentInfo = EasyMock.createMock(CommentInfo.class);
 
         RevisionApiRestClient revisionApiRestClient = EasyMock.createMock(RevisionApiRestClient.class);
         EasyMock.expect(revisionApiRestClient.getRequestPath()).andReturn(

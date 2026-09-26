@@ -44,7 +44,10 @@ _Note:_ It is not guaranteed that all interfaces are implemented. If an implemen
 request at GitHub - it is quite easy! :)
 
 _Note:_ The source of <code>com.google.gerrit.extensions</code> is included in this repository at the
-moment because not all extensions to this API are merged into Gerrit repository yet.
+moment because not all extensions to this API are merged into Gerrit repository yet. This code (and
+<code>com.google.gwtorm</code>, also included here) is vendored from upstream, as-is, so please don't
+send pull requests that just change its style or fix linter/SonarCloud findings in it; only touch it
+to keep it in sync with upstream or to add extensions that aren't merged there yet.
 
 [com.google.gerrit.extensions.api.GerritApi]: https://gerrit.googlesource.com/gerrit/+/HEAD/gerrit-extension-api/src/main/java/com/google/gerrit/extensions/api/GerritApi.java
 [Groovy]: http://www.groovy-lang.org/

@@ -61,7 +61,7 @@ public class GerritRestRequestTest extends AbstractJsonTest {
      * sent and before the login round trips - rather than being dropped on the way out.
      */
     @Test
-    public void getRejectsABodyBeforeSendingAnything() throws Exception {
+    public void getRejectsABodyBeforeSendingAnything() {
         GerritRestClient client = new GerritRestClientBuilder().get();
         GerritRestRequest request = restContext(client).get("/changes/");
 

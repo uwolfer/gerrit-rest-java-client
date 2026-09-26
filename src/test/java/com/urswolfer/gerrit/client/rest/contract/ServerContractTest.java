@@ -95,16 +95,13 @@ public class ServerContractTest {
             .stubRaw("GET", "/tools/hooks/commit-msg", "text/plain", "#!/bin/sh\n",
                 Collections.<String, String>emptyMap());
 
-        InputStream hook = server.api().tools().getCommitMessageHook();
-        try {
+        try (InputStream hook = server.api().tools().getCommitMessageHook()) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             int read;
             while ((read = hook.read()) != -1) {
                 out.write(read);
             }
             Truth.assertThat(out.toString("UTF-8")).isEqualTo("#!/bin/sh\n");
-        } finally {
-            hook.close();
         }
         server.verify();
     }

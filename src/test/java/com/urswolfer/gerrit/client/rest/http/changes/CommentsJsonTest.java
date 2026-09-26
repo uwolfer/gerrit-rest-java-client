@@ -34,6 +34,7 @@ import com.urswolfer.gerrit.client.rest.http.common.RobotCommentInfoBuilder;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -188,7 +189,7 @@ public class CommentsJsonTest extends AbstractJsonTest {
     @Test
     public void testParseRobotCommentInfosForFile() throws Exception {
         SortedMap<String, List<RobotCommentInfo>> robotComments = parseRobotComments();
-        Function<List<RobotCommentInfo>, Integer> listSizeFunction = robotCommentInfos -> robotCommentInfos.size();
+        Function<List<RobotCommentInfo>, Integer> listSizeFunction = Collection::size;
         SortedMap<String, Integer> commentsPerFile = Maps.transformValues(robotComments, listSizeFunction);
         SortedMap<String, Integer> expectedCommentsPerFile = Maps.transformValues(ROBOT_COMMENT_INFOS, listSizeFunction);
         Truth.assertThat(commentsPerFile).isEqualTo(expectedCommentsPerFile);

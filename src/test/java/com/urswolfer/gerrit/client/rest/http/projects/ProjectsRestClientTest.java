@@ -49,7 +49,7 @@ public class ProjectsRestClientTest {
     }
 
     @DataProvider(name = "ListProjectTestCases")
-    public Iterator<ProjectListTestCase[]> listProjectTestCases() throws Exception {
+    public Iterator<ProjectListTestCase[]> listProjectTestCases() {
         return Arrays.asList(
             listTestCase().withListParameter(
                 new TestListRequest().withDescription(true)
@@ -142,7 +142,7 @@ public class ProjectsRestClientTest {
         }
     }
 
-    private final static class TestListRequest {
+    private static final class TestListRequest {
         private Boolean description = null;
         private Boolean tree = null;
         private String prefix = null;

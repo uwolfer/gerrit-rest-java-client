@@ -39,7 +39,7 @@ public class GerritJsonTest {
     private final GerritJson gerritJson = new GerritJson(GsonFactory.create());
 
     @Test
-    public void asListReadsAnArray() throws Exception {
+    public void asListReadsAnArray() {
         List<BranchInfo> branches = gerritJson.asList(json("[{\"ref\":\"a\"},{\"ref\":\"b\"}]"), BranchInfo.class);
 
         Truth.assertThat(branches).hasSize(2);
@@ -52,7 +52,7 @@ public class GerritJsonTest {
      * carried their own copy of this; it now applies to every list.
      */
     @Test
-    public void asListWrapsABareObject() throws Exception {
+    public void asListWrapsABareObject() {
         List<BranchInfo> branches = gerritJson.asList(json("{\"ref\":\"a\"}"), BranchInfo.class);
 
         Truth.assertThat(branches).hasSize(1);
@@ -64,7 +64,7 @@ public class GerritJsonTest {
      * which is what the parsers this replaces did too.
      */
     @Test
-    public void asListOfJsonNullIsASingleNullElement() throws Exception {
+    public void asListOfJsonNullIsASingleNullElement() {
         List<BranchInfo> branches = gerritJson.asList(JsonNull.INSTANCE, BranchInfo.class);
 
         Truth.assertThat(branches).hasSize(1);
@@ -78,7 +78,7 @@ public class GerritJsonTest {
      * @see com.urswolfer.gerrit.client.rest.http.changes.RevisionApiRestClient
      */
     @Test
-    public void asListKeepsANullElementInsideAnArray() throws Exception {
+    public void asListKeepsANullElementInsideAnArray() {
         List<BranchInfo> branches = gerritJson.asList(json("[{\"ref\":\"a\"},null]"), BranchInfo.class);
 
         Truth.assertThat(branches).hasSize(2);
@@ -90,12 +90,12 @@ public class GerritJsonTest {
      * No response body at all. The parsers this replaces threw {@link NullPointerException} here.
      */
     @Test
-    public void asListOfNothingIsNull() throws Exception {
+    public void asListOfNothingIsNull() {
         Truth.assertThat(gerritJson.asList(null, BranchInfo.class)).isNull();
     }
 
     @Test
-    public void collectionsOfNothingAreNull() throws Exception {
+    public void collectionsOfNothingAreNull() {
         Truth.assertThat(gerritJson.as(null, BranchInfo.class)).isNull();
         Truth.assertThat(gerritJson.asMap(null, BranchInfo.class)).isNull();
         Truth.assertThat(gerritJson.asSortedMap(null, BranchInfo.class)).isNull();
@@ -105,7 +105,7 @@ public class GerritJsonTest {
     }
 
     @Test
-    public void asMapKeepsTheOrderOfTheResponse() throws Exception {
+    public void asMapKeepsTheOrderOfTheResponse() {
         Map<String, BranchInfo> branches =
             gerritJson.asMap(json("{\"b\":{\"ref\":\"b\"},\"a\":{\"ref\":\"a\"}}"), BranchInfo.class);
 
@@ -113,7 +113,7 @@ public class GerritJsonTest {
     }
 
     @Test
-    public void asSortedMapOrdersByKey() throws Exception {
+    public void asSortedMapOrdersByKey() {
         SortedMap<String, BranchInfo> branches =
             gerritJson.asSortedMap(json("{\"b\":{\"ref\":\"b\"},\"a\":{\"ref\":\"a\"}}"), BranchInfo.class);
 
@@ -121,7 +121,7 @@ public class GerritJsonTest {
     }
 
     @Test
-    public void asSortedMapOfListsOrdersByKeyAndReadsTheLists() throws Exception {
+    public void asSortedMapOfListsOrdersByKeyAndReadsTheLists() {
         SortedMap<String, List<BranchInfo>> branches =
             gerritJson.asSortedMapOfLists(json("{\"b\":[{\"ref\":\"b\"}],\"a\":[{\"ref\":\"a\"}]}"), BranchInfo.class);
 
@@ -130,21 +130,21 @@ public class GerritJsonTest {
     }
 
     @Test
-    public void asSetKeepsTheOrderOfTheResponse() throws Exception {
+    public void asSetKeepsTheOrderOfTheResponse() {
         Set<String> values = gerritJson.asSet(json("[\"b\",\"a\"]"), String.class);
 
         Truth.assertThat(values).containsExactly("b", "a").inOrder();
     }
 
     @Test
-    public void asSortedSetOrdersNaturally() throws Exception {
+    public void asSortedSetOrdersNaturally() {
         SortedSet<String> values = gerritJson.asSortedSet(json("[\"b\",\"a\"]"), String.class);
 
         Truth.assertThat(values).containsExactly("a", "b").inOrder();
     }
 
     @Test
-    public void toJsonWritesTheFieldsOfTheDeclaredType() throws Exception {
+    public void toJsonWritesTheFieldsOfTheDeclaredType() {
         ProjectInput input = new ProjectInput();
         input.name = "my/project";
 

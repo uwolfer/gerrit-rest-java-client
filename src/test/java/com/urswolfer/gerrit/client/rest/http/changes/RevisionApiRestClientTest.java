@@ -54,7 +54,7 @@ public class RevisionApiRestClientTest extends AbstractJsonTest {
     private static final String FILE_PATH_ENCODED = "src%2Fmain%2FREADME.md";
 
     @DataProvider(name = "TestCases")
-    public Iterator<RevisionApiTestCase[]> testCases() throws Exception {
+    public Iterator<RevisionApiTestCase[]> testCases() {
         return Arrays.asList(
                 withRevision("current")
                         .expectRevisionUrl("/changes/" + CHANGE_ID + "/revisions/current")

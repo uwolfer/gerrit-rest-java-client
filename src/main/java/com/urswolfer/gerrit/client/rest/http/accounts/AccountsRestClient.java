@@ -31,7 +31,9 @@ import java.util.List;
 /**
  * @author Urs Wolfer
  */
-public class AccountsRestClient extends Accounts.NotImplemented implements Accounts {
+public class AccountsRestClient
+        extends com.google.gerrit.extensions.api.accounts.Accounts.NotImplemented
+        implements Accounts {
 
     private final GerritRestContext context;
     private final GerritJson gerritJson;

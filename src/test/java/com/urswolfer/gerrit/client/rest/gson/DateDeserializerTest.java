@@ -33,19 +33,19 @@ public class DateDeserializerTest extends DateFormatterTest {
     private final DateDeserializer dateDeserializer = new DateDeserializer();
 
     @Test(dataProvider = "TestCases")
-    public void testDeserialize(TestCase testCase) throws Exception {
+    public void testDeserialize(TestCase testCase) {
         Date actualDate = dateDeserializer.deserialize(testCase.getJsonElement(), null, null);
         Truth.assertThat(actualDate).isEqualTo(testCase.date);
     }
 
     @Test(expectedExceptions = JsonParseException.class)
-    public void testInvalidFormattedDateString() throws Exception {
+    public void testInvalidFormattedDateString() {
         JsonElement jsonElement = getJsonElementForDateString("12.06.2013 12:12:44.123000000");
         dateDeserializer.deserialize(jsonElement, null, null);
     }
 
     @DataProvider(name = "TestCases")
-    public Iterator<TestCase[]> getTestCases() throws Exception {
+    public Iterator<TestCase[]> getTestCases() {
         return Arrays.asList(
                 forDateString("2013-07-21 14:23:59.207000000")
                         .utcDate(2013, 7, 21, 14, 23, 59),

@@ -27,11 +27,11 @@ import java.util.Properties;
  */
 public class Version {
 
-    private static final String VERSION;
+    private static final String CLIENT_VERSION;
 
     static {
         try {
-            VERSION = getVersionFromProperties();
+            CLIENT_VERSION = getVersionFromProperties();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -51,6 +51,6 @@ public class Version {
     }
 
     public static String get() {
-        return VERSION;
+        return CLIENT_VERSION;
     }
 }

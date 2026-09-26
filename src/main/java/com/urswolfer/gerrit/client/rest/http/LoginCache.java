@@ -70,7 +70,10 @@ public class LoginCache {
 
     public boolean isGitHubOAuthRequested(HttpContext loginContext) {
         HttpUriRequest lastRequest = (HttpUriRequest) loginContext.getAttribute(HttpCoreContext.HTTP_REQUEST);
-        return githubOAuthDetected || (githubOAuthDetected = (lastRequest != null && lastRequest.getURI().getPath().contains("github-plugin")));
+        if (!githubOAuthDetected) {
+            githubOAuthDetected = lastRequest != null && lastRequest.getURI().getPath().contains("github-plugin");
+        }
+        return githubOAuthDetected;
     }
 
     /**

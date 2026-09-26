@@ -18,7 +18,6 @@ package com.urswolfer.gerrit.client.rest.http.changes;
 
 import com.google.common.truth.Truth;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.urswolfer.gerrit.client.rest.http.GerritRestClient;
 import com.urswolfer.gerrit.client.rest.http.common.AbstractJsonTest;
 import com.urswolfer.gerrit.client.rest.http.common.GerritRestClientBuilder;
@@ -52,7 +51,6 @@ public class ReviewerApiRestClientTest extends AbstractJsonTest {
 
     @Test
     public void testDeleteVote() throws Exception {
-        JsonElement jsonElement = new JsonObject();
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectDelete("/changes/myProject~master~I8473b95934b5732ac55d26311a706c9c2bde9940/reviewers/" + ACCOUNT_ID + "/votes/" + LABEL)
             .get();

@@ -34,6 +34,9 @@ import java.util.*;
  */
 public class ChangeApiRestClient extends ChangeApi.NotImplemented implements ChangeApi {
 
+    private static final String REVIEWERS = "/reviewers";
+    private static final String ASSIGNEE = "/assignee";
+
     private final GerritRestContext context;
     private final ChangesRestClient changesRestClient;
     private final GerritJson gerritJson;
@@ -159,6 +162,7 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         return context.get(getRequestPath() + "/in").as(IncludedInInfo.class);
     }
 
+    /** @deprecated use {@link #reviewers()} instead. */
     @Deprecated
     @Override
     public List<ReviewerInfo> listReviewers() throws RestApiException {
@@ -167,17 +171,17 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public List<ReviewerInfo> reviewers() throws RestApiException {
-        return context.get(getRequestPath() + "/reviewers").asList(ReviewerInfo.class);
+        return context.get(getRequestPath() + REVIEWERS).asList(ReviewerInfo.class);
     }
 
     @Override
     public AddReviewerResult addReviewer(AddReviewerInput in) throws RestApiException {
-        return context.post(getRequestPath() + "/reviewers").body(in).as(AddReviewerResult.class);
+        return context.post(getRequestPath() + REVIEWERS).body(in).as(AddReviewerResult.class);
     }
 
     @Override
     public ReviewerResult addReviewer(ReviewerInput in) throws RestApiException {
-        return context.post(getRequestPath() + "/reviewers").body(in).as(ReviewerResult.class);
+        return context.post(getRequestPath() + REVIEWERS).body(in).as(ReviewerResult.class);
     }
 
     @Override
@@ -256,12 +260,12 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
 
     @Override
     public AccountInfo setAssignee(AssigneeInput input) throws RestApiException {
-        return context.put(getRequestPath() + "/assignee").body(input).as(AccountInfo.class);
+        return context.put(getRequestPath() + ASSIGNEE).body(input).as(AccountInfo.class);
     }
 
     @Override
     public AccountInfo getAssignee() throws RestApiException {
-        return context.get(getRequestPath() + "/assignee").as(AccountInfo.class);
+        return context.get(getRequestPath() + ASSIGNEE).as(AccountInfo.class);
     }
 
     @Override
@@ -269,8 +273,9 @@ public class ChangeApiRestClient extends ChangeApi.NotImplemented implements Cha
         return context.get(getRequestPath() + "/past_assignees").asList(AccountInfo.class);
     }
 
+    @Override
     public AccountInfo deleteAssignee() throws RestApiException {
-        String request = getRequestPath() + "/assignee";
+        String request = getRequestPath() + ASSIGNEE;
         JsonElement jsonElement= context.delete(request).asJson();
         return gerritJson.as(jsonElement, AccountInfo.class);
     }
