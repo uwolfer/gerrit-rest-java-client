@@ -116,7 +116,7 @@ public class GroupsRestClientTest {
     }
 
     @DataProvider(name = "ListGroupsTestCases")
-    public Iterator<GroupListTestCase[]> listGroupTestCases() throws Exception {
+    public Iterator<GroupListTestCase[]> listGroupTestCases() {
         return Arrays.asList(
             listTestCase().withListParameter(
                 new TestListRequest()
@@ -197,7 +197,7 @@ public class GroupsRestClientTest {
         }
     }
 
-    private final static class TestListRequest {
+    private static final class TestListRequest {
         private Boolean owned;
         private Integer limit;
         private Integer start;
@@ -260,7 +260,7 @@ public class GroupsRestClientTest {
     }
 
     @DataProvider(name = "QueryGroupsTestCases")
-    public Iterator<GroupQueryTestCase[]> queryGroupTestCases() throws Exception {
+    public Iterator<GroupQueryTestCase[]> queryGroupTestCases() {
         return Arrays.asList(queryTestCase().withQueryParameter(new TestQueryRequest()).expectUrl("/groups/"),
                 queryTestCase().withQueryParameter(new TestQueryRequest().withQuery("inname:test"))
                     .expectUrl("/groups/?query=inname:test"),
@@ -320,7 +320,7 @@ public class GroupsRestClientTest {
         }
     }
 
-    private final static class TestQueryRequest {
+    private static final class TestQueryRequest {
         private Integer limit;
         private Integer start;
         private String query;

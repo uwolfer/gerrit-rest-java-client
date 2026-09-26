@@ -51,13 +51,13 @@ public class HttpRequestsTest {
     }
 
     @Test
-    public void jsonVerbsDeclareTheJsonContentType() throws Exception {
+    public void jsonVerbsDeclareTheJsonContentType() {
         assertThat(contentType(HttpVerb.POST, "{}")).contains("application/json");
         assertThat(contentType(HttpVerb.PUT, "{}")).contains("application/json");
     }
 
     @Test
-    public void textVerbsDeclareThePlainTextContentType() throws Exception {
+    public void textVerbsDeclareThePlainTextContentType() {
         assertThat(contentType(HttpVerb.POST_TEXT_PLAIN, "a message")).contains("text/plain");
         assertThat(contentType(HttpVerb.PUT_TEXT_PLAIN, "a message")).contains("text/plain");
     }

@@ -68,7 +68,7 @@ public class AccountsJsonTest extends AbstractJsonTest {
     }
 
     @Test
-    public void testParseUserInfoWithNullJsonElement() throws Exception {
+    public void testParseUserInfoWithNullJsonElement() {
         AccountInfo accountInfo = gerritJson.as(null, AccountInfo.class);
         Truth.assertThat(accountInfo).isNull();
     }

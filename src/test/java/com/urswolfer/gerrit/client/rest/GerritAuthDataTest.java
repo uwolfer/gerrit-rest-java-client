@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
  */
 public class GerritAuthDataTest {
     @Test
-    public void basicAuth() throws Exception {
+    public void basicAuth() {
         String host = "http://localhost:8080";
         GerritAuthData.Basic authData = new GerritAuthData.Basic(host);
         Truth.assertThat(authData.getHost()).isEqualTo(host);
@@ -34,7 +34,7 @@ public class GerritAuthDataTest {
     }
 
     @Test
-    public void basicAuthWithUsernameAndPassword() throws Exception {
+    public void basicAuthWithUsernameAndPassword() {
         String host = "http://localhost:8080";
         String user = "foo";
         String password = "bar";
@@ -46,7 +46,7 @@ public class GerritAuthDataTest {
     }
 
     @Test
-    public void basicAuthUrlWithTrailingSlash() throws Exception {
+    public void basicAuthUrlWithTrailingSlash() {
         String host = "http://localhost:8080/r/";
         GerritAuthData.Basic authData = new GerritAuthData.Basic(host);
         Truth.assertThat(authData.getHost()).isEqualTo("http://localhost:8080/r");

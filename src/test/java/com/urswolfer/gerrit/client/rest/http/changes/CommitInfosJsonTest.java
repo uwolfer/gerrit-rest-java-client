@@ -124,7 +124,6 @@ public class CommitInfosJsonTest extends AbstractJsonTest{
 
     @Test
     public void testParseDiffInfo() throws Exception {
-        GerritJson gerritJson = new GerritJson(getGson());
         JsonElement jsonElement = getJsonElement("parsers/diff.json");
         DiffInfo diffInfo = gerritJson.as(jsonElement, DiffInfo.class);
         GerritAssert.assertEquals(diffInfo, DIFF_INFO);

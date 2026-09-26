@@ -52,7 +52,7 @@ public class SshKeyJsonTest extends AbstractJsonTest {
     }
 
     @Test
-    public void testParseSshKeyInfoWithNullJsonElement() throws Exception {
+    public void testParseSshKeyInfoWithNullJsonElement() {
         SshKeyInfo keyInfo = gerritJson.as(null, SshKeyInfo.class);
         Truth.assertThat(keyInfo).isNull();
     }

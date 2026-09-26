@@ -140,8 +140,7 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
     public void addMembers(String... members) throws RestApiException {
         String restPath = getRequestPath() + "/members";
 
-        // Create an object which can be used to create the json for:
-        // { members: [ "member1", "member2" ] }
+        // Create an object which can be used to create the json for a "members" list of member names.
         Map<String, List<String>> memberMap =
             Collections.singletonMap("members", Arrays.asList(members));
         context.post(restPath).body(memberMap).send();
@@ -158,8 +157,7 @@ public class GroupApiRestClient extends GroupApi.NotImplemented implements Group
     public void addGroups(String... groups) throws RestApiException {
         String restPath = getRequestPath() + BASE_URL;
 
-        // Create an object which can be used to create the json for:
-        // { groups: [ "group1", "group2 ] }
+        // Create an object which can be used to create the json for a "groups" list of group names.
         Map<String, List<String>> groupMap =
             Collections.singletonMap("groups", Arrays.asList(groups));
         context.post(restPath).body(groupMap).send();

@@ -27,6 +27,8 @@ import java.util.TimeZone;
  * @author Urs Wolfer
  */
 public abstract class DateFormatter {
+    protected DateFormatter() {}
+
     private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     protected static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = ThreadLocal.withInitial(() -> {

@@ -162,7 +162,6 @@ public class AccountApiRestClientTest {
             .expectGet("/accounts/jdoe/preferences", JsonParser.parseString("{\"changes_per_page\":25}"))
             .get();
         AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
-        GeneralPreferencesInfo mockPreferencesInfo = EasyMock.createMock(GeneralPreferencesInfo.class);
 
         GeneralPreferencesInfo result = accountsRestClient.getPreferences();
 
@@ -178,9 +177,7 @@ public class AccountApiRestClientTest {
             .get();
         AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
-        GeneralPreferencesInfo mockPreferencesInfo = EasyMock.createMock(GeneralPreferencesInfo.class);
-
-        GeneralPreferencesInfo result = accountsRestClient.setPreferences(EasyMock.createMock(GeneralPreferencesInfo.class));
+        accountsRestClient.setPreferences(EasyMock.createMock(GeneralPreferencesInfo.class));
 
         EasyMock.verify(gerritRestClient);
     }
@@ -191,7 +188,6 @@ public class AccountApiRestClientTest {
             .expectGet("/accounts/jdoe/preferences.diff", JsonParser.parseString("{\"tab_size\":8}"))
             .get();
         AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
-        DiffPreferencesInfo mockDiffPreferencesInfo = EasyMock.createMock(DiffPreferencesInfo.class);
 
         DiffPreferencesInfo result = accountsRestClient.getDiffPreferences();
 
@@ -206,8 +202,6 @@ public class AccountApiRestClientTest {
             .get();
         AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
-        DiffPreferencesInfo mockDiffPreferencesInfo = EasyMock.createMock(DiffPreferencesInfo.class);
-
         DiffPreferencesInfo result = accountsRestClient.setDiffPreferences(EasyMock.createMock(DiffPreferencesInfo.class));
 
         Truth.assertThat(result.tabSize).isEqualTo(8);
@@ -220,7 +214,6 @@ public class AccountApiRestClientTest {
             .expectGet("/accounts/jdoe/preferences.edit", JsonParser.parseString("{\"tab_size\":8}"))
             .get();
         AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
-        EditPreferencesInfo mockEditPreferencesInfo = EasyMock.createMock(EditPreferencesInfo.class);
 
         EditPreferencesInfo result = accountsRestClient.getEditPreferences();
 
@@ -234,8 +227,6 @@ public class AccountApiRestClientTest {
             .expectPut("/accounts/jdoe/preferences.edit", "{}", JsonParser.parseString("{\"tab_size\":8}"))
             .get();
         AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
-
-        EditPreferencesInfo mockEditPreferencesInfo = EasyMock.createMock(EditPreferencesInfo.class);
 
         EditPreferencesInfo result = accountsRestClient.setEditPreferences(EasyMock.createMock(EditPreferencesInfo.class));
 
@@ -483,7 +474,7 @@ public class AccountApiRestClientTest {
             .get();
         AccountApiRestClient accountsRestClient = getAccountApiRestClient(gerritRestClient, "jdoe");
 
-        SshKeyInfo result = accountsRestClient.addSshKey("foo");
+        accountsRestClient.addSshKey("foo");
 
         EasyMock.verify(gerritRestClient);
     }

@@ -87,7 +87,6 @@ public class ProjectApiRestClientTest {
     @Test
     public void testGetProjectConfig() throws Exception {
         String projectName = "sandbox";
-        ConfigInfo mockConfigInfo = EasyMock.createMock(ConfigInfo.class);
         GerritRestClient gerritRestClient = new GerritRestClientBuilder()
             .expectGet("/projects/sandbox/config", JsonParser.parseString("{\"description\":\"a project\"}"))
             .get();

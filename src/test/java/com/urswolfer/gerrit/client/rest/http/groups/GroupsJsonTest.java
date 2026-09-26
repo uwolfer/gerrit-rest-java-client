@@ -57,7 +57,7 @@ public class GroupsJsonTest extends AbstractJsonTest {
     }
 
     @Test
-    public void testParseGroupInfoWithNullJsonElement() throws Exception {
+    public void testParseGroupInfoWithNullJsonElement() {
         GroupInfo groupInfo = gerritJson.as(null, GroupInfo.class);
         Truth.assertThat(groupInfo).isNull();
     }

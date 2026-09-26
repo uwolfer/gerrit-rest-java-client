@@ -259,17 +259,14 @@ public class ChangesContractTest {
             .stubRaw("GET", path, "text/plain",
                 new String(Base64.encodeBase64(content.getBytes("UTF-8")), "UTF-8"), headers);
 
-        BinaryResult binaryResult =
-            server.api().changes().id(CHANGE_ID).revision("1").file("a/b.txt").content();
-        try {
+        try (BinaryResult binaryResult =
+                 server.api().changes().id(CHANGE_ID).revision("1").file("a/b.txt").content()) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             binaryResult.writeTo(out);
 
             Truth.assertThat(new String(Base64.decodeBase64(out.toString()), "UTF-8")).isEqualTo(content);
             Truth.assertThat(binaryResult.isBase64()).isTrue();
             Truth.assertThat(binaryResult.getContentType()).isEqualTo("text/plain");
-        } finally {
-            binaryResult.close();
         }
         server.verify();
     }
