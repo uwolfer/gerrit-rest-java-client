@@ -111,6 +111,8 @@ public class GroupsRestClient extends Groups.NotImplemented implements Groups {
             .paramIfPositive("S", listParameter.getStart())
             .flagIf(listParameter.getOwned(), "owned")
             .paramIfNotEmpty("suggest", listParameter.getSuggest())
+            .paramIfNotEmpty("r", listParameter.getRegex())
+            .paramIfNotEmpty("owned-by", listParameter.getOwnedBy())
             .toUrl();
         return groupInfos(url);
     }

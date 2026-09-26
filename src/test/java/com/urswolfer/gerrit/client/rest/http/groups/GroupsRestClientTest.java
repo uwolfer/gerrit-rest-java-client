@@ -137,12 +137,20 @@ public class GroupsRestClientTest {
                 new TestListRequest().withStart(5)
             ).expectUrl("/groups/?S=5"),
             listTestCase().withListParameter(
+                new TestListRequest().withRegex("foo.*")
+            ).expectUrl("/groups/?r=foo.*"),
+            listTestCase().withListParameter(
+                new TestListRequest().withOwnedBy("uuid")
+            ).expectUrl("/groups/?owned-by=uuid"),
+            listTestCase().withListParameter(
                 new TestListRequest()
                     .withSuggest("bar")
                     .withLimit(15)
                     .withStart(10)
                     .withOwned(true)
-            ).expectUrl("/groups/?n=15&S=10&owned&suggest=bar")
+                    .withRegex("foo.*")
+                    .withOwnedBy("uuid")
+            ).expectUrl("/groups/?n=15&S=10&owned&suggest=bar&r=foo.*&owned-by=uuid")
         ).stream().map(testCase -> new GroupListTestCase[]{testCase}).iterator();
     }
 
@@ -202,6 +210,8 @@ public class GroupsRestClientTest {
         private Integer limit;
         private Integer start;
         private String suggest;
+        private String regex;
+        private String ownedBy;
 
         public TestListRequest withOwned(boolean owned) {
             this.owned = owned;
@@ -223,6 +233,16 @@ public class GroupsRestClientTest {
             return this;
         }
 
+        public TestListRequest withRegex(String regex) {
+            this.regex = regex;
+            return this;
+        }
+
+        public TestListRequest withOwnedBy(String ownedBy) {
+            this.ownedBy = ownedBy;
+            return this;
+        }
+
         public Groups.ListRequest apply(Groups.ListRequest target) {
             if (limit != null) {
                 target.withLimit(limit);
@@ -235,6 +255,12 @@ public class GroupsRestClientTest {
             }
             if (suggest != null) {
                 target.withSuggest(suggest);
+            }
+            if (regex != null) {
+                target.withRegex(regex);
+            }
+            if (ownedBy != null) {
+                target.withOwnedBy(ownedBy);
             }
             return target;
         }
