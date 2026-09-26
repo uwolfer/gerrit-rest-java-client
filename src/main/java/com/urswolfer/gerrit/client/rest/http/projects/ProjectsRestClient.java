@@ -63,10 +63,10 @@ public class ProjectsRestClient extends Projects.NotImplemented implements Proje
         String url = UrlQuery.of("/projects/")
             .flagIf(listParameter.getDescription(), "d")
             .flagIf(listParameter.getShowTree(), "t")
-            .paramIfNotEmpty("p", listParameter.getPrefix())
+            .paramIfNotEmptyLiteralPlus("p", listParameter.getPrefix())
             .paramIfPositive("n", listParameter.getLimit())
             .paramIfPositive("S", listParameter.getStart())
-            .params("b", listParameter.getBranches())
+            .paramsLiteralPlus("b", listParameter.getBranches())
             .paramIf(filterType != null && filterType != ListRequest.FilterType.ALL, "type", filterType)
             .toUrl();
 

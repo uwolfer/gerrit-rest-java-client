@@ -27,6 +27,7 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
+import com.urswolfer.gerrit.client.rest.http.UrlEncoding;
 
 import java.util.Optional;
 
@@ -78,7 +79,10 @@ public class ChangeEditApiRestClient extends ChangeEditApi.NotImplemented implem
 
     @Override
     public Optional<BinaryResult> getFile(String filePath) throws RestApiException {
-        String request = getRequestPath() + "/" + filePath;
+        // the whole path is one segment; unlike modifyFile/deleteFile below, this keeps an
+        // existing %XX escape rather than re-escaping it, so a path already encoded to work
+        // around the old raw-path bug is not corrupted by this fix
+        String request = getRequestPath() + "/" + UrlEncoding.pathSegment(filePath);
         return Optional.of(context.get(request).binary("Failed to get file content."));
     }
 

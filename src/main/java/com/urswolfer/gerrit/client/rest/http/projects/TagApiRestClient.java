@@ -22,6 +22,7 @@ import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
+import com.urswolfer.gerrit.client.rest.http.UrlEncoding;
 
 /**
  * @author Pavel Bely
@@ -59,6 +60,6 @@ public class TagApiRestClient extends TagApi.NotImplemented implements TagApi {
     }
 
     protected String tagUrl() {
-        return projectApiRestClient.projectsUrl() + "/tags/" + name;
+        return projectApiRestClient.projectsUrl() + "/tags/" + UrlEncoding.pathSegment(name);
     }
 }

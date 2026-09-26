@@ -26,6 +26,7 @@ import com.google.gerrit.extensions.restapi.Url;
 import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.gson.GerritJson;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
+import com.urswolfer.gerrit.client.rest.http.UrlEncoding;
 
 /**
  * @author Ingo Rissmann
@@ -70,6 +71,6 @@ public class BranchApiRestClient extends BranchApi.NotImplemented implements Bra
     }
 
     protected String branchUrl() {
-        return projectApiRestClient.projectsUrl() + "/branches/" + name;
+        return projectApiRestClient.projectsUrl() + "/branches/" + UrlEncoding.pathSegment(name);
     }
 }

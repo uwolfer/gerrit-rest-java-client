@@ -107,16 +107,31 @@ public class ProjectsContractTest {
     }
 
     /**
-     * Note that the ref is not URL-encoded, unlike the project name it is appended to.
+     * The ref is one path segment, so its slashes are escaped. It used to go out as given, which
+     * split it across several segments.
      */
     @Test
-    public void branchRefIsNotUrlEncoded() throws Exception {
+    public void branchRefIsOnePathSegment() throws Exception {
         FakeGerritServer server = new FakeGerritServer()
-            .stub("GET", PROJECT_PATH + "/branches/refs/heads/master", "projects/branch.json");
+            .stub("GET", PROJECT_PATH + "/branches/refs%2Fheads%2Fmaster", "projects/branch.json");
 
         BranchInfo branchInfo = server.api().projects().name("my/project").branch("refs/heads/master").get();
 
         Truth.assertThat(branchInfo.ref).isEqualTo("refs/heads/master");
+        server.verify();
+    }
+
+    /**
+     * Callers who worked around the missing encoding passed the ref already encoded; that must not
+     * be encoded a second time.
+     */
+    @Test
+    public void anAlreadyEncodedBranchRefIsNotEncodedAgain() throws Exception {
+        FakeGerritServer server = new FakeGerritServer()
+            .stub("GET", PROJECT_PATH + "/branches/refs%2Fheads%2Fmaster", "projects/branch.json");
+
+        server.api().projects().name("my/project").branch("refs%2Fheads%2Fmaster").get();
+
         server.verify();
     }
 
