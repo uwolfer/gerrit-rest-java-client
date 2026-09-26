@@ -18,17 +18,19 @@ package com.urswolfer.gerrit.client.rest.http;
 
 import com.google.common.base.Strings;
 
+import java.util.function.UnaryOperator;
+
 /**
  * Builds a request URL with an optional query string.
  *
  * <p>This replaces the accumulate-a-string-then-maybe-append-a-question-mark block that each
  * listing endpoint carried its own copy of.
  *
- * <p>Values are written exactly as given, which is what the endpoints using this already did. The
- * client's URL encoding is inconsistent - a change query is not encoded while
- * {@code suggest_reviewers} is, and a branch ref is not encoded while the project name it is
- * appended to is - and this class deliberately does not change that. Encoding those values is a
- * change to what goes on the wire and belongs in its own commit, not hidden inside a refactoring.
+ * <p>Values go through {@link UrlEncoding#queryValue}, which escapes only what would break the
+ * URL and leaves a value the caller already encoded alone. A value that cannot contain a space to
+ * begin with - a ref name or pattern, a project name prefix - goes through
+ * {@link #paramIfNotEmptyLiteralPlus} or {@link #paramsLiteralPlus} instead, so a {@code +} in it
+ * is sent as the literal plus it must be rather than as a space.
  */
 public final class UrlQuery {
 
@@ -55,7 +57,7 @@ public final class UrlQuery {
     }
 
     public UrlQuery param(String name, Object value) {
-        return append(name + "=" + value);
+        return appendParam(name, value, UrlEncoding::queryValue);
     }
 
     public UrlQuery paramIf(boolean condition, String name, Object value) {
@@ -64,6 +66,14 @@ public final class UrlQuery {
 
     public UrlQuery paramIfNotEmpty(String name, String value) {
         return paramIf(!Strings.isNullOrEmpty(value), name, value);
+    }
+
+    /**
+     * For a value that cannot contain a space - a ref pattern, a project name prefix - so a
+     * {@code +} is a literal plus.
+     */
+    public UrlQuery paramIfNotEmptyLiteralPlus(String name, String value) {
+        return Strings.isNullOrEmpty(value) ? this : appendParam(name, value, UrlEncoding::queryValueWithLiteralPlus);
     }
 
     /**
@@ -86,14 +96,27 @@ public final class UrlQuery {
      * Repeats the parameter once per value, as Gerrit's {@code o=} options do.
      */
     public UrlQuery params(String name, Iterable<?> values) {
-        for (Object value : values) {
-            param(name, value);
-        }
-        return this;
+        return appendParams(name, values, UrlEncoding::queryValue);
+    }
+
+    /** Repeats the parameter once per ref name; a {@code +} is a literal plus. */
+    public UrlQuery paramsLiteralPlus(String name, Iterable<?> values) {
+        return appendParams(name, values, UrlEncoding::queryValueWithLiteralPlus);
     }
 
     public String toUrl() {
         return query.length() == 0 ? path : path + '?' + query;
+    }
+
+    private UrlQuery appendParam(String name, Object value, UnaryOperator<String> encode) {
+        return append(name + "=" + encode.apply(String.valueOf(value)));
+    }
+
+    private UrlQuery appendParams(String name, Iterable<?> values, UnaryOperator<String> encode) {
+        for (Object value : values) {
+            appendParam(name, value, encode);
+        }
+        return this;
     }
 
     private UrlQuery append(String parameter) {

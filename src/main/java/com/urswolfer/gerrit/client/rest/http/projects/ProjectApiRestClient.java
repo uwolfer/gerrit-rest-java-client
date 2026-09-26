@@ -247,8 +247,8 @@ public class ProjectApiRestClient extends ProjectApi.NotImplemented implements P
         return UrlQuery.of("/branches")
             .paramIfNonZero("n", lbr.getLimit())
             .paramIfNonZero("s", lbr.getStart())
-            .paramIfNotEmpty("m", lbr.getSubstring())
-            .paramIfNotEmpty("r", lbr.getRegex())
+            .paramIfNotEmptyLiteralPlus("m", lbr.getSubstring())
+            .paramIfNotEmptyLiteralPlus("r", lbr.getRegex())
             .toUrl();
     }
 

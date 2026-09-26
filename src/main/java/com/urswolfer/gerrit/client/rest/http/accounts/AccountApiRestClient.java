@@ -41,6 +41,7 @@ import com.google.gson.JsonElement;
 import com.urswolfer.gerrit.client.rest.RestClient.HttpVerb;
 import com.urswolfer.gerrit.client.rest.accounts.AccountApi;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
+import com.urswolfer.gerrit.client.rest.http.UrlEncoding;
 
 import java.util.List;
 import java.util.SortedSet;
@@ -197,7 +198,7 @@ public class AccountApiRestClient
 
     @Override
     public EmailApi createEmail(EmailInput input) throws RestApiException {
-        context.put(getRequestPath() + "/emails/" + input.email).body(input).send();
+        context.put(getRequestPath() + "/emails/" + UrlEncoding.pathSegment(input.email)).body(input).send();
         return email(input.email);
     }
 

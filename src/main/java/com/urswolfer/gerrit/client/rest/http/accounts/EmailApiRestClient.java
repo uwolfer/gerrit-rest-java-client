@@ -21,6 +21,7 @@ import com.google.gerrit.extensions.common.EmailInfo;
 import com.google.gerrit.extensions.restapi.RestApiException;
 import com.google.gerrit.extensions.restapi.Url;
 import com.urswolfer.gerrit.client.rest.http.GerritRestContext;
+import com.urswolfer.gerrit.client.rest.http.UrlEncoding;
 
 public class EmailApiRestClient extends EmailApi.NotImplemented implements EmailApi {
 
@@ -53,6 +54,6 @@ public class EmailApiRestClient extends EmailApi.NotImplemented implements Email
     }
 
     private String getRequestPath() {
-        return "/accounts/" + Url.encode(name) + "/emails/" + email;
+        return "/accounts/" + Url.encode(name) + "/emails/" + UrlEncoding.pathSegment(email);
     }
 }
