@@ -27,6 +27,7 @@ import com.urswolfer.gerrit.client.rest.GerritRestApi;
 import com.urswolfer.gerrit.client.rest.GerritRestApiFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
@@ -34,6 +35,7 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.BasicHttpEntity;
@@ -321,6 +323,33 @@ public class GerritRestClientTest {
 
         Truth.assertThat(extendCalled[0]).isTrue();
         Truth.assertThat(extendCredentialProviderCalled[0]).isTrue();
+    }
+
+    /**
+     * Tests that an API request keeps the timeouts of the client's default config: the config set on the request
+     * replaces that one as a whole.
+     */
+    @Test
+    public void testRequestKeepsDefaultTimeouts() throws Exception {
+        final List<RequestConfig> configs = new ArrayList<>();
+        HttpClientBuilderExtension httpClientBuilderExtension = new HttpClientBuilderExtension() {
+            @Override
+            public HttpClientBuilder extend(HttpClientBuilder httpClientBuilder, GerritAuthData authData) {
+                return httpClientBuilder.addInterceptorLast((HttpRequestInterceptor) (request, context) ->
+                    configs.add(HttpClientContext.adapt(context).getRequestConfig()));
+            }
+        };
+
+        GerritRestApiFactory gerritRestApiFactory = new GerritRestApiFactory();
+        GerritApi gerritClient = gerritRestApiFactory.create(new GerritAuthData.Basic(jettyUrl), httpClientBuilderExtension);
+        gerritClient.changes().query().get();
+
+        Truth.assertThat(configs).isNotEmpty();
+        RequestConfig config = configs.get(configs.size() - 1);
+        Truth.assertThat(config.getConnectTimeout()).isEqualTo(300000);
+        Truth.assertThat(config.getSocketTimeout()).isEqualTo(300000);
+        Truth.assertThat(config.getConnectionRequestTimeout()).isEqualTo(300000);
+        Truth.assertThat(config.isNormalizeUri()).isFalse();
     }
 
     @Test

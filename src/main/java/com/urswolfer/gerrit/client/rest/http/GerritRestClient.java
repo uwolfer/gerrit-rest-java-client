@@ -50,7 +50,10 @@ import java.util.Optional;
 public class GerritRestClient implements RestClient {
 
     private static final Gson GSON = GsonFactory.create();
-    private static final RequestConfig REQUEST_CONFIG = RequestConfig.custom().setNormalizeUri(false).build();
+    // A config set on the request replaces the client's default config as a whole, so it starts from that one: built
+    // from scratch it would drop the timeouts, and a request to a server which never answers would wait for good.
+    private static final RequestConfig REQUEST_CONFIG =
+            RequestConfig.copy(GerritHttpClientFactory.DEFAULT_REQUEST_CONFIG).setNormalizeUri(false).build();
 
     private final GerritAuthData authData;
     private final HttpRequestExecutor httpRequestExecutor;
