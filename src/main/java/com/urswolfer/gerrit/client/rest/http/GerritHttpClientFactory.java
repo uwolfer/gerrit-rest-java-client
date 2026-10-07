@@ -49,6 +49,12 @@ class GerritHttpClientFactory {
 
     private static final int CONNECTION_TIMEOUT_MS = 300000;
 
+    static final RequestConfig DEFAULT_REQUEST_CONFIG = RequestConfig.custom()
+            .setConnectTimeout(CONNECTION_TIMEOUT_MS) // how long it takes to connect to remote host
+            .setSocketTimeout(CONNECTION_TIMEOUT_MS) // how long it takes to retrieve data from remote host
+            .setConnectionRequestTimeout(CONNECTION_TIMEOUT_MS)
+            .build();
+
     private final GerritAuthData authData;
     private final List<HttpClientBuilderExtension> httpClientBuilderExtensions;
     private final BasicCookieStore cookieStore;
@@ -71,11 +77,7 @@ class GerritHttpClientFactory {
 
         httpContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
 
-        RequestConfig.Builder requestConfig = RequestConfig.custom()
-                .setConnectTimeout(CONNECTION_TIMEOUT_MS) // how long it takes to connect to remote host
-                .setSocketTimeout(CONNECTION_TIMEOUT_MS) // how long it takes to retrieve data from remote host
-                .setConnectionRequestTimeout(CONNECTION_TIMEOUT_MS);
-        client.setDefaultRequestConfig(requestConfig.build());
+        client.setDefaultRequestConfig(DEFAULT_REQUEST_CONFIG);
 
         CredentialsProvider credentialsProvider = credentialsProvider();
         client.setDefaultCredentialsProvider(credentialsProvider);
