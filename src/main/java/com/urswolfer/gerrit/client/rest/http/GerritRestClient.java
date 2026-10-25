@@ -131,6 +131,8 @@ public class GerritRestClient implements RestClient {
                 throw RestApiException.wrap("Unexpectedly empty response.", null);
             }
             return ret;
+        } catch (SignInPageException e) {
+            throw RestApiException.wrap(e.getMessage(), e);
         } catch (IOException e) {
             throw RestApiException.wrap("Request failed.", e);
         }
@@ -174,6 +176,7 @@ public class GerritRestClient implements RestClient {
 
         method.setConfig(REQUEST_CONFIG);
         HttpResponse response = httpRequestExecutor.execute(client, method, httpContext);
+        SignInPageException.throwIfSignInPage(response, httpContext, authData.getHost());
 
         if (!isRetry && response.getStatusLine().getStatusCode() == SC_FORBIDDEN && authenticator.hasSession()) {
             // handle expired sessions: try again with a fresh login, asking for what was asked for

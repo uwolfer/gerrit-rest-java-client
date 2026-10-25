@@ -36,6 +36,13 @@ GerritApi gerritApi = gerritRestApiFactory.create(authData);
 List<ChangeInfo> changes = gerritApi.changes().query("status:merged").withLimit(10).get();
 ```
 
+Behind an authentication proxy, such as Azure Application Proxy, which lets requests through
+once they carry its session cookie, override <code>GerritAuthData.getCookies()</code> to return
+that cookie. It is sent to the Gerrit host only, never to a host a request is redirected to. Until
+the proxy lets a request through, the request fails with a <code>RestApiException</code> caused by
+a <code>SignInPageException</code> (which <code>RestClient.request</code> and
+<code>requestRest</code> throw as it is), whose <code>getPageOrigin()</code> names the sign-in page.
+
 If you like to write a script instead of a full Java application, you might want to use [Groovy].
 There is a [basic Groovy example] available.
 

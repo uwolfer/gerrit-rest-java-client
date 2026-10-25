@@ -18,6 +18,9 @@ package com.urswolfer.gerrit.client.rest;
 
 import com.google.common.base.Strings;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * In most cases {@link Basic} is what you need.
  * You can create your own implementation when you for example want to access
@@ -64,6 +67,19 @@ public interface GerritAuthData {
      * will be used.
      */
     boolean isLoginAndPasswordAvailable();
+
+    /**
+     * Cookies to send with every request to the host of {@link #getHost()}, such as the session
+     * cookie of an authentication proxy in front of Gerrit, which a browser got by signing in to
+     * it. They never go to another host, such as one a request is redirected to. They replace a
+     * cookie the server sets under the same name, and a change of them starts a new login, as one
+     * of login or password does.
+     *
+     * @return the values of the cookies by their names; empty for none
+     */
+    default Map<String, String> getCookies() {
+        return Collections.emptyMap();
+    }
 
     /**
      * A simple implementation for providing username and password at
