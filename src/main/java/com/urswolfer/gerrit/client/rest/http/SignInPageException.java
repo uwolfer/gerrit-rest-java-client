@@ -79,15 +79,7 @@ public class SignInPageException extends IOException {
         int status = response.getStatusLine().getStatusCode();
         String origin = null;
         if (status >= 300 && status < 400) {
-            Header location = response.getFirstHeader(HttpHeaders.LOCATION);
-            URI uri = location != null ? GerritHostOnlyInterceptor.toUri(location.getValue(), target) : null;
-            String host = uri != null ? GerritHostOnlyInterceptor.hostName(uri) : null;
-            if (host != null) {
-                int port = URIUtils.extractHost(uri).getPort();
-                origin = uri.getScheme() + "://" + host + (port != -1 ? ":" + port : ""); // without user info
-            } else { // relative, on the host the request went to, or none to tell
-                origin = target.toURI();
-            }
+            origin = redirectOrigin(response, target);
         } else if (isSuccessfulPage(response) || !atGerrit && (status == 401 || status == 403)) {
             origin = target.toURI();
         }
@@ -95,6 +87,17 @@ public class SignInPageException extends IOException {
             EntityUtils.consumeQuietly(response.getEntity());
             throw new SignInPageException(origin);
         }
+    }
+
+    private static String redirectOrigin(HttpResponse response, HttpHost target) {
+        Header location = response.getFirstHeader(HttpHeaders.LOCATION);
+        URI uri = location != null ? GerritHostOnlyInterceptor.toUri(location.getValue(), target) : null;
+        String host = uri != null ? GerritHostOnlyInterceptor.hostName(uri) : null;
+        if (host == null) { // relative, on the host the request went to, or none to tell
+            return target.toURI();
+        }
+        int port = URIUtils.extractHost(uri).getPort();
+        return uri.getScheme() + "://" + host + (port == -1 ? "" : ":" + port); // without user info
     }
 
     private static boolean isSuccessfulPage(HttpResponse response) {

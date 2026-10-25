@@ -244,7 +244,7 @@ public class AuthenticationProxyTest {
      * A login which met the sign-in page took it for the way the host logs in, which a sign-in changes.
      */
     @Test
-    public void testChangedCookiesStartANewLogin() throws Exception {
+    public void testChangedCookiesStartANewLogin() {
         MutableCookies authData = new MutableCookies(proxyOrigin());
         GerritRestClient client = new GerritRestClient(authData, new HttpRequestExecutor());
         Assert.expectThrows(RestApiException.class, () -> client.getRequest("/changes/"));
