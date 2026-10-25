@@ -82,7 +82,8 @@ public class LoginCache {
      * Any getter-call in this class must call this method first.
      */
     private void invalidateLoginDataOnNewSettings() {
-        String authDataString = "" + authData.getHost() + authData.getLogin() + authData.getPassword();
+        String authDataString = "" + authData.getHost() + authData.getLogin() + authData.getPassword()
+            + authData.getCookies();
         if (!authDataString.equals(lastConnection)) {
             invalidate();
             lastConnection = authDataString;
