@@ -165,7 +165,7 @@ public class GerritRestClient implements RestClient {
         HttpRequestBase method = HttpRequests.create(verb, uri(path, gerritAuthOptional), requestBody);
 
         if (gerritAuthOptional.isPresent()) {
-            method.addHeader("X-Gerrit-Auth", gerritAuthOptional.get());
+            method.addHeader(GerritHostOnlyInterceptor.XSRF_TOKEN_HEADER, gerritAuthOptional.get());
         }
 
         for (Header header : headers) {

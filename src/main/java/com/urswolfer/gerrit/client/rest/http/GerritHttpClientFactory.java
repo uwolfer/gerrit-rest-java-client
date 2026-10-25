@@ -30,7 +30,6 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.protocol.HttpContext;
 
 import java.util.HashSet;
@@ -73,7 +72,7 @@ class GerritHttpClientFactory {
         client.useSystemProperties(); // see also: com.intellij.util.net.ssl.CertificateManager
 
         // we need to get redirected result after login (which is done with POST) for extracting xGerritAuth
-        client.setRedirectStrategy(new LaxRedirectStrategy());
+        client.setRedirectStrategy(new MethodKeepingRedirectStrategy());
 
         httpContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
 
@@ -91,6 +90,8 @@ class GerritHttpClientFactory {
             client.addInterceptorFirst(new PreemptiveAuthHttpRequestInterceptor(authData));
         }
 
+        client.setTargetAuthenticationStrategy(new GerritHostAuthenticationStrategy(authData));
+        client.addInterceptorFirst(new GerritHostOnlyInterceptor(authData));
         client.addInterceptorLast(new UserAgentHttpRequestInterceptor());
 
         for (HttpClientBuilderExtension httpClientBuilderExtension : httpClientBuilderExtensions) {
