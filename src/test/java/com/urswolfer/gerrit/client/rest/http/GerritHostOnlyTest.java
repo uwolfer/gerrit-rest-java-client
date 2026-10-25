@@ -143,6 +143,63 @@ public class GerritHostOnlyTest {
         Truth.assertThat(sent("https://gerrit_srv.corp.local", new HttpHost("gerrit_srv.corp.local", -1, "https"))).isTrue();
     }
 
+    /**
+     * A url java.net.URI cannot parse is left to the HTTP client, which may still get along with it.
+     */
+    @Test
+    public void testXsrfTokenKeptWhereGerritsUrlCannotBeRead() {
+        Truth.assertThat(sent("http://review example.org", new HttpHost("sso.example.org", -1, "https"))).isTrue();
+        Truth.assertThat(sent("review.example.org", new HttpHost("sso.example.org", -1, "https"))).isTrue();
+    }
+
+    @Test
+    public void testLoginAnsweredWhereGerritsUrlCannotBeRead() {
+        GerritHostAuthenticationStrategy strategy = new GerritHostAuthenticationStrategy(
+            new GerritAuthData.Basic("http://review example.org", "user", "secret"));
+        BasicHttpResponse challenge = new BasicHttpResponse(HttpVersion.HTTP_1_1, 401, "Unauthorized");
+        challenge.addHeader("WWW-Authenticate", "Basic realm=\"x\"");
+
+        Truth.assertThat(strategy.isAuthenticationRequested(new HttpHost("sso.example.org", -1, "https"),
+            challenge, HttpClientContext.create())).isTrue();
+    }
+
+    @Test
+    public void testXsrfTokenNotWhereNoHostIsKnown() {
+        GerritHostOnlyInterceptor interceptor = new GerritHostOnlyInterceptor(new GerritAuthData.Basic("https://review.example.org"));
+        BasicHttpRequest request = new BasicHttpRequest("GET", "/changes/");
+        request.addHeader(GerritHostOnlyInterceptor.XSRF_TOKEN_HEADER, "token");
+
+        interceptor.process(request, HttpClientContext.create()); // no target host
+
+        Truth.assertThat(request.getFirstHeader(GerritHostOnlyInterceptor.XSRF_TOKEN_HEADER)).isNull();
+    }
+
+    /**
+     * Nowhere to read the host from, so nothing to tell it apart by: the request is not followed.
+     */
+    @Test
+    public void testRedirectOfAPostNotFollowedWhereItsLocationIsMissingOrUnreadable() throws Exception {
+        MethodKeepingRedirectStrategy strategy = new MethodKeepingRedirectStrategy();
+        HttpClientContext context = HttpClientContext.create();
+        context.setAttribute(HttpClientContext.HTTP_TARGET_HOST, new HttpHost("review.example.org", -1, "https"));
+        HttpPost post = new HttpPost("https://review.example.org/login/");
+
+        Truth.assertThat(strategy.isRedirected(post, redirect(307, "https://sso.example.org/a b"), context)).isFalse();
+        Truth.assertThat(strategy.isRedirected(post,
+            new BasicHttpResponse(HttpVersion.HTTP_1_1, 307, "Redirect"), context)).isFalse();
+    }
+
+    /**
+     * Without the host the request went to, nothing says that a location with a host is the same one.
+     */
+    @Test
+    public void testRedirectOfAPostNotFollowedToAHostWithoutATargetHost() throws Exception {
+        MethodKeepingRedirectStrategy strategy = new MethodKeepingRedirectStrategy();
+
+        Truth.assertThat(strategy.isRedirected(new HttpPost("https://review.example.org/login/"),
+            redirect(307, "https://review.example.org/login/again"), HttpClientContext.create())).isFalse();
+    }
+
     private static boolean sent(String gerritUrl, HttpHost target) {
         GerritHostOnlyInterceptor interceptor = new GerritHostOnlyInterceptor(new GerritAuthData.Basic(gerritUrl));
         HttpClientContext context = HttpClientContext.create();
